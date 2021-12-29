@@ -55,8 +55,8 @@ class Credito extends Model
     {
         return $this->belongsTo(Sede::class, 'sede_id');
     }
-    public function cuotas()
+    public function fees()
     {
-        return $this->hasMany(Cuota::class, 'credito_id');
+        return $this->hasMany(Fee::class, 'credito_id');
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Cuota;
+use App\Models\Fee;
 use Illuminate\Database\Seeder;
 
 class CuotaSeeder extends Seeder
@@ -14,7 +14,7 @@ class CuotaSeeder extends Seeder
 	 */
 	public function run()
 	{
-		Cuota::factory()
+		Fee::factory()
 			->count(20)
 			->create();
 	}

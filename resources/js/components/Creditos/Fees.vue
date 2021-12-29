@@ -12,7 +12,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="cuotasModalLabel">
-                        Listado de Cuotas
+                        Listado de Fees
                     </h5>
                     <button
                         type="button"
@@ -29,7 +29,7 @@
                             <thead>
                                 <tr>
                                     <th>Fecha de vencimiento</th>
-                                    <th scope="col">Nro. Cuota</th>
+                                    <th scope="col">Nro. Fee</th>
                                     <th scope="col">Valor</th>
                                     <th scope="col">Capital</th>
                                     <th>Interés</th>
@@ -41,7 +41,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    v-for="(c, index) in listadoCuotas"
+                                    v-for="(c, index) in listCuotas"
                                     :key="c.id"
                                 >
                                     <th>{{ c.fecha_pago }}</th>
@@ -98,7 +98,7 @@ export default {
     data() {
         return {
             id_credito: 0,
-            listadoCuotas: []
+            listCuotas: []
         };
     },
     methods: {
@@ -106,15 +106,15 @@ export default {
             this.id_credito = credito_id;
             let me = this;
             axios
-                .get(`api/creditos/${credito_id}/cuotas`)
+                .get(`api/creditos/${credito_id}/fees`)
                 .then(function(response) {
-                    me.listadoCuotas = response.data;
+                    me.listCuotas = response.data;
                 });
         },
 
         pagarCuota(id) {
             let me = this;
-            axios.post(`api/cuota/${id}/pagar-cuota`).then(function(response) {
+            axios.post(`api/fee/${id}/pagar-fee`).then(function(response) {
                 me.listarCuotasCredito(me.id_credito);
             });
         }

@@ -85,7 +85,7 @@
 
                                 <div class="form-group col-md-4">
                                     <label for="cant_cuotas"
-                                        >Cantidad Cuotas</label
+                                        >Cantidad Fees</label
                                     >
                                     <input
                                         type="number"

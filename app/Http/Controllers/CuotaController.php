@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cuota;
+use App\Models\Fee;
 use Illuminate\Http\Request;
 
 class CuotaController extends Controller
@@ -15,7 +15,7 @@ class CuotaController extends Controller
     public function index()
     {
         //
-        $creditos = Cuota::select();
+        $creditos = Fee::select();
     }
 
     /**
@@ -37,25 +37,25 @@ class CuotaController extends Controller
     public function store(Request $request)
     {
         //
-        $cuota = new Cuota();
-        $cuota->credito_id = $request['credito_id'];
-        $cuota->cant_cuota = $request['cant_cuota'];
-        $cuota->valor = $request['valor'];
-        $cuota->fecha_pago = $request['fecha_pago'];
-        $cuota->dias_mora = $request['dias_mora'];
-        $cuota->valor_interes_mora = $request['valor_interes_mora'];
-        $cuota->valor_pago_interes = $request['valor_pago_interes'];
-        $cuota->valor_pago_capital = $request['valor_pago_capital'];
-        $cuota->save();
+        $fee = new Fee();
+        $fee->credito_id = $request['credito_id'];
+        $fee->cant_cuota = $request['cant_cuota'];
+        $fee->valor = $request['valor'];
+        $fee->fecha_pago = $request['fecha_pago'];
+        $fee->dias_mora = $request['dias_mora'];
+        $fee->valor_interes_mora = $request['valor_interes_mora'];
+        $fee->valor_pago_interes = $request['valor_pago_interes'];
+        $fee->valor_pago_capital = $request['valor_pago_capital'];
+        $fee->save();
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Cuota  $cuota
+     * @param  \App\Models\Fee  $fee
      * @return \Illuminate\Http\Response
      */
-    public function show(Cuota $cuota)
+    public function show(Fee $fee)
     {
         //
     }
@@ -63,10 +63,10 @@ class CuotaController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Cuota  $cuota
+     * @param  \App\Models\Fee  $fee
      * @return \Illuminate\Http\Response
      */
-    public function edit(Cuota $cuota)
+    public function edit(Fee $fee)
     {
         //
     }
@@ -75,30 +75,30 @@ class CuotaController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Cuota  $cuota
+     * @param  \App\Models\Fee  $fee
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Cuota $cuota)
+    public function update(Request $request, Fee $fee)
     {
         //
-        $cuota = new Cuota();
-        $cuota->nro_cuota = $request['nro_cuota'];
-        $cuota->valor = $request['valor'];
-        $cuota->fecha_pago = $request['fecha_pago'];
-        $cuota->dias_mora = $request['dias_mora'];
-        $cuota->valor_interes_mora = $request['valor_interes_mora'];
-        $cuota->valor_pago_interes = $request['valor_pago_interes'];
-        $cuota->valor_pago_capital = $request['valor_pago_capital'];
-        $cuota->save();
+        $fee = new Fee();
+        $fee->nro_cuota = $request['nro_cuota'];
+        $fee->valor = $request['valor'];
+        $fee->fecha_pago = $request['fecha_pago'];
+        $fee->dias_mora = $request['dias_mora'];
+        $fee->valor_interes_mora = $request['valor_interes_mora'];
+        $fee->valor_pago_interes = $request['valor_pago_interes'];
+        $fee->valor_pago_capital = $request['valor_pago_capital'];
+        $fee->save();
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Cuota  $cuota
+     * @param  \App\Models\Fee  $fee
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Cuota $cuota)
+    public function destroy(Fee $fee)
     {
         //
     }
@@ -120,11 +120,11 @@ class CuotaController extends Controller
         $fechaActual = date('Y-m-d');
         $mes_actual =  (date("d-m-Y", strtotime($fechaActual . "+ 1 months")));
 
-        $listadoCuotas = [];
+        $listCuotas = [];
         $pagoInteres = [];
         $pagoCapital = [];
         // exit;
-        $cuota =
+        $fee =
             ($valor *
                 ((pow(1 + $valor_pago_interes / 100, $cant_cuota) *
                     $valor_pago_interes) /
@@ -136,32 +136,32 @@ class CuotaController extends Controller
             $fecha_pago[$i] = (date("Y-m-d", strtotime($mes_actual . "+ $i months")));
 
             $pagoInteres[$i] = ($valor * ($valor_pago_interes / 100));
-            $pagoCapital[$i] = $cuota - $pagoInteres[$i];
+            $pagoCapital[$i] = $fee - $pagoInteres[$i];
             $valor = ($valor - $pagoCapital[$i]);
 
             foreach ($pagoCapital as $pc) {
-                $listadoCuotas[$i]['pagoCapital'] = (float) number_format($pc, 2, '.', '');
+                $listCuotas[$i]['pagoCapital'] = (float) number_format($pc, 2, '.', '');
             }
             foreach ($pagoInteres as $key => $pi) {
-                $listadoCuotas[$i]['pagoInteres'] = (float) number_format($pi, 2, '.', '');
+                $listCuotas[$i]['pagoInteres'] = (float) number_format($pi, 2, '.', '');
             }
             foreach ($fecha_pago as $fp) {
-                $listadoCuotas[$i]['fecha_pago'] = (date($fp));
-                $listadoCuotas[$i]['saldo_capital'] = (float) number_format($valor, 2, '.', '');
-                $listadoCuotas[$i]['valor_cuota'] = (float) number_format($cuota, 2, '.', '');
+                $listCuotas[$i]['fecha_pago'] = (date($fp));
+                $listCuotas[$i]['saldo_capital'] = (float) number_format($valor, 2, '.', '');
+                $listCuotas[$i]['valor_cuota'] = (float) number_format($fee, 2, '.', '');
             }
-            $listadoCuotas[$i]['cant_cuota'] = $i + 1;
+            $listCuotas[$i]['cant_cuota'] = $i + 1;
         }
 
-        return ['listadoCuotas' => $listadoCuotas, 'cuota' => (float) number_format($cuota, 2, '.', '')];
+        return ['listCuotas' => $listCuotas, 'fee' => (float) number_format($fee, 2, '.', '')];
     }
 
     public function pagarCuota($id)
     {
-        $cuota = Cuota::findOrFail($id);
-        $cuota->estado = '1';
-        $cuota->fecha_pago = date('Y-m-d');
-        $cuota->save();
+        $fee = Fee::findOrFail($id);
+        $fee->estado = '1';
+        $fee->fecha_pago = date('Y-m-d');
+        $fee->save();
 
         $imprimir_cuota = new ImprimirTicketController;
         $imprimir_cuota = $imprimir_cuota->imprimirCuota($id);

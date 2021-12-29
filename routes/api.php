@@ -44,10 +44,10 @@ Route::post('/sedes/{sede}/cambiar-estado',  [SedeController::class, 'cambiarEst
 
 Route::resource('/creditos', CreditoController::class);
 Route::post('/creditos/{credito}/cambiar-estado',  [CreditoController::class, 'cambiarEstado']);
-Route::get('/creditos/{credito}/cuotas', [CreditoController::class, 'cuotas']);
-Route::get('/cuotas/calcular-cuotas', [CuotaController::class, 'calcularCuotas']);
-Route::post('/cuota/{id}/pagar-cuota', [CuotaController::class, 'pagarCuota']);
+Route::get('/creditos/{credito}/fees', [CreditoController::class, 'fees']);
+Route::get('/fees/calcular-fees', [CuotaController::class, 'calcularCuotas']);
+Route::post('/fee/{id}/pagar-fee', [CuotaController::class, 'pagarCuota']);
 
-Route::get('/imprimir-cuota', [ImprimirTicketController::class, 'imprimirCuota']);
+Route::get('/imprimir-fee', [ImprimirTicketController::class, 'imprimirCuota']);
 
-Route::resource('/cuotas', CuotaController::class);
+Route::resource('/fees', CuotaController::class);

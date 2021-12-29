@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cuota;
+use App\Models\Fee;
 use App\Models\Sede;
 use Illuminate\Http\Request;
 use Exception;
@@ -22,8 +22,8 @@ class ImprimirTicketController extends Controller
         if (!$sede->impresora_pos || $sede->impresora_pos == '') {
             return false;
         }
-        $cuota = Cuota::findOrFail($id);
-        $credito = $cuota->credito;
+        $fee = Fee::findOrFail($id);
+        $credito = $fee->credito;
         $cliente = $credito['cliente'];
 
         // Config de impresora
@@ -69,11 +69,11 @@ class ImprimirTicketController extends Controller
             $printer->text("\n");
             $printer->text(sprintf('%-20s %-20s', 'Crédito', $credito->valor_credito));
             $printer->text("\n");
-            $printer->text(sprintf('%-20s %-20s', 'Nro Operacion', $cuota->id));
+            $printer->text(sprintf('%-20s %-20s', 'Nro Operacion', $fee->id));
             $printer->text("\n");
-            $printer->text(sprintf('%-20s %-20s', 'Fecha Cuota', $cuota->fecha_pago));
+            $printer->text(sprintf('%-20s %-20s', 'Fecha Fee', $fee->fecha_pago));
             $printer->text("\n");
-            $printer->text(sprintf('%-20s %-20s', 'Monto Cancelado', $cuota->valor));
+            $printer->text(sprintf('%-20s %-20s', 'Monto Cancelado', $fee->valor));
             $printer->text("\n");
             $printer->text("\n");
             $printer->setLineSpacing(2);

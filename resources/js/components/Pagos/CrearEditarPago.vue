@@ -51,7 +51,7 @@
                   />
                 </div>
                 <div class="form-group col-md-4">
-                  <label for="nro_cuota">Nro cuota</label>
+                  <label for="nro_cuota">Nro fee</label>
                   <input
                     type="number"
                     class="form-control"

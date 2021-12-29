@@ -15,34 +15,34 @@
                     <table id="lista-tabla" class="table">
                         <thead>
                             <tr>
-                                <th>Nro.Cuota</th>
+                                <th>Nro.Fee</th>
                                 <th>Fecha</th>
-                                <th>Cuota</th>
+                                <th>Fee</th>
                                 <th>Capital</th>
                                 <th>Interés</th>
                                 <th>Saldo Capital</th>
                             </tr>
                         </thead>
-                        <tbody v-if="listadoCuotas.length">
+                        <tbody v-if="listCuotas.length">
                             <tr
-                                v-for="cuota in listadoCuotas"
-                                :key="cuota.nro_cuota"
+                                v-for="fee in listCuotas"
+                                :key="fee.nro_cuota"
                             >
                                 <td>
-                                    No. {{ cuota.nro_cuota }}
+                                    No. {{ fee.nro_cuota }}
                                 </td>
                                 <td>
-                                   $ {{ cuota.fecha_pago }}
+                                   $ {{ fee.fecha_pago }}
                                 </td>
-                                <td>{{ cuota.valor_cuota }}</td>
+                                <td>{{ fee.valor_cuota }}</td>
                                 <td>
-                                   $ {{ cuota.pagoCapital }}
-                                </td>
-                                <td>
-                                    ${{ cuota.pagoInteres }}
+                                   $ {{ fee.pagoCapital }}
                                 </td>
                                 <td>
-                                    $ {{ cuota.saldo_capital }}
+                                    ${{ fee.pagoInteres }}
+                                </td>
+                                <td>
+                                    $ {{ fee.saldo_capital }}
                                 </td>
                             </tr>
                         </tbody>
@@ -73,7 +73,7 @@ export default {
     data() {
         return {
             editar: false,
-            listadoCuotas: [],
+            listCuotas: [],
             formCuotas: {},
             valor_cuota: 0
         };
@@ -81,7 +81,7 @@ export default {
     methods: {
         crearSimulador() {
             let me = this;
-            axios.post("api/cuotas", this.cuotas).then(function() {
+            axios.post("api/fees", this.fees).then(function() {
                 $("#formSimuladorModal").modal("hide");
                 me.resetData();
                 this.$emit("listar-creditos");
@@ -95,7 +95,7 @@ export default {
         },
         editarSimulador() {
             let me = this;
-            axios.put("api/creditos/" + 4, this.cuotas).then(function() {
+            axios.put("api/creditos/" + 4, this.fees).then(function() {
                 $("#formSimuladorModal").modal("hide");
                 me.resetData();
             });
@@ -106,15 +106,15 @@ export default {
         simular: function(id) {
             let me = this;
             axios
-                .post("api/creditos/" + id + "/cuotas", null, me.$root.config)
+                .post("api/creditos/" + id + "/fees", null, me.$root.config)
                 .then(function() {
                     me.listarCreditos(1);
                 });
         },
         resetData() {
             let me = this;
-            Object.keys(this.cuotas).forEach(function(key, index) {
-                me.cuotas[key] = "";
+            Object.keys(this.fees).forEach(function(key, index) {
+                me.fees[key] = "";
             });
         },
         agregar() {
@@ -125,12 +125,12 @@ export default {
             let me = this;
             axios
                 .get(
-                    `api/cuotas/calcular-cuotas?valor_credito=${this.capital}&interes=${this.interes}&cant_cuotas=${this.cant_cuotas}`
+                    `api/fees/calcular-fees?valor_credito=${this.capital}&interes=${this.interes}&cant_cuotas=${this.cant_cuotas}`
                 )
                 .then(
                     response => (
-                        (me.listadoCuotas = response.data.listadoCuotas),
-                        (me.valor_cuota = response.data.cuota)
+                        (me.listCuotas = response.data.listCuotas),
+                        (me.valor_cuota = response.data.fee)
                         
                     )
                 );

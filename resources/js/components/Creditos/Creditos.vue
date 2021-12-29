@@ -36,11 +36,11 @@
                             <th>Nro. Documento</th>
                             <th>Valor crédito</th>
                             <th>Valor Abonado</th>
-                            <th>Nro Cuotas</th>
-                            <th>Cuotas</th>
+                            <th>Nro Fees</th>
+                            <th>Fees</th>
                             <th>Estado</th>
                             <!-- <th>Simular Crédito</th> -->
-                            <th>Cuotas</th>
+                            <th>Fees</th>
                             <th>Opciones</th>
                         </tr>
                     </thead>
@@ -164,20 +164,20 @@
         />
         <!-- <simulador ref="Simulador"></simulador> -->
 
-        <cuotas ref="Cuotas" />
+        <fees ref="Fees" />
     </div>
 </template>
 <script>
 import CrearEditarCredito from "./CrearEditarCredito.vue";
 import Simulador from "./Simulador.vue";
 import CrearEditarCliente from "./../Clientes/CrearEditarCliente.vue";
-import Cuotas from "./Cuotas.vue";
+import Fees from "./Fees.vue";
 
 export default {
-    components: { CrearEditarCredito, Simulador, CrearEditarCliente, Cuotas },
+    components: { CrearEditarCredito, Simulador, CrearEditarCliente, Fees },
 
     props: {
-        cuotas: {
+        fees: {
             type: Object
         }
     },
@@ -216,7 +216,7 @@ export default {
             this.$refs.Simulador.abrirSimulador();
         },
         mostrarCuotas: function(credito) {
-            this.$refs.Cuotas.listarCuotasCredito(credito);
+            this.$refs.Fees.listarCuotasCredito(credito);
         },
         mostrarDatosCliente: function(cliente) {
             this.$refs.CrearEditarCliente.abirEditarCliente(cliente);

@@ -26,7 +26,7 @@
               <th>Tipo Deuda</th>
               <th>Id Deuda</th>
               <th>Valor Pago</th>
-              <th>Nro Cuota</th>
+              <th>Nro Fee</th>
               <th>Valor Interes</th>
               <th>Valor Capital</th>
               <th>Id Tercero</th>

@@ -13,7 +13,7 @@ class CreateCuotasTable extends Migration
      */
     public function up()
     {
-        Schema::create('cuotas', function (Blueprint $table) {
+        Schema::create('fees', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('credito_id');
             $table->integer('nro_cuota');
@@ -41,6 +41,6 @@ class CreateCuotasTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('cuotas');
+        Schema::dropIfExists('fees');
     }
 }

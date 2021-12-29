@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Cuota;
+use App\Models\Fee;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class CuotaFactory extends Factory
@@ -12,7 +12,7 @@ class CuotaFactory extends Factory
    *
    * @var string
    */
-  protected $model = Cuota::class;
+  protected $model = Fee::class;
 
   /**
    * Define the model's default state.

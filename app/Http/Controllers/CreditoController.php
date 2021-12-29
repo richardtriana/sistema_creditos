@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Cliente;
 use App\Models\Sede;
 use App\Models\Credito;
-use App\Models\Cuota;
+use App\Models\Fee;
 use Illuminate\Http\Request;
 
 class CreditoController extends Controller
@@ -64,8 +64,8 @@ class CreditoController extends Controller
     public function store(Request $request)
     {
 
-        $listadoCuotas = new CuotaController();
-        $listadoCuotas = $listadoCuotas->calcularCuotas($request);
+        $listCuotas = new CuotaController();
+        $listCuotas = $listCuotas->calcularCuotas($request);
 
         $credito = new Credito();
         $credito->cliente_id = $request['cliente_id'];
@@ -84,18 +84,18 @@ class CreditoController extends Controller
         $credito->valor_abonado = $request['valor_abonado'];
         $credito->valor_capital = $request['valor_capital'];
         $credito->valor_interes = $request['valor_interes'];
-        $credito->valor_cuota = $listadoCuotas['cuota'];
+        $credito->valor_cuota = $listCuotas['fee'];
         $credito->save();
 
-        foreach ($listadoCuotas['listadoCuotas'] as $nueva_cuota) {
-            $cuota = new Cuota();
-            $cuota->credito_id = $credito->id;
-            $cuota->nro_cuota = $nueva_cuota['cant_cuota'];
-            $cuota->valor = $nueva_cuota['valor_cuota'];
-            $cuota->fecha_pago = $nueva_cuota['fecha_pago'];
-            $cuota->valor_pago_interes = $nueva_cuota['pagoInteres'];
-            $cuota->valor_pago_capital = $nueva_cuota['pagoCapital'];
-            $cuota->save();
+        foreach ($listCuotas['listCuotas'] as $nueva_cuota) {
+            $fee = new Fee();
+            $fee->credito_id = $credito->id;
+            $fee->nro_cuota = $nueva_cuota['cant_cuota'];
+            $fee->valor = $nueva_cuota['valor_cuota'];
+            $fee->fecha_pago = $nueva_cuota['fecha_pago'];
+            $fee->valor_pago_interes = $nueva_cuota['pagoInteres'];
+            $fee->valor_pago_capital = $nueva_cuota['pagoCapital'];
+            $fee->save();
         }
     }
 
@@ -171,10 +171,10 @@ class CreditoController extends Controller
         $cre->save();
     }
 
-    public function cuotas(Request $request, $id)
+    public function fees(Request $request, $id)
     {
         
         $credito = Credito::findOrFail($id);
-        return $credito->cuotas()->get();
+        return $credito->fees()->get();
     }
 }
