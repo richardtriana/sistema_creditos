@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCuotasTable extends Migration
+class CreateFeesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,7 +15,7 @@ class CreateCuotasTable extends Migration
     {
         Schema::create('fees', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('credito_id');
+            $table->unsignedBigInteger('credit_id');
             $table->integer('nro_cuota');
             $table->float('valor', 20, 4);
             $table->date('fecha_pago');
@@ -25,9 +25,9 @@ class CreateCuotasTable extends Migration
             $table->float('valor_pago_capital', 20, 4)->nullable()->default(0);
             $table->tinyText('estado')->default(0);
             $table->date('registro_pago')->nullable();
-            $table->foreign('credito_id')
+            $table->foreign('credit_id')
                 ->references('id')
-                ->on('creditos')
+                ->on('credits')
                 ->onDelete('cascade');
 
             $table->timestamps();

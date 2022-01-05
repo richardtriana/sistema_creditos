@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\Credito;
+use App\Models\Credit;
 use App\Models\Fee;
-use Database\Factories\CuotaFactory;
+use Database\Factories\FeeFactory;
 use Illuminate\Database\Seeder;
 
-class CreditoSeeder extends Seeder
+class CreditSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -16,7 +16,7 @@ class CreditoSeeder extends Seeder
      */
     public function run()
     {
-        Credito::factory()
+        Credit::factory()
         ->has(Fee::factory()->count(3))
         ->count(10)
         ->create();

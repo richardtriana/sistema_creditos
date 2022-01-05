@@ -7,7 +7,7 @@
                         type="button"
                         class="btn btn-primary col-md-3 offset-9 mb-5"
                         id="btnCalcular"
-                        @click="simularCuotas()"
+                        @click="simularFees()"
                     >
                         Calcular
                     </button>
@@ -23,9 +23,9 @@
                                 <th>Saldo Capital</th>
                             </tr>
                         </thead>
-                        <tbody v-if="listCuotas.length">
+                        <tbody v-if="listFees.length">
                             <tr
-                                v-for="fee in listCuotas"
+                                v-for="fee in listFees"
                                 :key="fee.nro_cuota"
                             >
                                 <td>
@@ -73,8 +73,8 @@ export default {
     data() {
         return {
             editar: false,
-            listCuotas: [],
-            formCuotas: {},
+            listFees: [],
+            formFees: {},
             valor_cuota: 0
         };
     },
@@ -84,31 +84,31 @@ export default {
             axios.post("api/fees", this.fees).then(function() {
                 $("#formSimuladorModal").modal("hide");
                 me.resetData();
-                this.$emit("listar-creditos");
+                this.$emit("listar-credits");
             });
         },
-        abrirSimulador(credito) {
+        abrirSimulador(credit) {
             this.editar = true;
             let me = this;
             $("#formSimuladorModal").modal("show");
-            me.formSimulador = credito;
+            me.formSimulador = credit;
         },
         editarSimulador() {
             let me = this;
-            axios.put("api/creditos/" + 4, this.fees).then(function() {
+            axios.put("api/credits/" + 4, this.fees).then(function() {
                 $("#formSimuladorModal").modal("hide");
                 me.resetData();
             });
-            this.$emit("listar-creditos");
+            this.$emit("listar-credits");
 
             this.editar = false;
         },
         simular: function(id) {
             let me = this;
             axios
-                .post("api/creditos/" + id + "/fees", null, me.$root.config)
+                .post("api/credits/" + id + "/fees", null, me.$root.config)
                 .then(function() {
-                    me.listarCreditos(1);
+                    me.listarCredits(1);
                 });
         },
         resetData() {
@@ -118,18 +118,18 @@ export default {
             });
         },
         agregar() {
-            this.formCuotas.push(newCuota);
+            this.formFees.push(newFee);
             console.log(agregar);
         },
-        simularCuotas() {
+        simularFees() {
             let me = this;
             axios
                 .get(
-                    `api/fees/calcular-fees?valor_credito=${this.capital}&interes=${this.interes}&cant_cuotas=${this.cant_cuotas}`
+                    `api/fees/calcular-fees?valor_credit=${this.capital}&interes=${this.interes}&cant_cuotas=${this.cant_cuotas}`
                 )
                 .then(
                     response => (
-                        (me.listCuotas = response.data.listCuotas),
+                        (me.listFees = response.data.listFees),
                         (me.valor_cuota = response.data.fee)
                         
                     )
@@ -137,7 +137,7 @@ export default {
         }
     },
     mounted() {
-        // this.simularCuotas();
+        // this.simularFees();
     }
 };
 </script>

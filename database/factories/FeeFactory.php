@@ -5,7 +5,7 @@ namespace Database\Factories;
 use App\Models\Fee;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class CuotaFactory extends Factory
+class FeeFactory extends Factory
 {
   /**
    * The name of the factory's corresponding model.
@@ -22,7 +22,7 @@ class CuotaFactory extends Factory
   public function definition()
   {
     return [
-      'credito_id' => $this->faker->numberBetween(1, 10),
+      'credit_id' => $this->faker->numberBetween(1, 10),
       'nro_cuota' => $this->faker->numberBetween(1, 10),
       'valor' => $this->faker->randomFloat(4, 10, 60000),
       'fecha_pago' => $this->faker->date('Y-m-d'),

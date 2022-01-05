@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Credito extends Model
+class Credit extends Model
 {
     use HasFactory;
 
-    protected $table = 'creditos';
+    protected $table = 'credits';
 
     protected $fillable = [
         'cliente_id',
@@ -26,7 +26,7 @@ class Credito extends Model
         'porcentaje_interes_mensual',
         'usu_crea',
         'valor_cuota',
-        'valor_credito',
+        'valor_credit',
         'valor_abonado',
         'valor_capital',
         'valor_interes',
@@ -57,6 +57,6 @@ class Credito extends Model
     }
     public function fees()
     {
-        return $this->hasMany(Fee::class, 'credito_id');
+        return $this->hasMany(Fee::class, 'credit_id');
     }
 }

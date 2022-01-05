@@ -138,9 +138,9 @@ class ClienteController extends Controller
 		$c->save();
 	}
 
-	public function creditos(Request $request, $id)
+	public function credits(Request $request, $id)
 	{
 		$cliente = Cliente::find($id);
-		return $cliente->creditos()->get();
+		return $cliente->credits()->get();
 	}
 }

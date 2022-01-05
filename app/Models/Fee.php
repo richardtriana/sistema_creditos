@@ -11,7 +11,7 @@ class Fee extends Model
 
 
   protected $fillable = [
-    'credito_id',
+    'credit_id',
     'nro_cuota',
     'valor',
     'fecha_pago',
@@ -23,8 +23,8 @@ class Fee extends Model
     'estado'
   ];
 
-  public function credito()
+  public function credit()
   {
-    return $this->belongsTo(Credito::class, 'credito_id');
+    return $this->belongsTo(Credit::class, 'credit_id');
   }
 }

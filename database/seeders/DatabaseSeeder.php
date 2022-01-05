@@ -17,10 +17,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call(ClienteSeeder::class);
         $this->call(ProveedorSeeder::class);
-
         $this->call(SedeSeeder::class);
-        $this->call(CreditoSeeder::class);
-
-
+        $this->call(CreditSeeder::class);
     }
 }

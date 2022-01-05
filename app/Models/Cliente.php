@@ -27,8 +27,8 @@ class Cliente extends Model
     'foto', 'activo'
   ];
 
-  public function creditos()
+  public function credits()
   {
-    return $this->hasMany(Credito::class);
+    return $this->hasMany(Credit::class);
   }
 }

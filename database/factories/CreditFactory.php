@@ -2,17 +2,17 @@
 
 namespace Database\Factories;
 
-use App\Models\Credito;
+use App\Models\Credit;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class CreditoFactory extends Factory
+class CreditFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = Credito::class;
+    protected $model = Credit::class;
 
     /**
      * Define the model's default state.
@@ -36,7 +36,7 @@ class CreditoFactory extends Factory
             'interes' => $this->faker->randomNumber(),
             'usu_crea' => $this->faker->numberBetween(1, 3),
             'valor_cuota' => $this->faker->randomNumber(),
-            'valor_credito' => $this->faker->randomNumber(),
+            'valor_credit' => $this->faker->randomNumber(),
             'valor_abonado' => $this->faker->randomNumber(),
             'valor_capital' => $this->faker->randomNumber(),
             'valor_interes' => $this->faker->randomNumber(),

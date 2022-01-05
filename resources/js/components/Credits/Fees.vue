@@ -41,7 +41,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    v-for="(c, index) in listCuotas"
+                                    v-for="(c, index) in listFees"
                                     :key="c.id"
                                 >
                                     <th>{{ c.fecha_pago }}</th>
@@ -65,7 +65,7 @@
                                     </td>
                                     <td>
                                         <button
-                                            @click="pagarCuota(c.id)"
+                                            @click="pagarFee(c.id)"
                                             class="btn btn-success"
                                         >
                                             Pagar
@@ -94,28 +94,28 @@
 </template>
 <script>
 export default {
-    // props: ["credito_id"],
+    // props: ["credit_id"],
     data() {
         return {
-            id_credito: 0,
-            listCuotas: []
+            id_credit: 0,
+            listFees: []
         };
     },
     methods: {
-        listarCuotasCredito(credito_id) {
-            this.id_credito = credito_id;
+        listarFeesCredit(credit_id) {
+            this.id_credit = credit_id;
             let me = this;
             axios
-                .get(`api/creditos/${credito_id}/fees`)
+                .get(`api/credits/${credit_id}/fees`)
                 .then(function(response) {
-                    me.listCuotas = response.data;
+                    me.listFees = response.data;
                 });
         },
 
-        pagarCuota(id) {
+        pagarFee(id) {
             let me = this;
             axios.post(`api/fee/${id}/pagar-fee`).then(function(response) {
-                me.listarCuotasCredito(me.id_credito);
+                me.listarFeesCredit(me.id_credit);
             });
         }
     }

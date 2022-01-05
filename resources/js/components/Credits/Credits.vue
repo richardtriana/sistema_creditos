@@ -1,14 +1,14 @@
 <template>
     <div class="page">
         <div class="page-header d-flex justify-content-between p-4 border my-2">
-            <h3>Creditos</h3>
+            <h3>Credits</h3>
             <button
                 type="button"
                 class="btn btn-primary"
                 data-toggle="modal"
-                data-target="#formCreditoModal"
+                data-target="#formCreditModal"
             >
-                Crear Credito
+                Crear Credit
             </button>
         </div>
         <div class="page-search d-flex justify-content-between p-4 border my-2">
@@ -20,7 +20,7 @@
                     name="buscar_cliente"
                     class="form-control"
                     placeholder="Nombres | Documento"
-                    @keypress="listarCreditos()"
+                    @keypress="listarCredits()"
                     v-model="buscar_cliente"
                 />
             </div>
@@ -47,33 +47,33 @@
                     <!-- <tbody> -->
                     <tbody
                         v-if="
-                            listaCreditos.data && listaCreditos.data.length > 0
+                            listaCredits.data && listaCredits.data.length > 0
                         "
                     >
                         <tr
-                            v-for="credito in listaCreditos.data"
-                            :key="credito.index"
+                            v-for="credit in listaCredits.data"
+                            :key="credit.index"
                         >
-                            <td>{{ credito.id }}</td>
+                            <td>{{ credit.id }}</td>
                             <td>
-                                {{ credito.nombres }} {{ credito.apellidos }}
+                                {{ credit.nombres }} {{ credit.apellidos }}
                             </td>
-                            <td>{{ credito.nro_documento }}</td>
-                            <td>{{ credito.valor_credito }}</td>
-                            <td>{{ credito.valor_abonado }}</td>
-                            <td>{{ credito.cant_cuotas }}</td>
-                            <td>{{ credito.cant_cuotas_pagadas }}</td>
+                            <td>{{ credit.nro_documento }}</td>
+                            <td>{{ credit.valor_credit }}</td>
+                            <td>{{ credit.valor_abonado }}</td>
+                            <td>{{ credit.cant_cuotas }}</td>
+                            <td>{{ credit.cant_cuotas_pagadas }}</td>
 
-                            <td v-if="credito.id_rol == 1">Administrador</td>
-                            <td v-if="credito.id_rol == 2">Operario</td>
-                            <td v-if="credito.estado == 1">Activo</td>
-                            <td v-if="credito.estado == 0">Inactivo</td>
+                            <td v-if="credit.id_rol == 1">Administrador</td>
+                            <td v-if="credit.id_rol == 2">Operario</td>
+                            <td v-if="credit.estado == 1">Activo</td>
+                            <td v-if="credit.estado == 0">Inactivo</td>
                             <!-- 
                             <td class="text-center">
                                 <button
-                                    v-if="credito.estado == 1"
+                                    v-if="credit.estado == 1"
                                     class="btn btn-outline-primary"
-                                    @click="simularCredito()"
+                                    @click="simularCredit()"
                                 >
                                     <i class="bi bi-credit-card-2-back"></i>
                                 </button>
@@ -82,32 +82,32 @@
                                 <button
                                     data-toggle="modal"
                                     data-target="#cuotasModal"
-                                    v-if="credito.estado == 1"
+                                    v-if="credit.estado == 1"
                                     class="btn btn-outline-primary"
-                                    @click="mostrarCuotas(credito.id)"
+                                    @click="mostrarFees(credit.id)"
                                 >
                                     <i class="bi bi-eye"></i>
                                 </button>
                             </td>
                             <td class="text-center">
                                 <button
-                                    v-if="credito.estado == 1"
+                                    v-if="credit.estado == 1"
                                     class="btn btn-outline-primary"
-                                    @click="mostrarDatos(credito)"
+                                    @click="mostrarDatos(credit)"
                                 >
                                     <i class="bi bi-pen"></i>
                                 </button>
                                 <button
-                                    v-if="credito.estado == 1"
+                                    v-if="credit.estado == 1"
                                     class="btn btn-outline-danger"
-                                    @click="CambiarEstado(credito.id)"
+                                    @click="CambiarEstado(credit.id)"
                                 >
                                     <i class="bi bi-trash"></i>
                                 </button>
                                 <button
-                                    v-if="credito.estado == 0"
+                                    v-if="credit.estado == 0"
                                     class="btn btn-outline-success"
-                                    @click="CambiarEstado(credito.id)"
+                                    @click="CambiarEstado(credit.id)"
                                 >
                                     <i class="bi bi-check2-circle"></i>
                                 </button>
@@ -140,9 +140,9 @@
                 </table>
                 <pagination
                     :align="'center'"
-                    :data="listaCreditos"
+                    :data="listaCredits"
                     :limit="2"
-                    @pagination-change-page="listarCreditos"
+                    @pagination-change-page="listarCredits"
                 >
                     <span slot="prev-nav"
                         ><i class="bi bi-chevron-double-left"></i
@@ -156,11 +156,11 @@
 
         <crear-editar-cliente
             ref="CrearEditarCliente"
-            @listar-clientes="listarCreditos(1)"
+            @listar-clientes="listarCredits(1)"
         />
-        <crear-editar-credito
-            ref="CrearEditarCredito"
-            @listar-creditos="listarCreditos(1)"
+        <create-edit-credit
+            ref="CreateEditCredit"
+            @listar-credits="listarCredits(1)"
         />
         <!-- <simulador ref="Simulador"></simulador> -->
 
@@ -168,13 +168,13 @@
     </div>
 </template>
 <script>
-import CrearEditarCredito from "./CrearEditarCredito.vue";
+import CreateEditCredit from "./CreateEditCredit.vue";
 import Simulador from "./Simulador.vue";
 import CrearEditarCliente from "./../Clientes/CrearEditarCliente.vue";
 import Fees from "./Fees.vue";
 
 export default {
-    components: { CrearEditarCredito, Simulador, CrearEditarCliente, Fees },
+    components: { CreateEditCredit, Simulador, CrearEditarCliente, Fees },
 
     props: {
         fees: {
@@ -184,21 +184,21 @@ export default {
     data() {
         return {
             buscar_cliente: "",
-            listaCreditos: {},
+            listaCredits: {},
             listaClientes: {}
         };
     },
     created() {
-        this.listarCreditos(1);
+        this.listarCredits(1);
     },
     methods: {
-        listarCreditos(page = 1) {
+        listarCredits(page = 1) {
             let me = this;
             axios
-                .get(`api/creditos?page=${page}&credito=${this.buscar_cliente}`)
+                .get(`api/credits?page=${page}&credit=${this.buscar_cliente}`)
                 .then(function(response) {
                     console.log(response);
-                    me.listaCreditos = response.data;
+                    me.listaCredits = response.data;
                 });
         },
         listarClientes(page = 1) {
@@ -209,14 +209,14 @@ export default {
                     me.listaClientes = response.data;
                 });
         },
-        mostrarDatos: function(credito) {
-            this.$refs.CrearEditarCredito.abirEditarCredito(credito);
+        mostrarDatos: function(credit) {
+            this.$refs.CreateEditCredit.abirEditarCredit(credit);
         },
-        simularCredito: function() {
+        simularCredit: function() {
             this.$refs.Simulador.abrirSimulador();
         },
-        mostrarCuotas: function(credito) {
-            this.$refs.Fees.listarCuotasCredito(credito);
+        mostrarFees: function(credit) {
+            this.$refs.Fees.listarFeesCredit(credit);
         },
         mostrarDatosCliente: function(cliente) {
             this.$refs.CrearEditarCliente.abirEditarCliente(cliente);
@@ -225,7 +225,7 @@ export default {
             let me = this;
 
             Swal.fire({
-                title: "¿Quieres cambiar el estado del credito?",
+                title: "¿Quieres cambiar el estado del credit?",
                 showDenyButton: true,
                 denyButtonText: `Cancelar`,
                 confirmButtonText: `Guardar`
@@ -233,12 +233,12 @@ export default {
                 if (result.isConfirmed) {
                     axios
                         .post(
-                            "api/creditos/" + id + "/cambiar-estado",
+                            "api/credits/" + id + "/cambiar-estado",
                             null,
                             me.$root.config
                         )
                         .then(function() {
-                            me.listarCreditos(1);
+                            me.listarCredits(1);
                         });
                     Swal.fire("Cambios realizados!", "", "success");
                 } else if (result.isDenied) {

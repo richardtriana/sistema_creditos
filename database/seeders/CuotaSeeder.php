@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use App\Models\Fee;
 use Illuminate\Database\Seeder;
 
-class CuotaSeeder extends Seeder
+class FeeSeeder extends Seeder
 {
 	/**
 	 * Run the database seeds.

@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import Simulador from "../Creditos/Simulador.vue";
+import Simulador from "../Credits/Simulador.vue";
 export default {
     components: { Simulador },
     data() {
@@ -65,7 +65,7 @@ export default {
         };
     },
     methods: {
-        simularCredito: function() {
+        simularCredit: function() {
             this.$refs.Simulador.abrirSimulador();
         }
     },

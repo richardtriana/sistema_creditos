@@ -14,7 +14,7 @@ use Mike42\Escpos\Printer;
 
 class ImprimirTicketController extends Controller
 {
-    public function imprimirCuota($id)
+    public function imprimirFee($id)
     {
         // Orden
         $sede = Sede::first();
@@ -23,8 +23,8 @@ class ImprimirTicketController extends Controller
             return false;
         }
         $fee = Fee::findOrFail($id);
-        $credito = $fee->credito;
-        $cliente = $credito['cliente'];
+        $credit = $fee->credit;
+        $cliente = $credit['cliente'];
 
         // Config de impresora
         $connector = new WindowsPrintConnector($sede->impresora_pos);
@@ -67,7 +67,7 @@ class ImprimirTicketController extends Controller
             $printer->text("\n");
             $printer->text(sprintf('%-20s %-20s', 'Fecha', date('Y-m-d h:i:s A')));
             $printer->text("\n");
-            $printer->text(sprintf('%-20s %-20s', 'Crédito', $credito->valor_credito));
+            $printer->text(sprintf('%-20s %-20s', 'Crédito', $credit->valor_credit));
             $printer->text("\n");
             $printer->text(sprintf('%-20s %-20s', 'Nro Operacion', $fee->id));
             $printer->text("\n");

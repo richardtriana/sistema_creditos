@@ -2,16 +2,16 @@
     <div>
         <div
             class="modal fade"
-            id="formCreditoModal"
+            id="formCreditModal"
             tabindex="-1"
-            aria-labelledby="formCreditoModalLabel"
+            aria-labelledby="formCreditModalLabel"
             aria-hidden="true"
         >
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="formCreditoModalLabel">
-                            Creditos
+                        <h5 class="modal-title" id="formCreditModalLabel">
+                            Credits
                         </h5>
                         <button
                             type="button"
@@ -33,7 +33,7 @@
                                         label="nro_documento"
                                         aria-logname="{}"
                                         :reduce="nombres => nombres.id"
-                                        v-model="formCredito.cliente_id"
+                                        v-model="formCredit.cliente_id"
                                         placeholder="Buscar por Documento"
                                     >
                                     </v-select>
@@ -45,7 +45,7 @@
                                         type="number"
                                         class="form-control"
                                         id="deudor"
-                                        v-model="formCredito.deudor"
+                                        v-model="formCredit.deudor"
                                     />
                                 </div>
 
@@ -56,20 +56,20 @@
                                         label="sede"
                                         aria-logname="{}"
                                         :reduce="sede => sede.id"
-                                        v-model="formCredito.sede_id"
+                                        v-model="formCredit.sede_id"
                                     >
                                     </v-select>
                                 </div>
                                 <div class="form-group col-md-4">
-                                    <label for="valor_credito"
-                                        >Valor Credito</label
+                                    <label for="valor_credit"
+                                        >Valor Credit</label
                                     >
                                     <input
                                         type="number"
                                         class="form-control"
-                                        id="valor_credito"
+                                        id="valor_credit"
                                         step="any"
-                                        v-model="formCredito.valor_credito"
+                                        v-model="formCredit.valor_credit"
                                     />
                                 </div>
                                 <div class="form-group col-md-4">
@@ -78,7 +78,7 @@
                                         type="number"
                                         class="form-control"
                                         id="interes"
-                                        v-model="formCredito.interes"
+                                        v-model="formCredit.interes"
                                         step="any"
                                     />
                                 </div>
@@ -91,14 +91,14 @@
                                         type="number"
                                         class="form-control"
                                         id="cant_cuotas"
-                                        v-model="formCredito.cant_cuotas"
+                                        v-model="formCredit.cant_cuotas"
                                     />
                                 </div>
                             </div>
                             <simulador
-                                :capital="formCredito.valor_credito"
-                                :interes="formCredito.interes"
-                                :cant_cuotas="formCredito.cant_cuotas"
+                                :capital="formCredit.valor_credit"
+                                :interes="formCredit.interes"
+                                :cant_cuotas="formCredit.cant_cuotas"
                                 ref="Simulador"
                             ></simulador>
                             <button
@@ -113,7 +113,7 @@
                                 type="button"
                                 class="btn btn-primary rounded"
                                 @click="
-                                    editar ? editarCredito() : crearCredito()
+                                    editar ? editarCredit() : crearCredit()
                                 "
                             >
                                 Guardar
@@ -136,7 +136,7 @@ export default {
             editar: false,
             listaSedes: [],
             listaClientes: [],
-            formCredito: {
+            formCredit: {
                 cliente_id: "",
                 deudor_id: 2,
                 sede_id: "",
@@ -151,7 +151,7 @@ export default {
                 porcentaje_interes_anual: "",
                 usu_crea: 2,
                 calor_cuota: "",
-                valor_credito: "",
+                valor_credit: "",
                 valor_abonado: "",
                 valor_capital: "",
                 valor_interes: ""
@@ -162,7 +162,7 @@ export default {
         this.listarSedes(1);
         this.listarClientes(1);
     },
-    // Function crearCreditos
+    // Function crearCredits
     methods: {
         listarSedes(page = 1) {
             let me = this;
@@ -177,36 +177,36 @@ export default {
                 me.listaClientes = response.data;
             });
         },
-        crearCredito() {
+        crearCredit() {
             let me = this;
-            axios.post("api/creditos", this.formCredito).then(function() {
-                $("#formCreditoModal").modal("hide");
+            axios.post("api/credits", this.formCredit).then(function() {
+                $("#formCreditModal").modal("hide");
                 me.resetData();
-                this.$emit("listar-creditos");
+                this.$emit("listar-credits");
             });
         },
-        abirEditarCredito(credito) {
+        abirEditarCredit(credit) {
             this.editar = true;
             let me = this;
-            $("#formCreditoModal").modal("show");
-            me.formCredito = credito;
+            $("#formCreditModal").modal("show");
+            me.formCredit = credit;
         },
-        editarCredito() {
+        editarCredit() {
             let me = this;
             axios
-                .put("api/creditos/" + this.formCredito.id, this.formCredito)
+                .put("api/credits/" + this.formCredit.id, this.formCredit)
                 .then(function() {
-                    $("#formCreditoModal").modal("hide");
+                    $("#formCreditModal").modal("hide");
                     me.resetData();
                 });
-            this.$emit("listar-creditos");
+            this.$emit("listar-credits");
 
             this.editar = false;
         },
         resetData() {
             let me = this;
-            Object.keys(this.formCredito).forEach(function(key, index) {
-                me.formCredito[key] = "";
+            Object.keys(this.formCredit).forEach(function(key, index) {
+                me.formCredit[key] = "";
             });
         }
     }

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Fee;
 use Illuminate\Http\Request;
 
-class CuotaController extends Controller
+class FeeController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,7 +15,7 @@ class CuotaController extends Controller
     public function index()
     {
         //
-        $creditos = Fee::select();
+        $credits = Fee::select();
     }
 
     /**
@@ -38,7 +38,7 @@ class CuotaController extends Controller
     {
         //
         $fee = new Fee();
-        $fee->credito_id = $request['credito_id'];
+        $fee->credit_id = $request['credit_id'];
         $fee->cant_cuota = $request['cant_cuota'];
         $fee->valor = $request['valor'];
         $fee->fecha_pago = $request['fecha_pago'];
@@ -103,9 +103,9 @@ class CuotaController extends Controller
         //
     }
 
-    public function calcularCuotas(Request $request)
+    public function calcularFees(Request $request)
     {
-        $capital = $request->valor_credito;
+        $capital = $request->valor_credit;
         $interes = $request->interes;
         $cant_cuotas = $request->cant_cuotas;
 
@@ -120,7 +120,7 @@ class CuotaController extends Controller
         $fechaActual = date('Y-m-d');
         $mes_actual =  (date("d-m-Y", strtotime($fechaActual . "+ 1 months")));
 
-        $listCuotas = [];
+        $listFees = [];
         $pagoInteres = [];
         $pagoCapital = [];
         // exit;
@@ -140,23 +140,23 @@ class CuotaController extends Controller
             $valor = ($valor - $pagoCapital[$i]);
 
             foreach ($pagoCapital as $pc) {
-                $listCuotas[$i]['pagoCapital'] = (float) number_format($pc, 2, '.', '');
+                $listFees[$i]['pagoCapital'] = (float) number_format($pc, 2, '.', '');
             }
             foreach ($pagoInteres as $key => $pi) {
-                $listCuotas[$i]['pagoInteres'] = (float) number_format($pi, 2, '.', '');
+                $listFees[$i]['pagoInteres'] = (float) number_format($pi, 2, '.', '');
             }
             foreach ($fecha_pago as $fp) {
-                $listCuotas[$i]['fecha_pago'] = (date($fp));
-                $listCuotas[$i]['saldo_capital'] = (float) number_format($valor, 2, '.', '');
-                $listCuotas[$i]['valor_cuota'] = (float) number_format($fee, 2, '.', '');
+                $listFees[$i]['fecha_pago'] = (date($fp));
+                $listFees[$i]['saldo_capital'] = (float) number_format($valor, 2, '.', '');
+                $listFees[$i]['valor_cuota'] = (float) number_format($fee, 2, '.', '');
             }
-            $listCuotas[$i]['cant_cuota'] = $i + 1;
+            $listFees[$i]['cant_cuota'] = $i + 1;
         }
 
-        return ['listCuotas' => $listCuotas, 'fee' => (float) number_format($fee, 2, '.', '')];
+        return ['listFees' => $listFees, 'fee' => (float) number_format($fee, 2, '.', '')];
     }
 
-    public function pagarCuota($id)
+    public function pagarFee($id)
     {
         $fee = Fee::findOrFail($id);
         $fee->estado = '1';
@@ -164,6 +164,6 @@ class CuotaController extends Controller
         $fee->save();
 
         $imprimir_cuota = new ImprimirTicketController;
-        $imprimir_cuota = $imprimir_cuota->imprimirCuota($id);
+        $imprimir_cuota = $imprimir_cuota->imprimirFee($id);
     }
 }

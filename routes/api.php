@@ -3,9 +3,9 @@
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\ProveedorController;
-use App\Http\Controllers\CreditoController;
+use App\Http\Controllers\CreditController;
 use App\Http\Controllers\SedeController;
-use App\Http\Controllers\CuotaController;
+use App\Http\Controllers\FeeController;
 use App\Http\Controllers\ImprimirTicketController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -28,7 +28,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::resource('/clientes',  ClienteController::class);
 Route::post('/clientes/{cliente}/cambiar-estado',  [ClienteController::class, 'cambiarEstado']);
-Route::get('/clientes/{cliente}/creditos', [ClienteController::class, 'creditos']);
+Route::get('/clientes/{cliente}/credits', [ClienteController::class, 'credits']);
 
 
 Route::resource('/proveedores',  ProveedorController::class);
@@ -42,12 +42,12 @@ Route::post('/usuarios/{usuario}/cambiar-estado',  [UsuarioController::class, 'c
 Route::resource('/sedes',  SedeController::class);
 Route::post('/sedes/{sede}/cambiar-estado',  [SedeController::class, 'cambiarEstado']);
 
-Route::resource('/creditos', CreditoController::class);
-Route::post('/creditos/{credito}/cambiar-estado',  [CreditoController::class, 'cambiarEstado']);
-Route::get('/creditos/{credito}/fees', [CreditoController::class, 'fees']);
-Route::get('/fees/calcular-fees', [CuotaController::class, 'calcularCuotas']);
-Route::post('/fee/{id}/pagar-fee', [CuotaController::class, 'pagarCuota']);
+Route::resource('/credits', CreditController::class);
+Route::post('/credits/{credit}/cambiar-estado',  [CreditController::class, 'cambiarEstado']);
+Route::get('/credits/{credit}/fees', [CreditController::class, 'fees']);
+Route::get('/fees/calcular-fees', [FeeController::class, 'calcularFees']);
+Route::post('/fee/{id}/pagar-fee', [FeeController::class, 'pagarFee']);
 
-Route::get('/imprimir-fee', [ImprimirTicketController::class, 'imprimirCuota']);
+Route::get('/imprimir-fee', [ImprimirTicketController::class, 'imprimirFee']);
 
-Route::resource('/fees', CuotaController::class);
+Route::resource('/fees', FeeController::class);

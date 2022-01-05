@@ -40,8 +40,8 @@ const routes = [
     { path: '/usuarios', component: require('./components/Usuarios/Usuarios.vue').default },
     { path: '/proveedores', component: require('./components/Proveedores/Proveedores.vue').default },
     { path: '/pagos', component: require('./components/Pagos/Pagos.vue').default },
-    { path: '/creditos', component: require('./components/Creditos/Creditos.vue').default },
-    { path: '/creditos/:credito_id/fees', component: require('./components/Creditos/Fees.vue').default, props: true, name: 'fees' },
+    { path: '/credits', component: require('./components/Credits/Credits.vue').default },
+    { path: '/credits/:credit_id/fees', component: require('./components/Credits/Fees.vue').default, props: true, name: 'fees' },
     { path: '/sedes', component: require('./components/Sedes/Sedes.vue').default },
 
 
