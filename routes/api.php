@@ -6,7 +6,7 @@ use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\CreditController;
 use App\Http\Controllers\SedeController;
 use App\Http\Controllers\FeeController;
-use App\Http\Controllers\ImprimirTicketController;
+use App\Http\Controllers\PrintTicketController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -42,12 +42,13 @@ Route::post('/usuarios/{usuario}/cambiar-estado',  [UsuarioController::class, 'c
 Route::resource('/sedes',  SedeController::class);
 Route::post('/sedes/{sede}/cambiar-estado',  [SedeController::class, 'cambiarEstado']);
 
+Route::get('/credits/amortization-table', [FeeController::class, 'printTable']);
 Route::resource('/credits', CreditController::class);
 Route::post('/credits/{credit}/cambiar-estado',  [CreditController::class, 'cambiarEstado']);
 Route::get('/credits/{credit}/fees', [CreditController::class, 'fees']);
 Route::get('/fees/calcular-fees', [FeeController::class, 'calcularFees']);
-Route::post('/fee/{id}/pagar-fee', [FeeController::class, 'pagarFee']);
+Route::post('/fee/{id}/pay-fee', [FeeController::class, 'payFee']);
 
-Route::get('/imprimir-fee', [ImprimirTicketController::class, 'imprimirFee']);
+Route::get('/print-fee', [PrintTicketController::class, 'printFee']);
 
 Route::resource('/fees', FeeController::class);

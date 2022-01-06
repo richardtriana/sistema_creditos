@@ -43,20 +43,20 @@
                 </div>
             </div>
 
-            <simulador
+            <simulator
                 :capital="capital"
                 :interes="interes"
                 :cant_cuotas="cant_cuotas"
-                ref="Simulador"
-            ></simulador>
+                ref="Simulator"
+            ></simulator>
         </div>
     </div>
 </template>
 
 <script>
-import Simulador from "../Credits/Simulador.vue";
+import Simulator from "../credits/Simulator.vue";
 export default {
-    components: { Simulador },
+    components: { Simulator },
     data() {
         return {
             interes: 3,
@@ -66,7 +66,7 @@ export default {
     },
     methods: {
         simularCredit: function() {
-            this.$refs.Simulador.abrirSimulador();
+            this.$refs.Simulator.abrirSimulator();
         }
     },
     mounted() {

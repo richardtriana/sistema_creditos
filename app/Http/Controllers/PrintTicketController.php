@@ -12,9 +12,9 @@ use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 use Mike42\Escpos\Printer;
 
 
-class ImprimirTicketController extends Controller
+class PrintTicketController extends Controller
 {
-    public function imprimirFee($id)
+    public function printFee($id)
     {
         // Orden
         $sede = Sede::first();

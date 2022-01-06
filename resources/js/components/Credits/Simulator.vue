@@ -54,7 +54,7 @@
             <!-- <button
                 type="button"
                 class="btn btn-primary rounded"
-                @click="editar = crearSimulador()"
+                @click="editar = crearSimulator()"
             >
                 Guardar
             </button> -->
@@ -79,24 +79,24 @@ export default {
         };
     },
     methods: {
-        crearSimulador() {
+        crearSimulator() {
             let me = this;
             axios.post("api/fees", this.fees).then(function() {
-                $("#formSimuladorModal").modal("hide");
+                $("#formSimulatorModal").modal("hide");
                 me.resetData();
                 this.$emit("listar-credits");
             });
         },
-        abrirSimulador(credit) {
+        abrirSimulator(credit) {
             this.editar = true;
             let me = this;
-            $("#formSimuladorModal").modal("show");
-            me.formSimulador = credit;
+            $("#formSimulatorModal").modal("show");
+            me.formSimulator = credit;
         },
-        editarSimulador() {
+        editarSimulator() {
             let me = this;
             axios.put("api/credits/" + 4, this.fees).then(function() {
-                $("#formSimuladorModal").modal("hide");
+                $("#formSimulatorModal").modal("hide");
                 me.resetData();
             });
             this.$emit("listar-credits");

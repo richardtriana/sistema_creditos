@@ -36,48 +36,31 @@
                             <th>Nro. Documento</th>
                             <th>Valor crédito</th>
                             <th>Valor Abonado</th>
-                            <th>Nro Fees</th>
-                            <th>Fees</th>
+                            <th>Nro Cuotas</th>
+                            <th>Cuotas</th>
                             <th>Estado</th>
-                            <!-- <th>Simular Crédito</th> -->
-                            <th>Fees</th>
+                            <th>Ver Cuotas</th>
+                            <th>Tabla de <br> amortización</th>
                             <th>Opciones</th>
                         </tr>
                     </thead>
                     <!-- <tbody> -->
-                    <tbody
-                        v-if="
-                            listaCredits.data && listaCredits.data.length > 0
-                        "
-                    >
+                    <tbody v-if="creditList.data && creditList.data.length > 0">
                         <tr
-                            v-for="credit in listaCredits.data"
+                            v-for="credit in creditList.data"
                             :key="credit.index"
                         >
                             <td>{{ credit.id }}</td>
-                            <td>
-                                {{ credit.nombres }} {{ credit.apellidos }}
-                            </td>
+                            <td>{{ credit.nombres }} {{ credit.apellidos }}</td>
                             <td>{{ credit.nro_documento }}</td>
                             <td>{{ credit.valor_credit }}</td>
                             <td>{{ credit.valor_abonado }}</td>
                             <td>{{ credit.cant_cuotas }}</td>
                             <td>{{ credit.cant_cuotas_pagadas }}</td>
-
-                            <td v-if="credit.id_rol == 1">Administrador</td>
-                            <td v-if="credit.id_rol == 2">Operario</td>
-                            <td v-if="credit.estado == 1">Activo</td>
-                            <td v-if="credit.estado == 0">Inactivo</td>
-                            <!-- 
-                            <td class="text-center">
-                                <button
-                                    v-if="credit.estado == 1"
-                                    class="btn btn-outline-primary"
-                                    @click="simularCredit()"
-                                >
-                                    <i class="bi bi-credit-card-2-back"></i>
-                                </button>
-                            </td> -->
+                            <td>
+                                <span v-if="credit.estado == 1">Activo</span>
+                                <span v-if="credit.estado == 0">Inactivo</span>
+                            </td>
                             <td class="text-center">
                                 <button
                                     data-toggle="modal"
@@ -88,8 +71,21 @@
                                 >
                                     <i class="bi bi-eye"></i>
                                 </button>
+
+                                <button
+                                    v-else
+                                    class="btn disabled btn-outline-secondary"
+                                    disabled
+                                >
+                                    <i class="bi bi-eye-slash"></i>
+                                </button>
                             </td>
-                            <td class="text-center">
+                            <td>
+                                <button class="btn btn-outline-primary">
+                                    <i class="bi bi-file-pdf"></i>
+                                </button>
+                            </td>
+                            <td class="text-left">
                                 <button
                                     v-if="credit.estado == 1"
                                     class="btn btn-outline-primary"
@@ -97,6 +93,14 @@
                                 >
                                     <i class="bi bi-pen"></i>
                                 </button>
+                                <button
+                                    v-else
+                                    class="btn btn-outline-secondary"
+                                    disabled
+                                >
+                                    <i class="bi bi-pen"></i>
+                                </button>
+
                                 <button
                                     v-if="credit.estado == 1"
                                     class="btn btn-outline-danger"
@@ -119,8 +123,8 @@
                             class="alert alert-danger"
                             style="margin: 2px auto; width: 30%"
                         >
-                            Si no encuentras el usuario deseado. Podrías
-                            crearlo.
+                            <p>No se encontraron resultados.</p>
+                            <p>Crear usuario.</p>
                         </div>
                         <div
                             class="alert alert-info"
@@ -140,7 +144,7 @@
                 </table>
                 <pagination
                     :align="'center'"
-                    :data="listaCredits"
+                    :data="creditList"
                     :limit="2"
                     @pagination-change-page="listarCredits"
                 >
@@ -162,19 +166,18 @@
             ref="CreateEditCredit"
             @listar-credits="listarCredits(1)"
         />
-        <!-- <simulador ref="Simulador"></simulador> -->
 
         <fees ref="Fees" />
     </div>
 </template>
 <script>
 import CreateEditCredit from "./CreateEditCredit.vue";
-import Simulador from "./Simulador.vue";
+import Simulator from "./Simulator.vue";
 import CrearEditarCliente from "./../Clientes/CrearEditarCliente.vue";
 import Fees from "./Fees.vue";
 
 export default {
-    components: { CreateEditCredit, Simulador, CrearEditarCliente, Fees },
+    components: { CreateEditCredit, Simulator, CrearEditarCliente, Fees },
 
     props: {
         fees: {
@@ -184,7 +187,7 @@ export default {
     data() {
         return {
             buscar_cliente: "",
-            listaCredits: {},
+            creditList: {},
             listaClientes: {}
         };
     },
@@ -198,7 +201,7 @@ export default {
                 .get(`api/credits?page=${page}&credit=${this.buscar_cliente}`)
                 .then(function(response) {
                     console.log(response);
-                    me.listaCredits = response.data;
+                    me.creditList = response.data;
                 });
         },
         listarClientes(page = 1) {
@@ -213,7 +216,7 @@ export default {
             this.$refs.CreateEditCredit.abirEditarCredit(credit);
         },
         simularCredit: function() {
-            this.$refs.Simulador.abrirSimulador();
+            this.$refs.Simulator.abrirSimulator();
         },
         mostrarFees: function(credit) {
             this.$refs.Fees.listarFeesCredit(credit);

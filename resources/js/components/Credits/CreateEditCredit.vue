@@ -95,12 +95,12 @@
                                     />
                                 </div>
                             </div>
-                            <simulador
+                            <simulator
                                 :capital="formCredit.valor_credit"
                                 :interes="formCredit.interes"
                                 :cant_cuotas="formCredit.cant_cuotas"
-                                ref="Simulador"
-                            ></simulador>
+                                ref="Simulator"
+                            ></simulator>
                             <button
                                 type="button"
                                 class="btn btn-secondary"
@@ -128,9 +128,9 @@
 </template>
 
 <script>
-import Simulador from "./Simulador.vue";
+import Simulator from "./Simulator.vue";
 export default {
-    components: { Simulador },
+    components: { Simulator },
     data() {
         return {
             editar: false,
