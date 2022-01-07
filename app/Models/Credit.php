@@ -12,7 +12,7 @@ class Credit extends Model
     protected $table = 'credits';
 
     protected $fillable = [
-        'cliente_id',
+        'client_id',
         'deudor_id',
         'sede_id',
         'cant_cuotas',
@@ -33,17 +33,17 @@ class Credit extends Model
     ];
  
     protected $with = [
-        'cliente'
+        'client'
     ];
 
-    public function cliente()
+    public function client()
     {
-        return $this->belongsTo(Cliente::class, 'cliente_id');
+        return $this->belongsTo(Client::class, 'client_id');
     }
 
     public function deudor()
     {
-        return $this->belongsTo(Cliente::class, 'deudor_id');
+        return $this->belongsTo(Client::class, 'deudor_id');
     }
 
     public function asesor()

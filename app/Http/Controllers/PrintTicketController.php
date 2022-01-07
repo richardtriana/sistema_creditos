@@ -24,7 +24,7 @@ class PrintTicketController extends Controller
         }
         $fee = Fee::findOrFail($id);
         $credit = $fee->credit;
-        $cliente = $credit['cliente'];
+        $client = $credit['client'];
 
         // Config de impresora
         $connector = new WindowsPrintConnector($sede->impresora_pos);
@@ -63,7 +63,7 @@ class PrintTicketController extends Controller
             // $printer->text($system_user->name . "\n");
             $printer->setEmphasis(false);
 
-            $printer->text(sprintf('%-20s %-20s', 'Cliente', $cliente->nombres . ' ' . $cliente->apellidos));
+            $printer->text(sprintf('%-20s %-20s', 'Client', $client->nombres . ' ' . $client->apellidos));
             $printer->text("\n");
             $printer->text(sprintf('%-20s %-20s', 'Fecha', date('Y-m-d h:i:s A')));
             $printer->text("\n");

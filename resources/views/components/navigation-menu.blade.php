@@ -13,7 +13,7 @@
             <!-- Left Side Of Navbar -->
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
-                    <router-link class="nav-link text-white" to="/clientes"> Clientes </router-link>
+                    <router-link class="nav-link text-white" to="/clients"> Clients </router-link>
                 </li>
                 <li class="nav-item">
                     <router-link class="nav-link text-white" to="/usuarios"> Usuarios </router-link>

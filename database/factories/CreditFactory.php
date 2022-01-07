@@ -22,7 +22,7 @@ class CreditFactory extends Factory
     public function definition()
     {
         return [
-            'cliente_id' => $this->faker->numberBetween(1, 10),
+            'client_id' => $this->faker->numberBetween(1, 10),
             'deudor_id' => $this->faker->numberBetween(1, 10),
             'sede_id' => $this->faker->numberBetween(1, 3),
             'cant_cuotas' => $this->faker->randomNumber(),

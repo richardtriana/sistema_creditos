@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cliente;
+use App\Models\Client;
 use App\Models\Sede;
 use App\Models\Credit;
 use App\Models\Fee;
@@ -18,18 +18,18 @@ class CreditController extends Controller
     public function index(Request $request)
     {
         $credits = Credit::select();
-        $clientes = Cliente::select();
+        $clients = Client::select();
         $sedes = Sede::select();
 
         if ($request->credit && ($request->credit != '')) {
-            $credits  =     $credits->leftjoin('clientes as c', 'c.id', 'credits.cliente_id')
+            $credits  =     $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
                 ->where('nro_documento', 'LIKE', "%$request->credit%")
                 ->orWhere('nombres', 'LIKE', "%$request->credit%")
                 ->orWhere('email', 'LIKE', "%$request->credit%")
                 ->orWhere('apellidos', 'LIKE', "%$request->credit%")
                 ->select('credits.*', 'credits.id as id', 'c.nombres', 'c.apellidos', 'c.nro_documento');
         } else {
-            $credits  =     $credits->leftjoin('clientes as c', 'c.id', 'credits.cliente_id')
+            $credits  =     $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
                 ->where('nro_documento', 'LIKE', "%$request->credit%")
                 ->orWhere('nombres', 'LIKE', "%$request->credit%")
                 ->orWhere('email', 'LIKE', "%$request->credit%")
@@ -68,7 +68,7 @@ class CreditController extends Controller
         $listFees = $listFees->calcularFees($request);
 
         $credit = new Credit();
-        $credit->cliente_id = $request['cliente_id'];
+        $credit->client_id = $request['client_id'];
         $credit->deudor = $request['deudor'];
         $credit->deudor_id = $request['deudor_id'];
         $credit->sede_id = $request['sede_id'];
@@ -131,7 +131,7 @@ class CreditController extends Controller
     public function update(Request $request, Credit $credit)
     {
         $credit = Credit::find($request->id);
-        $credit->cliente_id = $request['cliente_id'];
+        $credit->client_id = $request['client_id'];
         $credit->deudor_id = $request['deudor_id'];
         $credit->deudor = $request['deudor'];
         $credit->sede_id = $request['sede_id'];

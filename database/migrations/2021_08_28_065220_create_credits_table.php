@@ -15,7 +15,7 @@ class CreateCreditsTable extends Migration
     {
         Schema::create('credits', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('cliente_id');
+            $table->unsignedBigInteger('client_id');
             $table->unsignedBigInteger('deudor_id');
             $table->unsignedBigInteger('sede_id');
             $table->unsignedBigInteger('usu_crea');
@@ -33,14 +33,14 @@ class CreateCreditsTable extends Migration
             $table->float('valor_capital', 20, 4)->nullable()->default(0);
             $table->float('valor_interes', 20, 4)->nullable()->default(0);
 
-            $table->foreign('cliente_id')
+            $table->foreign('client_id')
                 ->references('id')
-                ->on('clientes')
+                ->on('clients')
                 ->onDelete('cascade');
 
             $table->foreign('deudor_id')
                 ->references('id')
-                ->on('clientes')
+                ->on('clients')
                 ->onDelete('cascade');
 
             $table->foreign('sede_id')

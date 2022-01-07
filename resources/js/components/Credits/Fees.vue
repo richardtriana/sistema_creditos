@@ -126,10 +126,10 @@ export default {
 				.then(response => {
 					console.log(response);
 
-					const pdf = response.data;
+					const pdf = response.data.pdf;
 					var a = document.createElement("a");
 					a.href = "data:application/pdf;base64," + pdf;
-					a.download = `Order-5.pdf`;
+					a.download = `credit_${this.id_credit}.pdf`;
 					a.click();
 				});
 		}

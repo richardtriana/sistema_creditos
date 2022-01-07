@@ -184,11 +184,11 @@ export default {
         me.$emit("listar-usuarios");
       });
     },
-    abirEditarUsuario(cliente) {
+    abirEditarUsuario(client) {
       this.editar = true;
       let me = this;
       $("#formUsuarioModal").modal("show");
-      me.formUsuario = cliente;
+      me.formUsuario = client;
     },
     editarUsuario() {
       let me = this;

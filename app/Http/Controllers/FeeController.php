@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Credit;
 use App\Models\Fee;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 use PDF;
 
 class FeeController extends Controller
@@ -170,10 +171,26 @@ class FeeController extends Controller
   {
     $credit_id = $request->credit_id;
 
-    $credit = Credit::find($credit_id)->get();
+    $credit = Credit::find($credit_id)->first();
+    $client = $credit->client()->get();
+    $fees = $credit->fees()->get();
 
-    $pdf = PDF::loadView('templates.amortization_table');
-    $data = base64_encode($pdf->download('ejemplo.pdf'));
-    return $data;
+    $details = [
+      'credit' => $credit,
+      'client' => $client,
+      'fees' => $fees,
+      'url' => URL::to('/')
+    ];
+
+    $pdf = PDF::loadView('templates.amortization_table', $details);
+    $pdf = $pdf->download('amortization_table.pdf');
+
+    $data = [
+      'status' => 200,
+			'pdf' => base64_encode($pdf),
+			'message' => 'Tabla generada en pdf'
+    ];
+
+    return response()->json($data);
   }
 }

@@ -7,35 +7,32 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Document</title>
 </head>
-
 <body>
   <table class="table">
     <thead>
       <tr>
         <th scope="col">#</th>
-        <th scope="col">First</th>
-        <th scope="col">Last</th>
-        <th scope="col">Handle</th>
+        <th scope="col">Fecha</th>
+        <th scope="col">Valor</th>
+        <th scope="col">Capital</th>
+        <th scope="col">Interés</th>
+        <th scope="col">Mora</th>
+        <th scope="col">Días de mora</th>
       </tr>
     </thead>
     <tbody>
+      @foreach ($fees as $key => $f)
       <tr>
-        <th scope="row">1</th>
-        <td>Mark</td>
-        <td>Otto</td>
-        <td>@mdo</td>
+        <th>{{$key + 1}}</th>
+        <th scope="row">{{ $f->fecha_pago}}</th>
+        <td>{{ $f->valor}}</td>
+        <td>{{ $f->valor_pago_capital}}</td>
+        <td>{{ $f->valor_pago_interes}}</td>
+        <td>{{ $f->valor_interes_mora}}</td>
+        <td>{{ $f->dias_mora}}</td>
       </tr>
-      <tr>
-        <th scope="row">2</th>
-        <td>Jacob</td>
-        <td>Thornton</td>
-        <td>@fat</td>
-      </tr>
-      <tr>
-        <th scope="row">3</th>
-        <td colspan="2">Larry the Bird</td>
-        <td>@twitter</td>
-      </tr>
+      @endforeach
+
     </tbody>
   </table>
 

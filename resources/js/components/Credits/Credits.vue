@@ -13,15 +13,15 @@
         </div>
         <div class="page-search d-flex justify-content-between p-4 border my-2">
             <div class="form-group col-8 m-auto">
-                <label for="buscar_cliente">Buscar Cliente...</label>
+                <label for="buscar_client">Buscar Client...</label>
                 <input
                     type="text"
-                    id="buscar_cliente"
-                    name="buscar_cliente"
+                    id="buscar_client"
+                    name="buscar_client"
                     class="form-control"
                     placeholder="Nombres | Documento"
                     @keypress="listarCredits()"
-                    v-model="buscar_cliente"
+                    v-model="buscar_client"
                 />
             </div>
         </div>
@@ -32,7 +32,7 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Cliente</th>
+                            <th>Client</th>
                             <th>Nro. Documento</th>
                             <th>Valor crédito</th>
                             <th>Valor Abonado</th>
@@ -130,14 +130,14 @@
                             class="alert alert-info"
                             style="margin: 2px auto; width: 30%"
                         >
-                            Crear un nuevo Cliente
+                            Crear un nuevo Client
                             <button
                                 type="button"
                                 class="btn btn-success"
                                 data-toggle="modal"
-                                data-target="#formClienteModal"
+                                data-target="#formClientModal"
                             >
-                                Crear Cliente
+                                Crear Client
                             </button>
                         </div>
                     </div>
@@ -158,9 +158,9 @@
             </section>
         </div>
 
-        <crear-editar-cliente
-            ref="CrearEditarCliente"
-            @listar-clientes="listarCredits(1)"
+        <crear-editar-client
+            ref="CreateEditClient"
+            @listar-clients="listarCredits(1)"
         />
         <create-edit-credit
             ref="CreateEditCredit"
@@ -173,11 +173,11 @@
 <script>
 import CreateEditCredit from "./CreateEditCredit.vue";
 import Simulator from "./Simulator.vue";
-import CrearEditarCliente from "./../Clientes/CrearEditarCliente.vue";
+import CreateEditClient from "./../clients/CreateEditClient.vue";
 import Fees from "./Fees.vue";
 
 export default {
-    components: { CreateEditCredit, Simulator, CrearEditarCliente, Fees },
+    components: { CreateEditCredit, Simulator, CreateEditClient, Fees },
 
     props: {
         fees: {
@@ -186,9 +186,9 @@ export default {
     },
     data() {
         return {
-            buscar_cliente: "",
+            buscar_client: "",
             creditList: {},
-            listaClientes: {}
+            listaClients: {}
         };
     },
     created() {
@@ -198,18 +198,18 @@ export default {
         listarCredits(page = 1) {
             let me = this;
             axios
-                .get(`api/credits?page=${page}&credit=${this.buscar_cliente}`)
+                .get(`api/credits?page=${page}&credit=${this.buscar_client}`)
                 .then(function(response) {
                     console.log(response);
                     me.creditList = response.data;
                 });
         },
-        listarClientes(page = 1) {
+        listarClients(page = 1) {
             let me = this;
             axios
-                .get(`api/clientes?page=${page}&cliente=${this.buscar_cliente}`)
+                .get(`api/clients?page=${page}&client=${this.buscar_client}`)
                 .then(function(response) {
-                    me.listaClientes = response.data;
+                    me.listaClients = response.data;
                 });
         },
         mostrarDatos: function(credit) {
@@ -221,8 +221,8 @@ export default {
         mostrarFees: function(credit) {
             this.$refs.Fees.listarFeesCredit(credit);
         },
-        mostrarDatosCliente: function(cliente) {
-            this.$refs.CrearEditarCliente.abirEditarCliente(cliente);
+        mostrarDatosClient: function(client) {
+            this.$refs.CreateEditClient.abirEditarClient(client);
         },
         CambiarEstado: function(id) {
             let me = this;

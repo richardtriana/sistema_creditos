@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\CreditController;
@@ -26,9 +26,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
-Route::resource('/clientes',  ClienteController::class);
-Route::post('/clientes/{cliente}/cambiar-estado',  [ClienteController::class, 'cambiarEstado']);
-Route::get('/clientes/{cliente}/credits', [ClienteController::class, 'credits']);
+Route::resource('/clients',  ClientController::class);
+Route::post('/clients/{client}/cambiar-estado',  [ClientController::class, 'cambiarEstado']);
+Route::get('/clients/{client}/credits', [ClientController::class, 'credits']);
 
 
 Route::resource('/proveedores',  ProveedorController::class);

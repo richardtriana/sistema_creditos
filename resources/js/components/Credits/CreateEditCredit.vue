@@ -27,13 +27,13 @@
                         <form>
                             <div class="form-row">
                                 <div class="form-group col-md-4">
-                                    <label for="cliente_id">Cliente</label>
+                                    <label for="client_id">Client</label>
                                     <v-select
-                                        :options="listaClientes.data"
+                                        :options="listaClients.data"
                                         label="nro_documento"
                                         aria-logname="{}"
                                         :reduce="nombres => nombres.id"
-                                        v-model="formCredit.cliente_id"
+                                        v-model="formCredit.client_id"
                                         placeholder="Buscar por Documento"
                                     >
                                     </v-select>
@@ -135,9 +135,9 @@ export default {
         return {
             editar: false,
             listaSedes: [],
-            listaClientes: [],
+            listaClients: [],
             formCredit: {
-                cliente_id: "",
+                client_id: "",
                 deudor_id: 2,
                 sede_id: "",
                 cant_cuotas: "",
@@ -160,7 +160,7 @@ export default {
     },
     created() {
         this.listarSedes(1);
-        this.listarClientes(1);
+        this.listarClients(1);
     },
     // Function crearCredits
     methods: {
@@ -171,10 +171,10 @@ export default {
             });
         },
 
-        listarClientes(page = 1) {
+        listarClients(page = 1) {
             let me = this;
-            axios.get(`api/clientes?page=${page}`).then(function(response) {
-                me.listaClientes = response.data;
+            axios.get(`api/clients?page=${page}`).then(function(response) {
+                me.listaClients = response.data;
             });
         },
         crearCredit() {
