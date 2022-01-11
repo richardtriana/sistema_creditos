@@ -62,28 +62,28 @@
               <td>{{ usuario.sede_id }}</td>
               <td v-if="usuario.rol_id == 1">Administrador</td>
               <td v-if="usuario.rol_id == 2">Operario</td>
-              <td v-if="usuario.estado == 1">Activo</td>
-              <td v-if="usuario.estado == 0">Inactivo</td>
+              <td v-if="usuario.status == 1">Activo</td>
+              <td v-if="usuario.status == 0">Inactivo</td>
 
               <td class="text-right">
                 <button
-                  v-if="usuario.estado == 1"
+                  v-if="usuario.status == 1"
                   class="btn btn-outline-primary"
                   @click="mostrarDatos(usuario)"
                 >
                   <i class="bi bi-pen"></i>
                 </button>
                 <button
-                  v-if="usuario.estado == 1"
+                  v-if="usuario.status == 1"
                   class="btn btn-outline-danger"
-                  @click="CambiarEstado(usuario.id)"
+                  @click="changeStatus(usuario.id)"
                 >
                   <i class="bi bi-trash"></i>
                 </button>
                 <button
-                  v-if="usuario.estado == 0"
+                  v-if="usuario.status == 0"
                   class="btn btn-outline-success"
-                  @click="CambiarEstado(usuario.id)"
+                  @click="changeStatus(usuario.id)"
                 >
                   <i class="bi bi-check2-circle"></i>
                 </button>
@@ -133,11 +133,11 @@ export default {
     mostrarDatos: function (ususario) {
       this.$refs.CrearEditarUsuario.abirEditarUsuario(ususario);
     },
-    CambiarEstado: function (id) {
+    changeStatus: function (id) {
       let me = this;
 
       Swal.fire({
-        title: "¿Quieres cambiar el estado del usuario?",
+        title: "¿Quieres cambiar el status del usuario?",
         showDenyButton: true,
         denyButtonText: `Cancelar`,
         confirmButtonText: `Guardar`,
@@ -145,7 +145,7 @@ export default {
         if (result.isConfirmed) {
           axios
             .post(
-              "api/usuarios/" + id + "/cambiar-estado",
+              "api/usuarios/" + id + "/change-status",
               null,
               me.$root.config
             )

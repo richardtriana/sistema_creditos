@@ -116,11 +116,11 @@ class UsuarioController extends Controller
         //
     }
 
-    public function cambiarEstado(Usuario $usuario)
+    public function changeStatus(Usuario $usuario)
     {
         //
         $u = Usuario::find($usuario->id);
-        $u->estado = !$u->estado;
+        $u->status = !$u->status;
         $u->save();
     }
 }

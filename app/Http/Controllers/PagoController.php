@@ -28,10 +28,10 @@ class PagoController extends Controller
 		$pago->id_deuda = $request['id_deuda'];
 		$pago->valor_pago = $request['valor_pago'];
 		$pago->nro_cuota = $request['nro_cuota'];
-		$pago->valor_interes = $request['valor_interes'];
-		$pago->valor_capital = $request['valor_capital'];
+		$pago->interest_value = $request['interest_value'];
+		$pago->capital_value = $request['capital_value'];
 		$pago->id_tercero = $request['id_tercero'];
-    $pago->fecha_pago = $request['fecha_pago'];
+    $pago->payment_date = $request['payment_date'];
 		$pago->save();
 	}
 
@@ -52,10 +52,10 @@ class PagoController extends Controller
 		$pago->id_deuda = $request['id_deuda'];
 		$pago->valor_pago = $request['valor_pago'];
 		$pago->nro_cuota = $request['nro_cuota'];
-		$pago->valor_interes = $request['valor_interes'];
-		$pago->valor_capital = $request['valor_capital'];
+		$pago->interest_value = $request['interest_value'];
+		$pago->capital_value = $request['capital_value'];
 		$pago->id_tercero = $request['id_tercero'];
-    $pago->fecha_pago  = $request['fecha_pago '];
+    $pago->payment_date  = $request['payment_date '];
 		$pago->save();
 	}
 

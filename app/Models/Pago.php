@@ -16,9 +16,9 @@ class Pago extends Model
     'id_deuda',
     'valor_pago',
     'nro_cuota',
-    'valor_interes',
-    'valor_capital',
+    'interest_value',
+    'capital_value',
     'id_tercero',
-    'fecha_pago'
+    'payment_date'
   ];
 }

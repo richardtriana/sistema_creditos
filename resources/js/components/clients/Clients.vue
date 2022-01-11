@@ -54,7 +54,7 @@
                   :class="
                     c.activo == 1 ? 'btn-outline-success' : 'btn-outline-danger'
                   "
-                  @click="CambiarEstado(c.id)"
+                  @click="changeStatus(c.id)"
                 >
                   <i class="bi bi-check-circle-fill" v-if="c.activo == 1"></i>
                   <i class="bi bi-x-circle" v-if="c.activo == 0"></i>
@@ -82,7 +82,7 @@
         </pagination>
       </section>
     </div>
-    <crear-editar-client
+    <create-edit-client
       ref="CreateEditClient"
       @listar-clients="listarClients(1)"
     />
@@ -113,11 +113,11 @@ export default {
     mostrarDatos: function (client) {
       this.$refs.CreateEditClient.abirEditarClient(client);
     },
-    CambiarEstado: function (id) {
+    changeStatus: function (id) {
       let me = this;
 
       Swal.fire({
-        title: "¿Quieres cambiar el estado del client?",
+        title: "¿Quieres cambiar el status del client?",
         showDenyButton: true,
         denyButtonText: `Cancelar`,
         confirmButtonText: `Guardar`,
@@ -125,7 +125,7 @@ export default {
         if (result.isConfirmed) {
           axios
             .post(
-              `api/clients/${id}/cambiar-estado`,
+              `api/clients/${id}/change-status`,
               null,
               me.$root.config
             )

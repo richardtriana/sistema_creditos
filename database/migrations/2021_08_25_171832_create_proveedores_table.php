@@ -24,7 +24,7 @@ class CreateProveedoresTable extends Migration
             $table->char('celular2', 20)->nullable();
             $table->char('direccion', 200)->nullable();
             $table->string('email')->unique();
-            $table->tinyInteger('estado')->default(1);
+            $table->tinyInteger('status')->default(1);
             $table->softDeletes($column = 'deleted_at', $precision = 0);
             $table->timestamps();
         });

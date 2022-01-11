@@ -50,16 +50,16 @@
               <td>{{ sede.celular_contacto }}</td>
               <td>
                 <button
-                  v-if="sede.estado == 1"
+                  v-if="sede.status == 1"
                   class="btn btn-outline-danger"
-                  @click="CambiarEstado(sede.id)"
+                  @click="changeStatus(sede.id)"
                 >
                   <i class="bi bi-trash"></i>
                 </button>
                 <button
-                  v-if="sede.estado == 0"
+                  v-if="sede.status == 0"
                   class="btn btn-outline-success"
-                  @click="CambiarEstado(sede.id)"
+                  @click="changeStatus(sede.id)"
                 >
                   <i class="bi bi-check2-circle"></i>
                 </button>
@@ -67,7 +67,7 @@
 
               <td class="text-center">
                 <button
-                  v-if="sede.estado == 1"
+                  v-if="sede.status == 1"
                   class="btn btn-outline-primary"
                   @click="mostrarDatos(sede)"
                 >
@@ -116,18 +116,18 @@ export default {
     mostrarDatos: function (sede) {
       this.$refs.CrearEditarSede.abirEditarSede(sede);
     },
-    CambiarEstado: function (id) {
+    changeStatus: function (id) {
       let me = this;
 
       Swal.fire({
-        title: "¿Quieres cambiar el estado del sede?",
+        title: "¿Quieres cambiar el status del sede?",
         showDenyButton: true,
         denyButtonText: `Cancelar`,
         confirmButtonText: `Guardar`,
       }).then((result) => {
         if (result.isConfirmed) {
           axios
-            .post(`api/sedes/${id}/cambiar-estado`, null, me.$root.config)
+            .post(`api/sedes/${id}/change-status`, null, me.$root.config)
             .then(function () {
               me.listarSedes(1);
             });

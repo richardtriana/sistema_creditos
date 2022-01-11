@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Credit;
-use App\Models\Fee;
-use Database\Factories\FeeFactory;
+use App\Models\Installment;
+use Database\Factories\InstallmentFactory;
 use Illuminate\Database\Seeder;
 
 class CreditSeeder extends Seeder
@@ -17,7 +17,7 @@ class CreditSeeder extends Seeder
     public function run()
     {
         Credit::factory()
-        ->has(Fee::factory()->count(3))
+        ->has(Installment::factory()->count(3))
         ->count(10)
         ->create();
     }

@@ -60,11 +60,11 @@ class ProveedorController extends Controller
 		$proveedor->save();
 	}
 
-	public function cambiarEstado(Proveedor $proveedor)
+	public function changeStatus(Proveedor $proveedor)
 	{
 		//
 		$c = Proveedor::find($proveedor->id);
-		$c->estado = !$c->estado;
+		$c->status = !$c->status;
 		$c->save();
 	}
 	public function destroy($id)

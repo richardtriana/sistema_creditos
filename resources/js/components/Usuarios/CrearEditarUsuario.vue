@@ -166,7 +166,7 @@ export default {
         tipo_documento: 0,
         documento: 0,
         foto: "",
-        estado: "1",
+        status: "1",
         rol_id: "",
         sede_id: "",
       },

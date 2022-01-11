@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Fee extends Model
+class Installment extends Model
 {
   use HasFactory;
 
@@ -14,13 +14,14 @@ class Fee extends Model
     'credit_id',
     'nro_cuota',
     'valor',
-    'fecha_pago',
-    'dias_mora',
-    'valor_interes_mora',
-    'valor_pago_interes',
-    'valor_pago_capital',
-    'registro_pago',
-    'estado'
+    'payment_date',
+    'days_past_due',
+    'late_interests_value',
+    'interest_value',
+    'capital_value',
+    'paid_balance',
+    'payment_register',
+    'status'
   ];
 
   public function credit()

@@ -29,7 +29,7 @@ class CreditFactory extends Factory
             'cant_cuotas_pagadas' => $this->faker->randomNumber(),
             'dia_limite' => $this->faker->randomNumber(),
             'deudor' => $this->faker->boolean(),
-            'estado' => $this->faker->boolean(),
+            'status' => $this->faker->boolean(),
             'fecha_inicio' => $this->faker->date('Y-m-d'),
             'interes' => $this->faker->randomNumber(),
             'porcentaje_interes_anual' => $this->faker->randomNumber(),
@@ -38,8 +38,8 @@ class CreditFactory extends Factory
             'valor_cuota' => $this->faker->randomNumber(),
             'valor_credit' => $this->faker->randomNumber(),
             'valor_abonado' => $this->faker->randomNumber(),
-            'valor_capital' => $this->faker->randomNumber(),
-            'valor_interes' => $this->faker->randomNumber(),
+            'capital_value' => $this->faker->randomNumber(),
+            'interest_value' => $this->faker->randomNumber(),
         ];
     }
 }

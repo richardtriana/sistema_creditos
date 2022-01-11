@@ -85,7 +85,7 @@
 
                                 <div class="form-group col-md-4">
                                     <label for="cant_cuotas"
-                                        >Cantidad Fees</label
+                                        >Cantidad Installments</label
                                     >
                                     <input
                                         type="number"
@@ -145,7 +145,7 @@ export default {
                 cant_cuotas_pagadas: "",
                 dia_limite: "",
                 deudor: "",
-                estado: "1",
+                status: "1",
                 fecha_inicio: "",
                 interes: "",
                 porcentaje_interes_anual: "",
@@ -153,8 +153,8 @@ export default {
                 calor_cuota: "",
                 valor_credit: "",
                 valor_abonado: "",
-                valor_capital: "",
-                valor_interes: ""
+                capital_value: "",
+                interest_value: ""
             }
         };
     },

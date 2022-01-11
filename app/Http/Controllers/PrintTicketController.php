@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Fee;
+use App\Models\Installment;
 use App\Models\Sede;
 use Illuminate\Http\Request;
 use Exception;
@@ -14,7 +14,7 @@ use Mike42\Escpos\Printer;
 
 class PrintTicketController extends Controller
 {
-    public function printFee($id)
+    public function printInstallment($id)
     {
         // Orden
         $sede = Sede::first();
@@ -22,8 +22,8 @@ class PrintTicketController extends Controller
         if (!$sede->impresora_pos || $sede->impresora_pos == '') {
             return false;
         }
-        $fee = Fee::findOrFail($id);
-        $credit = $fee->credit;
+        $installment = Installment::findOrFail($id);
+        $credit = $installment->credit;
         $client = $credit['client'];
 
         // Config de impresora
@@ -69,11 +69,11 @@ class PrintTicketController extends Controller
             $printer->text("\n");
             $printer->text(sprintf('%-20s %-20s', 'Crédito', $credit->valor_credit));
             $printer->text("\n");
-            $printer->text(sprintf('%-20s %-20s', 'Nro Operacion', $fee->id));
+            $printer->text(sprintf('%-20s %-20s', 'Nro Operacion', $installment->id));
             $printer->text("\n");
-            $printer->text(sprintf('%-20s %-20s', 'Fecha Fee', $fee->fecha_pago));
+            $printer->text(sprintf('%-20s %-20s', 'Fecha Installment', $installment->payment_date));
             $printer->text("\n");
-            $printer->text(sprintf('%-20s %-20s', 'Monto Cancelado', $fee->valor));
+            $printer->text(sprintf('%-20s %-20s', 'Monto Cancelado', $installment->valor));
             $printer->text("\n");
             $printer->text("\n");
             $printer->setLineSpacing(2);

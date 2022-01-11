@@ -7,7 +7,7 @@
                         type="button"
                         class="btn btn-primary col-md-3 offset-9 mb-5"
                         id="btnCalcular"
-                        @click="simularFees()"
+                        @click="simularInstallments()"
                     >
                         Calcular
                     </button>
@@ -15,34 +15,34 @@
                     <table id="lista-tabla" class="table">
                         <thead>
                             <tr>
-                                <th>Nro.Fee</th>
+                                <th>Nro.Installment</th>
                                 <th>Fecha</th>
-                                <th>Fee</th>
+                                <th>Installment</th>
                                 <th>Capital</th>
                                 <th>Interés</th>
                                 <th>Saldo Capital</th>
                             </tr>
                         </thead>
-                        <tbody v-if="listFees.length">
+                        <tbody v-if="listInstallments.length">
                             <tr
-                                v-for="fee in listFees"
-                                :key="fee.nro_cuota"
+                                v-for="installment in listInstallments"
+                                :key="installment.nro_cuota"
                             >
                                 <td>
-                                    No. {{ fee.nro_cuota }}
+                                    No. {{ installment.nro_cuota }}
                                 </td>
                                 <td>
-                                   $ {{ fee.fecha_pago }}
+                                   $ {{ installment.payment_date }}
                                 </td>
-                                <td>{{ fee.valor_cuota }}</td>
+                                <td>{{ installment.valor_cuota }}</td>
                                 <td>
-                                   $ {{ fee.pagoCapital }}
-                                </td>
-                                <td>
-                                    ${{ fee.pagoInteres }}
+                                   $ {{ installment.pagoCapital }}
                                 </td>
                                 <td>
-                                    $ {{ fee.saldo_capital }}
+                                    ${{ installment.pagoInteres }}
+                                </td>
+                                <td>
+                                    $ {{ installment.saldo_capital }}
                                 </td>
                             </tr>
                         </tbody>
@@ -73,15 +73,15 @@ export default {
     data() {
         return {
             editar: false,
-            listFees: [],
-            formFees: {},
+            listInstallments: [],
+            formInstallments: {},
             valor_cuota: 0
         };
     },
     methods: {
         crearSimulator() {
             let me = this;
-            axios.post("api/fees", this.fees).then(function() {
+            axios.post("api/installments", this.installments).then(function() {
                 $("#formSimulatorModal").modal("hide");
                 me.resetData();
                 this.$emit("listar-credits");
@@ -95,7 +95,7 @@ export default {
         },
         editarSimulator() {
             let me = this;
-            axios.put("api/credits/" + 4, this.fees).then(function() {
+            axios.put("api/credits/" + 4, this.installments).then(function() {
                 $("#formSimulatorModal").modal("hide");
                 me.resetData();
             });
@@ -106,38 +106,38 @@ export default {
         simular: function(id) {
             let me = this;
             axios
-                .post("api/credits/" + id + "/fees", null, me.$root.config)
+                .post("api/credits/" + id + "/installments", null, me.$root.config)
                 .then(function() {
                     me.listarCredits(1);
                 });
         },
         resetData() {
             let me = this;
-            Object.keys(this.fees).forEach(function(key, index) {
-                me.fees[key] = "";
+            Object.keys(this.installments).forEach(function(key, index) {
+                me.installments[key] = "";
             });
         },
         agregar() {
-            this.formFees.push(newFee);
+            this.formInstallments.push(newInstallment);
             console.log(agregar);
         },
-        simularFees() {
+        simularInstallments() {
             let me = this;
             axios
                 .get(
-                    `api/fees/calcular-fees?valor_credit=${this.capital}&interes=${this.interes}&cant_cuotas=${this.cant_cuotas}`
+                    `api/installments/calcular-installments?valor_credit=${this.capital}&interes=${this.interes}&cant_cuotas=${this.cant_cuotas}`
                 )
                 .then(
                     response => (
-                        (me.listFees = response.data.listFees),
-                        (me.valor_cuota = response.data.fee)
+                        (me.listInstallments = response.data.listInstallments),
+                        (me.valor_cuota = response.data.installment)
                         
                     )
                 );
         }
     },
     mounted() {
-        // this.simularFees();
+        // this.simularInstallments();
     }
 };
 </script>

@@ -19,7 +19,7 @@ class Credit extends Model
         'cant_cuotas_pagadas',
         'dia_limite',
         'deudor',
-        'estado',
+        'status',
         'fecha_inicio',
         'interes',
         'porcentaje_interes_anual',
@@ -28,8 +28,8 @@ class Credit extends Model
         'valor_cuota',
         'valor_credit',
         'valor_abonado',
-        'valor_capital',
-        'valor_interes',
+        'capital_value',
+        'interest_value',
     ];
  
     protected $with = [
@@ -55,8 +55,8 @@ class Credit extends Model
     {
         return $this->belongsTo(Sede::class, 'sede_id');
     }
-    public function fees()
+    public function installments()
     {
-        return $this->hasMany(Fee::class, 'credit_id');
+        return $this->hasMany(Installment::class, 'credit_id');
     }
 }

@@ -129,11 +129,11 @@ class ClientController extends Controller
 		//
 	}
 
-	public function cambiarEstado(Client $client)
+	public function changeStatus(Client $client)
 	{
 		//
 		$c = Client::find($client->id);
-		// $client->estado = '0';
+		// $client->status = '0';
 		$c->activo = !$c->activo;
 		$c->save();
 	}
