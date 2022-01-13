@@ -25,7 +25,7 @@ class Credit extends Model
         'interest',
         'annual_interest_percentage',
         'porcentaje_interes_mensual',
-        'valor_cuota',
+        'installment_value',
         'credit_value',
         'paid_value',
         'capital_value',

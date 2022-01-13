@@ -34,7 +34,7 @@
                                 <td>
                                    $ {{ installment.payment_date }}
                                 </td>
-                                <td>{{ installment.valor_cuota }}</td>
+                                <td>{{ installment.installment_value }}</td>
                                 <td>
                                    $ {{ installment.pagoCapital }}
                                 </td>
@@ -75,7 +75,7 @@ export default {
             editar: false,
             listInstallments: [],
             formInstallments: {},
-            valor_cuota: 0
+            installment_value: 0
         };
     },
     methods: {
@@ -130,7 +130,7 @@ export default {
                 .then(
                     response => (
                         (me.listInstallments = response.data.listInstallments),
-                        (me.valor_cuota = response.data.installment)
+                        (me.installment_value = response.data.installment)
                         
                     )
                 );

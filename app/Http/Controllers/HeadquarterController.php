@@ -56,7 +56,7 @@ class HeadquarterController extends Controller
 		$headquarter->email = $request['email'];
 		$headquarter->legal_representative = $request['legal_representative'];
 		$headquarter->pos_printer = $request['pos_printer'];
-		$headquarter->cell_phone = $request['cell_phone'];
+		$headquarter->phone = $request['phone'];
 		$headquarter->save();
 	}
 
@@ -99,7 +99,7 @@ class HeadquarterController extends Controller
 		$headquarter->email = $request['email'];
 		$headquarter->legal_representative = $request['legal_representative'];
 		$headquarter->pos_printer = $request['pos_printer'];
-		$headquarter->cell_phone = $request['cell_phone'];
+		$headquarter->phone = $request['phone'];
 		$headquarter->save();
 	}
 

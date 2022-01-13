@@ -58,7 +58,7 @@
               <td>{{ usuario.last_name }}</td>
               <td>{{ usuario.email }}</td>
               <td>{{ usuario.document }}</td>
-              <td>{{ usuario.cell_phone }}</td>
+              <td>{{ usuario.phone }}</td>
               <td>{{ usuario.headquarter_id }}</td>
               <td v-if="usuario.rol_id == 1">Administrador</td>
               <td v-if="usuario.rol_id == 2">Operario</td>

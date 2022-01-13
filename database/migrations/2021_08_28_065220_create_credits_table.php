@@ -27,7 +27,7 @@ class CreateCreditsTable extends Migration
             $table->date('start_date');
             $table->float('interest', 20, 2)->default(3);
             $table->float('annual_interest_percentage', 20, 4)->nullable()->default(0);
-            $table->float('valor_cuota', 20, 4);
+            $table->float('installment_value', 20, 4);
             $table->float('credit_value', 20, 4);
             $table->float('paid_value', 20, 4)->nullable()->default(0);
             $table->float('capital_value', 20, 4)->nullable()->default(0);

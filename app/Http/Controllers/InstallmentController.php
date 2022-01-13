@@ -148,7 +148,7 @@ class InstallmentController extends Controller
       foreach ($payment_date as $fp) {
         $listInstallments[$i]['payment_date'] = (date($fp));
         $listInstallments[$i]['saldo_capital'] = (float) number_format($value, 2, '.', '');
-        $listInstallments[$i]['valor_cuota'] = (float) number_format($installment, 2, '.', '');
+        $listInstallments[$i]['installment_value'] = (float) number_format($installment, 2, '.', '');
       }
       $listInstallments[$i]['cant_cuota'] = $i + 1;
     }

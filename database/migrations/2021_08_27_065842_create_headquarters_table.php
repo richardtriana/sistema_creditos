@@ -21,7 +21,7 @@ class CreateHeadquartersTable extends Migration
             $table->string('nit')->nullable();
             $table->string('email')->nullable();
             $table->string('legal_representative')->nullable();
-            $table->string('cell_phone')->nullable();
+            $table->string('phone')->nullable();
             $table->string('pos_printer')->default('POS-80');
             $table->timestamps();
         });

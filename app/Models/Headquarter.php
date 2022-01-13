@@ -15,7 +15,7 @@ class Headquarter extends Model
         'nit',
         'email',
         'legal_representative',
-        'cell_phone',
+        'phone',
         'pos_printer'
     ];
 }

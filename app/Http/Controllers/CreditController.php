@@ -84,14 +84,14 @@ class CreditController extends Controller
         $credit->paid_value = $request['paid_value'];
         $credit->capital_value = $request['capital_value'];
         $credit->interest_value = $request['interest_value'];
-        $credit->valor_cuota = $listInstallments['installment'];
+        $credit->installment_value = $listInstallments['installment'];
         $credit->save();
 
         foreach ($listInstallments['listInstallments'] as $nueva_cuota) {
             $installment = new Installment();
             $installment->credit_id = $credit->id;
             $installment->nro_cuota = $nueva_cuota['cant_cuota'];
-            $installment->value = $nueva_cuota['valor_cuota'];
+            $installment->value = $nueva_cuota['installment_value'];
             $installment->payment_date = $nueva_cuota['payment_date'];
             $installment->valor_pago_interes = $nueva_cuota['pagoInteres'];
             $installment->valor_pago_capital = $nueva_cuota['pagoCapital'];
@@ -143,7 +143,7 @@ class CreditController extends Controller
         $credit->interest = $request['interest'];
         $credit->annual_interest_percentage = $request['annual_interest_percentage'];
         $credit->user_id = $request['user_id'];
-        $credit->valor_cuota = $request['valor_cuota'];
+        $credit->installment_value = $request['installment_value'];
         $credit->credit_value = $request['credit_value'];
         $credit->paid_value = $request['paid_value'];
         $credit->capital_value = $request['capital_value'];

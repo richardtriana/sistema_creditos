@@ -28,7 +28,7 @@ class HeadquarterFactory extends Factory
             'nit' => $this->faker->ean13(),
             'email' => $this->faker->email(),
             'legal_representative' => $this->faker->lastName(),
-            'cell_phone' => $this->faker->phoneNumber(),
+            'phone' => $this->faker->phoneNumber(),
             'pos_printer' => 'POS-80'
         ];
     }
