@@ -42,9 +42,9 @@
                                     >Passaporte</span
                                 >
                             </td>
-                            <td>{{ p.document_number }}</td>
-                            <td>{{ p.cell_phone1 }}</td>
-                            <td>{{ p.cell_phone2 }}</td>
+                            <td>{{ p.document }}</td>
+                            <td>{{ p.phone_1 }}</td>
+                            <td>{{ p.phone_2 }}</td>
                             <td>{{ p.email }}</td>
                             <td>{{ p.address }}</td>
                             <td>

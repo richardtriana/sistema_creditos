@@ -28,9 +28,9 @@ class ProveedorController extends Controller
 		$proveedor->name = $request['name'];
 		$proveedor->last_name = $request['last_name'];
 		$proveedor->type_document = $request['type_document'];
-		$proveedor->document_number = $request['document_number'];
-		$proveedor->cell_phone1 = $request['cell_phone1'];
-		$proveedor->cell_phone2 = $request['cell_phone2'];
+		$proveedor->document = $request['document'];
+		$proveedor->phone_1 = $request['phone_1'];
+		$proveedor->phone_2 = $request['phone_2'];
 		$proveedor->address = $request['address'];
     $proveedor->email = $request['email'];
 		$proveedor->save();
@@ -52,9 +52,9 @@ class ProveedorController extends Controller
 		$proveedor->name = $request['name'];
 		$proveedor->last_name = $request['last_name'];
 		$proveedor->type_document = $request['type_document'];
-		$proveedor->document_number = $request['document_number'];
-		$proveedor->cell_phone1 = $request['cell_phone1'];
-		$proveedor->cell_phone2 = $request['cell_phone2'];
+		$proveedor->document = $request['document'];
+		$proveedor->phone_1 = $request['phone_1'];
+		$proveedor->phone_2 = $request['phone_2'];
 		$proveedor->address = $request['address'];
     $proveedor->email = $request['email'];
 		$proveedor->save();

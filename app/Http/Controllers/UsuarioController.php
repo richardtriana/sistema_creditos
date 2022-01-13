@@ -51,7 +51,7 @@ class UsuarioController extends Controller
         $usuario->password = $request['password'];
         $usuario->name = $request['name'];
         $usuario->last_name = $request['last_name'];
-        $usuario->cell_phone = $request['cell_phone'];
+        $usuario->phone = $request['phone'];
         $usuario->address = $request['address'];
         $usuario->type_document = $request['type_document'];
         $usuario->document = $request['document'];
@@ -96,7 +96,7 @@ class UsuarioController extends Controller
         $usuario->password = $request['password'];
         $usuario->name = $request['name'];
         $usuario->last_name = $request['last_name'];
-        $usuario->cell_phone = $request['cell_phone'];
+        $usuario->phone = $request['phone'];
         $usuario->address = $request['address'];
         $usuario->type_document = $request['type_document'];
         $usuario->document = $request['document'];

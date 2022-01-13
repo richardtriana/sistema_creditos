@@ -25,18 +25,19 @@ class ClientFactory extends Factory
 			'name' => $this->faker->firstName(),
 			'last_name' => $this->faker->lastName(),
 			'type_document' => $this->faker->boolean(),
-			'document_number' => $this->faker->randomNumber(),
-			'fecha_nacimiento' => $this->faker->date(),
+			'document' => $this->faker->randomNumber(),
+			'birth_date' => $this->faker->date(),
 			'email' => $this->faker->email(),
-			'genero' => $this->faker->randomElement($array = ['f', 'm']),
-			'cell_phone1' => $this->faker->phoneNumber(),
-			'cell_phone2' => $this->faker->phoneNumber(),
+			'gender' => $this->faker->randomElement($array = ['f', 'm']),
+			'phone_1' => $this->faker->phoneNumber(),
+			'phone_2' => $this->faker->phoneNumber(),
 			'address' => $this->faker->address(),
-			'estado_civil' => $this->faker->numberBetween(1, 3),
-			'lugar_trabajo' => $this->faker->address(),
-			'cargo' => $this->faker->streetAddress(),
-			'independiente' => $this->faker->boolean(),
-			'photo' => $this->faker->image()
+			'civil_status' => $this->faker->numberBetween(1, 3),
+			'workplace' => $this->faker->address(),
+			'occupation' => $this->faker->streetAddress(),
+			'independent' => $this->faker->boolean(),
+			'photo' => $this->faker->image(),
+			'status' => $this->faker->boolean()
 		];
 	}
 }

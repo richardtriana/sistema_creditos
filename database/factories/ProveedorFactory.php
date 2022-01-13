@@ -25,9 +25,9 @@ class ProveedorFactory extends Factory
         'name' => $this->faker->firstName(),
         'last_name' => $this->faker->lastName(),
         'type_document' => $this->faker->numberBetween(1,2),
-        'document_number' => $this->faker->randomNumber(),
-        'cell_phone1' => $this->faker->phoneNumber(),
-        'cell_phone2' => $this->faker->phoneNumber(),
+        'document' => $this->faker->randomNumber(),
+        'phone_1' => $this->faker->phoneNumber(),
+        'phone_2' => $this->faker->phoneNumber(),
         'address' => $this->faker->address(),
         'email' => $this->faker->email()
 		  ];

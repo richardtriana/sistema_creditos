@@ -13,18 +13,19 @@ class Client extends Model
     'name',
     'last_name',
     'type_document',
-    'document_number',
-    'fecha_nacimiento',
+    'document',
+    'birth_date',
     'email',
-    'genero',
-    'cell_phone1',
-    'cell_phone2',
+    'gender',
+    'phone_1',
+    'phone_2',
     'address',
-    'estado_civil',
-    'lugar_trabajo',
-    'cargo',
-    'independiente',
-    'photo', 'activo'
+    'civil_status',
+    'workplace',
+    'occupation',
+    'independent',
+    'photo',
+    'status'
   ];
 
   public function credits()

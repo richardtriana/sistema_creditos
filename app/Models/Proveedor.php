@@ -15,9 +15,9 @@ class Proveedor extends Model
     'name',
     'last_name',
     'type_document',
-    'document_number',
-    'cell_phone1',
-    'cell_phone2',
+    'document',
+    'phone_1',
+    'phone_2',
     'address',
     'email',
     'status'

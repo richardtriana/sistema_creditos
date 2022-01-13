@@ -1,43 +1,43 @@
 <template>
-	<div>
-		<div
-			class="modal fade"
-			id="formCreditModal"
-			tabindex="-1"
-			aria-labelledby="formCreditModalLabel"
-			aria-hidden="true"
-		>
-			<div class="modal-dialog modal-lg">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="formCreditModalLabel">
-							Credits
-						</h5>
-						<button
-							type="button"
-							class="close"
-							data-dismiss="modal"
-							@click="(editar = false), resetData()"
-							aria-label="Close"
-						>
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						<form>
-							<div class="form-row">
-								<div class="form-group col-md-4">
-									<label for="client_id">Client</label>
-									<v-select
-										:options="clientList.data"
-										label="document_number"
-										aria-logname="{}"
-										:reduce="name => name.id"
-										v-model="formCredit.client_id"
-										placeholder="Buscar por Documento"
-									>
-									</v-select>
-								</div>
+    <div>
+        <div
+            class="modal fade"
+            id="formCreditModal"
+            tabindex="-1"
+            aria-labelledby="formCreditModalLabel"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="formCreditModalLabel">
+                            Credits
+                        </h5>
+                        <button
+                            type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            @click="(editar = false), resetData()"
+                            aria-label="Close"
+                        >
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <label for="client_id">Client</label>
+                                    <v-select
+                                        :options="clientList.data"
+                                        label="document"
+                                        aria-logname="{}"
+                                        :reduce="name => name.id"
+                                        v-model="formCredit.client_id"
+                                        placeholder="Buscar por Documento"
+                                    >
+                                    </v-select>
+                                </div>
 
 								<div class="form-group col-md-4">
 									<label for="debtor">Deudor</label>
@@ -144,7 +144,7 @@ export default {
 				start_date: "",
 				interest: "",
 				annual_interest_percentage: 0,
-				calor_cuota: "",
+				installment_value: "",
 				credit_value: "",
 				paid_value: "",
 				capital_value: "",

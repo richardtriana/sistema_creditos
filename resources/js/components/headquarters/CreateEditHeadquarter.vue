@@ -79,15 +79,15 @@
                                 </div>
 
                                 <div class="form-group col-md-4">
-                                    <label for="cell_phone"
+                                    <label for="phone"
                                         >Celular Contacto</label
                                     >
 
                                     <input
                                         type="number"
                                         class="form-control"
-                                        id="cell_phone"
-                                        v-model="formHeadquarter.cell_phone"
+                                        id="phone"
+                                        v-model="formHeadquarter.phone"
                                     />
                                 </div>
                                 <div class="form-group col-md-4">
@@ -136,7 +136,7 @@ export default {
                 name: "",
                 email: "",
                 password: "",
-                cell_phone: "",
+                phone: "",
                 address: "",
                 type_document: 0,
                 document: 0,

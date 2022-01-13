@@ -108,7 +108,7 @@ export default {
             axios
                 .post("api/credits/" + id + "/installments", null, me.$root.config)
                 .then(function() {
-                    me.listarCredits(1);
+                    me.listCredits(1);
                 });
         },
         resetData() {

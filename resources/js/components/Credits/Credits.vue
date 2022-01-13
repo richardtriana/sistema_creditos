@@ -13,15 +13,15 @@
 		</div>
 		<div class="page-search d-flex justify-content-between p-4 border my-2">
 			<div class="form-group col-8 m-auto">
-				<label for="buscar_client">Buscar Client...</label>
+				<label for="search_client">Buscar Client...</label>
 				<input
 					type="text"
-					id="buscar_client"
-					name="buscar_client"
+					id="search_client"
+					name="search_client"
 					class="form-control"
 					placeholder="Nombres | Documento"
-					@keypress="listarCredits()"
-					v-model="buscar_client"
+					@keypress="listCredits()"
+					v-model="search_client"
 				/>
 			</div>
 		</div>
@@ -52,7 +52,7 @@
 						<tr v-for="credit in creditList.data" :key="credit.index">
 							<td>{{ credit.id }}</td>
 							<td>{{ credit.name }} {{ credit.last_name }}</td>
-							<td>{{ credit.document_number }}</td>
+							<td>{{ credit.document }}</td>
 							<td>{{ credit.credit_value }}</td>
 							<td>{{ credit.paid_value }}</td>
 							<td>{{ credit.number_installments }}</td>
@@ -67,7 +67,7 @@
 									data-target="#cuotasModal"
 									v-if="credit.status == 1"
 									class="btn btn-outline-primary"
-									@click="mostrarInstallment(credit.id)"
+									@click="showInstallment(credit.id)"
 								>
 									<i class="bi bi-eye"></i>
 								</button>
@@ -142,7 +142,7 @@
 					:align="'center'"
 					:data="creditList"
 					:limit="2"
-					@pagination-change-page="listarCredits"
+					@pagination-change-page="listCredits"
 				>
 					<span slot="prev-nav"><i class="bi bi-chevron-double-left"></i></span>
 					<span slot="next-nav"
@@ -154,7 +154,7 @@
 
 		<create-edit-client
 			ref="CreateEditClient"
-			@listar-clients="listarCredits(1)"
+			@list-clients="listCredits(1)"
 		/>
 		<create-edit-credit
 			ref="CreateEditCredit"
@@ -180,19 +180,19 @@ export default {
 	},
 	data() {
 		return {
-			buscar_client: "",
+			search_client: "",
 			creditList: {},
 			clientList: {}
 		};
 	},
 	created() {
-		this.listarCredits(1);
+		this.listCredits(1);
 	},
 	methods: {
-		listarCredits(page = 1) {
+		listCredits(page = 1) {
 			let me = this;
 			axios
-				.get(`api/credits?page=${page}&credit=${this.buscar_client}`)
+				.get(`api/credits?page=${page}&credit=${this.search_client}`)
 				.then(function(response) {
 					console.log(response);
 					me.creditList = response.data;
@@ -201,7 +201,7 @@ export default {
 		listClients(page = 1) {
 			let me = this;
 			axios
-				.get(`api/clients?page=${page}&client=${this.buscar_client}`)
+				.get(`api/clients?page=${page}&client=${this.search_client}`)
 				.then(function(response) {
 					me.clientList = response.data;
 				});
@@ -212,11 +212,11 @@ export default {
 		simularCredit: function() {
 			this.$refs.Simulator.abrirSimulator();
 		},
-		mostrarInstallment: function(credit) {
+		showInstallment: function(credit) {
 			this.$refs.Installment.listCreditInstallments(credit);
 		},
 		showDataClient: function(client) {
-			this.$refs.CreateEditClient.abirEditarClient(client);
+			this.$refs.CreateEditClient.showEditClient(client);
 		},
 		changeStatus: function(id) {
 			let me = this;
@@ -231,7 +231,7 @@ export default {
 					axios
 						.post("api/credits/" + id + "/change-status", null, me.$root.config)
 						.then(function() {
-							me.listarCredits(1);
+							me.listCredits(1);
 						});
 					Swal.fire("Cambios realizados!", "", "success");
 				} else if (result.isDenied) {

@@ -47,7 +47,7 @@
               <td>{{ headquarter.nit }}</td>
               <td>{{ headquarter.email }}</td>
               <td>{{ headquarter.legal_representative }}</td>
-              <td>{{ headquarter.cell_phone }}</td>
+              <td>{{ headquarter.phone }}</td>
               <td>
                 <button
                   v-if="headquarter.status == 1"

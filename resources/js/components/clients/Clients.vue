@@ -13,15 +13,15 @@
     </div>
     <div class="page-search d-flex justify-content-between p-4 border my-2">
       <div class="form-group col-8 m-auto">
-        <label for="buscar_client">Buscar...</label>
+        <label for="search_client">Buscar...</label>
         <input
           type="text"
-          id="buscar_client"
-          name="buscar_client"
+          id="search_client"
+          name="search_client"
           class="form-control"
           placeholder="Nombres | Documento"
           @keypress="listClients(1)"
-          v-model="buscar_client"
+          v-model="search_client"
         />
       </div>
     </div>
@@ -44,8 +44,8 @@
             <tr v-for="c in clientList.data" :key="c.id">
               <td>{{ c.id }}</td>
               <td>{{ c.name }} {{ c.last_name }}</td>
-              <td>{{ c.document_number }}</td>
-              <td>( {{ c.cell_phone1 }} ) - ( {{ c.cell_phone2 }} )</td>
+              <td>{{ c.document }}</td>
+              <td>( {{ c.phone_1 }} ) - ( {{ c.phone_2 }} )</td>
               <td>{{ c.email }}</td>
               <td>{{ c.address }}</td>
               <td>
@@ -84,7 +84,7 @@
     </div>
     <create-edit-client
       ref="CreateEditClient"
-      @listar-clients="listClients(1)"
+      @list-clients="listClients(1)"
     />
   </div>
 </template>
@@ -94,7 +94,7 @@ export default {
   components: { CreateEditClient },
   data() {
     return {
-      buscar_client: "",
+      search_client: "",
       clientList: {},
     };
   },
@@ -105,13 +105,13 @@ export default {
     listClients(page = 1) {
       let me = this;
       axios
-        .get(`api/clients?page=${page}&client=${this.buscar_client}`)
+        .get(`api/clients?page=${page}&client=${this.search_client}`)
         .then(function (response) {
           me.clientList = response.data;
         });
     },
     showData: function (client) {
-      this.$refs.CreateEditClient.abirEditarClient(client);
+      this.$refs.CreateEditClient.showEditClient(client);
     },
     changeStatus: function (id) {
       let me = this;

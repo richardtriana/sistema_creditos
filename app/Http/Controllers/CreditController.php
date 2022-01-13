@@ -23,18 +23,18 @@ class CreditController extends Controller
 
         if ($request->credit && ($request->credit != '')) {
             $credits  =     $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
-                ->where('document_number', 'LIKE', "%$request->credit%")
+                ->where('document', 'LIKE', "%$request->credit%")
                 ->orWhere('name', 'LIKE', "%$request->credit%")
                 ->orWhere('email', 'LIKE', "%$request->credit%")
                 ->orWhere('last_name', 'LIKE', "%$request->credit%")
-                ->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document_number');
+                ->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document');
         } else {
             $credits  =     $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
-                ->where('document_number', 'LIKE', "%$request->credit%")
+                ->where('document', 'LIKE', "%$request->credit%")
                 ->orWhere('name', 'LIKE', "%$request->credit%")
                 ->orWhere('email', 'LIKE', "%$request->credit%")
                 ->orWhere('last_name', 'LIKE', "%$request->credit%")
-                ->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document_number');
+                ->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document');
         }
 
         $credits = $credits->paginate(10);

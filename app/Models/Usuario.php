@@ -11,7 +11,7 @@ class Usuario extends Model
   protected $table = "users";
 
   protected $fillable = [
-    'id', 'last_name', 'email', 'password', 'name', 'cell_phone', 'address', 'type_document', 'document', 'photo', 'headquarter_id', 'id_rol', 'status'
+    'id', 'last_name', 'email', 'password', 'name', 'phone', 'address', 'type_document', 'document', 'photo', 'headquarter_id', 'id_rol', 'status'
   ];
 
   /**

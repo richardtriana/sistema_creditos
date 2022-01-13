@@ -16,7 +16,7 @@ class ClientController extends Controller
 	{
 		$clients = Client::select();
 		if ($request->client && ($request->client != '')) {
-			$clients  = 	$clients->where('document_number', 'LIKE', "%$request->client%")
+			$clients  = 	$clients->where('document', 'LIKE', "%$request->client%")
 				->orWhere('name', 'LIKE', "%$request->client%")
 				->orWhere('email', 'LIKE', "%$request->client%")
 				->orWhere('last_name', 'LIKE', "%$request->client%");
@@ -52,17 +52,17 @@ class ClientController extends Controller
 		$client->name = $request['name'];
 		$client->last_name = $request['last_name'];
 		$client->type_document = $request['type_document'];
-		$client->document_number = $request['document_number'];
+		$client->document = $request['document'];
 		$client->email = $request['email'];
-		$client->fecha_nacimiento = $request['fecha_nacimiento'];
-		$client->genero = $request['genero'];
-		$client->cell_phone1 = $request['cell_phone1'];
-		$client->cell_phone2 = $request['cell_phone2'];
+		$client->birth_date = $request['birth_date'];
+		$client->gender = $request['gender'];
+		$client->phone_1 = $request['phone_1'];
+		$client->phone_2 = $request['phone_2'];
 		$client->address = $request['address'];
-		$client->estado_civil = $request['estado_civil'];
-		$client->lugar_trabajo = $request['lugar_trabajo'];
-		$client->cargo = $request['cargo'];
-		$client->independiente = $request['independiente'];
+		$client->civil_status = $request['civil_status'];
+		$client->workplace = $request['workplace'];
+		$client->occupation = $request['occupation'];
+		$client->independent = $request['independent'];
 		$client->photo = 'undefined';
 		$client->save();
 	}
@@ -102,17 +102,17 @@ class ClientController extends Controller
 		$client->name = $request['name'];
 		$client->last_name = $request['last_name'];
 		$client->type_document = $request['type_document'];
-		$client->document_number = $request['document_number'];
+		$client->document = $request['document'];
 		$client->email = $request['email'];
-		$client->fecha_nacimiento = $request['fecha_nacimiento'];
-		$client->genero = $request['genero'];
-		$client->cell_phone1 = $request['cell_phone1'];
-		$client->cell_phone2 = $request['cell_phone2'];
+		$client->birth_date = $request['birth_date'];
+		$client->gender = $request['gender'];
+		$client->phone_1 = $request['phone_1'];
+		$client->phone_2 = $request['phone_2'];
 		$client->address = $request['address'];
-		$client->estado_civil = $request['estado_civil'];
-		$client->lugar_trabajo = $request['lugar_trabajo'];
-		$client->cargo = $request['cargo'];
-		$client->independiente = $request['independiente'];
+		$client->civil_status = $request['civil_status'];
+		$client->workplace = $request['workplace'];
+		$client->occupation = $request['occupation'];
+		$client->independent = $request['independent'];
 		$client->photo = 'undefindef';
 		$client->save();
 	}
@@ -134,7 +134,7 @@ class ClientController extends Controller
 		//
 		$c = Client::find($client->id);
 		// $client->status = '0';
-		$c->activo = !$c->activo;
+		$c->status = !$c->status;
 		$c->save();
 	}
 

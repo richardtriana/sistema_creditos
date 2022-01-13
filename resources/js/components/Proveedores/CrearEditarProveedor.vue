@@ -61,26 +61,26 @@
                     type="number"
                     class="form-control"
                     id="Documento"
-                    v-model="formProveedor.document_number"
+                    v-model="formProveedor.document"
                   />
                 </div>
 
                 <div class="form-group col-4">
-                  <label for="cell_phone1">Celular 1</label>
+                  <label for="phone_1">Celular 1</label>
                   <input
                     type="tel"
                     class="form-control"
-                    id="cell_phone1"
-                    v-model="formProveedor.cell_phone1"
+                    id="phone_1"
+                    v-model="formProveedor.phone_1"
                   />
                 </div>
                 <div class="form-group col-4">
-                  <label for="cell_phone2">Celular 2</label>
+                  <label for="phone_2">Celular 2</label>
                   <input
                     type="tel"
                     class="form-control"
-                    id="cell_phone2"
-                    v-model="formProveedor.cell_phone2"
+                    id="phone_2"
+                    v-model="formProveedor.phone_2"
                   />
                 </div>
 
@@ -137,9 +137,9 @@ export default {
         name: "",
         last_name: "",
         type_document: 0,
-        document_number: 0,
-        cell_phone1: "",
-        cell_phone2: "",
+        document: 0,
+        phone_1: "",
+        phone_2: "",
         email: "",
       },
     };

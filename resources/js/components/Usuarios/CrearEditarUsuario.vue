@@ -54,12 +54,12 @@
                   />
                 </div>
                 <div class="form-group col-md-4">
-                  <label for="cell_phone">Celular</label>
+                  <label for="phone">Celular</label>
                   <input
                     type="number"
                     class="form-control"
-                    id="cell_phone"
-                    v-model="formUsuario.cell_phone"
+                    id="phone"
+                    v-model="formUsuario.phone"
                   />
                 </div>
                 <div class="form-group col-md-4">
@@ -161,7 +161,7 @@ export default {
         email: "",
         password: "",
         nombre: "",
-        cell_phone: "",
+        phone: "",
         address: "",
         type_document: 0,
         document: 0,
