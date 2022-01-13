@@ -29,8 +29,8 @@
                                 <div class="form-group col-md-4">
                                     <label for="client_id">Client</label>
                                     <v-select
-                                        :options="listaClients.data"
-                                        label="document_number"
+                                        :options="clientList.data"
+                                        label="document"
                                         aria-logname="{}"
                                         :reduce="name => name.id"
                                         v-model="formCredit.client_id"
@@ -135,7 +135,7 @@ export default {
         return {
             editar: false,
             listaSedes: [],
-            listaClients: [],
+            clientList: [],
             formCredit: {
                 client_id: "",
                 debtor_id: 2,
@@ -160,7 +160,7 @@ export default {
     },
     created() {
         this.listarSedes(1);
-        this.listarClients(1);
+        this.listClients(1);
     },
     // Function crearCredits
     methods: {
@@ -171,10 +171,10 @@ export default {
             });
         },
 
-        listarClients(page = 1) {
+        listClients(page = 1) {
             let me = this;
             axios.get(`api/clients?page=${page}`).then(function(response) {
-                me.listaClients = response.data;
+                me.clientList = response.data;
             });
         },
         crearCredit() {

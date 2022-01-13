@@ -69,7 +69,7 @@
                 <button
                   v-if="usuario.status == 1"
                   class="btn btn-outline-primary"
-                  @click="mostrarDatos(usuario)"
+                  @click="showData(usuario)"
                 >
                   <i class="bi bi-pen"></i>
                 </button>
@@ -130,7 +130,7 @@ export default {
           me.listaUsuarios = response.data;
         });
     },
-    mostrarDatos: function (ususario) {
+    showData: function (ususario) {
       this.$refs.CrearEditarUsuario.abirEditarUsuario(ususario);
     },
     changeStatus: function (id) {

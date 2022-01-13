@@ -17,12 +17,12 @@ class CreateProveedoresTable extends Migration
             $table->id();
             $table->char('name', 100);
             $table->char('last_name', 100);
-            $table->char('tipo_documento', 40)->default('Cédula de ciudadanía');
-            $table->double('document_number', 20, 0);
-            $table->char('genero', 20)->nullable();
-            $table->char('celular1', 20);
-            $table->char('celular2', 20)->nullable();
-            $table->char('direccion', 200)->nullable();
+            $table->char('type_document', 40)->default('Cédula de ciudadanía');
+            $table->double('document', 20, 0);
+            $table->char('gender', 20)->nullable();
+            $table->char('phone_1', 20);
+            $table->char('phone_2', 20)->nullable();
+            $table->char('address', 200)->nullable();
             $table->string('email')->unique();
             $table->tinyInteger('status')->default(1);
             $table->softDeletes($column = 'deleted_at', $precision = 0);

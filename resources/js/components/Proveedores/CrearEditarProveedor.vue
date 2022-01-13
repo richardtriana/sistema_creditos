@@ -42,12 +42,12 @@
                   />
                 </div>
                 <div class="form-group col-md-4">
-                  <label for="tipo_documento">Tipo Documento</label>
+                  <label for="type_document">Tipo Documento</label>
                   <select
-                    name="tipo_documento"
-                    id="tipo_documento"
+                    name="type_document"
+                    id="type_document"
                     class="custom-select"
-                    v-model="formProveedor.tipo_documento"
+                    v-model="formProveedor.type_document"
                   >
                     <option value="0" disabled>--Seleccionar--</option>
                     <option value="1">Cédula de ciudadanía</option>
@@ -61,26 +61,26 @@
                     type="number"
                     class="form-control"
                     id="Documento"
-                    v-model="formProveedor.document_number"
+                    v-model="formProveedor.document"
                   />
                 </div>
 
                 <div class="form-group col-4">
-                  <label for="celular1">Celular 1</label>
+                  <label for="phone_1">Celular 1</label>
                   <input
                     type="tel"
                     class="form-control"
-                    id="celular1"
-                    v-model="formProveedor.celular1"
+                    id="phone_1"
+                    v-model="formProveedor.phone_1"
                   />
                 </div>
                 <div class="form-group col-4">
-                  <label for="celular2">Celular 2</label>
+                  <label for="phone_2">Celular 2</label>
                   <input
                     type="tel"
                     class="form-control"
-                    id="celular2"
-                    v-model="formProveedor.celular2"
+                    id="phone_2"
+                    v-model="formProveedor.phone_2"
                   />
                 </div>
 
@@ -94,12 +94,12 @@
                   />
                 </div>
                 <div class="form-group col-4">
-                  <label for="direccion">Dirección</label>
+                  <label for="address">Dirección</label>
                   <input
                     type="text"
                     class="form-control"
-                    id="direccion"
-                    v-model="formProveedor.direccion"
+                    id="address"
+                    v-model="formProveedor.address"
                   />
                 </div>
               </div>
@@ -136,10 +136,10 @@ export default {
       formProveedor: {
         name: "",
         last_name: "",
-        tipo_documento: 0,
-        document_number: 0,
-        celular1: "",
-        celular2: "",
+        type_document: 0,
+        document: 0,
+        phone_1: "",
+        phone_2: "",
         email: "",
       },
     };

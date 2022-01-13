@@ -52,10 +52,10 @@ class UsuarioController extends Controller
         $usuario->name = $request['name'];
         $usuario->last_name = $request['last_name'];
         $usuario->celular = $request['celular'];
-        $usuario->direccion = $request['direccion'];
-        $usuario->tipo_documento = $request['tipo_documento'];
+        $usuario->address = $request['address'];
+        $usuario->type_document = $request['type_document'];
         $usuario->documento = $request['documento'];
-        $usuario->foto = 'undefindef';
+        $usuario->photo = 'undefindef';
         $usuario->save();
     }
 
@@ -97,10 +97,10 @@ class UsuarioController extends Controller
         $usuario->name = $request['name'];
         $usuario->last_name = $request['last_name'];
         $usuario->celular = $request['celular'];
-        $usuario->direccion = $request['direccion'];
-        $usuario->tipo_documento = $request['tipo_documento'];
+        $usuario->address = $request['address'];
+        $usuario->type_document = $request['type_document'];
         $usuario->documento = $request['documento'];
-        $usuario->foto = 'undefindef';
+        $usuario->photo = 'undefindef';
         $usuario->save();
     }
 

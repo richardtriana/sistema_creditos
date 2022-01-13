@@ -53,7 +53,7 @@
               <td class="text-center">
                 <button
                   class="btn btn-outline-primary"
-                  @click="mostrarDatos(o)"
+                  @click="showData(o)"
                 >
                   <i class="bi bi-pen"></i>
                 </button>
@@ -111,7 +111,7 @@ export default {
         me.listaPagos = response.data;
       });
     },
-    mostrarDatos: function (pago) {
+    showData: function (pago) {
       this.$refs.CrearEditarPago.abirEditarPago(pago);
     },
     showAlert() {

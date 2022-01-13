@@ -13,15 +13,15 @@
     </div>
     <div class="page-search d-flex justify-content-between p-4 border my-2">
       <div class="form-group col-8 m-auto">
-        <label for="buscar_client">Buscar...</label>
+        <label for="search_client">Buscar...</label>
         <input
           type="text"
-          id="buscar_client"
-          name="buscar_client"
+          id="search_client"
+          name="search_client"
           class="form-control"
           placeholder="Nombres | Documento"
-          @keypress="listarClients(1)"
-          v-model="buscar_client"
+          @keypress="listClients(1)"
+          v-model="search_client"
         />
       </div>
     </div>
@@ -41,13 +41,13 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="c in listaClients.data" :key="c.id">
+            <tr v-for="c in clientList.data" :key="c.id">
               <td>{{ c.id }}</td>
               <td>{{ c.name }} {{ c.last_name }}</td>
-              <td>{{ c.document_number }}</td>
-              <td>( {{ c.celular1 }} ) - ( {{ c.celular2 }} )</td>
+              <td>{{ c.document }}</td>
+              <td>( {{ c.phone_1 }} ) - ( {{ c.phone_2 }} )</td>
               <td>{{ c.email }}</td>
-              <td>{{ c.direccion }}</td>
+              <td>{{ c.address }}</td>
               <td>
                 <button
                   class="btn"
@@ -63,7 +63,7 @@
               <td v-if="c.activo == 1" class="text-center">
                 <button
                   class="btn btn-outline-primary"
-                  @click="mostrarDatos(c)"
+                  @click="showData(c)"
                 >
                   <i class="bi bi-pen"></i>
                 </button>
@@ -73,9 +73,9 @@
         </table>
         <pagination
           :align="'center'"
-          :data="listaClients"
+          :data="clientList"
           :limit="8"
-          @pagination-change-page="listarClients"
+          @pagination-change-page="listClients"
         >
           <span slot="prev-nav">&lt; Previous</span>
           <span slot="next-nav">Next &gt;</span>
@@ -84,7 +84,7 @@
     </div>
     <create-edit-client
       ref="CreateEditClient"
-      @listar-clients="listarClients(1)"
+      @list-clients="listClients(1)"
     />
   </div>
 </template>
@@ -94,24 +94,24 @@ export default {
   components: { CreateEditClient },
   data() {
     return {
-      buscar_client: "",
-      listaClients: {},
+      search_client: "",
+      clientList: {},
     };
   },
   created() {
-    this.listarClients(1);
+    this.listClients(1);
   },
   methods: {
-    listarClients(page = 1) {
+    listClients(page = 1) {
       let me = this;
       axios
-        .get(`api/clients?page=${page}&client=${this.buscar_client}`)
+        .get(`api/clients?page=${page}&client=${this.search_client}`)
         .then(function (response) {
-          me.listaClients = response.data;
+          me.clientList = response.data;
         });
     },
-    mostrarDatos: function (client) {
-      this.$refs.CreateEditClient.abirEditarClient(client);
+    showData: function (client) {
+      this.$refs.CreateEditClient.showEditClient(client);
     },
     changeStatus: function (id) {
       let me = this;
@@ -130,7 +130,7 @@ export default {
               me.$root.config
             )
             .then(function () {
-              me.listarClients(1);
+              me.listClients(1);
             });
           Swal.fire("Cambios realizados!", "", "success");
         } else if (result.isDenied) {

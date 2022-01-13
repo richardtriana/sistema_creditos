@@ -16,7 +16,7 @@ class ClientController extends Controller
 	{
 		$clients = Client::select();
 		if ($request->client && ($request->client != '')) {
-			$clients  = 	$clients->where('document_number', 'LIKE', "%$request->client%")
+			$clients  = 	$clients->where('document', 'LIKE', "%$request->client%")
 				->orWhere('name', 'LIKE', "%$request->client%")
 				->orWhere('email', 'LIKE', "%$request->client%")
 				->orWhere('last_name', 'LIKE', "%$request->client%");
@@ -51,19 +51,19 @@ class ClientController extends Controller
 		$client = new Client();
 		$client->name = $request['name'];
 		$client->last_name = $request['last_name'];
-		$client->tipo_documento = $request['tipo_documento'];
-		$client->document_number = $request['document_number'];
+		$client->type_document = $request['type_document'];
+		$client->document = $request['document'];
 		$client->email = $request['email'];
-		$client->fecha_nacimiento = $request['fecha_nacimiento'];
-		$client->genero = $request['genero'];
-		$client->celular1 = $request['celular1'];
-		$client->celular2 = $request['celular2'];
-		$client->direccion = $request['direccion'];
-		$client->estado_civil = $request['estado_civil'];
-		$client->lugar_trabajo = $request['lugar_trabajo'];
-		$client->cargo = $request['cargo'];
-		$client->independiente = $request['independiente'];
-		$client->foto = 'undefined';
+		$client->birth_date = $request['birth_date'];
+		$client->gender = $request['gender'];
+		$client->phone_1 = $request['phone_1'];
+		$client->phone_2 = $request['phone_2'];
+		$client->address = $request['address'];
+		$client->civil_status = $request['civil_status'];
+		$client->workplace = $request['workplace'];
+		$client->occupation = $request['occupation'];
+		$client->independent = $request['independent'];
+		$client->photo = 'undefined';
 		$client->save();
 	}
 
@@ -101,19 +101,19 @@ class ClientController extends Controller
 		$client = Client::find($request->id);
 		$client->name = $request['name'];
 		$client->last_name = $request['last_name'];
-		$client->tipo_documento = $request['tipo_documento'];
-		$client->document_number = $request['document_number'];
+		$client->type_document = $request['type_document'];
+		$client->document = $request['document'];
 		$client->email = $request['email'];
-		$client->fecha_nacimiento = $request['fecha_nacimiento'];
-		$client->genero = $request['genero'];
-		$client->celular1 = $request['celular1'];
-		$client->celular2 = $request['celular2'];
-		$client->direccion = $request['direccion'];
-		$client->estado_civil = $request['estado_civil'];
-		$client->lugar_trabajo = $request['lugar_trabajo'];
-		$client->cargo = $request['cargo'];
-		$client->independiente = $request['independiente'];
-		$client->foto = 'undefindef';
+		$client->birth_date = $request['birth_date'];
+		$client->gender = $request['gender'];
+		$client->phone_1 = $request['phone_1'];
+		$client->phone_2 = $request['phone_2'];
+		$client->address = $request['address'];
+		$client->civil_status = $request['civil_status'];
+		$client->workplace = $request['workplace'];
+		$client->occupation = $request['occupation'];
+		$client->independent = $request['independent'];
+		$client->photo = 'undefindef';
 		$client->save();
 	}
 
@@ -134,7 +134,7 @@ class ClientController extends Controller
 		//
 		$c = Client::find($client->id);
 		// $client->status = '0';
-		$c->activo = !$c->activo;
+		$c->status = !$c->status;
 		$c->save();
 	}
 

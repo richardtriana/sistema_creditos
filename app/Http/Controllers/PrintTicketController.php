@@ -50,7 +50,7 @@ class PrintTicketController extends Controller
             $printer->text("NIT: ");
             $printer->text($sede->nit . "\n");
             $printer->text("Dirección: ");
-            $printer->text($sede->direccion . "\n");
+            $printer->text($sede->address . "\n");
 
             $printer->setEmphasis(true);
             $printer->setTextSize(1, 2);

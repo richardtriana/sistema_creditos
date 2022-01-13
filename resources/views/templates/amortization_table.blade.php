@@ -44,7 +44,7 @@
     <table class="table">
       <tr>
         <td>Cliente: {{$client->name}}  {{$client->last_name}}</td>
-        <td>Nro. Documento {{$client->document_number}}</td>
+        <td>Nro. Documento {{$client->document}}</td>
         <td>Nro. Crédito: {{ $credit->id}}</td>
       </tr>
       <tr>

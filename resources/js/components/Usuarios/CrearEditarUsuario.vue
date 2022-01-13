@@ -63,12 +63,12 @@
                   />
                 </div>
                 <div class="form-group col-md-4">
-                  <label for="tipo_documento">Tipo Documento</label>
+                  <label for="type_document">Tipo Documento</label>
                   <select
-                    name="tipo_documento"
-                    id="tipo_documento"
+                    name="type_document"
+                    id="type_document"
                     class="custom-select"
-                    v-model="formUsuario.tipo_documento"
+                    v-model="formUsuario.type_document"
                   >
                     <option value="0" disabled>--Seleccionar--</option>
                     <option value="1">Cédula de ciudadanía</option>
@@ -162,10 +162,10 @@ export default {
         password: "",
         nombre: "",
         celular: "",
-        direccion: "",
-        tipo_documento: 0,
+        address: "",
+        type_document: 0,
         documento: 0,
-        foto: "",
+        photo: "",
         status: "1",
         rol_id: "",
         sede_id: "",

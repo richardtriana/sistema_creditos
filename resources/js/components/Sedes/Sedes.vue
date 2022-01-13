@@ -69,7 +69,7 @@
                 <button
                   v-if="sede.status == 1"
                   class="btn btn-outline-primary"
-                  @click="mostrarDatos(sede)"
+                  @click="showData(sede)"
                 >
                   <i class="bi bi-pen"></i>
                 </button>
@@ -113,7 +113,7 @@ export default {
           me.listaSedes = response.data;
         });
     },
-    mostrarDatos: function (sede) {
+    showData: function (sede) {
       this.$refs.CrearEditarSede.abirEditarSede(sede);
     },
     changeStatus: function (id) {

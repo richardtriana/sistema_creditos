@@ -35,18 +35,18 @@
                             <td>{{ p.name }}</td>
                             <td>{{ p.last_name }}</td>
                             <td>
-                                <span v-if="p.tipo_documento == '1'"
+                                <span v-if="p.type_document == '1'"
                                     >Cèdula de ciudadania</span
                                 >
-                                <span v-if="p.tipo_documento == '2'"
+                                <span v-if="p.type_document == '2'"
                                     >Passaporte</span
                                 >
                             </td>
-                            <td>{{ p.document_number }}</td>
-                            <td>{{ p.celular1 }}</td>
-                            <td>{{ p.celular2 }}</td>
+                            <td>{{ p.document }}</td>
+                            <td>{{ p.phone_1 }}</td>
+                            <td>{{ p.phone_2 }}</td>
                             <td>{{ p.email }}</td>
-                            <td>{{ p.direccion }}</td>
+                            <td>{{ p.address }}</td>
                             <td>
                                 <button
                                     class="btn"
@@ -70,7 +70,7 @@
                             <td class="text-center">
                                 <button
                                     class="btn btn-outline-primary"
-                                    @click="mostrarDatos(p)"
+                                    @click="showData(p)"
                                 >
                                     <i class="bi bi-pen"></i>
                                 </button>
@@ -114,7 +114,7 @@ export default {
                 me.listaProveedores = response.data;
             });
         },
-        mostrarDatos: function(proveedor) {
+        showData: function(proveedor) {
             this.$refs.CrearEditarProveedor.abirEditarProveedor(proveedor);
         },
         changeStatus: function(id) {

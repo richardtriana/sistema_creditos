@@ -36,12 +36,12 @@
                                     />
                                 </div>
                                 <div class="form-group col-md-4">
-                                    <label for="direccion">Dirección</label>
+                                    <label for="address">Dirección</label>
                                     <input
                                         type="text"
                                         class="form-control"
-                                        id="direccion"
-                                        v-model="formSede.direccion"
+                                        id="address"
+                                        v-model="formSede.address"
                                     />
                                 </div>
                                 <div class="form-group col-md-4">
@@ -138,10 +138,10 @@ export default {
                 password: "",
                 nombre: "",
                 celular: "",
-                direccion: "",
-                tipo_documento: 0,
+                address: "",
+                type_document: 0,
                 documento: 0,
-                foto: "",
+                photo: "",
                 status: "1",
                 id_rol: "",
                 sede_id: "",

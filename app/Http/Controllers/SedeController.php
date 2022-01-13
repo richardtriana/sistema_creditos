@@ -51,7 +51,7 @@ class SedeController extends Controller
 		$sede = new Sede();
 		$sede->sede = $request['sede'];
 		$sede->status = $request['status'];
-		$sede->direccion = $request['direccion'];
+		$sede->address = $request['address'];
 		$sede->nit = $request['nit'];
 		$sede->correo_contacto = $request['correo_contacto'];
 		$sede->representante = $request['representante'];
@@ -94,7 +94,7 @@ class SedeController extends Controller
 		$sede = Sede::find($request->id);
 		$sede->sede = $request['sede'];
 		$sede->status = $request['status'];
-		$sede->direccion = $request['direccion'];
+		$sede->address = $request['address'];
 		$sede->nit = $request['nit'];
 		$sede->correo_contacto = $request['correo_contacto'];
 		$sede->representante = $request['representante'];

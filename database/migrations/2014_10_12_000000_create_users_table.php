@@ -21,10 +21,10 @@ class CreateUsersTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->default(null)->nullable();
             $table->string('celular')->default(null)->nullable();
-            $table->string('direccion')->default(null)->nullable();
-            $table->string('tipo_documento')->default(null)->nullable();
+            $table->string('address')->default(null)->nullable();
+            $table->string('type_document')->default(null)->nullable();
             $table->string('documento')->default(null)->nullable();
-            $table->string('foto')->default(null)->nullable();
+            $table->string('photo')->default(null)->nullable();
             $table->tinyInteger('status')->default(1);
             $table->foreignId('rol_id')->default(1);
             $table->foreignId('sede_id')->default(1)->nullable();

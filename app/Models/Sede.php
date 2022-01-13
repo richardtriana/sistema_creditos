@@ -11,7 +11,7 @@ class Sede extends Model
     protected $fillable = [
         'sede',
         'status',
-        'direccion',
+        'address',
         'nit',
         'correo_contacto',
         'representante',
