@@ -12,19 +12,19 @@ class Client extends Model
   protected $fillable = [
     'name',
     'last_name',
-    'tipo_documento',
+    'type_document',
     'document_number',
     'fecha_nacimiento',
     'email',
     'genero',
-    'celular1',
-    'celular2',
-    'direccion',
+    'cell_phone1',
+    'cell_phone2',
+    'address',
     'estado_civil',
     'lugar_trabajo',
     'cargo',
     'independiente',
-    'foto', 'activo'
+    'photo', 'activo'
   ];
 
   public function credits()

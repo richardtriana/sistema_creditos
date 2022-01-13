@@ -24,19 +24,19 @@ class ClientFactory extends Factory
 		return [
 			'name' => $this->faker->firstName(),
 			'last_name' => $this->faker->lastName(),
-			'tipo_documento' => $this->faker->boolean(),
+			'type_document' => $this->faker->boolean(),
 			'document_number' => $this->faker->randomNumber(),
 			'fecha_nacimiento' => $this->faker->date(),
 			'email' => $this->faker->email(),
 			'genero' => $this->faker->randomElement($array = ['f', 'm']),
-			'celular1' => $this->faker->phoneNumber(),
-			'celular2' => $this->faker->phoneNumber(),
-			'direccion' => $this->faker->address(),
+			'cell_phone1' => $this->faker->phoneNumber(),
+			'cell_phone2' => $this->faker->phoneNumber(),
+			'address' => $this->faker->address(),
 			'estado_civil' => $this->faker->numberBetween(1, 3),
 			'lugar_trabajo' => $this->faker->address(),
 			'cargo' => $this->faker->streetAddress(),
 			'independiente' => $this->faker->boolean(),
-			'foto' => $this->faker->image()
+			'photo' => $this->faker->image()
 		];
 	}
 }

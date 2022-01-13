@@ -24,11 +24,11 @@ class ProveedorFactory extends Factory
       return [
         'name' => $this->faker->firstName(),
         'last_name' => $this->faker->lastName(),
-        'tipo_documento' => $this->faker->numberBetween(1,2),
+        'type_document' => $this->faker->numberBetween(1,2),
         'document_number' => $this->faker->randomNumber(),
-        'celular1' => $this->faker->phoneNumber(),
-        'celular2' => $this->faker->phoneNumber(),
-        'direccion' => $this->faker->address(),
+        'cell_phone1' => $this->faker->phoneNumber(),
+        'cell_phone2' => $this->faker->phoneNumber(),
+        'address' => $this->faker->address(),
         'email' => $this->faker->email()
 		  ];
     }

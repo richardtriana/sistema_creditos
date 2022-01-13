@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
-use App\Models\Sede;
+use App\Models\Headquarter;
 use App\Models\Credit;
 use App\Models\Installment;
 use Illuminate\Http\Request;
@@ -19,7 +19,7 @@ class CreditController extends Controller
     {
         $credits = Credit::select();
         $clients = Client::select();
-        $sedes = Sede::select();
+        $headquarters = Headquarter::select();
 
         if ($request->credit && ($request->credit != '')) {
             $credits  =     $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
@@ -71,15 +71,15 @@ class CreditController extends Controller
         $credit->client_id = $request['client_id'];
         $credit->debtor = $request['debtor'];
         $credit->debtor_id = $request['debtor_id'];
-        $credit->sede_id = $request['sede_id'];
+        $credit->headquarter_id = $request['headquarter_id'];
         $credit->number_installments = $request['number_installments'];
         $credit->number_paid_installments = $request['number_paid_installments'];
         $credit->day_limit = $request['day_limit'];
         $credit->status = $request['status'];
-        $credit->fecha_inicio = date('Y-m-d');
+        $credit->start_date = date('Y-m-d');
         $credit->interest = $request['interest'];
         $credit->annual_interest_percentage = $request['annual_interest_percentage'];
-        $credit->usu_crea = $request['usu_crea'];
+        $credit->user_id = $request['user_id'];
         $credit->credit_value = $request['credit_value'];
         $credit->paid_value = $request['paid_value'];
         $credit->capital_value = $request['capital_value'];
@@ -134,15 +134,15 @@ class CreditController extends Controller
         $credit->client_id = $request['client_id'];
         $credit->debtor_id = $request['debtor_id'];
         $credit->debtor = $request['debtor'];
-        $credit->sede_id = $request['sede_id'];
+        $credit->headquarter_id = $request['headquarter_id'];
         $credit->number_installments = $request['number_installments'];
         $credit->number_paid_installments = $request['number_paid_installments'];
         $credit->day_limit = $request['day_limit'];
         $credit->status = $request['status'];
-        $credit->fecha_inicio = $request['fecha_inicio'];
+        $credit->start_date = $request['start_date'];
         $credit->interest = $request['interest'];
         $credit->annual_interest_percentage = $request['annual_interest_percentage'];
-        $credit->usu_crea = $request['usu_crea'];
+        $credit->user_id = $request['user_id'];
         $credit->valor_cuota = $request['valor_cuota'];
         $credit->credit_value = $request['credit_value'];
         $credit->paid_value = $request['paid_value'];

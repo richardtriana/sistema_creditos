@@ -2,17 +2,17 @@
 
 namespace Database\Factories;
 
-use App\Models\Sede;
+use App\Models\Headquarter;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class SedeFactory extends Factory
+class HeadquarterFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = Sede::class;
+    protected $model = Headquarter::class;
 
     /**
      * Define the model's default state.
@@ -22,14 +22,14 @@ class SedeFactory extends Factory
     public function definition()
     {
         return [
-            'sede' => $this->faker->name(),
+            'headquarter' => $this->faker->name(),
             'status' => $this->faker->boolean(),
-            'direccion' => $this->faker->address(),
+            'address' => $this->faker->address(),
             'nit' => $this->faker->ean13(),
-            'correo_contacto' => $this->faker->email(),
-            'representante' => $this->faker->lastName(),
-            'celular_contacto' => $this->faker->phoneNumber(),
-            'impresora_pos' => 'POS-80'
+            'email' => $this->faker->email(),
+            'legal_representative' => $this->faker->lastName(),
+            'cell_phone' => $this->faker->phoneNumber(),
+            'pos_printer' => 'POS-80'
         ];
     }
 }

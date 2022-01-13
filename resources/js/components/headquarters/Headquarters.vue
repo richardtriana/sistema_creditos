@@ -1,27 +1,27 @@
 <template>
   <div class="">
     <div class="page-header d-flex justify-content-between p-4 border my-2">
-      <h3>Sedes</h3>
+      <h3>Headquarters</h3>
       <button
         type="button"
         class="btn btn-primary"
         data-toggle="modal"
-        data-target="#formSedeModal"
+        data-target="#formHeadquarterModal"
       >
-        Crear Sede
+        Crear Headquarter
       </button>
     </div>
     <div class="page-search d-flex justify-content-between p-4 border my-2">
       <div class="form-group col-8 m-auto">
-        <label for="buscar_sede">Buscar...</label>
+        <label for="search_headquarter">Buscar...</label>
         <input
           type="text"
-          id="buscar_sede"
-          name="buscar_sede"
+          id="search_headquarter"
+          name="search_headquarter"
           class="form-control"
           placeholder="Nombres | Documento"
-          @keypress="listarSedes(1)"
-          v-model="buscar_sede"
+          @keypress="listHeadquarters(1)"
+          v-model="search_headquarter"
         />
       </div>
     </div>
@@ -41,25 +41,25 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="sede in listaSedes.data" :key="sede.id">
-              <td>{{ sede.id }}</td>
-              <td>{{ sede.sede }}</td>
-              <td>{{ sede.nit }}</td>
-              <td>{{ sede.correo_contacto }}</td>
-              <td>{{ sede.representante }}</td>
-              <td>{{ sede.celular_contacto }}</td>
+            <tr v-for="headquarter in headquarterList.data" :key="headquarter.id">
+              <td>{{ headquarter.id }}</td>
+              <td>{{ headquarter.headquarter }}</td>
+              <td>{{ headquarter.nit }}</td>
+              <td>{{ headquarter.email }}</td>
+              <td>{{ headquarter.legal_representative }}</td>
+              <td>{{ headquarter.cell_phone }}</td>
               <td>
                 <button
-                  v-if="sede.status == 1"
+                  v-if="headquarter.status == 1"
                   class="btn btn-outline-danger"
-                  @click="changeStatus(sede.id)"
+                  @click="changeStatus(headquarter.id)"
                 >
                   <i class="bi bi-trash"></i>
                 </button>
                 <button
-                  v-if="sede.status == 0"
+                  v-if="headquarter.status == 0"
                   class="btn btn-outline-success"
-                  @click="changeStatus(sede.id)"
+                  @click="changeStatus(headquarter.id)"
                 >
                   <i class="bi bi-check2-circle"></i>
                 </button>
@@ -67,9 +67,9 @@
 
               <td class="text-center">
                 <button
-                  v-if="sede.status == 1"
+                  v-if="headquarter.status == 1"
                   class="btn btn-outline-primary"
-                  @click="mostrarDatos(sede)"
+                  @click="showData(headquarter)"
                 >
                   <i class="bi bi-pen"></i>
                 </button>
@@ -79,57 +79,57 @@
         </table>
         <pagination
           :align="'center'"
-          :data="listaSedes"
+          :data="headquarterList"
           :limit="8"
-          @pagination-change-page="listarSedes"
+          @pagination-change-page="listHeadquarters"
         >
           <span slot="prev-nav">&lt; Previous</span>
           <span slot="next-nav">Next &gt;</span>
         </pagination>
       </section>
     </div>
-    <crear-editar-sede ref="CrearEditarSede" @listar-sedes="listarSedes(1)" />
+    <create-edit-headquarter ref="CreateEditHeadquarter" @list-headquarters="listHeadquarters(1)" />
   </div>
 </template>
 <script>
-import CrearEditarSede from "./CrearEditarSede.vue";
+import CreateEditHeadquarter from "./CreateEditHeadquarter.vue";
 export default {
-  components: { CrearEditarSede },
+  components: { CreateEditHeadquarter },
   data() {
     return {
-      buscar_sede: "",
-      listaSedes: {},
+      search_headquarter: "",
+      headquarterList: {},
     };
   },
   created() {
-    this.listarSedes(1);
+    this.listHeadquarters(1);
   },
   methods: {
-    listarSedes(page = 1) {
+    listHeadquarters(page = 1) {
       let me = this;
       axios
-        .get(`api/sedes?page=${page}&sede=${this.buscar_sede}`)
+        .get(`api/headquarters?page=${page}&headquarter=${this.search_headquarter}`)
         .then(function (response) {
-          me.listaSedes = response.data;
+          me.headquarterList = response.data;
         });
     },
-    mostrarDatos: function (sede) {
-      this.$refs.CrearEditarSede.abirEditarSede(sede);
+    showData: function (headquarter) {
+      this.$refs.CreateEditHeadquarter.showEditHeadquarter(headquarter);
     },
     changeStatus: function (id) {
       let me = this;
 
       Swal.fire({
-        title: "¿Quieres cambiar el status del sede?",
+        title: "¿Quieres cambiar el estado de la sede?",
         showDenyButton: true,
         denyButtonText: `Cancelar`,
         confirmButtonText: `Guardar`,
       }).then((result) => {
         if (result.isConfirmed) {
           axios
-            .post(`api/sedes/${id}/change-status`, null, me.$root.config)
+            .post(`api/headquarters/${id}/change-status`, null, me.$root.config)
             .then(function () {
-              me.listarSedes(1);
+              me.listHeadquarters(1);
             });
           Swal.fire("Cambios realizados!", "", "success");
         } else if (result.isDenied) {

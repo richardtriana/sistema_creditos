@@ -42,7 +42,7 @@ const routes = [
     { path: '/pagos', component: require('./components/Pagos/Pagos.vue').default },
     { path: '/credits', component: require('./components/credits/Credits.vue').default },
     { path: '/credits/:credit_id/installments', component: require('./components/credits/Installment.vue').default, props: true, name: 'installments' },
-    { path: '/sedes', component: require('./components/Sedes/Sedes.vue').default },
+    { path: '/headquarters', component: require('./components/headquarters/Headquarters.vue').default },
 
 
 ]

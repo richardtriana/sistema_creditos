@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateSedesTable extends Migration
+class CreateHeadquartersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,16 @@ class CreateSedesTable extends Migration
      */
     public function up()
     {
-        Schema::create('sedes', function (Blueprint $table) {
+        Schema::create('headquarters', function (Blueprint $table) {
             $table->id();
-            $table->string('sede');
+            $table->string('headquarter');
             $table->tinyInteger('status')->default(1);
-            $table->string('direccion')->nullable();
+            $table->string('address')->nullable();
             $table->string('nit')->nullable();
-            $table->string('correo_contacto')->nullable();
-            $table->string('representante')->nullable();
-            $table->string('celular_contacto')->nullable();
-            $table->string('impresora_pos')->default('POS-80');
+            $table->string('email')->nullable();
+            $table->string('legal_representative')->nullable();
+            $table->string('cell_phone')->nullable();
+            $table->string('pos_printer')->default('POS-80');
             $table->timestamps();
         });
     }
@@ -34,6 +34,6 @@ class CreateSedesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('sedes');
+        Schema::dropIfExists('headquarters');
     }
 }

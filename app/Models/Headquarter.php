@@ -5,17 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Sede extends Model
+class Headquarter extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'sede',
+        'headquarter',
         'status',
-        'direccion',
+        'address',
         'nit',
-        'correo_contacto',
-        'representante',
-        'celular_contacto',
-        'impresora_pos'
+        'email',
+        'legal_representative',
+        'cell_phone',
+        'pos_printer'
     ];
 }

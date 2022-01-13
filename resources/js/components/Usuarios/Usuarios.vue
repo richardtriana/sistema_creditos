@@ -45,7 +45,7 @@
               <th>Correo</th>
               <th>Documento</th>
               <th>Celular</th>
-              <th>Sede</th>
+              <th>Headquarter</th>
               <th>Rol</th>
               <th>Estado</th>
               <th>Opciones</th>
@@ -57,9 +57,9 @@
               <td>{{ usuario.name }}</td>
               <td>{{ usuario.last_name }}</td>
               <td>{{ usuario.email }}</td>
-              <td>{{ usuario.documento }}</td>
-              <td>{{ usuario.celular }}</td>
-              <td>{{ usuario.sede_id }}</td>
+              <td>{{ usuario.document }}</td>
+              <td>{{ usuario.cell_phone }}</td>
+              <td>{{ usuario.headquarter_id }}</td>
               <td v-if="usuario.rol_id == 1">Administrador</td>
               <td v-if="usuario.rol_id == 2">Operario</td>
               <td v-if="usuario.status == 1">Activo</td>
@@ -69,7 +69,7 @@
                 <button
                   v-if="usuario.status == 1"
                   class="btn btn-outline-primary"
-                  @click="mostrarDatos(usuario)"
+                  @click="showData(usuario)"
                 >
                   <i class="bi bi-pen"></i>
                 </button>
@@ -130,7 +130,7 @@ export default {
           me.listaUsuarios = response.data;
         });
     },
-    mostrarDatos: function (ususario) {
+    showData: function (ususario) {
       this.$refs.CrearEditarUsuario.abirEditarUsuario(ususario);
     },
     changeStatus: function (id) {

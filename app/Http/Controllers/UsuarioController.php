@@ -16,7 +16,7 @@ class UsuarioController extends Controller
     {
         $usuarios = Usuario::select();
         if ($request->usuario && ($request->usuario != '')) {
-            $usuarios  =     $usuarios->where('documento', 'LIKE', "%$request->usuario%")
+            $usuarios  =     $usuarios->where('document', 'LIKE', "%$request->usuario%")
                 ->orWhere('name', 'LIKE', "%$request->usuario%")
                 ->orWhere('email', 'LIKE', "%$request->usuario%");
         }
@@ -51,11 +51,11 @@ class UsuarioController extends Controller
         $usuario->password = $request['password'];
         $usuario->name = $request['name'];
         $usuario->last_name = $request['last_name'];
-        $usuario->celular = $request['celular'];
-        $usuario->direccion = $request['direccion'];
-        $usuario->tipo_documento = $request['tipo_documento'];
-        $usuario->documento = $request['documento'];
-        $usuario->foto = 'undefindef';
+        $usuario->cell_phone = $request['cell_phone'];
+        $usuario->address = $request['address'];
+        $usuario->type_document = $request['type_document'];
+        $usuario->document = $request['document'];
+        $usuario->photo = 'undefindef';
         $usuario->save();
     }
 
@@ -96,11 +96,11 @@ class UsuarioController extends Controller
         $usuario->password = $request['password'];
         $usuario->name = $request['name'];
         $usuario->last_name = $request['last_name'];
-        $usuario->celular = $request['celular'];
-        $usuario->direccion = $request['direccion'];
-        $usuario->tipo_documento = $request['tipo_documento'];
-        $usuario->documento = $request['documento'];
-        $usuario->foto = 'undefindef';
+        $usuario->cell_phone = $request['cell_phone'];
+        $usuario->address = $request['address'];
+        $usuario->type_document = $request['type_document'];
+        $usuario->document = $request['document'];
+        $usuario->photo = 'undefindef';
         $usuario->save();
     }
 

@@ -27,11 +27,11 @@ class ProveedorController extends Controller
 		$proveedor = new Proveedor();
 		$proveedor->name = $request['name'];
 		$proveedor->last_name = $request['last_name'];
-		$proveedor->tipo_documento = $request['tipo_documento'];
+		$proveedor->type_document = $request['type_document'];
 		$proveedor->document_number = $request['document_number'];
-		$proveedor->celular1 = $request['celular1'];
-		$proveedor->celular2 = $request['celular2'];
-		$proveedor->direccion = $request['direccion'];
+		$proveedor->cell_phone1 = $request['cell_phone1'];
+		$proveedor->cell_phone2 = $request['cell_phone2'];
+		$proveedor->address = $request['address'];
     $proveedor->email = $request['email'];
 		$proveedor->save();
 	}
@@ -51,11 +51,11 @@ class ProveedorController extends Controller
 		$proveedor = Proveedor::find($request->id);
 		$proveedor->name = $request['name'];
 		$proveedor->last_name = $request['last_name'];
-		$proveedor->tipo_documento = $request['tipo_documento'];
+		$proveedor->type_document = $request['type_document'];
 		$proveedor->document_number = $request['document_number'];
-		$proveedor->celular1 = $request['celular1'];
-		$proveedor->celular2 = $request['celular2'];
-		$proveedor->direccion = $request['direccion'];
+		$proveedor->cell_phone1 = $request['cell_phone1'];
+		$proveedor->cell_phone2 = $request['cell_phone2'];
+		$proveedor->address = $request['address'];
     $proveedor->email = $request['email'];
 		$proveedor->save();
 	}
