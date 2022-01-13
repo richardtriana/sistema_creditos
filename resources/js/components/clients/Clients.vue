@@ -52,15 +52,15 @@
                 <button
                   class="btn"
                   :class="
-                    c.activo == 1 ? 'btn-outline-success' : 'btn-outline-danger'
+                    c.status == 1 ? 'btn-outline-success' : 'btn-outline-danger'
                   "
                   @click="changeStatus(c.id)"
                 >
-                  <i class="bi bi-check-circle-fill" v-if="c.activo == 1"></i>
-                  <i class="bi bi-x-circle" v-if="c.activo == 0"></i>
+                  <i class="bi bi-check-circle-fill" v-if="c.status == 1"></i>
+                  <i class="bi bi-x-circle" v-if="c.status == 0"></i>
                 </button>
               </td>
-              <td v-if="c.activo == 1" class="text-center">
+              <td v-if="c.status == 1" class="text-center">
                 <button
                   class="btn btn-outline-primary"
                   @click="showData(c)"
