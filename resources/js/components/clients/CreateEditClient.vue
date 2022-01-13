@@ -2,15 +2,15 @@
   <div>
     <div
       class="modal fade"
-      id="formClienteModal"
+      id="formClientModal"
       tabindex="-1"
-      aria-labelledby="formClienteModalLabel"
+      aria-labelledby="formClientModalLabel"
       aria-hidden="true"
     >
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="formClienteModalLabel">Clientes</h5>
+            <h5 class="modal-title" id="formClientModalLabel">Clients</h5>
             <button
               type="button"
               class="close"
@@ -25,12 +25,12 @@
             <form>
               <div class="form-row">
                 <div class="form-group col-md-4">
-                  <label for="nombres">Nombres</label>
+                  <label for="name">Nombres</label>
                   <input
                     type="text"
                     class="form-control"
-                    id="nombres"
-                    v-model="formCliente.nombres"
+                    id="name"
+                    v-model="formClient.name"
                   />
                 </div>
                 <div class="form-group col-md-4">
@@ -39,7 +39,7 @@
                     type="text"
                     class="form-control"
                     id="Apellidos"
-                    v-model="formCliente.apellidos"
+                    v-model="formClient.last_name"
                   />
                 </div>
                 <div class="form-group col-md-4">
@@ -48,7 +48,7 @@
                     type="date"
                     class="form-control"
                     id="fecha_nacimiento"
-                    v-model="formCliente.fecha_nacimiento"
+                    v-model="formClient.fecha_nacimiento"
                   />
                 </div>
                 <div class="form-group col-md-4">
@@ -57,7 +57,7 @@
                     name="tipo_documento"
                     id="tipo_documento"
                     class="custom-select"
-                    v-model="formCliente.tipo_documento"
+                    v-model="formClient.tipo_documento"
                   >
                     <option value="0" disabled>--Seleccionar--</option>
                     <option value="1">Cédula de ciudadanía</option>
@@ -71,7 +71,7 @@
                     type="number"
                     class="form-control"
                     id="Documento"
-                    v-model="formCliente.nro_documento"
+                    v-model="formClient.document_number"
                   />
                 </div>
 
@@ -81,7 +81,7 @@
                     name="estado_civil"
                     id="estado_civil"
                     class="custom-select"
-                    v-model="formCliente.estado_civil"
+                    v-model="formClient.estado_civil"
                   >
                     <option value="0" disabled>--Seleccionar--</option>
                     <option value="Soltero">Soltero</option>
@@ -102,7 +102,7 @@
                       name="inlineRadioOptions"
                       id="Hombre"
                       value="option1"
-                      v-model="formCliente.genero"
+                      v-model="formClient.genero"
                     />
                     <label class="form-check-label" for="Hombre">Hombre</label>
                   </div>
@@ -113,7 +113,7 @@
                       name="inlineRadioOptions"
                       id="Mujer"
                       value="option2"
-                      v-model="formCliente.genero"
+                      v-model="formClient.genero"
                     />
                     <label class="form-check-label" for="Mujer">Mujer</label>
                   </div>
@@ -124,7 +124,7 @@
                       name="inlineRadioOptions"
                       id="Otro"
                       value="option3"
-                      v-model="formCliente.genero"
+                      v-model="formClient.genero"
                     />
                     <label class="form-check-label" for="Otro">Otro</label>
                   </div>
@@ -137,7 +137,7 @@
                     type="email"
                     class="form-control"
                     id="email"
-                    v-model="formCliente.email"
+                    v-model="formClient.email"
                   />
                 </div>
                 <div class="form-group col-4">
@@ -146,7 +146,7 @@
                     type="text"
                     class="form-control"
                     id="direccion"
-                    v-model="formCliente.direccion"
+                    v-model="formClient.direccion"
                   />
                 </div>
                 <div class="form-group col-4">
@@ -155,7 +155,7 @@
                     type="tel"
                     class="form-control"
                     id="celular1"
-                    v-model="formCliente.celular1"
+                    v-model="formClient.celular1"
                   />
                 </div>
                 <div class="form-group col-4">
@@ -164,7 +164,7 @@
                     type="tel"
                     class="form-control"
                     id="celular2"
-                    v-model="formCliente.celular2"
+                    v-model="formClient.celular2"
                   />
                 </div>
                 <!-- </div>
@@ -175,7 +175,7 @@
                     type="email"
                     class="form-control"
                     id="lugar_trabajo"
-                    v-model="formCliente.lugar_trabajo"
+                    v-model="formClient.lugar_trabajo"
                   />
                 </div>
                 <div class="form-group col-md-4">
@@ -184,7 +184,7 @@
                     type="text"
                     class="form-control"
                     id="cargo"
-                    v-model="formCliente.cargo"
+                    v-model="formClient.cargo"
                   />
                 </div>
                 <div class="form-check col-md-4 ml-4">
@@ -193,7 +193,7 @@
                     type="checkbox"
                     value="1"
                     id="independiente"
-                    v-model="formCliente.independiente"
+                    v-model="formClient.independiente"
                   />
                   <label class="form-check-label" for="independiente">
                     Independiente
@@ -214,7 +214,7 @@
             <button
               type="button"
               class="btn btn-primary rounded"
-              @click="formCliente.id ? editarCliente() : crearCliente()"
+              @click="formClient.id ? editarClient() : crearClient()"
             >
               Guardar
             </button>
@@ -230,11 +230,11 @@ export default {
   data() {
     return {
       editar: false,
-      formCliente: {
-        nombres: "",
-        apellidos: "",
+      formClient: {
+        name: "",
+        last_name: "",
         tipo_documento: 0,
-        nro_documento: 0,
+        document_number: 0,
         fecha_nacimiento: "",
         email: "",
         celular1: "",
@@ -248,38 +248,38 @@ export default {
       },
     };
   },
-  // Function crearClientes
+  // Function crearClients
   methods: {
-    crearCliente() {
+    crearClient() {
       let me = this;
-      axios.post("api/clientes", this.formCliente).then(function () {
-        $("#formClienteModal").modal("hide");
+      axios.post("api/clients", this.formClient).then(function () {
+        $("#formClientModal").modal("hide");
         me.resetData();
-        me.$emit("listar-clientes");
+        me.$emit("listar-clients");
       });
     },
-    abirEditarCliente(cliente) {
+    abirEditarClient(client) {
       this.editar = true;
       let me = this;
-      $("#formClienteModal").modal("show");
-      me.formCliente = cliente;
+      $("#formClientModal").modal("show");
+      me.formClient = client;
     },
-    editarCliente() {
+    editarClient() {
       let me = this;
       axios
-        .put("api/clientes/" + this.formCliente.id, this.formCliente)
+        .put("api/clients/" + this.formClient.id, this.formClient)
         .then(function () {
-          $("#formClienteModal").modal("hide");
+          $("#formClientModal").modal("hide");
           me.resetData();
         });
-      me.$emit("listar-clientes");
+      me.$emit("listar-clients");
 
       me.editar = false;
     },
     resetData() {
       let me = this;
-      Object.keys(this.formCliente).forEach(function (key, index) {
-        me.formCliente[key] = "";
+      Object.keys(this.formClient).forEach(function (key, index) {
+        me.formClient[key] = "";
       });
     },
   },

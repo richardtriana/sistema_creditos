@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cuota;
+use App\Models\Installment;
 use App\Models\Sede;
 use Illuminate\Http\Request;
 use Exception;
@@ -12,9 +12,9 @@ use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 use Mike42\Escpos\Printer;
 
 
-class ImprimirTicketController extends Controller
+class PrintTicketController extends Controller
 {
-    public function imprimirCuota($id)
+    public function printInstallment($id)
     {
         // Orden
         $sede = Sede::first();
@@ -22,9 +22,9 @@ class ImprimirTicketController extends Controller
         if (!$sede->impresora_pos || $sede->impresora_pos == '') {
             return false;
         }
-        $cuota = Cuota::findOrFail($id);
-        $credito = $cuota->credito;
-        $cliente = $credito['cliente'];
+        $installment = Installment::findOrFail($id);
+        $credit = $installment->credit;
+        $client = $credit['client'];
 
         // Config de impresora
         $connector = new WindowsPrintConnector($sede->impresora_pos);
@@ -63,17 +63,17 @@ class ImprimirTicketController extends Controller
             // $printer->text($system_user->name . "\n");
             $printer->setEmphasis(false);
 
-            $printer->text(sprintf('%-20s %-20s', 'Cliente', $cliente->nombres . ' ' . $cliente->apellidos));
+            $printer->text(sprintf('%-20s %-20s', 'Client', $client->name . ' ' . $client->last_name));
             $printer->text("\n");
             $printer->text(sprintf('%-20s %-20s', 'Fecha', date('Y-m-d h:i:s A')));
             $printer->text("\n");
-            $printer->text(sprintf('%-20s %-20s', 'Crédito', $credito->valor_credito));
+            $printer->text(sprintf('%-20s %-20s', 'Crédito', $credit->credit_value));
             $printer->text("\n");
-            $printer->text(sprintf('%-20s %-20s', 'Nro Operacion', $cuota->id));
+            $printer->text(sprintf('%-20s %-20s', 'Nro Operacion', $installment->id));
             $printer->text("\n");
-            $printer->text(sprintf('%-20s %-20s', 'Fecha Cuota', $cuota->fecha_pago));
+            $printer->text(sprintf('%-20s %-20s', 'Fecha Installment', $installment->payment_date));
             $printer->text("\n");
-            $printer->text(sprintf('%-20s %-20s', 'Monto Cancelado', $cuota->valor));
+            $printer->text(sprintf('%-20s %-20s', 'Monto Cancelado', $installment->value));
             $printer->text("\n");
             $printer->text("\n");
             $printer->setLineSpacing(2);

@@ -32,8 +32,8 @@
                     <tbody>
                         <tr v-for="p in listaProveedores.data" :key="p.id">
                             <td>{{ p.id }}</td>
-                            <td>{{ p.nombres }}</td>
-                            <td>{{ p.apellidos }}</td>
+                            <td>{{ p.name }}</td>
+                            <td>{{ p.last_name }}</td>
                             <td>
                                 <span v-if="p.tipo_documento == '1'"
                                     >Cèdula de ciudadania</span
@@ -42,7 +42,7 @@
                                     >Passaporte</span
                                 >
                             </td>
-                            <td>{{ p.nro_documento }}</td>
+                            <td>{{ p.document_number }}</td>
                             <td>{{ p.celular1 }}</td>
                             <td>{{ p.celular2 }}</td>
                             <td>{{ p.email }}</td>
@@ -51,19 +51,19 @@
                                 <button
                                     class="btn"
                                     :class="
-                                        p.estado == 1
+                                        p.status == 1
                                             ? 'btn-outline-success'
                                             : 'btn-outline-danger'
                                     "
-                                    @click="CambiarEstado(p.id)"
+                                    @click="changeStatus(p.id)"
                                 >
                                     <i
                                         class="bi bi-check-circle-fill"
-                                        v-if="p.estado == 1"
+                                        v-if="p.status == 1"
                                     ></i>
                                     <i
                                         class="bi bi-x-circle"
-                                        v-if="p.estado == 0"
+                                        v-if="p.status == 0"
                                     ></i>
                                 </button>
                             </td>
@@ -117,11 +117,11 @@ export default {
         mostrarDatos: function(proveedor) {
             this.$refs.CrearEditarProveedor.abirEditarProveedor(proveedor);
         },
-        CambiarEstado: function(id) {
+        changeStatus: function(id) {
             let me = this;
 
             Swal.fire({
-                title: "¿Quieres cambiar el estado del proveedor?",
+                title: "¿Quieres cambiar el status del proveedor?",
                 showDenyButton: true,
                 denyButtonText: `Cancelar`,
                 confirmButtonText: `Guardar`
@@ -129,7 +129,7 @@ export default {
                 if (result.isConfirmed) {
                     axios
                         .post(
-                            `api/proveedores/${id}/cambiar-estado`,
+                            `api/proveedores/${id}/change-status`,
                             null,
                             me.$root.config
                         )

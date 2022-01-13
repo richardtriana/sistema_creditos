@@ -1,27 +1,27 @@
 <template>
   <div class="">
     <div class="page-header d-flex justify-content-between p-4 border my-2">
-      <h3>Clientes</h3>
+      <h3>Clients</h3>
       <button
         type="button"
         class="btn btn-primary"
         data-toggle="modal"
-        data-target="#formClienteModal"
+        data-target="#formClientModal"
       >
-        Crear cliente
+        Crear client
       </button>
     </div>
     <div class="page-search d-flex justify-content-between p-4 border my-2">
       <div class="form-group col-8 m-auto">
-        <label for="buscar_cliente">Buscar...</label>
+        <label for="buscar_client">Buscar...</label>
         <input
           type="text"
-          id="buscar_cliente"
-          name="buscar_cliente"
+          id="buscar_client"
+          name="buscar_client"
           class="form-control"
           placeholder="Nombres | Documento"
-          @keypress="listarClientes(1)"
-          v-model="buscar_cliente"
+          @keypress="listarClients(1)"
+          v-model="buscar_client"
         />
       </div>
     </div>
@@ -41,10 +41,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="c in listaClientes.data" :key="c.id">
+            <tr v-for="c in listaClients.data" :key="c.id">
               <td>{{ c.id }}</td>
-              <td>{{ c.nombres }} {{ c.apellidos }}</td>
-              <td>{{ c.nro_documento }}</td>
+              <td>{{ c.name }} {{ c.last_name }}</td>
+              <td>{{ c.document_number }}</td>
               <td>( {{ c.celular1 }} ) - ( {{ c.celular2 }} )</td>
               <td>{{ c.email }}</td>
               <td>{{ c.direccion }}</td>
@@ -54,7 +54,7 @@
                   :class="
                     c.activo == 1 ? 'btn-outline-success' : 'btn-outline-danger'
                   "
-                  @click="CambiarEstado(c.id)"
+                  @click="changeStatus(c.id)"
                 >
                   <i class="bi bi-check-circle-fill" v-if="c.activo == 1"></i>
                   <i class="bi bi-x-circle" v-if="c.activo == 0"></i>
@@ -73,51 +73,51 @@
         </table>
         <pagination
           :align="'center'"
-          :data="listaClientes"
+          :data="listaClients"
           :limit="8"
-          @pagination-change-page="listarClientes"
+          @pagination-change-page="listarClients"
         >
           <span slot="prev-nav">&lt; Previous</span>
           <span slot="next-nav">Next &gt;</span>
         </pagination>
       </section>
     </div>
-    <crear-editar-cliente
-      ref="CrearEditarCliente"
-      @listar-clientes="listarClientes(1)"
+    <create-edit-client
+      ref="CreateEditClient"
+      @listar-clients="listarClients(1)"
     />
   </div>
 </template>
 <script>
-import CrearEditarCliente from "./CrearEditarCliente.vue";
+import CreateEditClient from "./CreateEditClient.vue";
 export default {
-  components: { CrearEditarCliente },
+  components: { CreateEditClient },
   data() {
     return {
-      buscar_cliente: "",
-      listaClientes: {},
+      buscar_client: "",
+      listaClients: {},
     };
   },
   created() {
-    this.listarClientes(1);
+    this.listarClients(1);
   },
   methods: {
-    listarClientes(page = 1) {
+    listarClients(page = 1) {
       let me = this;
       axios
-        .get(`api/clientes?page=${page}&cliente=${this.buscar_cliente}`)
+        .get(`api/clients?page=${page}&client=${this.buscar_client}`)
         .then(function (response) {
-          me.listaClientes = response.data;
+          me.listaClients = response.data;
         });
     },
-    mostrarDatos: function (cliente) {
-      this.$refs.CrearEditarCliente.abirEditarCliente(cliente);
+    mostrarDatos: function (client) {
+      this.$refs.CreateEditClient.abirEditarClient(client);
     },
-    CambiarEstado: function (id) {
+    changeStatus: function (id) {
       let me = this;
 
       Swal.fire({
-        title: "¿Quieres cambiar el estado del cliente?",
+        title: "¿Quieres cambiar el status del client?",
         showDenyButton: true,
         denyButtonText: `Cancelar`,
         confirmButtonText: `Guardar`,
@@ -125,12 +125,12 @@ export default {
         if (result.isConfirmed) {
           axios
             .post(
-              `api/clientes/${id}/cambiar-estado`,
+              `api/clients/${id}/change-status`,
               null,
               me.$root.config
             )
             .then(function () {
-              me.listarClientes(1);
+              me.listarClients(1);
             });
           Swal.fire("Cambios realizados!", "", "success");
         } else if (result.isDenied) {

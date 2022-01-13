@@ -1,12 +1,12 @@
 <?php
 
-use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\ProveedorController;
-use App\Http\Controllers\CreditoController;
+use App\Http\Controllers\CreditController;
 use App\Http\Controllers\SedeController;
-use App\Http\Controllers\CuotaController;
-use App\Http\Controllers\ImprimirTicketController;
+use App\Http\Controllers\InstallmentController;
+use App\Http\Controllers\PrintTicketController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,28 +26,30 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
-Route::resource('/clientes',  ClienteController::class);
-Route::post('/clientes/{cliente}/cambiar-estado',  [ClienteController::class, 'cambiarEstado']);
-Route::get('/clientes/{cliente}/creditos', [ClienteController::class, 'creditos']);
+Route::resource('/clients',  ClientController::class);
+Route::post('/clients/{client}/change-status',  [ClientController::class, 'changeStatus']);
+Route::get('/clients/{client}/credits', [ClientController::class, 'credits']);
 
 
 Route::resource('/proveedores',  ProveedorController::class);
-Route::post('/proveedores/{proveedor}/cambiar-estado',  [ProveedorController::class, 'cambiarEstado']);
+Route::post('/proveedores/{proveedor}/change-status',  [ProveedorController::class, 'changeStatus']);
 
-// Route::resource('/pagos',  PagoController::class);
-// Route::post('/pagos/{pago}/cambiar-estado',  [PagoController::class, 'cambiarEstado']);
 Route::resource('/usuarios',  UsuarioController::class);
-Route::post('/usuarios/{usuario}/cambiar-estado',  [UsuarioController::class, 'cambiarEstado']);
+Route::post('/usuarios/{usuario}/change-status',  [UsuarioController::class, 'changeStatus']);
 
 Route::resource('/sedes',  SedeController::class);
-Route::post('/sedes/{sede}/cambiar-estado',  [SedeController::class, 'cambiarEstado']);
+Route::post('/sedes/{sede}/change-status',  [SedeController::class, 'changeStatus']);
 
-Route::resource('/creditos', CreditoController::class);
-Route::post('/creditos/{credito}/cambiar-estado',  [CreditoController::class, 'cambiarEstado']);
-Route::get('/creditos/{credito}/cuotas', [CreditoController::class, 'cuotas']);
-Route::get('/cuotas/calcular-cuotas', [CuotaController::class, 'calcularCuotas']);
-Route::post('/cuota/{id}/pagar-cuota', [CuotaController::class, 'pagarCuota']);
+Route::get('/credits/amortization-table', [InstallmentController::class, 'printTable']);
+Route::post('/credits/pay-credit-installments/{id}', [CreditController::class, 'payMultipleInstallments']);
+Route::resource('/credits', CreditController::class);
+Route::post('/credits/{credit}/change-status',  [CreditController::class, 'changeStatus']);
+Route::get('/credits/{credit}/installments', [CreditController::class, 'installments']);
 
-Route::get('/imprimir-cuota', [ImprimirTicketController::class, 'imprimirCuota']);
 
-Route::resource('/cuotas', CuotaController::class);
+Route::get('/installments/calculate-installments', [InstallmentController::class, 'calcularInstallments']);
+Route::post('/installment/{id}/pay-installment', [InstallmentController::class, 'payInstallment']);
+
+Route::get('/print-installment', [PrintTicketController::class, 'printInstallment']);
+
+Route::resource('/installments', InstallmentController::class);

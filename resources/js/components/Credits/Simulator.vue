@@ -7,7 +7,7 @@
                         type="button"
                         class="btn btn-primary col-md-3 offset-9 mb-5"
                         id="btnCalcular"
-                        @click="simularCuotas()"
+                        @click="simularInstallments()"
                     >
                         Calcular
                     </button>
@@ -15,34 +15,34 @@
                     <table id="lista-tabla" class="table">
                         <thead>
                             <tr>
-                                <th>Nro.Cuota</th>
+                                <th>Nro.Installment</th>
                                 <th>Fecha</th>
-                                <th>Cuota</th>
+                                <th>Installment</th>
                                 <th>Capital</th>
                                 <th>Interés</th>
                                 <th>Saldo Capital</th>
                             </tr>
                         </thead>
-                        <tbody v-if="listadoCuotas.length">
+                        <tbody v-if="listInstallments.length">
                             <tr
-                                v-for="cuota in listadoCuotas"
-                                :key="cuota.nro_cuota"
+                                v-for="installment in listInstallments"
+                                :key="installment.nro_cuota"
                             >
                                 <td>
-                                    No. {{ cuota.nro_cuota }}
+                                    No. {{ installment.nro_cuota }}
                                 </td>
                                 <td>
-                                   $ {{ cuota.fecha_pago }}
+                                   $ {{ installment.payment_date }}
                                 </td>
-                                <td>{{ cuota.valor_cuota }}</td>
+                                <td>{{ installment.valor_cuota }}</td>
                                 <td>
-                                   $ {{ cuota.pagoCapital }}
-                                </td>
-                                <td>
-                                    ${{ cuota.pagoInteres }}
+                                   $ {{ installment.pagoCapital }}
                                 </td>
                                 <td>
-                                    $ {{ cuota.saldo_capital }}
+                                    ${{ installment.pagoInteres }}
+                                </td>
+                                <td>
+                                    $ {{ installment.saldo_capital }}
                                 </td>
                             </tr>
                         </tbody>
@@ -54,7 +54,7 @@
             <!-- <button
                 type="button"
                 class="btn btn-primary rounded"
-                @click="editar = crearSimulador()"
+                @click="editar = crearSimulator()"
             >
                 Guardar
             </button> -->
@@ -66,78 +66,78 @@
 import moment from "moment";
 
 export default {
-    props: ["cant_cuotas", "interes", "capital"],
-    // capital valor total del prestamo
-    // tasa valor de tasa de interes que se compraria
+    props: ["number_installments", "interest", "capital"],
+    // capital value total del prestamo
+    // tasa value de tasa de interest que se compraria
     // plazos numero de pagos
     data() {
         return {
             editar: false,
-            listadoCuotas: [],
-            formCuotas: {},
+            listInstallments: [],
+            formInstallments: {},
             valor_cuota: 0
         };
     },
     methods: {
-        crearSimulador() {
+        crearSimulator() {
             let me = this;
-            axios.post("api/cuotas", this.cuotas).then(function() {
-                $("#formSimuladorModal").modal("hide");
+            axios.post("api/installments", this.installments).then(function() {
+                $("#formSimulatorModal").modal("hide");
                 me.resetData();
-                this.$emit("listar-creditos");
+                this.$emit("listar-credits");
             });
         },
-        abrirSimulador(credito) {
+        abrirSimulator(credit) {
             this.editar = true;
             let me = this;
-            $("#formSimuladorModal").modal("show");
-            me.formSimulador = credito;
+            $("#formSimulatorModal").modal("show");
+            me.formSimulator = credit;
         },
-        editarSimulador() {
+        editarSimulator() {
             let me = this;
-            axios.put("api/creditos/" + 4, this.cuotas).then(function() {
-                $("#formSimuladorModal").modal("hide");
+            axios.put("api/credits/" + 4, this.installments).then(function() {
+                $("#formSimulatorModal").modal("hide");
                 me.resetData();
             });
-            this.$emit("listar-creditos");
+            this.$emit("listar-credits");
 
             this.editar = false;
         },
         simular: function(id) {
             let me = this;
             axios
-                .post("api/creditos/" + id + "/cuotas", null, me.$root.config)
+                .post("api/credits/" + id + "/installments", null, me.$root.config)
                 .then(function() {
-                    me.listarCreditos(1);
+                    me.listarCredits(1);
                 });
         },
         resetData() {
             let me = this;
-            Object.keys(this.cuotas).forEach(function(key, index) {
-                me.cuotas[key] = "";
+            Object.keys(this.installments).forEach(function(key, index) {
+                me.installments[key] = "";
             });
         },
         agregar() {
-            this.formCuotas.push(newCuota);
+            this.formInstallments.push(newInstallment);
             console.log(agregar);
         },
-        simularCuotas() {
+        simularInstallments() {
             let me = this;
             axios
                 .get(
-                    `api/cuotas/calcular-cuotas?valor_credito=${this.capital}&interes=${this.interes}&cant_cuotas=${this.cant_cuotas}`
+                    `api/installments/calculate-installments?credit_value=${this.capital}&interest=${this.interest}&number_installments=${this.number_installments}`
                 )
                 .then(
                     response => (
-                        (me.listadoCuotas = response.data.listadoCuotas),
-                        (me.valor_cuota = response.data.cuota)
+                        (me.listInstallments = response.data.listInstallments),
+                        (me.valor_cuota = response.data.installment)
                         
                     )
                 );
         }
     },
     mounted() {
-        // this.simularCuotas();
+        // this.simularInstallments();
     }
 };
 </script>

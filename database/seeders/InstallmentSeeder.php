@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Cuota;
+use App\Models\Installment;
 use Illuminate\Database\Seeder;
 
-class CuotaSeeder extends Seeder
+class InstallmentSeeder extends Seeder
 {
 	/**
 	 * Run the database seeds.
@@ -14,7 +14,7 @@ class CuotaSeeder extends Seeder
 	 */
 	public function run()
 	{
-		Cuota::factory()
+		Installment::factory()
 			->count(20)
 			->create();
 	}

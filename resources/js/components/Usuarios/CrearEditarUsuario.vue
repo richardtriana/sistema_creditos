@@ -32,7 +32,7 @@
                     type="text"
                     class="form-control"
                     id="nombre"
-                    v-model="formUsuario.nombres"
+                    v-model="formUsuario.name"
                   />
                 </div>
                 <div class="form-group col-md-4">
@@ -41,7 +41,7 @@
                     type="text"
                     class="form-control"
                     id="name"
-                    v-model="formUsuario.apellidos"
+                    v-model="formUsuario.last_name"
                   />
                 </div>
                 <div class="form-group col-md-4">
@@ -166,7 +166,7 @@ export default {
         tipo_documento: 0,
         documento: 0,
         foto: "",
-        estado: "1",
+        status: "1",
         rol_id: "",
         sede_id: "",
       },
@@ -184,11 +184,11 @@ export default {
         me.$emit("listar-usuarios");
       });
     },
-    abirEditarUsuario(cliente) {
+    abirEditarUsuario(client) {
       this.editar = true;
       let me = this;
       $("#formUsuarioModal").modal("show");
-      me.formUsuario = cliente;
+      me.formUsuario = client;
     },
     editarUsuario() {
       let me = this;

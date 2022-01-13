@@ -50,7 +50,7 @@ class SedeController extends Controller
 
 		$sede = new Sede();
 		$sede->sede = $request['sede'];
-		$sede->estado = $request['estado'];
+		$sede->status = $request['status'];
 		$sede->direccion = $request['direccion'];
 		$sede->nit = $request['nit'];
 		$sede->correo_contacto = $request['correo_contacto'];
@@ -93,7 +93,7 @@ class SedeController extends Controller
 	{
 		$sede = Sede::find($request->id);
 		$sede->sede = $request['sede'];
-		$sede->estado = $request['estado'];
+		$sede->status = $request['status'];
 		$sede->direccion = $request['direccion'];
 		$sede->nit = $request['nit'];
 		$sede->correo_contacto = $request['correo_contacto'];
@@ -115,10 +115,10 @@ class SedeController extends Controller
 		abort(404);
 	}
 
-	public function cambiarEstado(Sede $sede)
+	public function changeStatus(Sede $sede)
 	{
 		$sd = Sede::find($sede->id);
-		$sd->estado = !$sd->estado;
+		$sd->status = !$sd->status;
 		$sd->save();
 	}
 }

@@ -25,48 +25,48 @@
                         type="number"
                         class="form-control"
                         id="tiempo"
-                        v-model="cant_cuotas"
+                        v-model="number_installments"
                         placeholder="Ingresar cantidad de meses"
                     />
                 </div>
                 <div class="form-group col-md-4">
-                    <label for="interes">Interés Mensual</label>
+                    <label for="interest">Interés Mensual</label>
                     <input
                         required
                         type="number"
                         class="form-control"
-                        id="interes"
-                        v-model="interes"
+                        id="interest"
+                        v-model="interest"
                         step="any"
                         placeholder="Ingresar tasa de interés mensual"
                     />
                 </div>
             </div>
 
-            <simulador
+            <simulator
                 :capital="capital"
-                :interes="interes"
-                :cant_cuotas="cant_cuotas"
-                ref="Simulador"
-            ></simulador>
+                :interest="interest"
+                :number_installments="number_installments"
+                ref="Simulator"
+            ></simulator>
         </div>
     </div>
 </template>
 
 <script>
-import Simulador from "../Creditos/Simulador.vue";
+import Simulator from "../credits/Simulator.vue";
 export default {
-    components: { Simulador },
+    components: { Simulator },
     data() {
         return {
-            interes: 3,
+            interest: 3,
             capital: 500000,
-            cant_cuotas: 12
+            number_installments: 12
         };
     },
     methods: {
-        simularCredito: function() {
-            this.$refs.Simulador.abrirSimulador();
+        simularCredit: function() {
+            this.$refs.Simulator.abrirSimulator();
         }
     },
     mounted() {

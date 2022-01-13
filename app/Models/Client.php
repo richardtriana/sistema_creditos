@@ -5,15 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Cliente extends Model
+class Client extends Model
 {
   use HasFactory;
 
   protected $fillable = [
-    'nombres',
-    'apellidos',
+    'name',
+    'last_name',
     'tipo_documento',
-    'nro_documento',
+    'document_number',
     'fecha_nacimiento',
     'email',
     'genero',
@@ -27,8 +27,8 @@ class Cliente extends Model
     'foto', 'activo'
   ];
 
-  public function creditos()
+  public function credits()
   {
-    return $this->hasMany(Credito::class);
+    return $this->hasMany(Credit::class);
   }
 }

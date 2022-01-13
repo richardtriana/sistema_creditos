@@ -142,7 +142,7 @@ export default {
                 tipo_documento: 0,
                 documento: 0,
                 foto: "",
-                estado: "1",
+                status: "1",
                 id_rol: "",
                 sede_id: "",
                 impresora_pos: ""
