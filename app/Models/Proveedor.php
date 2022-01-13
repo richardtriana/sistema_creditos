@@ -12,14 +12,14 @@ class Proveedor extends Model
   protected $table = 'proveedores';
 
   protected $fillable = [
-    'nombres',
-    'apellidos',
+    'name',
+    'last_name',
     'tipo_documento',
-    'nro_documento',
+    'document_number',
     'celular1',
     'celular2',
     'direccion',
     'email',
-    'estado'
+    'status'
   ];
 }

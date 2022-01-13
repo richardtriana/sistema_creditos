@@ -17,10 +17,10 @@ class PagoFactory extends Factory
         'id_deuda' => $this->faker->numberBetween(1,3),
         'valor_pago' => $this->faker->randomFloat(2,15000,20000),
         'nro_cuota' => $this->faker->numberBetween(1,14),
-        'valor_interes' => $this->faker->randomFloat(2,15000,20000),
-        'valor_capital' => $this->faker->randomFloat(2,15000,20000),
+        'interest_value' => $this->faker->randomFloat(2,15000,20000),
+        'capital_value' => $this->faker->randomFloat(2,15000,20000),
         'id_tercero' => $this->faker->numberBetween(1,3),
-        'fecha_pago' => $this->faker->date()
+        'payment_date' => $this->faker->date()
 		  ];
     }
 }

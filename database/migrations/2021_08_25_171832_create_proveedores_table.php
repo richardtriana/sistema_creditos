@@ -15,16 +15,16 @@ class CreateProveedoresTable extends Migration
     {
         Schema::create('proveedores', function (Blueprint $table) {
             $table->id();
-            $table->char('nombres', 100);
-            $table->char('apellidos', 100);
+            $table->char('name', 100);
+            $table->char('last_name', 100);
             $table->char('tipo_documento', 40)->default('Cédula de ciudadanía');
-            $table->double('nro_documento', 20, 0);
+            $table->double('document_number', 20, 0);
             $table->char('genero', 20)->nullable();
             $table->char('celular1', 20);
             $table->char('celular2', 20)->nullable();
             $table->char('direccion', 200)->nullable();
             $table->string('email')->unique();
-            $table->tinyInteger('estado')->default(1);
+            $table->tinyInteger('status')->default(1);
             $table->softDeletes($column = 'deleted_at', $precision = 0);
             $table->timestamps();
         });

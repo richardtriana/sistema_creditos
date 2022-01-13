@@ -19,10 +19,10 @@ class CreatePagosTable extends Migration
             $table->foreignId('id_deuda')->nullable();
             $table->double('valor_pago', 12, 2);
             $table->integer('nro_cuota');
-            $table->double('valor_interes', 12, 2)->nullable()->default('0');
-            $table->double('valor_capital', 12, 2)->nullable();
+            $table->double('interest_value', 12, 2)->nullable()->default('0');
+            $table->double('capital_value', 12, 2)->nullable();
             $table->foreignId('id_tercero')->nullable();
-            $table->date('fecha_pago');
+            $table->date('payment_date');
             $table->timestamps();
         });
     }

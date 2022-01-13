@@ -51,7 +51,7 @@
                   />
                 </div>
                 <div class="form-group col-md-4">
-                  <label for="nro_cuota">Nro cuota</label>
+                  <label for="nro_cuota">Nro installment</label>
                   <input
                     type="number"
                     class="form-control"
@@ -60,21 +60,21 @@
                   />
                 </div>
                 <div class="form-group col-md-4">
-                  <label for="valor_interes">Valor interes</label>
+                  <label for="interest_value">Valor interest</label>
                   <input
                     type="number"
                     class="form-control"
-                    id="valor_interes"
-                    v-model="formPago.valor_interes"
+                    id="interest_value"
+                    v-model="formPago.interest_value"
                   />
                 </div>
                 <div class="form-group col-md-4">
-                  <label for="valor_capital">Valor capital</label>
+                  <label for="capital_value">Valor capital</label>
                   <input
                     type="number"
                     class="form-control"
-                    id="valor_capital"
-                    v-model="formPago.valor_capital"
+                    id="capital_value"
+                    v-model="formPago.capital_value"
                   />
                 </div>
                 <div class="form-group col-md-4">
@@ -87,12 +87,12 @@
                   />
                 </div>
                 <div class="form-group col-md-4">
-                  <label for="fecha_pago">Fecha pago</label>
+                  <label for="payment_date">Fecha pago</label>
                   <input
                     type="number"
                     class="form-control"
-                    id="fecha_pago"
-                    v-model="formPago.fecha_pago"
+                    id="payment_date"
+                    v-model="formPago.payment_date"
                   />
                 </div>
               </div>

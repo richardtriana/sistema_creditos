@@ -2,7 +2,7 @@
     <div class="container">
         <a class="navbar-brand" href="{{ url('/') }}">
             {{-- {{ config('app.name', 'Laravel') }} --}}
-            <img src="{{ asset('img/logo.jpg') }}" alt="" srcset="" width="100" height="100">
+            <img src="{{ asset('images/logo.jpeg') }}" alt="" srcset="" width="100">
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
@@ -13,13 +13,13 @@
             <!-- Left Side Of Navbar -->
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
-                    <router-link class="nav-link text-white" to="/clientes"> Clientes </router-link>
+                    <router-link class="nav-link text-white" to="/clients"> Clients </router-link>
                 </li>
                 <li class="nav-item">
                     <router-link class="nav-link text-white" to="/usuarios"> Usuarios </router-link>
                 </li>
                 <li class="nav-item">
-                    <router-link class="nav-link text-white" to="/creditos"> Creditos </router-link>
+                    <router-link class="nav-link text-white" to="/credits"> Credits </router-link>
                 </li>
                 <li class="nav-item">
                     <router-link class="nav-link text-white" to="/sedes"> Sedes </router-link>
@@ -51,7 +51,7 @@
                     <li class="nav-item dropdown">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                            {{ Auth::user()->nombres }}
+                            {{ Auth::user()->name }}
                         </a>
 
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">

@@ -2,10 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\Cliente;
+use App\Models\Credit;
+use App\Models\Installment;
+use Database\Factories\InstallmentFactory;
 use Illuminate\Database\Seeder;
 
-class ClienteSeeder extends Seeder
+class CreditSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,8 +16,8 @@ class ClienteSeeder extends Seeder
      */
     public function run()
     {
-        //
-        Cliente::factory()
+        Credit::factory()
+        ->has(Installment::factory()->count(3))
         ->count(10)
         ->create();
     }

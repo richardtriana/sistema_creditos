@@ -26,7 +26,7 @@
               <th>Tipo Deuda</th>
               <th>Id Deuda</th>
               <th>Valor Pago</th>
-              <th>Nro Cuota</th>
+              <th>Nro Installment</th>
               <th>Valor Interes</th>
               <th>Valor Capital</th>
               <th>Id Tercero</th>
@@ -41,10 +41,10 @@
               <td>{{ o.id_deuda }}</td>
               <td>{{ o.valor_pago }}</td>
               <td>{{ o.nro_cuota }}</td>
-              <td>{{ o.valor_interes }}</td>
-              <td>{{ o.valor_capital }}</td>
+              <td>{{ o.interest_value }}</td>
+              <td>{{ o.capital_value }}</td>
               <td>{{ o.id_tercero }}</td>
-              <td>{{ o.fecha_pago }}</td>
+              <td>{{ o.payment_date }}</td>
               <td class="text-center">
                 <button class="btn btn-outline-primary">
                   <i class="bi bi-eye"></i>
@@ -60,14 +60,14 @@
                 <button
                   v-if="o.activo == 1"
                   class="btn btn-outline-danger"
-                  @click="CambiarEstado(o.id)"
+                  @click="changeStatus(o.id)"
                 >
                   <i class="bi bi-trash"></i>
                 </button>
                 <button
                   v-if="o.activo == 0"
                   class="btn btn-outline-success"
-                  @click="CambiarEstado(o.id)"
+                  @click="changeStatus(o.id)"
                 >
                   <i class="bi bi-check2-circle"></i>
                 </button>
@@ -118,11 +118,11 @@ export default {
       // Use sweetalert2
       this.$swal("Hello Vue world!!!");
     },
-    CambiarEstado: function (id) {
+    changeStatus: function (id) {
       let me = this;
 
       Swal.fire({
-        title: "¿Quieres cambiar el estado del pago?",
+        title: "¿Quieres cambiar el status del pago?",
         showDenyButton: true,
         denyButtonText: `Cancelar`,
         confirmButtonText: `Guardar`,
@@ -130,7 +130,7 @@ export default {
         if (result.isConfirmed) {
           axios
             .post(
-              "api/pagos/" + id + "/cambiar-estado",
+              "api/pagos/" + id + "/change-status",
               null,
               me.$root.config
             )

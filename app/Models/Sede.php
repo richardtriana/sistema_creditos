@@ -10,7 +10,7 @@ class Sede extends Model
     use HasFactory;
     protected $fillable = [
         'sede',
-        'estado',
+        'status',
         'direccion',
         'nit',
         'correo_contacto',
