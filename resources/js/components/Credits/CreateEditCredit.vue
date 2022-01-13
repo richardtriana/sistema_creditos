@@ -30,9 +30,9 @@
                                     <label for="client_id">Client</label>
                                     <v-select
                                         :options="listaClients.data"
-                                        label="nro_documento"
+                                        label="document_number"
                                         aria-logname="{}"
-                                        :reduce="nombres => nombres.id"
+                                        :reduce="name => name.id"
                                         v-model="formCredit.client_id"
                                         placeholder="Buscar por Documento"
                                     >
@@ -40,12 +40,12 @@
                                 </div>
 
                                 <div class="form-group col-md-4">
-                                    <label for="deudor">Deudor</label>
+                                    <label for="debtor">Deudor</label>
                                     <input
                                         type="number"
                                         class="form-control"
-                                        id="deudor"
-                                        v-model="formCredit.deudor"
+                                        id="debtor"
+                                        v-model="formCredit.debtor"
                                     />
                                 </div>
 
@@ -61,44 +61,44 @@
                                     </v-select>
                                 </div>
                                 <div class="form-group col-md-4">
-                                    <label for="valor_credit"
+                                    <label for="credit_value"
                                         >Valor Credit</label
                                     >
                                     <input
                                         type="number"
                                         class="form-control"
-                                        id="valor_credit"
+                                        id="credit_value"
                                         step="any"
-                                        v-model="formCredit.valor_credit"
+                                        v-model="formCredit.credit_value"
                                     />
                                 </div>
                                 <div class="form-group col-md-4">
-                                    <label for="interes">Interes</label>
+                                    <label for="interest">Interes</label>
                                     <input
                                         type="number"
                                         class="form-control"
-                                        id="interes"
-                                        v-model="formCredit.interes"
+                                        id="interest"
+                                        v-model="formCredit.interest"
                                         step="any"
                                     />
                                 </div>
 
                                 <div class="form-group col-md-4">
-                                    <label for="cant_cuotas"
+                                    <label for="number_installments"
                                         >Cantidad Installments</label
                                     >
                                     <input
                                         type="number"
                                         class="form-control"
-                                        id="cant_cuotas"
-                                        v-model="formCredit.cant_cuotas"
+                                        id="number_installments"
+                                        v-model="formCredit.number_installments"
                                     />
                                 </div>
                             </div>
                             <simulator
-                                :capital="formCredit.valor_credit"
-                                :interes="formCredit.interes"
-                                :cant_cuotas="formCredit.cant_cuotas"
+                                :capital="formCredit.credit_value"
+                                :interest="formCredit.interest"
+                                :number_installments="formCredit.number_installments"
                                 ref="Simulator"
                             ></simulator>
                             <button
@@ -138,21 +138,21 @@ export default {
             listaClients: [],
             formCredit: {
                 client_id: "",
-                deudor_id: 2,
+                debtor_id: 2,
                 sede_id: "",
-                cant_cuotas: "",
-                cant_cuotas_pagadas: "",
-                cant_cuotas_pagadas: "",
-                dia_limite: "",
-                deudor: "",
+                number_installments: "",
+                number_paid_installments: "",
+                number_paid_installments: "",
+                day_limit: "",
+                debtor: "",
                 status: "1",
                 fecha_inicio: "",
-                interes: "",
-                porcentaje_interes_anual: "",
+                interest: "",
+                annual_interest_percentage: "",
                 usu_crea: 2,
                 calor_cuota: "",
-                valor_credit: "",
-                valor_abonado: "",
+                credit_value: "",
+                paid_value: "",
                 capital_value: "",
                 interest_value: ""
             }

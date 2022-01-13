@@ -22,10 +22,10 @@ class ClientFactory extends Factory
 	public function definition()
 	{
 		return [
-			'nombres' => $this->faker->firstName(),
-			'apellidos' => $this->faker->lastName(),
+			'name' => $this->faker->firstName(),
+			'last_name' => $this->faker->lastName(),
 			'tipo_documento' => $this->faker->boolean(),
-			'nro_documento' => $this->faker->randomNumber(),
+			'document_number' => $this->faker->randomNumber(),
 			'fecha_nacimiento' => $this->faker->date(),
 			'email' => $this->faker->email(),
 			'genero' => $this->faker->randomElement($array = ['f', 'm']),

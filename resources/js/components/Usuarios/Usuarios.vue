@@ -54,8 +54,8 @@
           <tbody>
             <tr v-for="usuario in listaUsuarios.data" :key="usuario.id">
               <td>{{ usuario.id }}</td>
-              <td>{{ usuario.nombres }}</td>
-              <td>{{ usuario.apellidos }}</td>
+              <td>{{ usuario.name }}</td>
+              <td>{{ usuario.last_name }}</td>
               <td>{{ usuario.email }}</td>
               <td>{{ usuario.documento }}</td>
               <td>{{ usuario.celular }}</td>

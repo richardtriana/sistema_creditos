@@ -25,12 +25,12 @@
             <form>
               <div class="form-row">
                 <div class="form-group col-md-4">
-                  <label for="nombres">Nombres</label>
+                  <label for="name">Nombres</label>
                   <input
                     type="text"
                     class="form-control"
-                    id="nombres"
-                    v-model="formClient.nombres"
+                    id="name"
+                    v-model="formClient.name"
                   />
                 </div>
                 <div class="form-group col-md-4">
@@ -39,7 +39,7 @@
                     type="text"
                     class="form-control"
                     id="Apellidos"
-                    v-model="formClient.apellidos"
+                    v-model="formClient.last_name"
                   />
                 </div>
                 <div class="form-group col-md-4">
@@ -71,7 +71,7 @@
                     type="number"
                     class="form-control"
                     id="Documento"
-                    v-model="formClient.nro_documento"
+                    v-model="formClient.document_number"
                   />
                 </div>
 
@@ -231,10 +231,10 @@ export default {
     return {
       editar: false,
       formClient: {
-        nombres: "",
-        apellidos: "",
+        name: "",
+        last_name: "",
         tipo_documento: 0,
-        nro_documento: 0,
+        document_number: 0,
         fecha_nacimiento: "",
         email: "",
         celular1: "",

@@ -63,17 +63,17 @@ class PrintTicketController extends Controller
             // $printer->text($system_user->name . "\n");
             $printer->setEmphasis(false);
 
-            $printer->text(sprintf('%-20s %-20s', 'Client', $client->nombres . ' ' . $client->apellidos));
+            $printer->text(sprintf('%-20s %-20s', 'Client', $client->name . ' ' . $client->last_name));
             $printer->text("\n");
             $printer->text(sprintf('%-20s %-20s', 'Fecha', date('Y-m-d h:i:s A')));
             $printer->text("\n");
-            $printer->text(sprintf('%-20s %-20s', 'Crédito', $credit->valor_credit));
+            $printer->text(sprintf('%-20s %-20s', 'Crédito', $credit->credit_value));
             $printer->text("\n");
             $printer->text(sprintf('%-20s %-20s', 'Nro Operacion', $installment->id));
             $printer->text("\n");
             $printer->text(sprintf('%-20s %-20s', 'Fecha Installment', $installment->payment_date));
             $printer->text("\n");
-            $printer->text(sprintf('%-20s %-20s', 'Monto Cancelado', $installment->valor));
+            $printer->text(sprintf('%-20s %-20s', 'Monto Cancelado', $installment->value));
             $printer->text("\n");
             $printer->text("\n");
             $printer->setLineSpacing(2);

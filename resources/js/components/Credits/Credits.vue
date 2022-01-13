@@ -51,12 +51,12 @@
 					<tbody v-if="creditList.data && creditList.data.length > 0">
 						<tr v-for="credit in creditList.data" :key="credit.index">
 							<td>{{ credit.id }}</td>
-							<td>{{ credit.nombres }} {{ credit.apellidos }}</td>
-							<td>{{ credit.nro_documento }}</td>
-							<td>{{ credit.valor_credit }}</td>
-							<td>{{ credit.valor_abonado }}</td>
-							<td>{{ credit.cant_cuotas }}</td>
-							<td>{{ credit.cant_cuotas_pagadas }}</td>
+							<td>{{ credit.name }} {{ credit.last_name }}</td>
+							<td>{{ credit.document_number }}</td>
+							<td>{{ credit.credit_value }}</td>
+							<td>{{ credit.paid_value }}</td>
+							<td>{{ credit.number_installments }}</td>
+							<td>{{ credit.number_paid_installments }}</td>
 							<td>
 								<span v-if="credit.status == 1">Activo</span>
 								<span v-if="credit.status == 0">Inactivo</span>

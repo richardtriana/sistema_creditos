@@ -24,7 +24,7 @@ class InstallmentFactory extends Factory
     return [
       'credit_id' => $this->faker->numberBetween(1, 10),
       'nro_cuota' => $this->faker->numberBetween(1, 10),
-      'valor' => $this->faker->randomFloat(4, 10, 60000),
+      'value' => $this->faker->randomFloat(4, 10, 60000),
       'payment_date' => $this->faker->date('Y-m-d'),
       'days_past_due' => $this->faker->numberBetween(1, 10),
       'late_interests_value' =>  $this->faker->randomFloat(4, 10, 60000),

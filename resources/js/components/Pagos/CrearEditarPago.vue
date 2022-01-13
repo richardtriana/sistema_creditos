@@ -60,7 +60,7 @@
                   />
                 </div>
                 <div class="form-group col-md-4">
-                  <label for="interest_value">Valor interes</label>
+                  <label for="interest_value">Valor interest</label>
                   <input
                     type="number"
                     class="form-control"

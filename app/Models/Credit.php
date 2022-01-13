@@ -13,21 +13,21 @@ class Credit extends Model
 
     protected $fillable = [
         'client_id',
-        'deudor_id',
+        'debtor_id',
         'sede_id',
-        'cant_cuotas',
-        'cant_cuotas_pagadas',
-        'dia_limite',
-        'deudor',
+        'number_installments',
+        'number_paid_installments',
+        'day_limit',
+        'debtor',
         'status',
         'fecha_inicio',
-        'interes',
-        'porcentaje_interes_anual',
+        'interest',
+        'annual_interest_percentage',
         'porcentaje_interes_mensual',
         'usu_crea',
         'valor_cuota',
-        'valor_credit',
-        'valor_abonado',
+        'credit_value',
+        'paid_value',
         'capital_value',
         'interest_value',
     ];
@@ -41,9 +41,9 @@ class Credit extends Model
         return $this->belongsTo(Client::class, 'client_id');
     }
 
-    public function deudor()
+    public function debtor()
     {
-        return $this->belongsTo(Client::class, 'deudor_id');
+        return $this->belongsTo(Client::class, 'debtor_id');
     }
 
     public function asesor()

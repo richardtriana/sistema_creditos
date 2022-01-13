@@ -13,7 +13,7 @@ class Installment extends Model
   protected $fillable = [
     'credit_id',
     'nro_cuota',
-    'valor',
+    'value',
     'payment_date',
     'days_past_due',
     'late_interests_value',

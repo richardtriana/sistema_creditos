@@ -43,8 +43,8 @@
           <tbody>
             <tr v-for="c in listaClients.data" :key="c.id">
               <td>{{ c.id }}</td>
-              <td>{{ c.nombres }} {{ c.apellidos }}</td>
-              <td>{{ c.nro_documento }}</td>
+              <td>{{ c.name }} {{ c.last_name }}</td>
+              <td>{{ c.document_number }}</td>
               <td>( {{ c.celular1 }} ) - ( {{ c.celular2 }} )</td>
               <td>{{ c.email }}</td>
               <td>{{ c.direccion }}</td>

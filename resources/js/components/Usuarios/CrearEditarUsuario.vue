@@ -32,7 +32,7 @@
                     type="text"
                     class="form-control"
                     id="nombre"
-                    v-model="formUsuario.nombres"
+                    v-model="formUsuario.name"
                   />
                 </div>
                 <div class="form-group col-md-4">
@@ -41,7 +41,7 @@
                     type="text"
                     class="form-control"
                     id="name"
-                    v-model="formUsuario.apellidos"
+                    v-model="formUsuario.last_name"
                   />
                 </div>
                 <div class="form-group col-md-4">

@@ -56,7 +56,7 @@
 						</div>
 					</div>
 					<section>
-						<table class="table">
+						<table class="table table-sm">
 							<thead>
 								<tr>
 									<th>Fecha de vencimiento</th>
@@ -66,6 +66,7 @@
 									<th>Interés</th>
 									<th>Mora</th>
 									<th>Dias de mora</th>
+									<th>Valor abonado</th>
 									<th>Estado</th>
 									<th></th>
 								</tr>
@@ -74,11 +75,12 @@
 								<tr v-for="f in listInstallments" :key="f.id">
 									<th>{{ f.payment_date }}</th>
 									<td>{{ f.nro_cuota }}</td>
-									<td>{{ f.valor }}</td>
-									<td>{{ f.valor_pago_capital }}</td>
-									<td>{{ f.valor_pago_interes }}</td>
+									<td>{{ f.value }}</td>
+									<td>{{ f.capital_value }}</td>
+									<td>{{ f.interest_value }}</td>
 									<td>{{ f.late_interests_value }}</td>
 									<td>{{ f.days_past_due }}</td>
+									<td>{{ f.paid_balance }}</td>
 									<td>
 										<span v-if="f.status == 0" class=" badge badge-secondary"
 											>Pendiente</span
@@ -91,9 +93,15 @@
 										<button
 											@click="payInstallment(f.id)"
 											type="button"
-											class="btn btn-outline-success"
+											class="btn btn-sm btn-success"
 											v-if="f.status == 0"
-										></button>
+										>
+											Pagar
+										</button>
+
+										<button v-else class="btn btn-sm btn-secondary" disabled>
+											Pagar
+										</button>
 									</td>
 								</tr>
 							</tbody>
@@ -123,9 +131,11 @@ export default {
 		listCreditInstallments(credit_id) {
 			this.id_credit = credit_id;
 			let me = this;
-			axios.get(`api/credits/${credit_id}/installments`).then(function(response) {
-				me.listInstallments = response.data;
-			});
+			axios
+				.get(`api/credits/${credit_id}/installments`)
+				.then(function(response) {
+					me.listInstallments = response.data;
+				});
 		},
 
 		payInstallment(id) {
@@ -136,24 +146,12 @@ export default {
 		},
 
 		payCredit() {
-			// var amount_x = this.amount_value;
-			// for (let i = 0; i < this.listInstallments.length && amount_x > 0; i++) {
-			// 	// if (this.listInstallments[i]["status"] == 0) {
-			// 	amount_x = amount_x - this.listInstallments[i]["valor"];
-			// 	console.log(amount_x, this.listInstallments[i]["valor"]);
-			// 	if (amount_x > 0) {
-			// 		this.listInstallmentsPaid.push(this.listInstallments[i]);
-			// 		if (amount_x < this.listInstallments[i]["valor"]) {
-			// 			console.log("holi");
-			// 		}
-			// 	}
-			// 	// console.log("amount1", amount_x);
-			// }
-
 			var data = {
 				amount: this.amount_value
 			};
-			axios.post(`api/credits/pay-credit-installments/${this.id_credit}`, data);
+			axios
+				.post(`api/credits/pay-credit-installments/${this.id_credit}`, data)
+				.then(this.listCreditInstallments(this.id_credit));
 		},
 
 		printTable() {

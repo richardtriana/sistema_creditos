@@ -32,8 +32,8 @@
                     <tbody>
                         <tr v-for="p in listaProveedores.data" :key="p.id">
                             <td>{{ p.id }}</td>
-                            <td>{{ p.nombres }}</td>
-                            <td>{{ p.apellidos }}</td>
+                            <td>{{ p.name }}</td>
+                            <td>{{ p.last_name }}</td>
                             <td>
                                 <span v-if="p.tipo_documento == '1'"
                                     >Cèdula de ciudadania</span
@@ -42,7 +42,7 @@
                                     >Passaporte</span
                                 >
                             </td>
-                            <td>{{ p.nro_documento }}</td>
+                            <td>{{ p.document_number }}</td>
                             <td>{{ p.celular1 }}</td>
                             <td>{{ p.celular2 }}</td>
                             <td>{{ p.email }}</td>

@@ -17,7 +17,7 @@ class CreateInstallmentsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('credit_id');
             $table->integer('nro_cuota');
-            $table->float('valor', 20, 4);
+            $table->float('value', 20, 4);
             $table->date('payment_date');
             $table->float('days_past_due')->nullable()->default(0);
             $table->float('late_interests_value', 20, 4)->nullable()->default(0);

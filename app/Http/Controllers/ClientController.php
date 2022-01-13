@@ -16,10 +16,10 @@ class ClientController extends Controller
 	{
 		$clients = Client::select();
 		if ($request->client && ($request->client != '')) {
-			$clients  = 	$clients->where('nro_documento', 'LIKE', "%$request->client%")
-				->orWhere('nombres', 'LIKE', "%$request->client%")
+			$clients  = 	$clients->where('document_number', 'LIKE', "%$request->client%")
+				->orWhere('name', 'LIKE', "%$request->client%")
 				->orWhere('email', 'LIKE', "%$request->client%")
-				->orWhere('apellidos', 'LIKE', "%$request->client%");
+				->orWhere('last_name', 'LIKE', "%$request->client%");
 		}
 		$clients = $clients->paginate(10);
 
@@ -49,10 +49,10 @@ class ClientController extends Controller
 	{
 
 		$client = new Client();
-		$client->nombres = $request['nombres'];
-		$client->apellidos = $request['apellidos'];
+		$client->name = $request['name'];
+		$client->last_name = $request['last_name'];
 		$client->tipo_documento = $request['tipo_documento'];
-		$client->nro_documento = $request['nro_documento'];
+		$client->document_number = $request['document_number'];
 		$client->email = $request['email'];
 		$client->fecha_nacimiento = $request['fecha_nacimiento'];
 		$client->genero = $request['genero'];
@@ -99,10 +99,10 @@ class ClientController extends Controller
 	public function update(Request $request, Client $client)
 	{
 		$client = Client::find($request->id);
-		$client->nombres = $request['nombres'];
-		$client->apellidos = $request['apellidos'];
+		$client->name = $request['name'];
+		$client->last_name = $request['last_name'];
 		$client->tipo_documento = $request['tipo_documento'];
-		$client->nro_documento = $request['nro_documento'];
+		$client->document_number = $request['document_number'];
 		$client->email = $request['email'];
 		$client->fecha_nacimiento = $request['fecha_nacimiento'];
 		$client->genero = $request['genero'];

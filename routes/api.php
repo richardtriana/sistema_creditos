@@ -40,14 +40,14 @@ Route::post('/usuarios/{usuario}/change-status',  [UsuarioController::class, 'ch
 Route::resource('/sedes',  SedeController::class);
 Route::post('/sedes/{sede}/change-status',  [SedeController::class, 'changeStatus']);
 
+Route::get('/credits/amortization-table', [InstallmentController::class, 'printTable']);
 Route::post('/credits/pay-credit-installments/{id}', [CreditController::class, 'payMultipleInstallments']);
 Route::resource('/credits', CreditController::class);
 Route::post('/credits/{credit}/change-status',  [CreditController::class, 'changeStatus']);
 Route::get('/credits/{credit}/installments', [CreditController::class, 'installments']);
 
 
-Route::get('/credits/amortization-table', [InstallmentController::class, 'printTable']);
-Route::get('/installments/calcular-installments', [InstallmentController::class, 'calcularInstallments']);
+Route::get('/installments/calculate-installments', [InstallmentController::class, 'calcularInstallments']);
 Route::post('/installment/{id}/pay-installment', [InstallmentController::class, 'payInstallment']);
 
 Route::get('/print-installment', [PrintTicketController::class, 'printInstallment']);

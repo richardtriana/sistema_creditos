@@ -11,6 +11,7 @@
       font-family: Arial, Helvetica, sans-serif;
       font-size: 12px;
     }
+
     .table {
       border-collapse: collapse;
       width: 100%;
@@ -26,10 +27,10 @@
     table th {
       text-align: left;
     }
-    
+
     .text-center {
-            text-align: center !important;
-        }
+      text-align: center !important;
+    }
   </style>
 </head>
 
@@ -42,19 +43,19 @@
   <section>
     <table class="table">
       <tr>
-        <td>Cliente: </td>
-        <td>Nro. Documento</td>
+        <td>Cliente: {{$client->name}}  {{$client->last_name}}</td>
+        <td>Nro. Documento {{$client->document_number}}</td>
         <td>Nro. Crédito: {{ $credit->id}}</td>
       </tr>
       <tr>
-        <td>Monto: {{ $credit->valor_credit}}</td>
-        <td>Nro. Cuotas: {{ $credit->cant_cuotas}}</td>
+        <td>Monto: {{ $credit->credit_value}}</td>
+        <td>Nro. Cuotas: {{ $credit->number_installments}}</td>
         <td>Fecha de desembolso: {{ $credit->id}}</td>
       </tr>
       <tr>
         <td>Producto</td>
         <td>Sucursal</td>
-        <td>Taasa de Interés</td>
+        <td>Tasa de Interés</td>
       </tr>
       <tr>
         <td colspan="3"></td>
@@ -79,9 +80,9 @@
         <tr>
           <th>{{$key + 1}}</th>
           <th scope="row">{{ $f->payment_date}}</th>
-          <td>{{ $f->valor}}</td>
-          <td>{{ $f->valor_pago_capital}}</td>
-          <td>{{ $f->valor_pago_interes}}</td>
+          <td>{{ $f->value}}</td>
+          <td>{{ $f->capital_value}}</td>
+          <td>{{ $f->interest_value}}</td>
           <td>{{ $f->late_interests_value}}</td>
           <td>{{ $f->days_past_due}}</td>
         </tr>

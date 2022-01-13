@@ -25,18 +25,18 @@
                         type="number"
                         class="form-control"
                         id="tiempo"
-                        v-model="cant_cuotas"
+                        v-model="number_installments"
                         placeholder="Ingresar cantidad de meses"
                     />
                 </div>
                 <div class="form-group col-md-4">
-                    <label for="interes">Interés Mensual</label>
+                    <label for="interest">Interés Mensual</label>
                     <input
                         required
                         type="number"
                         class="form-control"
-                        id="interes"
-                        v-model="interes"
+                        id="interest"
+                        v-model="interest"
                         step="any"
                         placeholder="Ingresar tasa de interés mensual"
                     />
@@ -45,8 +45,8 @@
 
             <simulator
                 :capital="capital"
-                :interes="interes"
-                :cant_cuotas="cant_cuotas"
+                :interest="interest"
+                :number_installments="number_installments"
                 ref="Simulator"
             ></simulator>
         </div>
@@ -59,9 +59,9 @@ export default {
     components: { Simulator },
     data() {
         return {
-            interes: 3,
+            interest: 3,
             capital: 500000,
-            cant_cuotas: 12
+            number_installments: 12
         };
     },
     methods: {

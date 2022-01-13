@@ -25,10 +25,10 @@ class ProveedorController extends Controller
 	{
 
 		$proveedor = new Proveedor();
-		$proveedor->nombres = $request['nombres'];
-		$proveedor->apellidos = $request['apellidos'];
+		$proveedor->name = $request['name'];
+		$proveedor->last_name = $request['last_name'];
 		$proveedor->tipo_documento = $request['tipo_documento'];
-		$proveedor->nro_documento = $request['nro_documento'];
+		$proveedor->document_number = $request['document_number'];
 		$proveedor->celular1 = $request['celular1'];
 		$proveedor->celular2 = $request['celular2'];
 		$proveedor->direccion = $request['direccion'];
@@ -49,10 +49,10 @@ class ProveedorController extends Controller
 	public function update(Request $request, Proveedor $proveedor)
 	{
 		$proveedor = Proveedor::find($request->id);
-		$proveedor->nombres = $request['nombres'];
-		$proveedor->apellidos = $request['apellidos'];
+		$proveedor->name = $request['name'];
+		$proveedor->last_name = $request['last_name'];
 		$proveedor->tipo_documento = $request['tipo_documento'];
-		$proveedor->nro_documento = $request['nro_documento'];
+		$proveedor->document_number = $request['document_number'];
 		$proveedor->celular1 = $request['celular1'];
 		$proveedor->celular2 = $request['celular2'];
 		$proveedor->direccion = $request['direccion'];

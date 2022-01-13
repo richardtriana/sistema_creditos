@@ -43,7 +43,7 @@ class InstallmentController extends Controller
     $installment = new Installment();
     $installment->credit_id = $request['credit_id'];
     $installment->cant_cuota = $request['cant_cuota'];
-    $installment->valor = $request['valor'];
+    $installment->value = $request['value'];
     $installment->payment_date = $request['payment_date'];
     $installment->days_past_due = $request['days_past_due'];
     $installment->late_interests_value = $request['late_interests_value'];
@@ -86,7 +86,7 @@ class InstallmentController extends Controller
     //
     $installment = new Installment();
     $installment->nro_cuota = $request['nro_cuota'];
-    $installment->valor = $request['valor'];
+    $installment->value = $request['value'];
     $installment->payment_date = $request['payment_date'];
     $installment->days_past_due = $request['days_past_due'];
     $installment->late_interests_value = $request['late_interests_value'];
@@ -108,13 +108,13 @@ class InstallmentController extends Controller
 
   public function calcularInstallments(Request $request)
   {
-    $capital = $request->valor_credit;
-    $interes = $request->interes;
-    $cant_cuotas = $request->cant_cuotas;
+    $capital = $request->credit_value;
+    $interest = $request->interest;
+    $number_installments = $request->number_installments;
 
-    $valor = $capital;
-    $valor_pago_interes = $interes;
-    $cant_cuota = $cant_cuotas;
+    $value = $capital;
+    $valor_pago_interes = $interest;
+    $cant_cuota = $number_installments;
 
     $payment_date = [];
     $fechaActual = date('Y-m-d');
@@ -123,21 +123,21 @@ class InstallmentController extends Controller
     $listInstallments = [];
     $pagoInteres = [];
     $pagoCapital = [];
-    // exit;
+
     $installment =
-      ($valor *
+      ($value *
         ((pow(1 + $valor_pago_interes / 100, $cant_cuota) *
           $valor_pago_interes) /
           100)) /
       (pow(1 + $valor_pago_interes / 100, $cant_cuota) - 1);
 
-    for ($i = 0; $i < $cant_cuotas; $i++) {
+    for ($i = 0; $i < $number_installments; $i++) {
 
       $payment_date[$i] = (date("Y-m-d", strtotime($mes_actual . "+ $i months")));
 
-      $pagoInteres[$i] = ($valor * ($valor_pago_interes / 100));
+      $pagoInteres[$i] = ($value * ($valor_pago_interes / 100));
       $pagoCapital[$i] = $installment - $pagoInteres[$i];
-      $valor = ($valor - $pagoCapital[$i]);
+      $value = ($value - $pagoCapital[$i]);
 
       foreach ($pagoCapital as $pc) {
         $listInstallments[$i]['pagoCapital'] = (float) number_format($pc, 2, '.', '');
@@ -147,7 +147,7 @@ class InstallmentController extends Controller
       }
       foreach ($payment_date as $fp) {
         $listInstallments[$i]['payment_date'] = (date($fp));
-        $listInstallments[$i]['saldo_capital'] = (float) number_format($valor, 2, '.', '');
+        $listInstallments[$i]['saldo_capital'] = (float) number_format($value, 2, '.', '');
         $listInstallments[$i]['valor_cuota'] = (float) number_format($installment, 2, '.', '');
       }
       $listInstallments[$i]['cant_cuota'] = $i + 1;
@@ -172,7 +172,7 @@ class InstallmentController extends Controller
     $credit_id = $request->credit_id;
 
     $credit = Credit::find($credit_id)->first();
-    $client = $credit->client()->get();
+    $client = $credit->client()->first();
     $installments = $credit->installments()->get();
 
     $details = [
@@ -187,8 +187,8 @@ class InstallmentController extends Controller
 
     $data = [
       'status' => 200,
-			'pdf' => base64_encode($pdf),
-			'message' => 'Tabla generada en pdf'
+      'pdf' => base64_encode($pdf),
+      'message' => 'Tabla generada en pdf'
     ];
 
     return response()->json($data);
