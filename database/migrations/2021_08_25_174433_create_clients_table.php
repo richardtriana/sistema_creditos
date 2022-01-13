@@ -17,11 +17,11 @@ class CreateClientsTable extends Migration
       $table->id();
       $table->string('name');
       $table->string('last_name');
-      $table->tinyInteger('tipo_documento')->default(null);
+      $table->tinyInteger('type_document')->default(null);
       $table->integer('document_number');
-      $table->string('celular1')->default(null)->nullable();
-      $table->string('celular2')->default(null)->nullable();
-      $table->string('direccion')->default(null)->nullable();
+      $table->string('cell_phone1')->default(null)->nullable();
+      $table->string('cell_phone2')->default(null)->nullable();
+      $table->string('address')->default(null)->nullable();
       $table->string('email')->default(null)->nullable();
       $table->date('fecha_nacimiento')->default(null)->nullable();
       $table->tinyText('genero')->default(null)->nullable();
@@ -30,7 +30,7 @@ class CreateClientsTable extends Migration
       $table->string('lugar_trabajo')->default(null)->nullable();
       $table->string('cargo')->default(null)->nullable();
       $table->tinyInteger('independiente')->default(null)->nullable();
-      $table->string('foto')->default(null)->nullable();
+      $table->string('photo')->default(null)->nullable();
       $table->timestamps();
     });
   }

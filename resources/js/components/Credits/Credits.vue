@@ -92,7 +92,7 @@
 								<button
 									v-if="credit.status == 1"
 									class="btn btn-outline-primary"
-									@click="mostrarDatos(credit)"
+									@click="showData(credit)"
 								>
 									<i class="bi bi-pen"></i>
 								</button>
@@ -158,7 +158,7 @@
 		/>
 		<create-edit-credit
 			ref="CreateEditCredit"
-			@listar-credits="listarCredits(1)"
+			@list-credits="listarCredits(1)"
 		/>
 
 		<installment ref="Installment" />
@@ -182,7 +182,7 @@ export default {
 		return {
 			buscar_client: "",
 			creditList: {},
-			listaClients: {}
+			clientList: {}
 		};
 	},
 	created() {
@@ -198,16 +198,16 @@ export default {
 					me.creditList = response.data;
 				});
 		},
-		listarClients(page = 1) {
+		listClients(page = 1) {
 			let me = this;
 			axios
 				.get(`api/clients?page=${page}&client=${this.buscar_client}`)
 				.then(function(response) {
-					me.listaClients = response.data;
+					me.clientList = response.data;
 				});
 		},
-		mostrarDatos: function(credit) {
-			this.$refs.CreateEditCredit.abirEditarCredit(credit);
+		showData: function(credit) {
+			this.$refs.CreateEditCredit.showEditCredit(credit);
 		},
 		simularCredit: function() {
 			this.$refs.Simulator.abrirSimulator();
@@ -215,7 +215,7 @@ export default {
 		mostrarInstallment: function(credit) {
 			this.$refs.Installment.listCreditInstallments(credit);
 		},
-		mostrarDatosClient: function(client) {
+		showDataClient: function(client) {
 			this.$refs.CreateEditClient.abirEditarClient(client);
 		},
 		changeStatus: function(id) {

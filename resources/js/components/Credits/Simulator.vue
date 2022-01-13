@@ -84,7 +84,7 @@ export default {
             axios.post("api/installments", this.installments).then(function() {
                 $("#formSimulatorModal").modal("hide");
                 me.resetData();
-                this.$emit("listar-credits");
+                this.$emit("list-credits");
             });
         },
         abrirSimulator(credit) {
@@ -99,7 +99,7 @@ export default {
                 $("#formSimulatorModal").modal("hide");
                 me.resetData();
             });
-            this.$emit("listar-credits");
+            this.$emit("list-credits");
 
             this.editar = false;
         },

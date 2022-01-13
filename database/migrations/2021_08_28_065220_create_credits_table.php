@@ -17,14 +17,14 @@ class CreateCreditsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('client_id');
             $table->unsignedBigInteger('debtor_id');
-            $table->unsignedBigInteger('sede_id');
-            $table->unsignedBigInteger('usu_crea');
+            $table->unsignedBigInteger('headquarter_id');
+            $table->unsignedBigInteger('user_id');
             $table->integer('number_installments');
             $table->integer('number_paid_installments')->nullable()->default(0);
             $table->integer('day_limit')->nullable()->default(1);
-            $table->boolean('debtor')->comment('Solo se confirma si tiene debtor');
+            $table->boolean('debtor')->comment('Solo se confirma si tiene deudor');
             $table->tinyInteger('status')->default(0)->nullable()->default(0);
-            $table->date('fecha_inicio');
+            $table->date('start_date');
             $table->float('interest', 20, 2)->default(3);
             $table->float('annual_interest_percentage', 20, 4)->nullable()->default(0);
             $table->float('valor_cuota', 20, 4);
@@ -32,6 +32,12 @@ class CreateCreditsTable extends Migration
             $table->float('paid_value', 20, 4)->nullable()->default(0);
             $table->float('capital_value', 20, 4)->nullable()->default(0);
             $table->float('interest_value', 20, 4)->nullable()->default(0);
+
+
+            $table->foreign('headquarter_id')
+                ->references('id')
+                ->on('headquarters')
+                ->onDelete('cascade');
 
             $table->foreign('client_id')
                 ->references('id')
@@ -43,16 +49,10 @@ class CreateCreditsTable extends Migration
                 ->on('clients')
                 ->onDelete('cascade');
 
-            $table->foreign('sede_id')
-                ->references('id')
-                ->on('sedes')
-                ->onDelete('cascade');
-
-            $table->foreign('usu_crea')
+            $table->foreign('user_id')
                 ->references('id')
                 ->on('users')
                 ->onDelete('cascade');
-
 
             $table->timestamps();
         });

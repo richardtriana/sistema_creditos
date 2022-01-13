@@ -51,19 +51,19 @@ class ClientController extends Controller
 		$client = new Client();
 		$client->name = $request['name'];
 		$client->last_name = $request['last_name'];
-		$client->tipo_documento = $request['tipo_documento'];
+		$client->type_document = $request['type_document'];
 		$client->document_number = $request['document_number'];
 		$client->email = $request['email'];
 		$client->fecha_nacimiento = $request['fecha_nacimiento'];
 		$client->genero = $request['genero'];
-		$client->celular1 = $request['celular1'];
-		$client->celular2 = $request['celular2'];
-		$client->direccion = $request['direccion'];
+		$client->cell_phone1 = $request['cell_phone1'];
+		$client->cell_phone2 = $request['cell_phone2'];
+		$client->address = $request['address'];
 		$client->estado_civil = $request['estado_civil'];
 		$client->lugar_trabajo = $request['lugar_trabajo'];
 		$client->cargo = $request['cargo'];
 		$client->independiente = $request['independiente'];
-		$client->foto = 'undefined';
+		$client->photo = 'undefined';
 		$client->save();
 	}
 
@@ -101,19 +101,19 @@ class ClientController extends Controller
 		$client = Client::find($request->id);
 		$client->name = $request['name'];
 		$client->last_name = $request['last_name'];
-		$client->tipo_documento = $request['tipo_documento'];
+		$client->type_document = $request['type_document'];
 		$client->document_number = $request['document_number'];
 		$client->email = $request['email'];
 		$client->fecha_nacimiento = $request['fecha_nacimiento'];
 		$client->genero = $request['genero'];
-		$client->celular1 = $request['celular1'];
-		$client->celular2 = $request['celular2'];
-		$client->direccion = $request['direccion'];
+		$client->cell_phone1 = $request['cell_phone1'];
+		$client->cell_phone2 = $request['cell_phone2'];
+		$client->address = $request['address'];
 		$client->estado_civil = $request['estado_civil'];
 		$client->lugar_trabajo = $request['lugar_trabajo'];
 		$client->cargo = $request['cargo'];
 		$client->independiente = $request['independiente'];
-		$client->foto = 'undefindef';
+		$client->photo = 'undefindef';
 		$client->save();
 	}
 

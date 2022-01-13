@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Installment;
-use App\Models\Sede;
+use App\Models\Headquarter;
 use Illuminate\Http\Request;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -17,9 +17,9 @@ class PrintTicketController extends Controller
     public function printInstallment($id)
     {
         // Orden
-        $sede = Sede::first();
+        $headquarter = Headquarter::first();
 
-        if (!$sede->impresora_pos || $sede->impresora_pos == '') {
+        if (!$headquarter->pos_printer || $headquarter->pos_printer == '') {
             return false;
         }
         $installment = Installment::findOrFail($id);
@@ -27,7 +27,7 @@ class PrintTicketController extends Controller
         $client = $credit['client'];
 
         // Config de impresora
-        $connector = new WindowsPrintConnector($sede->impresora_pos);
+        $connector = new WindowsPrintConnector($headquarter->pos_printer);
 
         try {
 
@@ -44,13 +44,13 @@ class PrintTicketController extends Controller
 
             $printer->setTextSize(1, 2);
             $printer->setEmphasis(true);
-            $printer->text($sede->sede . "\n");
+            $printer->text($headquarter->headquarter . "\n");
             $printer->setTextSize(1, 1);
             $printer->setEmphasis(false);
             $printer->text("NIT: ");
-            $printer->text($sede->nit . "\n");
+            $printer->text($headquarter->nit . "\n");
             $printer->text("Dirección: ");
-            $printer->text($sede->direccion . "\n");
+            $printer->text($headquarter->address . "\n");
 
             $printer->setEmphasis(true);
             $printer->setTextSize(1, 2);

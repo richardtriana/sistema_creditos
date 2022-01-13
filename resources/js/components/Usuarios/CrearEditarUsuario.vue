@@ -54,21 +54,21 @@
                   />
                 </div>
                 <div class="form-group col-md-4">
-                  <label for="celular">Celular</label>
+                  <label for="cell_phone">Celular</label>
                   <input
-                    type="date"
+                    type="number"
                     class="form-control"
-                    id="celular"
-                    v-model="formUsuario.celular"
+                    id="cell_phone"
+                    v-model="formUsuario.cell_phone"
                   />
                 </div>
                 <div class="form-group col-md-4">
-                  <label for="tipo_documento">Tipo Documento</label>
+                  <label for="type_document">Tipo Documento</label>
                   <select
-                    name="tipo_documento"
-                    id="tipo_documento"
+                    name="type_document"
+                    id="type_document"
                     class="custom-select"
-                    v-model="formUsuario.tipo_documento"
+                    v-model="formUsuario.type_document"
                   >
                     <option value="0" disabled>--Seleccionar--</option>
                     <option value="1">Cédula de ciudadanía</option>
@@ -76,30 +76,30 @@
                   </select>
                 </div>
                 <div class="form-group col-md-4">
-                  <label for="documento">Nro. Documento</label>
+                  <label for="document">Nro. Documento</label>
 
                   <input
                     type="number"
                     class="form-control"
-                    id="documento"
-                    v-model="formUsuario.documento"
+                    id="document"
+                    v-model="formUsuario.document"
                   />
                 </div>
                 <div class="form-group col-md-4">
-                  <label for="sede_id">Sede</label>
+                  <label for="headquarter_id">Headquarter</label>
                   <v-select
-                    :options="listaSedes.data"
-                    label="sede"
-                    :reduce="(sede) => sede.id"
-                    v-model="formUsuario.sede_id"
+                    :options="headquarterList.data"
+                    label="headquarter"
+                    :reduce="(headquarter) => headquarter.id"
+                    v-model="formUsuario.headquarter_id"
                   >
                   </v-select>
 
                   <!-- <input
                     type="number"
                     class="form-control"
-                    id="sede_id"
-                    v-model="formUsuario.sede_id"
+                    id="headquarter_id"
+                    v-model="formUsuario.headquarter_id"
                   /> -->
                 </div>
                 <div class="form-group col-md-4">
@@ -155,26 +155,26 @@ export default {
   data() {
     return {
       editar: false,
-      listaSedes: [],
+      headquarterList: [],
       formUsuario: {
         name: "",
         email: "",
         password: "",
         nombre: "",
-        celular: "",
-        direccion: "",
-        tipo_documento: 0,
-        documento: 0,
-        foto: "",
+        cell_phone: "",
+        address: "",
+        type_document: 0,
+        document: 0,
+        photo: "",
         status: "1",
         rol_id: "",
-        sede_id: "",
+        headquarter_id: "",
       },
     };
   },
   // Function crearUsuarios
   created() {
-    this.listarSedes(1);
+    this.listHeadquarters(1);
   },
   methods: {
     crearUsuario() {
@@ -207,10 +207,10 @@ export default {
       });
     },
 
-    listarSedes(page = 1) {
+    listHeadquarters(page = 1) {
       let me = this;
-      axios.get(`api/sedes?page=${page}`).then(function (response) {
-        me.listaSedes = response.data;
+      axios.get(`api/headquarters?page=${page}`).then(function (response) {
+        me.headquarterList = response.data;
       });
     },
   },

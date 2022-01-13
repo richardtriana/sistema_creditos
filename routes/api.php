@@ -4,7 +4,7 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\CreditController;
-use App\Http\Controllers\SedeController;
+use App\Http\Controllers\HeadquarterController;
 use App\Http\Controllers\InstallmentController;
 use App\Http\Controllers\PrintTicketController;
 use Illuminate\Http\Request;
@@ -37,8 +37,8 @@ Route::post('/proveedores/{proveedor}/change-status',  [ProveedorController::cla
 Route::resource('/usuarios',  UsuarioController::class);
 Route::post('/usuarios/{usuario}/change-status',  [UsuarioController::class, 'changeStatus']);
 
-Route::resource('/sedes',  SedeController::class);
-Route::post('/sedes/{sede}/change-status',  [SedeController::class, 'changeStatus']);
+Route::resource('/headquarters',  HeadquarterController::class);
+Route::post('/headquarters/{headquarter}/change-status',  [HeadquarterController::class, 'changeStatus']);
 
 Route::get('/credits/amortization-table', [InstallmentController::class, 'printTable']);
 Route::post('/credits/pay-credit-installments/{id}', [CreditController::class, 'payMultipleInstallments']);

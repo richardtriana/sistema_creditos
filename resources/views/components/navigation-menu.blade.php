@@ -22,7 +22,7 @@
                     <router-link class="nav-link text-white" to="/credits"> Credits </router-link>
                 </li>
                 <li class="nav-item">
-                    <router-link class="nav-link text-white" to="/sedes"> Sedes </router-link>
+                    <router-link class="nav-link text-white" to="/headquarters"> Headquarters </router-link>
                 </li>
                 <li class="nav-item">
                     <router-link class="nav-link text-white"  to="/proveedores"> Proveedores </router-link>
