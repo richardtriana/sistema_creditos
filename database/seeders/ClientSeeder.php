@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Client;
+use App\Models\Credit;
 use Illuminate\Database\Seeder;
 
 class ClientSeeder extends Seeder
@@ -16,6 +17,7 @@ class ClientSeeder extends Seeder
     {
         //
         Client::factory()
+        ->has(Credit::factory()->count(3))
         ->count(10)
         ->create();
     }

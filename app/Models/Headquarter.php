@@ -18,4 +18,15 @@ class Headquarter extends Model
         'phone',
         'pos_printer'
     ];
+
+
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
+
+    public function clients()
+    {
+        return $this->hasMany(Client::class);
+    }
 }

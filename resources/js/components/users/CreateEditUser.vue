@@ -2,16 +2,16 @@
   <div>
     <div
       class="modal fade"
-      id="formUsuarioModal"
+      id="formUserModal"
       tabindex="-1"
-      aria-labelledby="formUsuarioModalLabel"
+      aria-labelledby="formUserModalLabel"
       aria-hidden="true"
     >
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="formUsuarioModalLabel">
-              Gestionar Usuario
+            <h5 class="modal-title" id="formUserModalLabel">
+              Gestionar User
             </h5>
             <button
               type="button"
@@ -32,7 +32,7 @@
                     type="text"
                     class="form-control"
                     id="nombre"
-                    v-model="formUsuario.name"
+                    v-model="formUser.name"
                   />
                 </div>
                 <div class="form-group col-md-4">
@@ -41,7 +41,7 @@
                     type="text"
                     class="form-control"
                     id="name"
-                    v-model="formUsuario.last_name"
+                    v-model="formUser.last_name"
                   />
                 </div>
                 <div class="form-group col-md-4">
@@ -50,7 +50,7 @@
                     type="text"
                     class="form-control"
                     id="email"
-                    v-model="formUsuario.email"
+                    v-model="formUser.email"
                   />
                 </div>
                 <div class="form-group col-md-4">
@@ -59,7 +59,7 @@
                     type="number"
                     class="form-control"
                     id="phone"
-                    v-model="formUsuario.phone"
+                    v-model="formUser.phone"
                   />
                 </div>
                 <div class="form-group col-md-4">
@@ -68,7 +68,7 @@
                     name="type_document"
                     id="type_document"
                     class="custom-select"
-                    v-model="formUsuario.type_document"
+                    v-model="formUser.type_document"
                   >
                     <option value="0" disabled>--Seleccionar--</option>
                     <option value="1">Cédula de ciudadanía</option>
@@ -82,7 +82,7 @@
                     type="number"
                     class="form-control"
                     id="document"
-                    v-model="formUsuario.document"
+                    v-model="formUser.document"
                   />
                 </div>
                 <div class="form-group col-md-4">
@@ -91,7 +91,7 @@
                     :options="headquarterList.data"
                     label="headquarter"
                     :reduce="(headquarter) => headquarter.id"
-                    v-model="formUsuario.headquarter_id"
+                    v-model="formUser.headquarter_id"
                   >
                   </v-select>
 
@@ -99,7 +99,7 @@
                     type="number"
                     class="form-control"
                     id="headquarter_id"
-                    v-model="formUsuario.headquarter_id"
+                    v-model="formUser.headquarter_id"
                   /> -->
                 </div>
                 <div class="form-group col-md-4">
@@ -108,7 +108,7 @@
                     name="rol_id"
                     id="rol_id"
                     class="custom-select"
-                    v-model="formUsuario.rol_id"
+                    v-model="formUser.rol_id"
                   >
                     <option value="0" disabled>--Seleccionar--</option>
                     <option value="1">Administrador</option>
@@ -121,7 +121,7 @@
                     type="password"
                     class="form-control"
                     id="password"
-                    v-model="formUsuario.password"
+                    v-model="formUser.password"
                   />
                 </div>
               </div>
@@ -139,7 +139,7 @@
             <button
               type="button"
               class="btn btn-primary rounded"
-              @click="editar ? editarUsuario() : crearUsuario()"
+              @click="editar ? editarUser() : crearUser()"
             >
               Guardar
             </button>
@@ -156,7 +156,7 @@ export default {
     return {
       editar: false,
       headquarterList: [],
-      formUsuario: {
+      formUser: {
         name: "",
         email: "",
         password: "",
@@ -172,38 +172,38 @@ export default {
       },
     };
   },
-  // Function crearUsuarios
+  // Function crearUsers
   created() {
     this.listHeadquarters(1);
   },
   methods: {
-    crearUsuario() {
+    crearUser() {
       let me = this;
-      axios.post("api/usuarios", this.formUsuario).then(function () {
-        $("#formUsuarioModal").modal("hide");
-        me.$emit("listar-usuarios");
+      axios.post("api/users", this.formUser).then(function () {
+        $("#formUserModal").modal("hide");
+        me.$emit("listar-users");
       });
     },
-    abirEditarUsuario(client) {
+    abirEditarUser(client) {
       this.editar = true;
       let me = this;
-      $("#formUsuarioModal").modal("show");
-      me.formUsuario = client;
+      $("#formUserModal").modal("show");
+      me.formUser = client;
     },
-    editarUsuario() {
+    editarUser() {
       let me = this;
       axios
-        .put("api/usuarios/" + this.formUsuario.id, this.formUsuario)
+        .put("api/users/" + this.formUser.id, this.formUser)
         .then(function () {
-          $("#formUsuarioModal").modal("hide");
-          me.$emit("listar-usuarios");
+          $("#formUserModal").modal("hide");
+          me.$emit("listar-users");
         });
       this.editar = false;
     },
     resetData() {
       let me = this;
-      Object.keys(this.formUsuario).forEach(function (key, index) {
-        me.formUsuario[key] = "";
+      Object.keys(this.formUser).forEach(function (key, index) {
+        me.formUser[key] = "";
       });
     },
 

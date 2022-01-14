@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Credit;
 use App\Models\Installment;
-use Database\Factories\InstallmentFactory;
 use Illuminate\Database\Seeder;
 
 class CreditSeeder extends Seeder

@@ -15,15 +15,15 @@ class CreateCreditsTable extends Migration
     {
         Schema::create('credits', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('client_id');
-            $table->unsignedBigInteger('debtor_id');
-            $table->unsignedBigInteger('headquarter_id');
-            $table->unsignedBigInteger('user_id');
+            $table->foreignId('client_id');
+            $table->foreignId('debtor_id');
+            $table->foreignId('headquarter_id');
+            $table->foreignId('user_id');
             $table->integer('number_installments');
             $table->integer('number_paid_installments')->nullable()->default(0);
             $table->integer('day_limit')->nullable()->default(1);
             $table->boolean('debtor')->comment('Solo se confirma si tiene deudor');
-            $table->tinyInteger('status')->default(0)->nullable()->default(0);
+            $table->tinyInteger('status')->default(0)->nullable();
             $table->date('start_date');
             $table->float('interest', 20, 2)->default(3);
             $table->float('annual_interest_percentage', 20, 4)->nullable()->default(0);
@@ -32,7 +32,6 @@ class CreateCreditsTable extends Migration
             $table->float('paid_value', 20, 4)->nullable()->default(0);
             $table->float('capital_value', 20, 4)->nullable()->default(0);
             $table->float('interest_value', 20, 4)->nullable()->default(0);
-
 
             $table->foreign('headquarter_id')
                 ->references('id')

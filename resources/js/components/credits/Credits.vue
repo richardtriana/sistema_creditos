@@ -123,7 +123,7 @@
 							style="margin: 2px auto; width: 30%"
 						>
 							<p>No se encontraron resultados.</p>
-							<p>Crear usuario.</p>
+							<p>Crear user.</p>
 						</div>
 						<div class="alert alert-info" style="margin: 2px auto; width: 30%">
 							Crear un nuevo Client

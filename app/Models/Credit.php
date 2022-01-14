@@ -46,7 +46,7 @@ class Credit extends Model
         return $this->belongsTo(Client::class, 'debtor_id');
     }
     
-    public function asesor()
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
@@ -57,6 +57,6 @@ class Credit extends Model
     }
     public function installments()
     {
-        return $this->hasMany(Installment::class, 'credit_id');
+        return $this->hasMany(Installment::class);
     }
 }

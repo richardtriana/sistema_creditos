@@ -1,27 +1,27 @@
 <template>
   <div>
     <div class="page-header d-flex justify-content-between p-4 border my-2">
-      <h3>Usuarios</h3>
+      <h3>Users</h3>
       <button
         type="button"
         class="btn btn-primary"
         data-toggle="modal"
-        data-target="#formUsuarioModal"
+        data-target="#formUserModal"
       >
-        Crear Usuario
+        Crear User
       </button>
     </div>
     <div class="page-search d-flex justify-content-between p-4 border my-2">
       <div class="form-group col-8 m-auto">
-        <label for="buscar_usuario">Buscar...</label>
+        <label for="buscar_user">Buscar...</label>
         <input
           type="text"
-          id="buscar_usuario"
-          name="buscar_usuario"
+          id="buscar_user"
+          name="buscar_user"
           class="form-control"
           placeholder="Nombres | Documento"
-          @keypress="listarUsuarios(1)"
-          v-model="buscar_usuario"
+          @keypress="listarUsers(1)"
+          v-model="buscar_user"
         />
       </div>
     </div>
@@ -52,38 +52,38 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="usuario in listaUsuarios.data" :key="usuario.id">
-              <td>{{ usuario.id }}</td>
-              <td>{{ usuario.name }}</td>
-              <td>{{ usuario.last_name }}</td>
-              <td>{{ usuario.email }}</td>
-              <td>{{ usuario.document }}</td>
-              <td>{{ usuario.phone }}</td>
-              <td>{{ usuario.headquarter_id }}</td>
-              <td v-if="usuario.rol_id == 1">Administrador</td>
-              <td v-if="usuario.rol_id == 2">Operario</td>
-              <td v-if="usuario.status == 1">Activo</td>
-              <td v-if="usuario.status == 0">Inactivo</td>
+            <tr v-for="user in listaUsers.data" :key="user.id">
+              <td>{{ user.id }}</td>
+              <td>{{ user.name }}</td>
+              <td>{{ user.last_name }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.document }}</td>
+              <td>{{ user.phone }}</td>
+              <td>{{ user.headquarter_id }}</td>
+              <td v-if="user.rol_id == 1">Administrador</td>
+              <td v-if="user.rol_id == 2">Operario</td>
+              <td v-if="user.status == 1">Activo</td>
+              <td v-if="user.status == 0">Inactivo</td>
 
               <td class="text-right">
                 <button
-                  v-if="usuario.status == 1"
+                  v-if="user.status == 1"
                   class="btn btn-outline-primary"
-                  @click="showData(usuario)"
+                  @click="showData(user)"
                 >
                   <i class="bi bi-pen"></i>
                 </button>
                 <button
-                  v-if="usuario.status == 1"
+                  v-if="user.status == 1"
                   class="btn btn-outline-danger"
-                  @click="changeStatus(usuario.id)"
+                  @click="changeStatus(user.id)"
                 >
                   <i class="bi bi-trash"></i>
                 </button>
                 <button
-                  v-if="usuario.status == 0"
+                  v-if="user.status == 0"
                   class="btn btn-outline-success"
-                  @click="changeStatus(usuario.id)"
+                  @click="changeStatus(user.id)"
                 >
                   <i class="bi bi-check2-circle"></i>
                 </button>
@@ -93,9 +93,9 @@
         </table>
         <pagination
           :align="'center'"
-          :data="listaUsuarios"
+          :data="listaUsers"
           :limit="8"
-          @pagination-change-page="listarUsuarios"
+          @pagination-change-page="listarUsers"
         >
           <span slot="prev-nav"><i class="bi bi-chevron-double-left"></i></span>
           <span slot="next-nav"
@@ -104,40 +104,40 @@
         </pagination>
       </section>
     </div>
-    <crear-editar-usuario ref="CrearEditarUsuario" />
+    <create-edit-user ref="CreateEditUser" />
   </div>
 </template>
 
 <script>
-import CrearEditarUsuario from "./CrearEditarUsuario.vue";
+import CreateEditUser from "./CreateEditUser.vue";
 export default {
-  components: { CrearEditarUsuario },
+  components: { CreateEditUser },
   data() {
     return {
-      buscar_usuario: "",
-      listaUsuarios: {},
+      buscar_user: "",
+      listaUsers: {},
     };
   },
   created() {
-    this.listarUsuarios(1);
+    this.listarUsers(1);
   },
   methods: {
-    listarUsuarios(page = 1) {
+    listarUsers(page = 1) {
       let me = this;
       axios
-        .get(`api/usuarios?page=${page}&usuario=${this.buscar_usuario}`)
+        .get(`api/users?page=${page}&user=${this.buscar_user}`)
         .then(function (response) {
-          me.listaUsuarios = response.data;
+          me.listaUsers = response.data;
         });
     },
     showData: function (ususario) {
-      this.$refs.CrearEditarUsuario.abirEditarUsuario(ususario);
+      this.$refs.CreateEditUser.abirEditarUser(ususario);
     },
     changeStatus: function (id) {
       let me = this;
 
       Swal.fire({
-        title: "¿Quieres cambiar el status del usuario?",
+        title: "¿Quieres cambiar el status del user?",
         showDenyButton: true,
         denyButtonText: `Cancelar`,
         confirmButtonText: `Guardar`,
@@ -145,12 +145,12 @@ export default {
         if (result.isConfirmed) {
           axios
             .post(
-              "api/usuarios/" + id + "/change-status",
+              "api/users/" + id + "/change-status",
               null,
               me.$root.config
             )
             .then(function () {
-              me.listarUsuarios(1);
+              me.listarUsers(1);
             });
           Swal.fire("Cambios realizados!", "", "success");
         } else if (result.isDenied) {

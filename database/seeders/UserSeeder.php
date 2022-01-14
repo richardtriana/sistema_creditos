@@ -3,11 +3,11 @@
 namespace Database\Seeders;
 
 use App\Models\Client;
-use App\Models\Headquarter;
+use App\Models\Credit;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
-class HeadquarterSeeder extends Seeder
+class UserSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -16,9 +16,10 @@ class HeadquarterSeeder extends Seeder
      */
     public function run()
     {
-        Headquarter::factory()
-            ->has(User::factory()->count(3))
-            ->count(5)
+        //
+        User::factory()
+            ->has(Credit::factory()->count(3))
+            ->count(10)
             ->create();
     }
 }
