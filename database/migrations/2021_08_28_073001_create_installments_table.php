@@ -23,7 +23,7 @@ class CreateInstallmentsTable extends Migration
             $table->float('late_interests_value', 20, 4)->nullable()->default(0);
             $table->float('interest_value', 20, 4)->nullable()->default(0);
             $table->float('capital_value', 20, 4)->nullable()->default(0);
-            $table->tinyText('status')->default(0);
+            $table->tinyInteger('status')->default(0);
             $table->float('paid_balance')->nullable();
             $table->date('payment_register', 20, 4)->nullable();
             $table->foreign('credit_id')
