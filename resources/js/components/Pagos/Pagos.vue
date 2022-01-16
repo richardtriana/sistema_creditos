@@ -86,7 +86,7 @@
         </pagination>
       </section>
     </div>
-    <crear-editar-pago
+    <create-edit-pago
       ref="CrearEditarPago"
       @listar-pago="listarPago(1)"
     />

@@ -89,7 +89,7 @@
                 </pagination>
             </section>
         </div>
-        <crear-editar-proveedor
+        <create-edit-proveedor
             ref="CrearEditarProveedor"
             @listar-proveedores="listarProveedores(1)"
         />

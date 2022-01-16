@@ -16,7 +16,7 @@
                     <router-link class="nav-link text-white" to="/clients"> Clients </router-link>
                 </li>
                 <li class="nav-item">
-                    <router-link class="nav-link text-white" to="/usuarios"> Usuarios </router-link>
+                    <router-link class="nav-link text-white" to="/users"> Users </router-link>
                 </li>
                 <li class="nav-item">
                     <router-link class="nav-link text-white" to="/credits"> Credits </router-link>

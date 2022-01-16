@@ -18,7 +18,7 @@ class User extends Authenticatable
      * @var string[]
      */
     protected $fillable = [
-        'id', 'email', 'password', 'name', 'last_name', 'phone', 'address', 'type_document', 'document', 'photo', 'headquarter_id', 'id_rol', 'status'
+        'id', 'last_name', 'email', 'password', 'name', 'phone', 'address', 'type_document', 'document', 'photo', 'headquarter_id', 'rol_id', 'status'
     ];
 
     /**
@@ -40,8 +40,18 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    protected $with = [
+        'headquarter'
+    ];
+
+
     public function headquarter()
     {
         return $this->belongsTo(Headquarter::class, 'headquarter_id');
+    }
+
+    public function credits()
+    {
+        return $this->hasMany(Credit::class);
     }
 }
