@@ -87,7 +87,7 @@ export default {
                 this.$emit("list-credits");
             });
         },
-        abrirSimulator(credit) {
+        openSimulator(credit) {
             this.editar = true;
             let me = this;
             $("#formSimulatorModal").modal("show");

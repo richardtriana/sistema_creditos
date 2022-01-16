@@ -2135,7 +2135,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     simularCredit: function simularCredit() {
-      this.$refs.Simulator.abrirSimulator();
+      this.$refs.Simulator.openSimulator();
     }
   },
   mounted: function mounted() {
@@ -3067,6 +3067,16 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
@@ -3086,14 +3096,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         user_id: "",
         number_installments: "",
         number_paid_installments: ""
-      }, _defineProperty(_formCredit, "number_paid_installments", ""), _defineProperty(_formCredit, "day_limit", ""), _defineProperty(_formCredit, "debtor", ""), _defineProperty(_formCredit, "status", "1"), _defineProperty(_formCredit, "start_date", ""), _defineProperty(_formCredit, "interest", ""), _defineProperty(_formCredit, "annual_interest_percentage", 0), _defineProperty(_formCredit, "installment_value", ""), _defineProperty(_formCredit, "credit_value", ""), _defineProperty(_formCredit, "paid_value", ""), _defineProperty(_formCredit, "capital_value", ""), _defineProperty(_formCredit, "interest_value", ""), _formCredit)
+      }, _defineProperty(_formCredit, "number_paid_installments", ""), _defineProperty(_formCredit, "day_limit", ""), _defineProperty(_formCredit, "debtor", ""), _defineProperty(_formCredit, "status", "1"), _defineProperty(_formCredit, "start_date", ""), _defineProperty(_formCredit, "interest", ""), _defineProperty(_formCredit, "annual_interest_percentage", 0), _defineProperty(_formCredit, "installment_value", ""), _defineProperty(_formCredit, "credit_value", ""), _defineProperty(_formCredit, "paid_value", ""), _defineProperty(_formCredit, "capital_value", ""), _defineProperty(_formCredit, "interest_value", ""), _defineProperty(_formCredit, "description", ""), _defineProperty(_formCredit, "disbursement_date", ""), _formCredit)
     };
   },
   created: function created() {
     this.listHeadquarters(1);
     this.listClients(1);
   },
-  // Function createCredits
   methods: {
     listHeadquarters: function listHeadquarters() {
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
@@ -3318,12 +3327,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
 
 
 
@@ -3370,7 +3373,7 @@ __webpack_require__.r(__webpack_exports__);
       this.$refs.CreateEditCredit.showEditCredit(credit);
     },
     simularCredit: function simularCredit() {
-      this.$refs.Simulator.abrirSimulator();
+      this.$refs.Simulator.openSimulator();
     },
     showInstallment: function showInstallment(credit) {
       this.$refs.Installment.listCreditInstallments(credit);
@@ -3381,7 +3384,7 @@ __webpack_require__.r(__webpack_exports__);
     changeStatus: function changeStatus(id) {
       var me = this;
       Swal.fire({
-        title: "¿Quieres cambiar el status del credit?",
+        title: "¿Quieres cambiar el status del credito?",
         showDenyButton: true,
         denyButtonText: "Cancelar",
         confirmButtonText: "Guardar"
@@ -3689,7 +3692,7 @@ __webpack_require__.r(__webpack_exports__);
         this.$emit("list-credits");
       });
     },
-    abrirSimulator: function abrirSimulator(credit) {
+    openSimulator: function openSimulator(credit) {
       this.editar = true;
       var me = this;
       $("#formSimulatorModal").modal("show");
@@ -68281,11 +68284,7 @@ var render = function() {
                   staticClass: "modal-title",
                   attrs: { id: "formCreditModalLabel" }
                 },
-                [
-                  _vm._v(
-                    "\n                            Credits\n                        "
-                  )
-                ]
+                [_vm._v("\n\t\t\t\t\t\tCreditos\n\t\t\t\t\t")]
               ),
               _vm._v(" "),
               _c(
@@ -68371,6 +68370,38 @@ var render = function() {
                             _vm.$set(
                               _vm.formCredit,
                               "debtor",
+                              $event.target.value
+                            )
+                          }
+                        }
+                      })
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "form-group col-md-4" }, [
+                      _c("label", { attrs: { for: "description" } }, [
+                        _vm._v("Description")
+                      ]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.formCredit.description,
+                            expression: "formCredit.description"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: { type: "text", id: "description" },
+                        domProps: { value: _vm.formCredit.description },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(
+                              _vm.formCredit,
+                              "description",
                               $event.target.value
                             )
                           }
@@ -68477,7 +68508,7 @@ var render = function() {
                     _vm._v(" "),
                     _c("div", { staticClass: "form-group col-md-4" }, [
                       _c("label", { attrs: { for: "number_installments" } }, [
-                        _vm._v("Cantidad Installments")
+                        _vm._v("Cantidad Cuotas")
                       ]),
                       _vm._v(" "),
                       _c("input", {
@@ -68528,7 +68559,7 @@ var render = function() {
                         }
                       }
                     },
-                    [_vm._v("\n\t\t\t\t\t\t\t\tCerrar\n\t\t\t\t\t\t\t")]
+                    [_vm._v("\n\t\t\t\t\t\t\tCerrar\n\t\t\t\t\t\t")]
                   ),
                   _vm._v(" "),
                   _c(
@@ -68542,7 +68573,7 @@ var render = function() {
                         }
                       }
                     },
-                    [_vm._v("\n\t\t\t\t\t\t\t\tGuardar\n\t\t\t\t\t\t\t")]
+                    [_vm._v("\n\t\t\t\t\t\t\tGuardar\n\t\t\t\t\t\t")]
                   )
                 ],
                 1
@@ -68641,7 +68672,7 @@ var render = function() {
               _c(
                 "table",
                 {
-                  staticClass: "table table-md table-bordered table-responsive"
+                  staticClass: "table table-sm table-bordered table-responsive"
                 },
                 [
                   _vm._m(1),
@@ -68837,7 +68868,7 @@ var render = function() {
         ref: "CreateEditCredit",
         on: {
           "list-credits": function($event) {
-            return _vm.listarCredits(1)
+            return _vm.listCredits(1)
           }
         }
       }),
@@ -68859,7 +68890,7 @@ var staticRenderFns = [
           "page-header d-flex justify-content-between p-4 border my-2"
       },
       [
-        _c("h3", [_vm._v("Credits")]),
+        _c("h3", [_vm._v("Creditos")]),
         _vm._v(" "),
         _c(
           "button",
@@ -68884,7 +68915,7 @@ var staticRenderFns = [
       _c("tr", [
         _c("th", [_vm._v("ID")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Client")]),
+        _c("th", [_vm._v("Cliente")]),
         _vm._v(" "),
         _c("th", [_vm._v("Nro. Documento")]),
         _vm._v(" "),

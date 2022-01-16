@@ -7,199 +7,203 @@ use App\Models\Headquarter;
 use App\Models\Credit;
 use App\Models\Installment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CreditController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index(Request $request)
-    {
-        $credits = Credit::select();
-        $clients = Client::select();
-        $headquarters = Headquarter::select();
+	/**
+	 * Display a listing of the resource.
+	 *
+	 * @return \Illuminate\Http\Response
+	 */
+	public function index(Request $request)
+	{
+		$credits = Credit::select();
 
-        if ($request->credit && ($request->credit != '')) {
-            $credits  =     $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
-                ->where('document', 'LIKE', "%$request->credit%")
-                ->orWhere('name', 'LIKE', "%$request->credit%")
-                ->orWhere('email', 'LIKE', "%$request->credit%")
-                ->orWhere('last_name', 'LIKE', "%$request->credit%")
-                ->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document');
-        } else {
-            $credits  =     $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
-                ->where('document', 'LIKE', "%$request->credit%")
-                ->orWhere('name', 'LIKE', "%$request->credit%")
-                ->orWhere('email', 'LIKE', "%$request->credit%")
-                ->orWhere('last_name', 'LIKE', "%$request->credit%")
-                ->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document');
-        }
+		if ($request->credit && ($request->credit != '')) {
+			$credits  =     $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
+				->where('document', 'LIKE', "%$request->credit%")
+				->orWhere('name', 'LIKE', "%$request->credit%")
+				->orWhere('email', 'LIKE', "%$request->credit%")
+				->orWhere('last_name', 'LIKE', "%$request->credit%")
+				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document');
+		} else {
+			$credits  =     $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
+				->where('document', 'LIKE', "%$request->credit%")
+				->orWhere('name', 'LIKE', "%$request->credit%")
+				->orWhere('email', 'LIKE', "%$request->credit%")
+				->orWhere('last_name', 'LIKE', "%$request->credit%")
+				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document');
+		}
 
-        $credits = $credits->paginate(10);
+		$credits = $credits->paginate(10);
 
-        return $credits;
-    }
+		return $credits;
+	}
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create($id)
-    {
-        //
-        $credit = Credit::findOrFail($id);
-        Credit::destroy($id);
-        return redirect('credit')->with('mensaje', 'Credit eliminado correctamente');
-    }
+	/**
+	 * Show the form for creating a new resource.
+	 *
+	 * @return \Illuminate\Http\Response
+	 */
+	public function create($id)
+	{
+		//
+	}
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
+	/**
+	 * Store a newly created resource in storage.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return \Illuminate\Http\Response
+	 */
+	public function store(Request $request)
+	{
 
-        $listInstallments = new InstallmentController();
-        $listInstallments = $listInstallments->calcularInstallments($request);
+		$listInstallments = new InstallmentController();
+		$listInstallments = $listInstallments->calcularInstallments($request);
 
-        $credit = new Credit();
-        $credit->client_id = $request['client_id'];
-        $credit->debtor = $request['debtor'];
-        $credit->debtor_id = $request['debtor_id'];
-        $credit->headquarter_id = $request['headquarter_id'];
-        $credit->number_installments = $request['number_installments'];
-        $credit->number_paid_installments = $request['number_paid_installments'];
-        $credit->day_limit = $request['day_limit'];
-        $credit->status = $request['status'];
-        $credit->start_date = date('Y-m-d');
-        $credit->interest = $request['interest'];
-        $credit->annual_interest_percentage = $request['annual_interest_percentage'];
-        $credit->user_id = $request['user_id'];
-        $credit->credit_value = $request['credit_value'];
-        $credit->paid_value = $request['paid_value'];
-        $credit->capital_value = $request['capital_value'];
-        $credit->interest_value = $request['interest_value'];
-        $credit->installment_value = $listInstallments['installment'];
-        $credit->save();
+		$user_id = Auth::user();
 
-        foreach ($listInstallments['listInstallments'] as $nueva_cuota) {
-            $installment = new Installment();
-            $installment->credit_id = $credit->id;
-            $installment->nro_cuota = $nueva_cuota['cant_cuota'];
-            $installment->value = $nueva_cuota['installment_value'];
-            $installment->payment_date = $nueva_cuota['payment_date'];
-            $installment->valor_pago_interes = $nueva_cuota['pagoInteres'];
-            $installment->valor_pago_capital = $nueva_cuota['pagoCapital'];
-            $installment->save();
-        }
-    }
+		$credit = new Credit();
+		$credit->client_id = $request['client_id'];
+		$credit->debtor_id = $request['debtor_id'];
+		$credit->user_id = 1;
+		$credit->debtor = $request['debtor'];
+		$credit->headquarter_id = $request['headquarter_id'];
+		$credit->number_installments = $request['number_installments'];
+		$credit->number_paid_installments = $request['number_paid_installments'];
+		$credit->day_limit = $request['day_limit'];
+		$credit->status = $request['status'];
+		$credit->start_date = date('Y-m-d');
+		$credit->interest = $request['interest'];
+		$credit->annual_interest_percentage = $request['annual_interest_percentage'];
+		$credit->credit_value = $request['credit_value'];
+		$credit->paid_value = $request['paid_value'];
+		$credit->capital_value = $request['capital_value'];
+		$credit->interest_value = $request['interest_value'];
+		$credit->description = $request['description'];
+		$credit->disbursement_date = date('Y-m-d');
+		$credit->installment_value = $listInstallments['installment'];
+		$credit->save();
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Credit  $credit
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Credit $credit)
-    {
-        //
-    }
+		foreach ($listInstallments['listInstallments'] as $nueva_cuota) {
+			$installment = new Installment();
+			$installment->credit_id = $credit->id;
+			$installment->nro_cuota = $nueva_cuota['cant_cuota'];
+			$installment->value = $nueva_cuota['installment_value'];
+			$installment->payment_date = $nueva_cuota['payment_date'];
+			$installment->interest_value = $nueva_cuota['pagoInteres'];
+			$installment->capital_value = $nueva_cuota['pagoCapital'];
+			$installment->save();
+		}
+	}
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Credit  $credit
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Credit $credit)
-    {
-        //
-    }
+	/**
+	 * Display the specified resource.
+	 *
+	 * @param  \App\Models\Credit  $credit
+	 * @return \Illuminate\Http\Response
+	 */
+	public function show(Credit $credit)
+	{
+		//
+	}
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Credit  $credit
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Credit $credit)
-    {
-        $credit = Credit::find($request->id);
-        $credit->client_id = $request['client_id'];
-        $credit->debtor_id = $request['debtor_id'];
-        $credit->debtor = $request['debtor'];
-        $credit->headquarter_id = $request['headquarter_id'];
-        $credit->number_installments = $request['number_installments'];
-        $credit->number_paid_installments = $request['number_paid_installments'];
-        $credit->day_limit = $request['day_limit'];
-        $credit->status = $request['status'];
-        $credit->start_date = $request['start_date'];
-        $credit->interest = $request['interest'];
-        $credit->annual_interest_percentage = $request['annual_interest_percentage'];
-        $credit->user_id = $request['user_id'];
-        $credit->installment_value = $request['installment_value'];
-        $credit->credit_value = $request['credit_value'];
-        $credit->paid_value = $request['paid_value'];
-        $credit->capital_value = $request['capital_value'];
-        $credit->interest_value = $request['interest_value'];
-        $credit->save();
-    }
+	/**
+	 * Show the form for editing the specified resource.
+	 *
+	 * @param  \App\Models\Credit  $credit
+	 * @return \Illuminate\Http\Response
+	 */
+	public function edit(Credit $credit)
+	{
+		//
+	}
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Credit  $credit
-     * @return \Illuminate\Http\Response
-     */
+	/**
+	 * Update the specified resource in storage.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @param  \App\Models\Credit  $credit
+	 * @return \Illuminate\Http\Response
+	 */
+	public function update(Request $request, Credit $credit)
+	{
+		$credit = Credit::find($request->id);
+		$credit->client_id = $request['client_id'];
+		$credit->debtor_id = $request['debtor_id'];
+		$credit->debtor = $request['debtor'];
+		$credit->headquarter_id = $request['headquarter_id'];
+		$credit->number_installments = $request['number_installments'];
+		$credit->number_paid_installments = $request['number_paid_installments'];
+		$credit->day_limit = $request['day_limit'];
+		$credit->status = $request['status'];
+		$credit->start_date = $request['start_date'];
+		$credit->interest = $request['interest'];
+		$credit->annual_interest_percentage = $request['annual_interest_percentage'];
+		$credit->user_id = $request['user_id'];
+		$credit->installment_value = $request['installment_value'];
+		$credit->credit_value = $request['credit_value'];
+		$credit->paid_value = $request['paid_value'];
+		$credit->capital_value = $request['capital_value'];
+		$credit->interest_value = $request['interest_value'];
+		$credit->description = $request['description'];
+		$credit->disbursement_date = date('Y-m-d');
+		$credit->save();
+	}
 
-    public function destroy($id)
-    {
-        //
-    }
+	/**
+	 * Remove the specified resource from storage.
+	 *
+	 * @param  \App\Models\Credit  $credit
+	 * @return \Illuminate\Http\Response
+	 */
 
-    public function changeStatus(Credit $credit)
-    {
-        //
-        $cre = Credit::find($credit->id);
-        $cre->status = !$cre->status;
-        $cre->save();
-    }
+	public function destroy($id)
+	{
+		$credit = Credit::findOrFail($id);
+		$credit->destroy($id);
+		return redirect('credit')->with('mensaje', 'Credit eliminado correctamente');
+	}
 
-    public function installments(Request $request, $id)
-    {
+	public function changeStatus(Credit $credit)
+	{
+		//
+		$cre = Credit::find($credit->id);
+		$cre->status = !$cre->status;
+		$cre->save();
+	}
 
-        $credit = Credit::findOrFail($id);
-        return $credit->installments()->get();
-    }
+	public function installments(Request $request, $id)
+	{
+
+		$credit = Credit::findOrFail($id);
+		return $credit->installments()->get();
+	}
 
 
-    public function payMultipleInstallments(Request $request, $id)
-    {
-        $credit_id = $id;
-        $amount = $request['amount'];
+	public function payMultipleInstallments(Request $request, $id)
+	{
+		$credit_id = $id;
+		$amount = $request['amount'];
 
-        $credit = Credit::findOrFail($credit_id);
-        $listInstallments = $credit->installments()->where('status', '0')->get();
+		$credit = Credit::findOrFail($credit_id);
+		$listInstallments = $credit->installments()->where('status', '0')->get();
 
-        for ($i = 0; $i < count($listInstallments) && $amount > 0; $i++) {
-            if ($amount > 0) {
-                $installment = Installment::find($listInstallments[$i]['id']);
-                if ($amount >= $listInstallments[$i]["value"]) {
-                    $installment->paid_balance = $installment->value;
-                    $installment->save();
-                } else {
-                    $installment->paid_balance = $amount;
-                    $installment->status  = 1;
-                    $installment->save();
-                }
-            }
-            $amount = $amount - $listInstallments[$i]["value"];
-        }
-    }
+		for ($i = 0; $i < count($listInstallments) && $amount > 0; $i++) {
+			if ($amount > 0) {
+				$installment = Installment::find($listInstallments[$i]['id']);
+				if ($amount >= $listInstallments[$i]["value"]) {
+					$installment->paid_balance = $installment->value;
+					$installment->save();
+				} else {
+					$installment->paid_balance = $amount;
+					$installment->status  = 1;
+					$installment->save();
+				}
+			}
+			$amount = $amount - $listInstallments[$i]["value"];
+		}
+	}
 }
