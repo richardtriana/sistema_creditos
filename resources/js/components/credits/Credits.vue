@@ -1,7 +1,7 @@
 <template>
 	<div class="page">
 		<div class="page-header d-flex justify-content-between p-4 border my-2">
-			<h3>Credits</h3>
+			<h3>Creditos</h3>
 			<button
 				type="button"
 				class="btn btn-primary"
@@ -28,11 +28,11 @@
 
 		<div class="page-content mt-4" style="width: 100%">
 			<section class="">
-				<table class="table table-md table-bordered table-responsive">
+				<table class="table table-sm table-bordered table-responsive">
 					<thead>
 						<tr>
 							<th>ID</th>
-							<th>Client</th>
+							<th>Cliente</th>
 							<th>Nro. Documento</th>
 							<th>Valor crédito</th>
 							<th>Valor Abonado</th>
@@ -152,14 +152,8 @@
 			</section>
 		</div>
 
-		<create-edit-client
-			ref="CreateEditClient"
-			@list-clients="listCredits(1)"
-		/>
-		<create-edit-credit
-			ref="CreateEditCredit"
-			@list-credits="listarCredits(1)"
-		/>
+		<create-edit-client ref="CreateEditClient" @list-clients="listCredits(1)" />
+		<create-edit-credit ref="CreateEditCredit" @list-credits="listCredits(1)" />
 
 		<installment ref="Installment" />
 	</div>
@@ -210,7 +204,7 @@ export default {
 			this.$refs.CreateEditCredit.showEditCredit(credit);
 		},
 		simularCredit: function() {
-			this.$refs.Simulator.abrirSimulator();
+			this.$refs.Simulator.openSimulator();
 		},
 		showInstallment: function(credit) {
 			this.$refs.Installment.listCreditInstallments(credit);
@@ -222,7 +216,7 @@ export default {
 			let me = this;
 
 			Swal.fire({
-				title: "¿Quieres cambiar el status del credit?",
+				title: "¿Quieres cambiar el status del credito?",
 				showDenyButton: true,
 				denyButtonText: `Cancelar`,
 				confirmButtonText: `Guardar`
