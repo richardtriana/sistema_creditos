@@ -30,8 +30,10 @@ class Credit extends Model
         'paid_value',
         'capital_value',
         'interest_value',
+        'disbursement_date',
+        'description'
     ];
- 
+
     protected $with = [
         'client'
     ];
@@ -45,7 +47,7 @@ class Credit extends Model
     {
         return $this->belongsTo(Client::class, 'debtor_id');
     }
-    
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

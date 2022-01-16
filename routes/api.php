@@ -22,14 +22,12 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+	return $request->user();
 });
-
 
 Route::resource('/clients',  ClientController::class);
 Route::post('/clients/{client}/change-status',  [ClientController::class, 'changeStatus']);
 Route::get('/clients/{client}/credits', [ClientController::class, 'credits']);
-
 
 Route::resource('/proveedores',  ProveedorController::class);
 Route::post('/proveedores/{proveedor}/change-status',  [ProveedorController::class, 'changeStatus']);
@@ -45,7 +43,6 @@ Route::post('/credits/pay-credit-installments/{id}', [CreditController::class, '
 Route::resource('/credits', CreditController::class);
 Route::post('/credits/{credit}/change-status',  [CreditController::class, 'changeStatus']);
 Route::get('/credits/{credit}/installments', [CreditController::class, 'installments']);
-
 
 Route::get('/installments/calculate-installments', [InstallmentController::class, 'calcularInstallments']);
 Route::post('/installment/{id}/pay-installment', [InstallmentController::class, 'payInstallment']);

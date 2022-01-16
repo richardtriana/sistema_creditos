@@ -66,7 +66,7 @@ export default {
     },
     methods: {
         simularCredit: function() {
-            this.$refs.Simulator.abrirSimulator();
+            this.$refs.Simulator.openSimulator();
         }
     },
     mounted() {
