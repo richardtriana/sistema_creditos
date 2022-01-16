@@ -15,6 +15,7 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('headquarter_id');
             $table->string('name');
             $table->string('last_name');
             $table->string('email')->unique();
@@ -26,9 +27,12 @@ class CreateUsersTable extends Migration
             $table->string('document')->default(null)->nullable();
             $table->string('photo')->default(null)->nullable();
             $table->tinyInteger('status')->default(1);
-            $table->foreignId('rol_id')->default(1);
-            $table->foreignId('headquarter_id')->default(1)->nullable();
             $table->rememberToken();
+
+            $table->foreign('headquarter_id')
+                ->references('id')
+                ->on('headquarters')
+                ->onDelete('cascade');
             $table->timestamps();
         });
     }

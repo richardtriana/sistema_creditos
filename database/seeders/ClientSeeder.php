@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Client;
+use App\Models\Credit;
 use Illuminate\Database\Seeder;
 
 class ClientSeeder extends Seeder

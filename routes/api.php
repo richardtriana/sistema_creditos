@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\ClientController;
-use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\CreditController;
 use App\Http\Controllers\HeadquarterController;
@@ -34,8 +34,8 @@ Route::get('/clients/{client}/credits', [ClientController::class, 'credits']);
 Route::resource('/proveedores',  ProveedorController::class);
 Route::post('/proveedores/{proveedor}/change-status',  [ProveedorController::class, 'changeStatus']);
 
-Route::resource('/usuarios',  UsuarioController::class);
-Route::post('/usuarios/{usuario}/change-status',  [UsuarioController::class, 'changeStatus']);
+Route::resource('/users',  UserController::class);
+Route::post('/users/{user}/change-status',  [UserController::class, 'changeStatus']);
 
 Route::resource('/headquarters',  HeadquarterController::class);
 Route::post('/headquarters/{headquarter}/change-status',  [HeadquarterController::class, 'changeStatus']);
