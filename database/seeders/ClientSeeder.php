@@ -17,7 +17,6 @@ class ClientSeeder extends Seeder
     {
         //
         Client::factory()
-        ->has(Credit::factory()->count(3))
         ->count(10)
         ->create();
     }

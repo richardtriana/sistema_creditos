@@ -20,7 +20,7 @@ class UserController extends Controller
                 ->orWhere('name', 'LIKE', "%$request->user%")
                 ->orWhere('email', 'LIKE', "%$request->user%");
         }
-        $users = $users->paginate(5);
+        $users = $users->paginate(10);
 
         return $users;
     }
@@ -90,16 +90,18 @@ class UserController extends Controller
     {
         $user = User::find($request->id);
         $user->headquarter_id = $request['headquarter_id'];
-        $user->rol_id = $request['rol_id'];
+        // $user->rol_id = $request['rol_id'];
         $user->email = $request['email'];
-        $user->password = $request['password'];
+        if ($request['password'] != NULL) {
+            $user->password = $request['password'];
+        }
         $user->name = $request['name'];
         $user->last_name = $request['last_name'];
         $user->phone = $request['phone'];
         $user->address = $request['address'];
         $user->type_document = $request['type_document'];
         $user->document = $request['document'];
-        $user->photo = 'undefindef';
+        $user->photo = 'undefined';
         $user->save();
     }
 

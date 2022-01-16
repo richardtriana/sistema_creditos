@@ -40,6 +40,11 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    protected $with = [
+        'headquarter'
+    ];
+
+
     public function headquarter()
     {
         return $this->belongsTo(Headquarter::class, 'headquarter_id');

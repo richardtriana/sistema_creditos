@@ -31,8 +31,7 @@ class InstallmentFactory extends Factory
       'interest_value' => $this->faker->randomFloat(4, 10, 60000),
       'capital_value' => $this->faker->randomFloat(4, 10, 60000),
       'payment_register' => $this->faker->date('Y-m-d', 'now'),
-      'status' => $this->faker->boolean(),
-
+      'status' => $this->faker->boolean()
     ];
   }
 }

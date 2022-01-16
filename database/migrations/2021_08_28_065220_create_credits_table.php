@@ -16,7 +16,7 @@ class CreateCreditsTable extends Migration
         Schema::create('credits', function (Blueprint $table) {
             $table->id();
             $table->foreignId('client_id');
-            $table->foreignId('debtor_id');
+            $table->foreignId('debtor_id')->nullable();
             $table->foreignId('headquarter_id');
             $table->foreignId('user_id');
             $table->integer('number_installments');
@@ -35,8 +35,7 @@ class CreateCreditsTable extends Migration
 
             $table->foreign('headquarter_id')
                 ->references('id')
-                ->on('headquarters')
-                ->onDelete('cascade');
+                ->on('headquarters');
 
             $table->foreign('client_id')
                 ->references('id')
@@ -45,8 +44,7 @@ class CreateCreditsTable extends Migration
 
             $table->foreign('debtor_id')
                 ->references('id')
-                ->on('clients')
-                ->onDelete('cascade');
+                ->on('clients');
 
             $table->foreign('user_id')
                 ->references('id')
