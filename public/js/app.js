@@ -3170,39 +3170,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -3214,11 +3181,9 @@ __webpack_require__.r(__webpack_exports__);
         nit: "",
         address: "",
         email: "",
-        tax_regime: "",
         telephone: "",
         mobile: "",
         logo: "",
-        printer: "",
         condition_order: "",
         condition_quotation: ""
       },
@@ -3228,11 +3193,9 @@ __webpack_require__.r(__webpack_exports__);
         nit: "",
         address: "",
         email: "",
-        tax_regime: "",
         telephone: "",
         mobile: "",
         file0: "",
-        printer: "",
         condition_order: "",
         condition_quotation: ""
       },
@@ -3255,10 +3218,10 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       axios.get("api/configurations").then(function (response) {
-        if (response.data.configuration) {
+        if (response.data.company) {
           var _this$formConfigurati;
 
-          _this.formConfiguration = response.data.configuration;
+          _this.formConfiguration = response.data.company;
           _this.formConfiguration.condition_quotation = (_this$formConfigurati = _this.formConfiguration.condition_quotation) !== null && _this$formConfigurati !== void 0 ? _this$formConfigurati : "";
         }
       });
@@ -3279,7 +3242,7 @@ __webpack_require__.r(__webpack_exports__);
     assignErrors: function assignErrors(response) {
       var _this3 = this;
 
-      var fillable = ["name", "legal_representative", "nit", "address", "email", "tax_regime", "telephone", "mobile", "file0", "printer", "condition_order", "condition_quotation"];
+      var fillable = ["name", "legal_representative", "nit", "address", "email", "telephone", "mobile", "file0", "condition_order", "condition_quotation"];
 
       if (response) {
         var errors = response.response.data.errors;
@@ -68872,32 +68835,6 @@ var render = function () {
             ]),
             _vm._v(" "),
             _c("div", { staticClass: "form-group col-12 col-md-6" }, [
-              _c("label", { attrs: { for: "tax_regime" } }, [
-                _vm._v("Regimen tributario"),
-              ]),
-              _vm._v(" "),
-              _c("input", {
-                staticClass: "form-control",
-                attrs: {
-                  type: "text",
-                  id: "tax_regime",
-                  name: "tax_regime",
-                  placeholder: "Ingresar régimen tributario",
-                },
-                domProps: { value: _vm.formConfiguration.tax_regime },
-              }),
-              _vm._v(" "),
-              _c(
-                "small",
-                {
-                  staticClass: "form-text text-danger",
-                  attrs: { id: "tax_regimeHelp" },
-                },
-                [_vm._v(_vm._s(_vm.formErrors.tax_regime))]
-              ),
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "form-group col-12 col-md-6" }, [
               _c("label", { attrs: { for: "telephone" } }, [
                 _vm._v("Teléfono"),
               ]),
@@ -69013,42 +68950,6 @@ var render = function () {
               ],
               1
             ),
-            _vm._v(" "),
-            _c("div", { staticClass: "form-group col-12 col-md-6" }, [
-              _c("label", { attrs: { for: "printer" } }, [
-                _vm._v("Impresora POS"),
-              ]),
-              _vm._v(" "),
-              _c("input", {
-                staticClass: "form-control",
-                attrs: {
-                  type: "tel",
-                  id: "printer",
-                  name: "printer",
-                  placeholder: "Ingresar nombre de impresora pos",
-                },
-                domProps: { value: _vm.formConfiguration.printer },
-              }),
-              _vm._v(" "),
-              _c(
-                "small",
-                { staticClass: "text-muted", attrs: { id: "printerHelp1" } },
-                [
-                  _vm._v(
-                    "\n\t\t\t\t\t\t\t* Esta impresora debe estar previamente configurada en su sistema\n\t\t\t\t\t\t"
-                  ),
-                ]
-              ),
-              _vm._v(" "),
-              _c(
-                "small",
-                {
-                  staticClass: "form-text text-danger",
-                  attrs: { id: "printerHelp2" },
-                },
-                [_vm._v(_vm._s(_vm.formErrors.printer))]
-              ),
-            ]),
           ]),
           _vm._v(" "),
           _c("div", { staticClass: "form-group" }, [

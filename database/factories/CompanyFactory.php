@@ -22,7 +22,7 @@ class CompanyFactory extends Factory
     public function definition()
     {
         return [
-            'name' => 'Tecnoplus',
+            'name' => 'Grucosur tecnoplus',
             'legal_representative' => 'Richard Arturo Peña',
             'nit' => '123459789-0',
             'address' => 'Añadir direccion',
