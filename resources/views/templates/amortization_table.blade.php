@@ -43,19 +43,19 @@
   <section>
     <table class="table">
       <tr>
-        <td>Cliente: {{$client->name}}  {{$client->last_name}}</td>
+        <td>Cliente: {{$client->name}} {{$client->last_name}}</td>
         <td>Nro. Documento {{$client->document}}</td>
         <td>Nro. Crédito: {{ $credit->id}}</td>
       </tr>
       <tr>
-        <td>Monto: {{ $credit->credit_value}}</td>
+        <td>Monto: $ {{ $credit->credit_value}}</td>
         <td>Nro. Cuotas: {{ $credit->number_installments}}</td>
-        <td>Fecha de desembolso: {{ $credit->id}}</td>
+        <td>Fecha de desembolso: {{ $credit->disbursement_date}}</td>
       </tr>
       <tr>
-        <td>Producto</td>
+        <td>Producto: {{ $credit->description}}</td>
         <td>Sucursal</td>
-        <td>Tasa de Interés</td>
+        <td>Tasa de Interés mensual: {{ $credit->interest}}</td>
       </tr>
       <tr>
         <td colspan="3"></td>
