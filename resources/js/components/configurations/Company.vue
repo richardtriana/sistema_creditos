@@ -84,22 +84,7 @@
 							formErrors.email
 						}}</small>
 					</div>
-					<div class="form-group col-12 col-md-6">
-						<label for="tax_regime">Regimen tributario</label>
-						<input
-							type="text"
-							class="form-control"
-							id="tax_regime"
-							name="tax_regime"
-							placeholder="Ingresar régimen tributario"
-							:value="formConfiguration.tax_regime"
-						/>
-						<small id="tax_regimeHelp" class="form-text text-danger">{{
-							formErrors.tax_regime
-						}}</small>
-					</div>
-					<!-- </div>
-        <div class="form-row"> -->
+
 					<div class="form-group col-12 col-md-6">
 						<label for="telephone">Teléfono</label>
 						<input
@@ -157,24 +142,6 @@
 							formErrors.condition_quotation
 						}}</small>
 					</div>
-
-					<div class="form-group col-12 col-md-6">
-						<label for="printer">Impresora POS</label>
-						<input
-							type="tel"
-							class="form-control"
-							id="printer"
-							name="printer"
-							placeholder="Ingresar nombre de impresora pos"
-							:value="formConfiguration.printer"
-						/>
-						<small id="printerHelp1" class="text-muted">
-							* Esta impresora debe estar previamente configurada en su sistema
-						</small>
-						<small id="printerHelp2" class="form-text text-danger">{{
-							formErrors.printer
-						}}</small>
-					</div>
 				</div>
 				<div class="form-group">
 					<label for="logo">Logo</label>
@@ -229,11 +196,9 @@ export default {
 				nit: "",
 				address: "",
 				email: "",
-				tax_regime: "",
 				telephone: "",
 				mobile: "",
 				logo: "",
-				printer: "",
 				condition_order: "",
 				condition_quotation: ""
 			},
@@ -243,11 +208,9 @@ export default {
 				nit: "",
 				address: "",
 				email: "",
-				tax_regime: "",
 				telephone: "",
 				mobile: "",
 				file0: "",
-				printer: "",
 				condition_order: "",
 				condition_quotation: ""
 			},
@@ -276,8 +239,8 @@ export default {
 	methods: {
 		getCofiguration() {
 			axios.get("api/configurations").then(response => {
-				if (response.data.configuration) {
-					this.formConfiguration = response.data.configuration;
+				if (response.data.company) {
+					this.formConfiguration = response.data.company;
 					this.formConfiguration.condition_quotation =
 						this.formConfiguration.condition_quotation ?? "";
 				}
@@ -308,11 +271,9 @@ export default {
 				"nit",
 				"address",
 				"email",
-				"tax_regime",
 				"telephone",
 				"mobile",
 				"file0",
-				"printer",
 				"condition_order",
 				"condition_quotation"
 			];
