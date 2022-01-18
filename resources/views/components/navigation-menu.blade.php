@@ -27,6 +27,9 @@
                 <li class="nav-item">
                     <router-link class="nav-link text-white" to="/proveedores"> Proveedores </router-link>
                 </li>
+                <li class="nav-item">
+                    <router-link class="nav-link text-white" to="/company"> Empresa </router-link>
+                </li>
             </ul>
 
             <!-- Right Side Of Navbar -->

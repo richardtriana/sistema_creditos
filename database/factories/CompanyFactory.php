@@ -22,13 +22,12 @@ class CompanyFactory extends Factory
     public function definition()
     {
         return [
-            'company' => $this->faker->company(),
-            'status' => $this->faker->boolean(),
-            'address' => $this->faker->address(),
-            'nit' => $this->faker->ean13(),
-            'email' => $this->faker->email(),
-            'legal_representative' => $this->faker->firstNameFemale(),
-            'phone' => $this->faker->phoneNumber(),
+            'name' => 'Tecnoplus',
+            'legal_representative' => 'Richard Arturo Peña',
+            'nit' => '123459789-0',
+            'address' => 'Añadir direccion',
+            'email' => 'empresa@nombredominio.com',
+            'logo' => 'images/logo.jpeg'
         ];
     }
 }
