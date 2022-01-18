@@ -14,6 +14,8 @@ import vSelect from 'vue-select'
 
 import 'vue-select/dist/vue-select.css';
 Vue.component('v-select', vSelect)
+import CKEditor from '@ckeditor/ckeditor5-vue2';
+
 
 /**
  * The following block of code may be used to automatically register your
@@ -30,6 +32,8 @@ Vue.component('pagination', require('laravel-vue-pagination'));
 
 
 Vue.use(VueRouter)
+Vue.use(CKEditor)
+
 // Vue.use(Swal);
 window.Swal = Swal
 
@@ -42,6 +46,7 @@ const routes = [
     { path: '/credits', component: require('./components/credits/Credits.vue').default },
     { path: '/credits/:credit_id/installments', component: require('./components/credits/Installment.vue').default, props: true, name: 'installments' },
     { path: '/headquarters', component: require('./components/headquarters/Headquarters.vue').default },
+    { path: '/company', component: require('./components/configurations/Company.vue').default },
 
 
 ]
