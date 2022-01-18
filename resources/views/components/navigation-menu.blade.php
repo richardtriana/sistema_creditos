@@ -13,19 +13,22 @@
             <!-- Left Side Of Navbar -->
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
-                    <router-link class="nav-link text-white" to="/clients"> Clients </router-link>
+                    <router-link class="nav-link text-white" to="/clients"> Clientes </router-link>
                 </li>
                 <li class="nav-item">
-                    <router-link class="nav-link text-white" to="/users"> Users </router-link>
+                    <router-link class="nav-link text-white" to="/users"> Usuarios </router-link>
                 </li>
                 <li class="nav-item">
-                    <router-link class="nav-link text-white" to="/credits"> Credits </router-link>
+                    <router-link class="nav-link text-white" to="/credits"> Creditos </router-link>
                 </li>
                 <li class="nav-item">
-                    <router-link class="nav-link text-white" to="/headquarters"> Headquarters </router-link>
+                    <router-link class="nav-link text-white" to="/headquarters"> Sedes </router-link>
                 </li>
                 <li class="nav-item">
                     <router-link class="nav-link text-white" to="/proveedores"> Proveedores </router-link>
+                </li>
+                <li class="nav-item">
+                    <router-link class="nav-link text-white" to="/company"> Empresa </router-link>
                 </li>
             </ul>
 

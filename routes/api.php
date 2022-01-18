@@ -1,12 +1,14 @@
 <?php
 
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\CreditController;
 use App\Http\Controllers\HeadquarterController;
 use App\Http\Controllers\InstallmentController;
 use App\Http\Controllers\PrintTicketController;
+use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -50,3 +52,10 @@ Route::post('/installment/{id}/pay-installment', [InstallmentController::class, 
 Route::get('/print-installment', [PrintTicketController::class, 'printInstallment']);
 
 Route::resource('/installments', InstallmentController::class);
+
+Route::resource('/configurations', CompanyController::class);
+Route::get('/company-logo', function () {
+	$configuration = new Company();
+	$image = $configuration->select('logo')->first();
+	return $image;
+});
