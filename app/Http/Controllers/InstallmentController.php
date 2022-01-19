@@ -42,7 +42,7 @@ class InstallmentController extends Controller
     //
     $installment = new Installment();
     $installment->credit_id = $request['credit_id'];
-    $installment->cant_cuota = $request['cant_cuota'];
+    $installment->installment_number = $request['installment_number'];
     $installment->value = $request['value'];
     $installment->payment_date = $request['payment_date'];
     $installment->days_past_due = $request['days_past_due'];
@@ -85,7 +85,7 @@ class InstallmentController extends Controller
   {
     //
     $installment = new Installment();
-    $installment->nro_cuota = $request['nro_cuota'];
+    $installment->installment_number = $request['installment_number'];
     $installment->value = $request['value'];
     $installment->payment_date = $request['payment_date'];
     $installment->days_past_due = $request['days_past_due'];
@@ -114,7 +114,7 @@ class InstallmentController extends Controller
 
     $value = $capital;
     $valor_pago_interes = $interest;
-    $cant_cuota = $number_installments;
+    $installment_number = $number_installments;
 
     $payment_date = [];
     $fechaActual = date('Y-m-d');
@@ -126,10 +126,10 @@ class InstallmentController extends Controller
 
     $installment =
       ($value *
-        ((pow(1 + $valor_pago_interes / 100, $cant_cuota) *
+        ((pow(1 + $valor_pago_interes / 100, $installment_number) *
           $valor_pago_interes) /
           100)) /
-      (pow(1 + $valor_pago_interes / 100, $cant_cuota) - 1);
+      (pow(1 + $valor_pago_interes / 100, $installment_number) - 1);
 
     for ($i = 0; $i < $number_installments; $i++) {
 
@@ -150,21 +150,44 @@ class InstallmentController extends Controller
         $listInstallments[$i]['saldo_capital'] = (float) number_format($value, 2, '.', '');
         $listInstallments[$i]['installment_value'] = (float) number_format($installment, 2, '.', '');
       }
-      $listInstallments[$i]['cant_cuota'] = $i + 1;
+      $listInstallments[$i]['installment_number'] = $i + 1;
     }
 
     return ['listInstallments' => $listInstallments, 'installment' => (float) number_format($installment, 2, '.', '')];
   }
 
-  public function payInstallment($id)
+  public function payInstallment($id, $amount = null)
   {
     $installment = Installment::findOrFail($id);
-    $installment->status = '1';
+
+    $now = date("Y-m-d");
+    $payment_date                   = $installment->payment_date;
+    $payment_date_sub_mont          = date("Y-m-d", strtotime($payment_date . "- 1 month"));
+    $payment_date_add_days  = date("Y-m-d", strtotime($payment_date_sub_mont . "+ 5 days"));
+
+    if ($payment_date <= $now) {
+      if ($payment_date >= $payment_date_add_days) {
+        # code...
+
+      } else {
+        
+      }
+    }
+
+    if ($amount >= $installment->value) {
+      $installment->paid_balance = $installment->value;
+    } else {
+      $installment->paid_balance = $amount;
+    }
+
+    $installment->status  = 1;
     $installment->payment_date = date('Y-m-d');
     $installment->save();
 
     $print_cuota = new PrintTicketController;
     $print_cuota = $print_cuota->printInstallment($id);
+
+    
   }
 
   public function printTable(Request $request)

@@ -16,7 +16,7 @@ class CreateInstallmentsTable extends Migration
         Schema::create('installments', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('credit_id');
-            $table->integer('nro_cuota');
+            $table->integer('installment_number');
             $table->float('value', 20, 4);
             $table->date('payment_date');
             $table->float('days_past_due')->nullable()->default(0);

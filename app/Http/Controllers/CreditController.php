@@ -74,7 +74,7 @@ class CreditController extends Controller
 		$credit->number_installments = $request['number_installments'];
 		$credit->number_paid_installments = $request['number_paid_installments'];
 		$credit->day_limit = $request['day_limit'];
-		$credit->status = $request['status'];
+		$credit->status = 1;
 		$credit->start_date = date('Y-m-d');
 		$credit->interest = $request['interest'];
 		$credit->annual_interest_percentage = $request['annual_interest_percentage'];
@@ -87,38 +87,16 @@ class CreditController extends Controller
 		$credit->installment_value = $listInstallments['installment'];
 		$credit->save();
 
-		foreach ($listInstallments['listInstallments'] as $nueva_cuota) {
+		foreach ($listInstallments['listInstallments'] as $new_installment) {
 			$installment = new Installment();
 			$installment->credit_id = $credit->id;
-			$installment->nro_cuota = $nueva_cuota['cant_cuota'];
-			$installment->value = $nueva_cuota['installment_value'];
-			$installment->payment_date = $nueva_cuota['payment_date'];
-			$installment->interest_value = $nueva_cuota['pagoInteres'];
-			$installment->capital_value = $nueva_cuota['pagoCapital'];
+			$installment->installment_number = $new_installment['installment_number'];
+			$installment->value = $new_installment['installment_value'];
+			$installment->payment_date = $new_installment['payment_date'];
+			$installment->interest_value = $new_installment['pagoInteres'];
+			$installment->capital_value = $new_installment['pagoCapital'];
 			$installment->save();
 		}
-	}
-
-	/**
-	 * Display the specified resource.
-	 *
-	 * @param  \App\Models\Credit  $credit
-	 * @return \Illuminate\Http\Response
-	 */
-	public function show(Credit $credit)
-	{
-		//
-	}
-
-	/**
-	 * Show the form for editing the specified resource.
-	 *
-	 * @param  \App\Models\Credit  $credit
-	 * @return \Illuminate\Http\Response
-	 */
-	public function edit(Credit $credit)
-	{
-		//
 	}
 
 	/**
@@ -138,7 +116,6 @@ class CreditController extends Controller
 		$credit->number_installments = $request['number_installments'];
 		$credit->number_paid_installments = $request['number_paid_installments'];
 		$credit->day_limit = $request['day_limit'];
-		$credit->status = $request['status'];
 		$credit->start_date = $request['start_date'];
 		$credit->interest = $request['interest'];
 		$credit->annual_interest_percentage = $request['annual_interest_percentage'];
@@ -182,7 +159,6 @@ class CreditController extends Controller
 		return $credit->installments()->get();
 	}
 
-
 	public function payMultipleInstallments(Request $request, $id)
 	{
 		$credit_id = $id;
@@ -194,14 +170,19 @@ class CreditController extends Controller
 		for ($i = 0; $i < count($listInstallments) && $amount > 0; $i++) {
 			if ($amount > 0) {
 				$installment = Installment::find($listInstallments[$i]['id']);
-				if ($amount >= $listInstallments[$i]["value"]) {
-					$installment->paid_balance = $installment->value;
-					$installment->save();
-				} else {
-					$installment->paid_balance = $amount;
-					$installment->status  = 1;
-					$installment->save();
-				}
+				$pay_installment = new InstallmentController();
+				$balance =	$pay_installment->payInstallment($listInstallments[$i]['id'], $amount);
+
+
+				// if ($amount >= $listInstallments[$i]["value"]) {
+				// 	$installment->paid_balance = $installment->value;
+				// 	$installment->status  = 1;
+				// 	$installment->save();
+				// } else {
+				// 	$installment->paid_balance = $amount;
+				// 	$installment->status  = 1;
+				// 	$installment->save();
+				// }
 			}
 			$amount = $amount - $listInstallments[$i]["value"];
 		}
