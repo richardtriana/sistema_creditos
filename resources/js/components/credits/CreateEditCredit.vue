@@ -10,9 +10,7 @@
 			<div class="modal-dialog modal-lg">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title" id="formCreditModalLabel">
-							Creditos
-						</h5>
+						<h5 class="modal-title" id="formCreditModalLabel">Creditos</h5>
 						<button
 							type="button"
 							class="close"
@@ -28,7 +26,15 @@
 							<div class="form-row">
 								<div class="form-group col-md-4">
 									<label for="client_id">Client</label>
-									<v-select
+									<button
+										class="btn btn-outline-secondary"
+										type="button"
+										data-toggle="modal"
+										data-target="#addClientModal"
+									>
+										<i class="bi bi-card-checklist"></i>
+									</button>
+									<!-- <v-select
 										:options="clientList.data"
 										label="document"
 										aria-logname="{}"
@@ -36,7 +42,7 @@
 										v-model="formCredit.client_id"
 										placeholder="Buscar por Documento"
 									>
-									</v-select>
+									</v-select> -->
 								</div>
 
 								<div class="form-group col-md-4">
@@ -65,7 +71,7 @@
 										:options="headquarterList.data"
 										label="headquarter"
 										aria-logname="{}"
-										:reduce="headquarter => headquarter.id"
+										:reduce="(headquarter) => headquarter.id"
 										v-model="formCredit.headquarter_id"
 									>
 									</v-select>
@@ -127,14 +133,16 @@
 					<div class="modal-footer"></div>
 				</div>
 			</div>
+			<add-client />
 		</div>
 	</div>
 </template>
 
 <script>
+import AddClient from "../clients/AddClient.vue";
 import Simulator from "./Simulator.vue";
 export default {
-	components: { Simulator },
+	components: { Simulator, AddClient },
 	data() {
 		return {
 			editar: false,
@@ -160,8 +168,8 @@ export default {
 				capital_value: "",
 				interest_value: "",
 				description: "",
-				disbursement_date: ""
-			}
+				disbursement_date: "",
+			},
 		};
 	},
 	created() {
@@ -171,19 +179,19 @@ export default {
 	methods: {
 		listHeadquarters(page = 1) {
 			let me = this;
-			axios.get(`api/headquarters?page=${page}`).then(function(response) {
+			axios.get(`api/headquarters?page=${page}`).then(function (response) {
 				me.headquarterList = response.data;
 			});
 		},
 		listClients(page = 1) {
 			let me = this;
-			axios.get(`api/clients?page=${page}`).then(function(response) {
+			axios.get(`api/clients?page=${page}`).then(function (response) {
 				me.clientList = response.data;
 			});
 		},
 		createCredit() {
 			let me = this;
-			axios.post("api/credits", this.formCredit).then(function() {
+			axios.post("api/credits", this.formCredit).then(function () {
 				$("#formCreditModal").modal("hide");
 				me.resetData();
 				this.$emit("list-credits");
@@ -199,7 +207,7 @@ export default {
 			let me = this;
 			axios
 				.put("api/credits/" + this.formCredit.id, this.formCredit)
-				.then(function() {
+				.then(function () {
 					$("#formCreditModal").modal("hide");
 					me.resetData();
 				});
@@ -209,10 +217,10 @@ export default {
 		},
 		resetData() {
 			let me = this;
-			Object.keys(this.formCredit).forEach(function(key, index) {
+			Object.keys(this.formCredit).forEach(function (key, index) {
 				me.formCredit[key] = "";
 			});
-		}
-	}
+		},
+	},
 };
 </script>
