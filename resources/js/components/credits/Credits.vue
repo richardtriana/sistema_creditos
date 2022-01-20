@@ -190,7 +190,6 @@ export default {
 			axios
 				.get(`api/credits?page=${page}&credit=${this.search_client}`)
 				.then(function(response) {
-					console.log(response);
 					me.creditList = response.data;
 				});
 		},

@@ -156,28 +156,56 @@ class InstallmentController extends Controller
     return ['listInstallments' => $listInstallments, 'installment' => (float) number_format($installment, 2, '.', '')];
   }
 
-  public function payInstallment($id, $amount = null)
+  public function payInstallment($id, $amount = null, $late_payment = true)
   {
+    // echo '<pre>';
+    // var_dump('amount', $amount);
+    // echo '</pre>';
+
+
     $installment = Installment::findOrFail($id);
 
     $now = date("Y-m-d");
-    $payment_date                   = $installment->payment_date;
-    $payment_date_sub_mont          = date("Y-m-d", strtotime($payment_date . "- 1 month"));
-    $payment_date_add_days  = date("Y-m-d", strtotime($payment_date_sub_mont . "+ 5 days"));
+    $payment_date = $installment->payment_date;
+    $payment_date_sub_month = date("Y-m-d", strtotime($payment_date . "- 1 month"));
+    $payment_date_add_days = date("Y-m-d", strtotime($payment_date_sub_month . "+ 5 days"));
 
-    if ($payment_date <= $now) {
-      if ($payment_date >= $payment_date_add_days) {
-        # code...
+    // Se verifica si la cuota se paga a tiempo
+    if ($payment_date >= $now) {
+      if (($now < $payment_date_add_days)) {
 
+        // Solo se cobra capital
+        $amount_to_pay = $installment->capital_value;
+        if ($amount >= $amount_to_pay) {
+          $installment->paid_balance = $amount_to_pay;
+          $balance =  $amount - $amount_to_pay;
+        } else {
+          $installment->paid_balance = $amount;
+          $balance = 0;
+        }
       } else {
-        
+
+        // Se cobra interes y capital
+        $amount_to_pay = $installment->value;
+        if ($amount >= $amount_to_pay) {
+          $installment->paid_balance = $amount_to_pay;
+          $balance = $amount -  $amount_to_pay;
+        } else {
+          $installment->paid_balance = $amount;
+          $balance = 0;
+        }
       }
     }
 
-    if ($amount >= $installment->value) {
-      $installment->paid_balance = $installment->value;
-    } else {
-      $installment->paid_balance = $amount;
+    if ($payment_date < $now) {
+      $amount_to_pay = $installment->value;
+      if ($amount >= $amount_to_pay) {
+        $installment->paid_balance = $amount_to_pay;
+        $balance = $amount - $amount_to_pay;
+      } else {
+        $installment->paid_balance = $amount;
+        $balance = 0;
+      }
     }
 
     $installment->status  = 1;
@@ -187,7 +215,7 @@ class InstallmentController extends Controller
     $print_cuota = new PrintTicketController;
     $print_cuota = $print_cuota->printInstallment($id);
 
-    
+    return $balance;
   }
 
   public function printTable(Request $request)

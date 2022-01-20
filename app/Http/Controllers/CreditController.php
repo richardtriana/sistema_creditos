@@ -168,23 +168,11 @@ class CreditController extends Controller
 		$listInstallments = $credit->installments()->where('status', '0')->get();
 
 		for ($i = 0; $i < count($listInstallments) && $amount > 0; $i++) {
+			$pay_installment = new InstallmentController();
 			if ($amount > 0) {
-				$installment = Installment::find($listInstallments[$i]['id']);
-				$pay_installment = new InstallmentController();
-				$balance =	$pay_installment->payInstallment($listInstallments[$i]['id'], $amount);
-
-
-				// if ($amount >= $listInstallments[$i]["value"]) {
-				// 	$installment->paid_balance = $installment->value;
-				// 	$installment->status  = 1;
-				// 	$installment->save();
-				// } else {
-				// 	$installment->paid_balance = $amount;
-				// 	$installment->status  = 1;
-				// 	$installment->save();
-				// }
+				$balance =	$pay_installment->payInstallment($listInstallments[$i]['id'], $amount, true);
 			}
-			$amount = $amount - $listInstallments[$i]["value"];
+			$amount = $balance;
 		}
 	}
 }
