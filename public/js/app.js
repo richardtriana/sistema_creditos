@@ -3673,6 +3673,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 
 
 
@@ -3745,20 +3747,16 @@ __webpack_require__.r(__webpack_exports__);
         }
       });
     },
-    printTable: function printTable(credit_id) {
-      var _this = this;
-
+    printTable: function printTable(credit_id, client) {
       axios.get("api/credits/amortization-table?credit_id=".concat(credit_id)).then(function (response) {
-        console.log(response);
         var pdf = response.data.pdf;
         var a = document.createElement("a");
         a.href = "data:application/pdf;base64," + pdf;
-        a.download = "credit_".concat(_this.id_credit, ".pdf");
+        a.download = "credit_".concat(credit_id, "-").concat(client, ".pdf");
         a.click();
       });
     }
-  } //End of methods
-
+  }
 });
 
 /***/ }),
@@ -3774,6 +3772,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+//
+//
 //
 //
 //
@@ -4005,21 +4005,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: ["number_installments", "interest", "capital"],
   // capital value total del prestamo
-  // tasa value de tasa de interest que se compraria
+  //tasa de interest que se compraria
   // plazos numero de pagos
   data: function data() {
     return {
@@ -4030,7 +4020,7 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
-    crearSimulator: function crearSimulator() {
+    createSimulator: function createSimulator() {
       var me = this;
       axios.post("api/installments", this.installments).then(function () {
         $("#formSimulatorModal").modal("hide");
@@ -4044,7 +4034,7 @@ __webpack_require__.r(__webpack_exports__);
       $("#formSimulatorModal").modal("show");
       me.formSimulator = credit;
     },
-    editarSimulator: function editarSimulator() {
+    editSimulator: function editSimulator() {
       var me = this;
       axios.put("api/credits/" + 4, this.installments).then(function () {
         $("#formSimulatorModal").modal("hide");
@@ -4079,14 +4069,14 @@ __webpack_require__.r(__webpack_exports__);
       this.formInstallments.push(newInstallment);
       console.log(agregar);
     }),
-    simularInstallments: function simularInstallments() {
+    simulateInstallments: function simulateInstallments() {
       var me = this;
       axios.get("api/installments/calculate-installments?credit_value=".concat(this.capital, "&interest=").concat(this.interest, "&number_installments=").concat(this.number_installments)).then(function (response) {
         return me.listInstallments = response.data.listInstallments, me.installment_value = response.data.installment;
       });
     }
   },
-  mounted: function mounted() {// this.simularInstallments();
+  mounted: function mounted() {// this.simulateInstallments();
   }
 });
 
@@ -69536,7 +69526,10 @@ var render = function () {
                                   staticClass: "btn btn-outline-primary",
                                   on: {
                                     click: function ($event) {
-                                      return _vm.printTable(credit.id)
+                                      return _vm.printTable(
+                                        credit.id,
+                                        credit.name + "_" + credit.last_name
+                                      )
                                     },
                                   },
                                 },
@@ -69682,7 +69675,7 @@ var staticRenderFns = [
               "data-target": "#formCreditModal",
             },
           },
-          [_vm._v("\n\t\t\tCrear Credit\n\t\t")]
+          [_vm._v("\n      Crear Credit\n    ")]
         ),
       ]
     )
@@ -69712,9 +69705,9 @@ var staticRenderFns = [
         _c("th", [_vm._v("Ver Cuotas")]),
         _vm._v(" "),
         _c("th", [
-          _vm._v("\n\t\t\t\t\t\t\tTabla de "),
+          _vm._v("\n              Tabla de "),
           _c("br"),
-          _vm._v("\n\t\t\t\t\t\t\tamortización\n\t\t\t\t\t\t"),
+          _vm._v("\n              amortización\n            "),
         ]),
         _vm._v(" "),
         _c("th", [_vm._v("Opciones")]),
@@ -69749,7 +69742,7 @@ var staticRenderFns = [
         staticStyle: { margin: "2px auto", width: "30%" },
       },
       [
-        _vm._v("\n\t\t\t\t\t\tCrear un nuevo Client\n\t\t\t\t\t\t"),
+        _vm._v("\n            Crear un nuevo Client\n            "),
         _c(
           "button",
           {
@@ -69760,7 +69753,7 @@ var staticRenderFns = [
               "data-target": "#formClientModal",
             },
           },
-          [_vm._v("\n\t\t\t\t\t\t\tCrear Client\n\t\t\t\t\t\t")]
+          [_vm._v("\n              Crear Client\n            ")]
         ),
       ]
     )
@@ -69849,21 +69842,33 @@ var render = function () {
                     ]),
                     _vm._v(" "),
                     _c("div", { staticClass: "form-group col-3" }, [
-                      _c(
-                        "button",
-                        {
-                          staticClass: "btn btn-outline-primary my-auto",
-                          on: {
-                            click: function ($event) {
-                              return _vm.payCredit()
+                      _vm.amount_value > 0
+                        ? _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-outline-primary my-auto",
+                              on: {
+                                click: function ($event) {
+                                  return _vm.payCredit()
+                                },
+                              },
                             },
-                          },
-                        },
-                        [
-                          _c("i", { staticClass: "bi bi-currency-dollar" }),
-                          _vm._v(" Abonar a crédito\n\t\t\t\t\t\t\t"),
-                        ]
-                      ),
+                            [
+                              _c("i", { staticClass: "bi bi-currency-dollar" }),
+                              _vm._v(" Abonar a crédito\n              "),
+                            ]
+                          )
+                        : _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-outline-secondary my-auto",
+                              attrs: { disabled: "" },
+                            },
+                            [
+                              _c("i", { staticClass: "bi bi-currency-dollar" }),
+                              _vm._v(" Abonar a crédito\n              "),
+                            ]
+                          ),
                     ]),
                     _vm._v(" "),
                     _c("div", { staticClass: "form-group col-3" }, [
@@ -69879,7 +69884,7 @@ var render = function () {
                         },
                         [
                           _c("i", { staticClass: "bi bi-file-pdf" }),
-                          _vm._v(" Tabla de amortización\n\t\t\t\t\t\t\t"),
+                          _vm._v(" Tabla de amortización\n              "),
                         ]
                       ),
                     ]),
@@ -69897,7 +69902,7 @@ var render = function () {
                       return _c("tr", { key: f.id }, [
                         _c("th", [_vm._v(_vm._s(f.payment_date))]),
                         _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(f.nro_cuota))]),
+                        _c("td", [_vm._v(_vm._s(f.installment_number))]),
                         _vm._v(" "),
                         _c("td", [_vm._v(_vm._s(f.value))]),
                         _vm._v(" "),
@@ -69915,7 +69920,7 @@ var render = function () {
                           f.status == 0
                             ? _c(
                                 "span",
-                                { staticClass: " badge badge-secondary" },
+                                { staticClass: "badge badge-secondary" },
                                 [_vm._v("Pendiente")]
                               )
                             : _vm._e(),
@@ -69944,7 +69949,7 @@ var render = function () {
                                 },
                                 [
                                   _vm._v(
-                                    "\n\t\t\t\t\t\t\t\t\t\tPagar\n\t\t\t\t\t\t\t\t\t"
+                                    "\n                    Pagar\n                  "
                                   ),
                                 ]
                               )
@@ -69956,7 +69961,7 @@ var render = function () {
                                 },
                                 [
                                   _vm._v(
-                                    "\n\t\t\t\t\t\t\t\t\t\tPagar\n\t\t\t\t\t\t\t\t\t"
+                                    "\n                    Pagar\n                  "
                                   ),
                                 ]
                               ),
@@ -69985,7 +69990,7 @@ var staticRenderFns = [
       _c(
         "h5",
         { staticClass: "modal-title", attrs: { id: "cuotasModalLabel" } },
-        [_vm._v("\n\t\t\t\t\tListado de Cuotas\n\t\t\t\t")]
+        [_vm._v("Listado de Cuotas")]
       ),
       _vm._v(" "),
       _c(
@@ -70049,7 +70054,7 @@ var staticRenderFns = [
           staticClass: "btn btn-secondary",
           attrs: { type: "button", "data-dismiss": "modal" },
         },
-        [_vm._v("\n\t\t\t\t\tClose\n\t\t\t\t")]
+        [_vm._v("\n          Close\n        ")]
       ),
     ])
   },
@@ -70087,11 +70092,11 @@ var render = function () {
               attrs: { type: "button", id: "btnCalcular" },
               on: {
                 click: function ($event) {
-                  return _vm.simularInstallments()
+                  return _vm.simulateInstallments()
                 },
               },
             },
-            [_vm._v("\n                    Calcular\n                ")]
+            [_vm._v("\n          Calcular\n        ")]
           ),
           _vm._v(" "),
           _c("table", { staticClass: "table", attrs: { id: "lista-tabla" } }, [
@@ -70100,48 +70105,24 @@ var render = function () {
             _vm.listInstallments.length
               ? _c(
                   "tbody",
-                  _vm._l(_vm.listInstallments, function (installment) {
-                    return _c("tr", { key: installment.nro_cuota }, [
-                      _c("td", [
-                        _vm._v(
-                          "\n                                No. " +
-                            _vm._s(installment.nro_cuota) +
-                            "\n                            "
-                        ),
-                      ]),
+                  _vm._l(_vm.listInstallments, function (installment, index) {
+                    return _c("tr", { key: installment.installment_number }, [
+                      _c("td", [_vm._v("No. " + _vm._s(index + 1))]),
                       _vm._v(" "),
                       _c("td", [
-                        _vm._v(
-                          "\n                               $ " +
-                            _vm._s(installment.payment_date) +
-                            "\n                            "
-                        ),
+                        _vm._v("$ " + _vm._s(installment.payment_date)),
                       ]),
                       _vm._v(" "),
                       _c("td", [_vm._v(_vm._s(installment.installment_value))]),
                       _vm._v(" "),
                       _c("td", [
-                        _vm._v(
-                          "\n                               $ " +
-                            _vm._s(installment.pagoCapital) +
-                            "\n                            "
-                        ),
+                        _vm._v("$ " + _vm._s(installment.pagoCapital)),
                       ]),
                       _vm._v(" "),
-                      _c("td", [
-                        _vm._v(
-                          "\n                                $" +
-                            _vm._s(installment.pagoInteres) +
-                            "\n                            "
-                        ),
-                      ]),
+                      _c("td", [_vm._v("$" + _vm._s(installment.pagoInteres))]),
                       _vm._v(" "),
                       _c("td", [
-                        _vm._v(
-                          "\n                                $ " +
-                            _vm._s(installment.saldo_capital) +
-                            "\n                            "
-                        ),
+                        _vm._v("$ " + _vm._s(installment.saldo_capital)),
                       ]),
                     ])
                   }),
@@ -86839,7 +86820,7 @@ Vue.compile = compileToFunctions;
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"_args":[["axios@0.21.4","C:\\\\xampp\\\\htdocs\\\\creditos"]],"_development":true,"_from":"axios@0.21.4","_id":"axios@0.21.4","_inBundle":false,"_integrity":"sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==","_location":"/axios","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"axios@0.21.4","name":"axios","escapedName":"axios","rawSpec":"0.21.4","saveSpec":null,"fetchSpec":"0.21.4"},"_requiredBy":["#DEV:/"],"_resolved":"https://registry.npmjs.org/axios/-/axios-0.21.4.tgz","_spec":"0.21.4","_where":"C:\\\\xampp\\\\htdocs\\\\creditos","author":{"name":"Matt Zabriskie"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"bugs":{"url":"https://github.com/axios/axios/issues"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}],"dependencies":{"follow-redirects":"^1.14.0"},"description":"Promise based HTTP client for the browser and node.js","devDependencies":{"coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.3.0","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^23.0.0","grunt-karma":"^4.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^4.0.2","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^6.3.2","karma-chrome-launcher":"^3.1.0","karma-firefox-launcher":"^2.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^4.3.6","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.8","karma-webpack":"^4.0.2","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^8.2.1","sinon":"^4.5.0","terser-webpack-plugin":"^4.2.3","typescript":"^4.0.5","url-search-params":"^0.10.0","webpack":"^4.44.2","webpack-dev-server":"^3.11.0"},"homepage":"https://axios-http.com","jsdelivr":"dist/axios.min.js","keywords":["xhr","http","ajax","promise","node"],"license":"MIT","main":"index.js","name":"axios","repository":{"type":"git","url":"git+https://github.com/axios/axios.git"},"scripts":{"build":"NODE_ENV=production grunt build","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","examples":"node ./examples/server.js","fix":"eslint --fix lib/**/*.js","postversion":"git push && git push --tags","preversion":"npm test","start":"node ./sandbox/server.js","test":"grunt test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json"},"typings":"./index.d.ts","unpkg":"dist/axios.min.js","version":"0.21.4"}');
+module.exports = JSON.parse('{"name":"axios","version":"0.21.4","description":"Promise based HTTP client for the browser and node.js","main":"index.js","scripts":{"test":"grunt test","start":"node ./sandbox/server.js","build":"NODE_ENV=production grunt build","preversion":"npm test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json","postversion":"git push && git push --tags","examples":"node ./examples/server.js","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","fix":"eslint --fix lib/**/*.js"},"repository":{"type":"git","url":"https://github.com/axios/axios.git"},"keywords":["xhr","http","ajax","promise","node"],"author":"Matt Zabriskie","license":"MIT","bugs":{"url":"https://github.com/axios/axios/issues"},"homepage":"https://axios-http.com","devDependencies":{"coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.3.0","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^23.0.0","grunt-karma":"^4.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^4.0.2","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^6.3.2","karma-chrome-launcher":"^3.1.0","karma-firefox-launcher":"^2.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^4.3.6","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.8","karma-webpack":"^4.0.2","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^8.2.1","sinon":"^4.5.0","terser-webpack-plugin":"^4.2.3","typescript":"^4.0.5","url-search-params":"^0.10.0","webpack":"^4.44.2","webpack-dev-server":"^3.11.0"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"jsdelivr":"dist/axios.min.js","unpkg":"dist/axios.min.js","typings":"./index.d.ts","dependencies":{"follow-redirects":"^1.14.0"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}]}');
 
 /***/ })
 
