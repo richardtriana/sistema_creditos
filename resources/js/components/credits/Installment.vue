@@ -62,7 +62,7 @@
               <thead>
                 <tr>
                   <th>Fecha de vencimiento</th>
-                  <th scope="col">Nro. Installment</th>
+                  <th scope="col">Nro. Cuota</th>
                   <th scope="col">Valor</th>
                   <th scope="col">Capital</th>
                   <th>Interés</th>

@@ -143,4 +143,21 @@ class ClientController extends Controller
 		$client = Client::find($id);
 		return $client->credits()->get();
 	}
+
+	public function filterClientList(Request $request)
+	{
+		if (!$request->client || $request->client == '') {
+			$clients = Client::select()
+				->where('status', 1)
+				->get();
+		} else {
+			$clients = Client::select()
+				->where('status', 1)
+				->where('document', 'LIKE', "%$request->client%")
+				->orWhere('name', 'LIKE', "%$request->client%")
+				->get(20);
+		}
+
+		return $clients;
+	}
 }

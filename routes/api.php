@@ -30,6 +30,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::resource('/clients',  ClientController::class);
 Route::post('/clients/{client}/change-status',  [ClientController::class, 'changeStatus']);
 Route::get('/clients/{client}/credits', [ClientController::class, 'credits']);
+Route::post('/clients/filter-client-list',  [ClientController::class, 'filterClientList']);
 
 Route::resource('/proveedores',  ProveedorController::class);
 Route::post('/proveedores/{proveedor}/change-status',  [ProveedorController::class, 'changeStatus']);
