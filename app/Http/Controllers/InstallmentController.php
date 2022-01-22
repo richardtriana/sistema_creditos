@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Company;
 use App\Models\Credit;
 use App\Models\Installment;
 use Illuminate\Http\Request;
@@ -220,13 +221,15 @@ class InstallmentController extends Controller
 
   public function printTable(Request $request)
   {
-    $credit_id = $request->credit_id;
+    $company = Company::first();
 
+    $credit_id = $request->credit_id;
     $credit = Credit::find($credit_id)->first();
     $client = $credit->client()->first();
     $installments = $credit->installments()->get();
 
     $details = [
+      'company' => $company,
       'credit' => $credit,
       'client' => $client,
       'installments' => $installments,

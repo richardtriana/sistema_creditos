@@ -35,7 +35,11 @@
 </head>
 
 <body>
+  <img src="{{ $company->logo}}" alt="" srcset="" width="100">
   <header class="text-center">
+    <h2>
+      {{ $company->name}}
+    </h2>
     <h3>
       Calendario de pagos
     </h3>
@@ -91,6 +95,16 @@
       </tbody>
     </table>
   </section>
+  <p>
+    <small style="margin-top: 20px">
+      {!! $company->condition_quotation !!}
+    </small>
+  </p>
+  <p>
+    <small style="margin-top: 20px">
+      {{ $company->address }}
+    </small>
+  </p>
 
 </body>
 

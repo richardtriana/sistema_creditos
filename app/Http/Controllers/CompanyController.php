@@ -46,8 +46,8 @@ class CompanyController extends Controller
       'nit' => 'required|string|min:8|max:15',
       'address' => 'required|string|min:3|max:150',
       'email' => 'required|email',
-      'telephone' => 'required|string|min:5|max:13',
-      'mobile' => 'required|string|min:5|max:13',
+      'telephone' => 'string|min:5|max:13',
+      'mobile' => 'string|min:5|max:13',
       'file0' => 'nullable|image|mimes:jpg,png,jpeg,gif,svg',
       'condition_order' => 'nullable|string',
       'condition_quotation' => 'nullable|string'
