@@ -186,7 +186,7 @@
 							v-model="formClient.independent"
 						/>
 						<label class="form-check-label" for="independent">
-							independent
+							Independiente
 						</label>
 					</div>
 				</div>

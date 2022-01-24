@@ -47,6 +47,7 @@ const routes = [
     { path: '/credits/:credit_id/installments', component: require('./components/credits/Installment.vue').default, props: true, name: 'installments' },
     { path: '/headquarters', component: require('./components/headquarters/Headquarters.vue').default },
     { path: '/company', component: require('./components/configurations/Company.vue').default },
+    { path: '/boxes', component: require('./components/boxes/Boxes.vue').default },
 
 
 ]
