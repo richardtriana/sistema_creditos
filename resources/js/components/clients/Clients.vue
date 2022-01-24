@@ -1,14 +1,14 @@
 <template>
 	<div class="">
 		<div class="page-header d-flex justify-content-between p-4 border my-2">
-			<h3>Clients</h3>
+			<h3>Clientes</h3>
 			<button
 				type="button"
 				class="btn btn-primary"
 				data-toggle="modal"
 				data-target="#formClientModal"
 			>
-				Crear client
+				Crear cliente
 			</button>
 		</div>
 		<div class="page-search d-flex justify-content-between p-4 border my-2">
@@ -74,19 +74,15 @@
 					:limit="8"
 					@pagination-change-page="listClients"
 				>
-					<span slot="prev-nav">&lt; Previous</span>
-					<span slot="next-nav">Next &gt;</span>
+					<span slot="prev-nav">&lt; Anterior</span>
+					<span slot="next-nav">Siguiente &gt;</span>
 				</pagination>
 			</section>
 		</div>
 		<modal-create-edit-client
 			ref="ModalCreateEditClient"
 			@list-clients="listClients(1)"
-		/>
-		<!-- <create-edit-client
-      ref="ModalCreateEditClient"
-      @list-clients="listClients(1)"
-    /> -->
+		/>	
 	</div>
 </template>
 <script>
