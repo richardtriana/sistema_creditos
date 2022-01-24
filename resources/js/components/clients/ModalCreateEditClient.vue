@@ -8,7 +8,7 @@
 			aria-hidden="true"
 		>
 			<div class="modal-dialog modal-lg">
-				<create-edit-client @list-clients="listClients()" />
+				<create-edit-client ref="CreateEditClient" @list-clients="listClients()" />
 			</div>
 		</div>
 	</div>
