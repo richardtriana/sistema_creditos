@@ -4,7 +4,7 @@
 		<div class="card-header">
 				<h5>Cajas relacionadas</h5>
 		</div>
-			<table class="table">
+			<table class="table table-sm table-responsive">
 				<thead class="thead-light">
 					<tr>
 						<th scope="col">#</th>
@@ -34,7 +34,7 @@
 								type="button"
 								class="btn btn-outline-primary"
 								data-toggle="modal"
-								data-target="#exampleModal"
+								data-target="#boxModal"
 							>
 								<i class="bi bi-pencil"></i>
 							</button>
