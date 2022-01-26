@@ -19,5 +19,3 @@ export default {
 	components: { MainBox, Box },
 };
 </script>
-
-<style></style>

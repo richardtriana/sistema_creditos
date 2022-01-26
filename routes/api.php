@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BoxController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\UserController;
@@ -7,6 +8,7 @@ use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\CreditController;
 use App\Http\Controllers\HeadquarterController;
 use App\Http\Controllers\InstallmentController;
+use App\Http\Controllers\MainBoxController;
 use App\Http\Controllers\PrintTicketController;
 use App\Models\Company;
 use Illuminate\Http\Request;
@@ -26,6 +28,10 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 	return $request->user();
 });
+
+Route::resource('/boxes',  BoxController::class);
+
+Route::resource('/main-box',  MainBoxController::class);
 
 Route::resource('/clients',  ClientController::class);
 Route::post('/clients/{client}/change-status',  [ClientController::class, 'changeStatus']);

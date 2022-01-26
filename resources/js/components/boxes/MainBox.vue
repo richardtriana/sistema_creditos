@@ -102,7 +102,21 @@
 </template>
 
 <script>
-export default {};
+export default {
+	data() {
+		return {
+			formMainBox: {},
+		};
+	},
+	created() {
+		this.getMainBox();
+	},
+	methods: {
+		getMainBox() {
+			axios.get("api/main-box").then((reponse) => {
+				this.formMainBox = reponse.data.main_box
+			})
+		}
+	}
+};
 </script>
-
-<style></style>
