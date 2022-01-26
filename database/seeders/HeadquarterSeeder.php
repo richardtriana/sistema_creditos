@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Box;
 use App\Models\Client;
 use App\Models\Headquarter;
 use App\Models\User;

@@ -1,9 +1,9 @@
 <template>
 	<div>
 		<div class="card mt-4">
-		<div class="card-header">
+			<div class="card-header">
 				<h5>Cajas relacionadas</h5>
-		</div>
+			</div>
 			<table class="table table-sm table-responsive">
 				<thead class="thead-light">
 					<tr>
@@ -15,10 +15,10 @@
 						<th>Opciones</th>
 					</tr>
 				</thead>
-				<tbody>
-					<tr>
-						<th scope="row">1</th>
-						<td>Mark</td>
+				<tbody v-if="boxList.length > 0">
+					<tr v-for="(l, index) in boxList" :key="index">
+						<th scope="row">{{ index + 1 }}</th>
+						<td>x</td>
 						<td>Otto</td>
 						<td>@mdo</td>
 						<td>
@@ -51,9 +51,20 @@
 import CreateEditBox from "./CreateEditBox.vue";
 export default {
 	components: { CreateEditBox },
+	data() {
+		return {
+			boxList: {},
+		};
+	},
+	created() {
+		this.listBoxes();
+	},
+	methods: {
+		listBoxes() {
+			axios.get("api/boxes").then((reponse) => {
+				this.boxList = reponse.data.boxes;
+			});
+		},
+	},
 };
 </script>
-
-<style></style>
-
-CreateEditBox
