@@ -32,7 +32,7 @@ class ProveedorController extends Controller
 		$proveedor->phone_1 = $request['phone_1'];
 		$proveedor->phone_2 = $request['phone_2'];
 		$proveedor->address = $request['address'];
-    $proveedor->email = $request['email'];
+		$proveedor->email = $request['email'];
 		$proveedor->save();
 	}
 
@@ -56,7 +56,7 @@ class ProveedorController extends Controller
 		$proveedor->phone_1 = $request['phone_1'];
 		$proveedor->phone_2 = $request['phone_2'];
 		$proveedor->address = $request['address'];
-    $proveedor->email = $request['email'];
+		$proveedor->email = $request['email'];
 		$proveedor->save();
 	}
 

@@ -41,7 +41,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="headquarter in headquarterList.data" :key="headquarter.id">
+            <tr
+              v-for="headquarter in headquarterList.data"
+              :key="headquarter.id"
+            >
               <td>{{ headquarter.id }}</td>
               <td>{{ headquarter.headquarter }}</td>
               <td>{{ headquarter.nit }}</td>
@@ -88,7 +91,10 @@
         </pagination>
       </section>
     </div>
-    <create-edit-headquarter ref="CreateEditHeadquarter" @list-headquarters="listHeadquarters(1)" />
+    <create-edit-headquarter
+      ref="CreateEditHeadquarter"
+      @list-headquarters="listHeadquarters(1)"
+    />
   </div>
 </template>
 <script>
@@ -108,7 +114,9 @@ export default {
     listHeadquarters(page = 1) {
       let me = this;
       axios
-        .get(`api/headquarters?page=${page}&headquarter=${this.search_headquarter}`)
+        .get(
+          `api/headquarters?page=${page}&headquarter=${this.search_headquarter}`
+        )
         .then(function (response) {
           me.headquarterList = response.data;
         });

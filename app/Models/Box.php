@@ -20,8 +20,18 @@ class Box extends Model
 		'last_editor'
 	];
 
+	protected $with = [
+		'headquarter',
+		'last_editor'
+	];
+
 	public function headquarter()
 	{
 		return $this->belongsTo(Headquarter::class, 'headquarter_id');
+	}
+
+	public function last_editor()
+	{
+		return $this->belongsTo(User::class, 'last_editor');
 	}
 }

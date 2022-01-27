@@ -14,10 +14,14 @@ class MainBoxController extends Controller
 	 */
 	public function index()
 	{
+		$main_box = MainBox::first();
+		$last_editor = $main_box->last_editor()->first();
+
 		return response()->json([
 			'status' => 'success',
 			'code' => 200,
-			'main_box' => MainBox::first()
+			'main_box' => $main_box,
+			'last_editor' => $last_editor
 		]);
 	}
 

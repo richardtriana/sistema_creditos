@@ -121,5 +121,10 @@ class HeadquarterController extends Controller
 		$sd->status = !$sd->status;
 		$sd->save();
 	}
-}
 
+	public function listHeadquarter()
+	{
+		$headquarters = Headquarter::select()->where('status', 1)->get();
+		return $headquarters;
+	}
+}
