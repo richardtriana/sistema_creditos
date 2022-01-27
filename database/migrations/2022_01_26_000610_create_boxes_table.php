@@ -16,10 +16,10 @@ class CreateBoxesTable extends Migration
 		Schema::create('boxes', function (Blueprint $table) {
 			$table->id();
 			$table->foreignId('headquarter_id')->nullable();
-			$table->float('initial_balance', 20,2)->default(0);
-			$table->float('current_balance', 20,2)->default(0);
-			$table->float('input', 20,2)->default(0);
-			$table->float('output', 20,2)->default(0);
+			$table->float('initial_balance', 20, 2)->default(0);
+			$table->float('current_balance', 20, 2)->default(0);
+			$table->float('input', 20, 2)->default(0);
+			$table->float('output', 20, 2)->default(0);
 			$table->char('history', 255)->nullable();
 			$table->date('last_update')->nullable();
 			$table->foreignId('last_editor')->nullable();
@@ -32,7 +32,8 @@ class CreateBoxesTable extends Migration
 			$table->foreign('last_editor')
 				->references('id')
 				->on('users');
-
+				
+			$table->softDeletes();
 			$table->timestamps();
 		});
 	}

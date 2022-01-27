@@ -2607,6 +2607,9 @@ __webpack_require__.r(__webpack_exports__);
       axios.get("api/boxes").then(function (reponse) {
         _this.boxList = reponse.data.boxes;
       });
+    },
+    showEditBox: function showEditBox(box) {
+      this.$refs.CreateEditBox.showEditBox(box);
     }
   }
 });
@@ -2732,7 +2735,35 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({});
+//
+//
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  data: function data() {
+    return {
+      editar: false,
+      formBox: {},
+      headquarterList: {}
+    };
+  },
+  created: function created() {
+    this.listHeadquarters(1);
+  },
+  methods: {
+    showEditBox: function showEditBox(box) {
+      this.editar = true;
+      var me = this;
+      $("#formBoxModal").modal("show");
+      me.formBox = box;
+      console.log(box);
+    },
+    listHeadquarters: function listHeadquarters() {
+      var me = this;
+      axios.get("api/headquarters/list-headquarter").then(function (response) {
+        me.headquarterList = response.data;
+      });
+    }
+  }
+});
 
 /***/ }),
 
@@ -2850,10 +2881,20 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
-      formMainBox: {}
+      formMainBox: {},
+      lastEditor: {}
     };
   },
   created: function created() {
@@ -2865,6 +2906,7 @@ __webpack_require__.r(__webpack_exports__);
 
       axios.get("api/main-box").then(function (reponse) {
         _this.formMainBox = reponse.data.main_box;
+        _this.lastEditor = reponse.data.last_editor;
       });
     }
   }
@@ -5000,6 +5042,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _CreateEditHeadquarter_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CreateEditHeadquarter.vue */ "./resources/js/components/headquarters/CreateEditHeadquarter.vue");
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -68927,21 +68975,47 @@ var render = function () {
           _vm.boxList.length > 0
             ? _c(
                 "tbody",
-                _vm._l(_vm.boxList, function (l, index) {
+                _vm._l(_vm.boxList, function (box, index) {
                   return _c("tr", { key: index }, [
                     _c("th", { attrs: { scope: "row" } }, [
                       _vm._v(_vm._s(index + 1)),
                     ]),
                     _vm._v(" "),
-                    _c("td", [_vm._v("x")]),
+                    _c("td", [_vm._v(_vm._s(box.headquarter.headquarter))]),
                     _vm._v(" "),
-                    _c("td", [_vm._v("Otto")]),
+                    _c("td", [_vm._v(_vm._s(box.current_balance))]),
                     _vm._v(" "),
-                    _c("td", [_vm._v("@mdo")]),
+                    _c("td", [_vm._v(_vm._s(box.last_update))]),
+                    _vm._v(" "),
+                    _c("td", [
+                      _vm._v(
+                        _vm._s(box.last_editor.name) +
+                          " " +
+                          _vm._s(box.last_editor.last_name)
+                      ),
+                    ]),
+                    _vm._v(" "),
+                    _c("td", [
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-outline-primary",
+                          attrs: {
+                            type: "button",
+                            "data-toggle": "modal",
+                            "data-target": "#boxModal",
+                          },
+                          on: {
+                            click: function ($event) {
+                              return _vm.showEditBox(box)
+                            },
+                          },
+                        },
+                        [_c("i", { staticClass: "bi bi-pencil" })]
+                      ),
+                    ]),
                     _vm._v(" "),
                     _vm._m(2, true),
-                    _vm._v(" "),
-                    _vm._m(3, true),
                   ])
                 }),
                 0
@@ -68950,7 +69024,7 @@ var render = function () {
         ]),
       ]),
       _vm._v(" "),
-      _c("create-edit-box"),
+      _c("create-edit-box", { ref: "CreateEditBox" }),
     ],
     1
   )
@@ -68976,11 +69050,13 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Saldo disponible")]),
         _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Deuda")]),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Última modificación")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Estado")]),
+        _c("th", [_vm._v("ültimo editor")]),
         _vm._v(" "),
         _c("th", [_vm._v("Opciones")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Eliminar")]),
       ]),
     ])
   },
@@ -68989,32 +69065,9 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("td", [
-      _c("button", { staticClass: "btn btn-outline-success" }, [
-        _c("i", { staticClass: "bi bi-check-circle" }),
-      ]),
-      _vm._v(" "),
       _c("button", { staticClass: "btn btn-outline-danger" }, [
-        _c("i", { staticClass: "bi bi-x-circle" }),
+        _c("i", { staticClass: "bi bi-trash2" }),
       ]),
-    ])
-  },
-  function () {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("td", [
-      _c(
-        "button",
-        {
-          staticClass: "btn btn-outline-primary",
-          attrs: {
-            type: "button",
-            "data-toggle": "modal",
-            "data-target": "#boxModal",
-          },
-        },
-        [_c("i", { staticClass: "bi bi-pencil" })]
-      ),
     ])
   },
 ]
@@ -69083,140 +69136,152 @@ var render = function () {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm._m(0)
+  return _c("div", [
+    _c(
+      "div",
+      {
+        staticClass: "modal fade",
+        attrs: {
+          id: "boxModal",
+          tabindex: "-1",
+          "aria-labelledby": "boxModalLabel",
+          "aria-hidden": "true",
+        },
+      },
+      [
+        _c("div", { staticClass: "modal-dialog" }, [
+          _c("div", { staticClass: "modal-content" }, [
+            _vm._m(0),
+            _vm._v(" "),
+            _c("form", [
+              _c("div", { staticClass: "modal-body" }, [
+                _c("div", { staticClass: "form-group" }, [
+                  _c("label", { attrs: { for: "exampleInputEmail1" } }, [
+                    _vm._v("Saldo disponible"),
+                  ]),
+                  _vm._v(" "),
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.formBox.current_balance,
+                        expression: "formBox.current_balance",
+                      },
+                    ],
+                    staticClass: "form-control",
+                    attrs: {
+                      type: "number",
+                      step: "any",
+                      id: "exampleInputEmail1",
+                      "aria-describedby": "emailHelp",
+                    },
+                    domProps: { value: _vm.formBox.current_balance },
+                    on: {
+                      input: function ($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.$set(
+                          _vm.formBox,
+                          "current_balance",
+                          $event.target.value
+                        )
+                      },
+                    },
+                  }),
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "form-group" }, [
+                  _c("label", { attrs: { for: "exampleFormControlSelect1" } }, [
+                    _vm._v("Sede"),
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "select",
+                    {
+                      staticClass: "form-control",
+                      attrs: { id: "exampleFormControlSelect1" },
+                    },
+                    _vm._l(_vm.headquarterList, function (headquarter) {
+                      return _c("option", { key: headquarter.id }, [
+                        _vm._v(
+                          "\n                  " +
+                            _vm._s(headquarter.headquarter) +
+                            "\n                "
+                        ),
+                      ])
+                    }),
+                    0
+                  ),
+                ]),
+                _vm._v(" "),
+                _vm._m(1),
+              ]),
+              _vm._v(" "),
+              _vm._m(2),
+            ]),
+          ]),
+        ]),
+      ]
+    ),
+  ])
 }
 var staticRenderFns = [
   function () {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", [
+    return _c("div", { staticClass: "modal-header" }, [
+      _c("h5", { staticClass: "modal-title", attrs: { id: "boxModalLabel" } }, [
+        _vm._v("Sede"),
+      ]),
+      _vm._v(" "),
       _c(
-        "div",
+        "button",
         {
-          staticClass: "modal fade",
+          staticClass: "close",
           attrs: {
-            id: "boxModal",
-            tabindex: "-1",
-            "aria-labelledby": "boxModalLabel",
-            "aria-hidden": "true",
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close",
           },
         },
-        [
-          _c("div", { staticClass: "modal-dialog" }, [
-            _c("div", { staticClass: "modal-content" }, [
-              _c("div", { staticClass: "modal-header" }, [
-                _c(
-                  "h5",
-                  {
-                    staticClass: "modal-title",
-                    attrs: { id: "boxModalLabel" },
-                  },
-                  [_vm._v("Sede")]
-                ),
-                _vm._v(" "),
-                _c(
-                  "button",
-                  {
-                    staticClass: "close",
-                    attrs: {
-                      type: "button",
-                      "data-dismiss": "modal",
-                      "aria-label": "Close",
-                    },
-                  },
-                  [
-                    _c("span", { attrs: { "aria-hidden": "true" } }, [
-                      _vm._v("×"),
-                    ]),
-                  ]
-                ),
-              ]),
-              _vm._v(" "),
-              _c("form", [
-                _c("div", { staticClass: "modal-body" }, [
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", { attrs: { for: "exampleInputEmail1" } }, [
-                      _vm._v("Saldo disponible"),
-                    ]),
-                    _vm._v(" "),
-                    _c("input", {
-                      staticClass: "form-control",
-                      attrs: {
-                        type: "number",
-                        step: "any",
-                        id: "exampleInputEmail1",
-                        "aria-describedby": "emailHelp",
-                      },
-                    }),
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c(
-                      "label",
-                      { attrs: { for: "exampleFormControlSelect1" } },
-                      [_vm._v("Sede")]
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "select",
-                      {
-                        staticClass: "form-control",
-                        attrs: { id: "exampleFormControlSelect1" },
-                      },
-                      [
-                        _c("option", [_vm._v("1")]),
-                        _vm._v(" "),
-                        _c("option", [_vm._v("2")]),
-                        _vm._v(" "),
-                        _c("option", [_vm._v("3")]),
-                        _vm._v(" "),
-                        _c("option", [_vm._v("4")]),
-                        _vm._v(" "),
-                        _c("option", [_vm._v("5")]),
-                      ]
-                    ),
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", { attrs: { for: "anadir_saldo" } }, [
-                      _vm._v("Añadir saldo"),
-                    ]),
-                    _vm._v(" "),
-                    _c("input", {
-                      staticClass: "form-control",
-                      attrs: {
-                        type: "number",
-                        step: "any",
-                        id: "anadir_saldo",
-                      },
-                    }),
-                  ]),
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "modal-footer" }, [
-                  _c(
-                    "button",
-                    {
-                      staticClass: "btn btn-secondary",
-                      attrs: { type: "button", "data-dismiss": "modal" },
-                    },
-                    [_vm._v("\n\t\t\t\t\t\t\tClose\n\t\t\t\t\t\t")]
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "button",
-                    {
-                      staticClass: "btn btn-primary",
-                      attrs: { type: "submit" },
-                    },
-                    [_vm._v("Submit")]
-                  ),
-                ]),
-              ]),
-            ]),
-          ]),
-        ]
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      ),
+    ])
+  },
+  function () {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group" }, [
+      _c("label", { attrs: { for: "anadir_saldo" } }, [_vm._v("Añadir saldo")]),
+      _vm._v(" "),
+      _c("input", {
+        staticClass: "form-control",
+        attrs: { type: "number", step: "any", id: "anadir_saldo" },
+      }),
+    ])
+  },
+  function () {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-footer" }, [
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-secondary",
+          attrs: { type: "button", "data-dismiss": "modal" },
+        },
+        [_vm._v("\n              Close\n            ")]
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
+        { staticClass: "btn btn-primary", attrs: { type: "submit" } },
+        [_vm._v("Submit")]
       ),
     ])
   },
@@ -69243,167 +69308,289 @@ var render = function () {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm._m(0)
+  return _c("div", { staticClass: "card" }, [
+    _vm._m(0),
+    _vm._v(" "),
+    _c("div", { staticClass: "card-body" }, [
+      _c("form", { staticClass: "form-row" }, [
+        _c("div", { staticClass: "form-group row col-md-6" }, [
+          _c(
+            "label",
+            {
+              staticClass: "col-sm-4 col-form-label",
+              attrs: { for: "saldo_inicial" },
+            },
+            [_vm._v("Saldo inicial")]
+          ),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-sm-8" }, [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.formMainBox.initial_balance,
+                  expression: "formMainBox.initial_balance",
+                },
+              ],
+              staticClass: "form-control",
+              attrs: {
+                type: "text",
+                readonly: "",
+                id: "saldo_inicial",
+                placeholder: "$",
+              },
+              domProps: { value: _vm.formMainBox.initial_balance },
+              on: {
+                input: function ($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(
+                    _vm.formMainBox,
+                    "initial_balance",
+                    $event.target.value
+                  )
+                },
+              },
+            }),
+          ]),
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-group row col-md-6" }, [
+          _c(
+            "label",
+            {
+              staticClass: "col-sm-4 col-form-label",
+              attrs: { for: "saldo_inicial" },
+            },
+            [_vm._v("Saldo actual")]
+          ),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-sm-8" }, [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.formMainBox.current_balance,
+                  expression: "formMainBox.current_balance",
+                },
+              ],
+              staticClass: "form-control",
+              attrs: {
+                type: "text",
+                readonly: "",
+                id: "saldo_inicial",
+                placeholder: "$",
+              },
+              domProps: { value: _vm.formMainBox.current_balance },
+              on: {
+                input: function ($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(
+                    _vm.formMainBox,
+                    "current_balance",
+                    $event.target.value
+                  )
+                },
+              },
+            }),
+          ]),
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-group row col-md-6" }, [
+          _c(
+            "label",
+            { staticClass: "col-sm-4 col-form-label", attrs: { for: "input" } },
+            [_vm._v("Entradas")]
+          ),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-sm-8" }, [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.formMainBox.input,
+                  expression: "formMainBox.input",
+                },
+              ],
+              staticClass: "form-control",
+              attrs: {
+                type: "text",
+                readonly: "",
+                id: "input",
+                placeholder: "$",
+              },
+              domProps: { value: _vm.formMainBox.input },
+              on: {
+                input: function ($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(_vm.formMainBox, "input", $event.target.value)
+                },
+              },
+            }),
+          ]),
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-group row col-md-6" }, [
+          _c(
+            "label",
+            {
+              staticClass: "col-sm-4 col-form-label",
+              attrs: { for: "output" },
+            },
+            [_vm._v("Salidas")]
+          ),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-sm-8" }, [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.formMainBox.output,
+                  expression: "formMainBox.output",
+                },
+              ],
+              staticClass: "form-control",
+              attrs: {
+                type: "text",
+                readonly: "",
+                id: "output",
+                placeholder: "$",
+              },
+              domProps: { value: _vm.formMainBox.output },
+              on: {
+                input: function ($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(_vm.formMainBox, "output", $event.target.value)
+                },
+              },
+            }),
+          ]),
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-group row col-md-6" }, [
+          _c(
+            "label",
+            {
+              staticClass: "col-sm-4 col-form-label",
+              attrs: { for: "last_update" },
+            },
+            [_vm._v("Última modificacion")]
+          ),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-sm-8" }, [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.formMainBox.last_update,
+                  expression: "formMainBox.last_update",
+                },
+              ],
+              staticClass: "form-control",
+              attrs: {
+                type: "text",
+                readonly: "",
+                disabled: "",
+                id: "last_update",
+              },
+              domProps: { value: _vm.formMainBox.last_update },
+              on: {
+                input: function ($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(_vm.formMainBox, "last_update", $event.target.value)
+                },
+              },
+            }),
+          ]),
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-group row col-md-6" }, [
+          _c(
+            "label",
+            {
+              staticClass: "col-sm-4 col-form-label",
+              attrs: { for: "last_update" },
+            },
+            [_vm._v("Último editor")]
+          ),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-sm-8" }, [
+            _vm._v(
+              "\n          " +
+                _vm._s(_vm.lastEditor.name) +
+                " " +
+                _vm._s(_vm.lastEditor.last_name) +
+                "\n        "
+            ),
+          ]),
+        ]),
+        _vm._v(" "),
+        _vm._m(1),
+        _vm._v(" "),
+        _vm._m(2),
+      ]),
+    ]),
+  ])
 }
 var staticRenderFns = [
   function () {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "card" }, [
-      _c("div", { staticClass: "card-header text-center" }, [
-        _c("h5", [_vm._v("Caja principal")]),
-      ]),
+    return _c("div", { staticClass: "card-header text-center" }, [
+      _c("h5", [_vm._v("Caja principal")]),
+    ])
+  },
+  function () {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group row col-md-6 h5" }, [
+      _c(
+        "label",
+        {
+          staticClass: "col-sm-4 col-form-label",
+          attrs: { for: "saldo_inicial" },
+        },
+        [_vm._v("Añadir saldo")]
+      ),
       _vm._v(" "),
-      _c("div", { staticClass: "card-body" }, [
-        _c("form", { staticClass: "form-row" }, [
-          _c("div", { staticClass: "form-group row col-md-6" }, [
-            _c(
-              "label",
-              {
-                staticClass: "col-sm-4 col-form-label",
-                attrs: { for: "saldo_inicial" },
-              },
-              [_vm._v("Saldo inicial")]
-            ),
-            _vm._v(" "),
-            _c("div", { staticClass: "col-sm-8" }, [
-              _c("input", {
-                staticClass: "form-control",
-                attrs: {
-                  type: "text",
-                  readonly: "",
-                  id: "saldo_inicial",
-                  placeholder: "$",
-                },
-              }),
-            ]),
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "form-group row col-md-6" }, [
-            _c(
-              "label",
-              {
-                staticClass: "col-sm-4 col-form-label",
-                attrs: { for: "saldo_inicial" },
-              },
-              [_vm._v("Saldo actual")]
-            ),
-            _vm._v(" "),
-            _c("div", { staticClass: "col-sm-8" }, [
-              _c("input", {
-                staticClass: "form-control",
-                attrs: {
-                  type: "text",
-                  readonly: "",
-                  id: "saldo_inicial",
-                  placeholder: "$",
-                },
-              }),
-            ]),
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "form-group row col-md-6" }, [
-            _c(
-              "label",
-              {
-                staticClass: "col-sm-4 col-form-label",
-                attrs: { for: "saldo_inicial" },
-              },
-              [_vm._v("Entradas")]
-            ),
-            _vm._v(" "),
-            _c("div", { staticClass: "col-sm-8" }, [
-              _c("input", {
-                staticClass: "form-control",
-                attrs: {
-                  type: "text",
-                  readonly: "",
-                  id: "saldo_inicial",
-                  placeholder: "$",
-                },
-              }),
-            ]),
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "form-group row col-md-6" }, [
-            _c(
-              "label",
-              {
-                staticClass: "col-sm-4 col-form-label",
-                attrs: { for: "saldo_inicial" },
-              },
-              [_vm._v("Salidas")]
-            ),
-            _vm._v(" "),
-            _c("div", { staticClass: "col-sm-8" }, [
-              _c("input", {
-                staticClass: "form-control",
-                attrs: {
-                  type: "text",
-                  readonly: "",
-                  id: "saldo_inicial",
-                  placeholder: "$",
-                },
-              }),
-            ]),
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "form-group row col-md-6" }, [
-            _c(
-              "label",
-              {
-                staticClass: "col-sm-4 col-form-label",
-                attrs: { for: "saldo_inicial" },
-              },
-              [_vm._v("Última modificacion")]
-            ),
-            _vm._v(" "),
-            _c("div", { staticClass: "col-sm-8" }, [
-              _c("input", {
-                staticClass: "form-control",
-                attrs: {
-                  type: "text",
-                  readonly: "",
-                  disabled: "",
-                  id: "saldo_inicial",
-                  placeholder: "18-09-2016",
-                },
-              }),
-            ]),
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "form-group row col-md-6 h5" }, [
-            _c(
-              "label",
-              {
-                staticClass: "col-sm-4 col-form-label",
-                attrs: { for: "saldo_inicial" },
-              },
-              [_vm._v("Añadir saldo")]
-            ),
-            _vm._v(" "),
-            _c("div", { staticClass: "col-sm-8" }, [
-              _c("input", {
-                staticClass: "form-control form-control-lg",
-                attrs: { type: "text", id: "saldo_inicial", placeholder: "$" },
-              }),
-            ]),
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "w-100 text-center" }, [
-            _c(
-              "button",
-              {
-                staticClass: "btn btn-primary",
-                staticStyle: { "min-width": "30%" },
-                attrs: { type: "button" },
-              },
-              [_vm._v("\n\t\t\t\t\tGuardar\n\t\t\t\t")]
-            ),
-          ]),
-        ]),
+      _c("div", { staticClass: "col-sm-8" }, [
+        _c("input", {
+          staticClass: "form-control form-control-lg",
+          attrs: { type: "text", id: "saldo_inicial", placeholder: "$" },
+        }),
       ]),
+    ])
+  },
+  function () {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "w-100 text-center" }, [
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-primary",
+          staticStyle: { "min-width": "30%" },
+          attrs: { type: "button" },
+        },
+        [_vm._v("\n          Guardar\n        ")]
+      ),
     ])
   },
 ]
@@ -89031,7 +89218,7 @@ Vue.compile = compileToFunctions;
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"_args":[["axios@0.21.4","C:\\\\xampp\\\\htdocs\\\\creditos"]],"_development":true,"_from":"axios@0.21.4","_id":"axios@0.21.4","_inBundle":false,"_integrity":"sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==","_location":"/axios","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"axios@0.21.4","name":"axios","escapedName":"axios","rawSpec":"0.21.4","saveSpec":null,"fetchSpec":"0.21.4"},"_requiredBy":["#DEV:/"],"_resolved":"https://registry.npmjs.org/axios/-/axios-0.21.4.tgz","_spec":"0.21.4","_where":"C:\\\\xampp\\\\htdocs\\\\creditos","author":{"name":"Matt Zabriskie"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"bugs":{"url":"https://github.com/axios/axios/issues"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}],"dependencies":{"follow-redirects":"^1.14.0"},"description":"Promise based HTTP client for the browser and node.js","devDependencies":{"coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.3.0","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^23.0.0","grunt-karma":"^4.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^4.0.2","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^6.3.2","karma-chrome-launcher":"^3.1.0","karma-firefox-launcher":"^2.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^4.3.6","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.8","karma-webpack":"^4.0.2","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^8.2.1","sinon":"^4.5.0","terser-webpack-plugin":"^4.2.3","typescript":"^4.0.5","url-search-params":"^0.10.0","webpack":"^4.44.2","webpack-dev-server":"^3.11.0"},"homepage":"https://axios-http.com","jsdelivr":"dist/axios.min.js","keywords":["xhr","http","ajax","promise","node"],"license":"MIT","main":"index.js","name":"axios","repository":{"type":"git","url":"git+https://github.com/axios/axios.git"},"scripts":{"build":"NODE_ENV=production grunt build","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","examples":"node ./examples/server.js","fix":"eslint --fix lib/**/*.js","postversion":"git push && git push --tags","preversion":"npm test","start":"node ./sandbox/server.js","test":"grunt test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json"},"typings":"./index.d.ts","unpkg":"dist/axios.min.js","version":"0.21.4"}');
+module.exports = JSON.parse('{"name":"axios","version":"0.21.4","description":"Promise based HTTP client for the browser and node.js","main":"index.js","scripts":{"test":"grunt test","start":"node ./sandbox/server.js","build":"NODE_ENV=production grunt build","preversion":"npm test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json","postversion":"git push && git push --tags","examples":"node ./examples/server.js","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","fix":"eslint --fix lib/**/*.js"},"repository":{"type":"git","url":"https://github.com/axios/axios.git"},"keywords":["xhr","http","ajax","promise","node"],"author":"Matt Zabriskie","license":"MIT","bugs":{"url":"https://github.com/axios/axios/issues"},"homepage":"https://axios-http.com","devDependencies":{"coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.3.0","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^23.0.0","grunt-karma":"^4.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^4.0.2","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^6.3.2","karma-chrome-launcher":"^3.1.0","karma-firefox-launcher":"^2.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^4.3.6","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.8","karma-webpack":"^4.0.2","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^8.2.1","sinon":"^4.5.0","terser-webpack-plugin":"^4.2.3","typescript":"^4.0.5","url-search-params":"^0.10.0","webpack":"^4.44.2","webpack-dev-server":"^3.11.0"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"jsdelivr":"dist/axios.min.js","unpkg":"dist/axios.min.js","typings":"./index.d.ts","dependencies":{"follow-redirects":"^1.14.0"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}]}');
 
 /***/ })
 

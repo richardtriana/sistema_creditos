@@ -44,6 +44,7 @@ Route::post('/proveedores/{proveedor}/change-status',  [ProveedorController::cla
 Route::resource('/users',  UserController::class);
 Route::post('/users/{user}/change-status',  [UserController::class, 'changeStatus']);
 
+Route::get('/headquarters/list-headquarter',  [HeadquarterController::class, 'listHeadquarter']);
 Route::resource('/headquarters',  HeadquarterController::class);
 Route::post('/headquarters/{headquarter}/change-status',  [HeadquarterController::class, 'changeStatus']);
 
