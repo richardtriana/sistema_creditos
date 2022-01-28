@@ -74,7 +74,13 @@ class BoxController extends Controller
 	 */
 	public function update(Request $request, Box $box)
 	{
-		//
+		$amount =  $request->amount;
+
+		if ($box->initial_balance == 0) {
+			$box->initial_balance =  $amount;
+		}
+		$box->current_balance = $box->current_balance + $amount;
+		$box->save();
 	}
 
 	/**
