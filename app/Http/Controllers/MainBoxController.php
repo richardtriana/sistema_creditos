@@ -77,7 +77,13 @@ class MainBoxController extends Controller
 	 */
 	public function update(Request $request, MainBox $mainBox)
 	{
-		//
+		$amount =  $request->amount;
+
+		if ($mainBox->initial_balance == 0) {
+			$mainBox->initial_balance =  $amount;
+		}
+		$mainBox->current_balance = $mainBox->current_balance + $amount;
+		$mainBox->save();
 	}
 
 	/**

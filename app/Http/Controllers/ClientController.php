@@ -113,7 +113,7 @@ class ClientController extends Controller
 		$client->workplace = $request['workplace'];
 		$client->occupation = $request['occupation'];
 		$client->independent = $request['independent'];
-		$client->photo = 'undefindef';
+		$client->photo = 'undefined';
 		$client->save();
 	}
 
