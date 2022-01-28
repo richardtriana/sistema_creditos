@@ -14,10 +14,14 @@ class MainBoxController extends Controller
 	 */
 	public function index()
 	{
+		$main_box = MainBox::first();
+		$last_editor = $main_box->last_editor()->first();
+
 		return response()->json([
 			'status' => 'success',
 			'code' => 200,
-			'main_box' => MainBox::first()
+			'main_box' => $main_box,
+			'last_editor' => $last_editor
 		]);
 	}
 
@@ -73,7 +77,13 @@ class MainBoxController extends Controller
 	 */
 	public function update(Request $request, MainBox $mainBox)
 	{
-		//
+		$amount =  $request->amount;
+
+		if ($mainBox->initial_balance == 0) {
+			$mainBox->initial_balance =  $amount;
+		}
+		$mainBox->current_balance = $mainBox->current_balance + $amount;
+		$mainBox->save();
 	}
 
 	/**

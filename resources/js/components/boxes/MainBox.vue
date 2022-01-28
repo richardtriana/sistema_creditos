@@ -16,6 +16,7 @@
 							class="form-control"
 							id="saldo_inicial"
 							placeholder="$"
+							v-model="formMainBox.initial_balance"
 						/>
 					</div>
 				</div>
@@ -31,40 +32,39 @@
 							class="form-control"
 							id="saldo_inicial"
 							placeholder="$"
+							v-model="formMainBox.current_balance"
 						/>
 					</div>
 				</div>
 
 				<div class="form-group row col-md-6">
-					<label for="saldo_inicial" class="col-sm-4 col-form-label"
-						>Entradas</label
-					>
+					<label for="input" class="col-sm-4 col-form-label">Entradas</label>
 					<div class="col-sm-8">
 						<input
 							type="text"
 							readonly
 							class="form-control"
-							id="saldo_inicial"
+							id="input"
 							placeholder="$"
+							v-model="formMainBox.input"
 						/>
 					</div>
 				</div>
 				<div class="form-group row col-md-6">
-					<label for="saldo_inicial" class="col-sm-4 col-form-label"
-						>Salidas</label
-					>
+					<label for="output" class="col-sm-4 col-form-label">Salidas</label>
 					<div class="col-sm-8">
 						<input
 							type="text"
 							readonly
 							class="form-control"
-							id="saldo_inicial"
+							id="output"
 							placeholder="$"
+							v-model="formMainBox.output"
 						/>
 					</div>
 				</div>
 				<div class="form-group row col-md-6">
-					<label for="saldo_inicial" class="col-sm-4 col-form-label"
+					<label for="last_update" class="col-sm-4 col-form-label"
 						>Última modificacion</label
 					>
 					<div class="col-sm-8">
@@ -73,9 +73,18 @@
 							class="form-control"
 							readonly
 							disabled
-							id="saldo_inicial"
-							placeholder="18-09-2016"
+							id="last_update"
+							v-model="formMainBox.last_update"
 						/>
+					</div>
+				</div>
+
+				<div class="form-group row col-md-6">
+					<label for="last_update" class="col-sm-4 col-form-label"
+						>Último editor</label
+					>
+					<div class="col-sm-8">
+						{{ lastEditor.name }} {{ lastEditor.last_name }}
 					</div>
 				</div>
 				<div class="form-group row col-md-6 h5">
@@ -88,11 +97,12 @@
 							class="form-control form-control-lg"
 							id="saldo_inicial"
 							placeholder="$"
+							v-model="add_amount"
 						/>
 					</div>
 				</div>
 				<div class="w-100 text-center">
-					<button class="btn btn-primary" type="button" style="min-width: 30%">
+					<button class="btn btn-primary" type="button" style="min-width: 30%" @click="updateBox()">
 						Guardar
 					</button>
 				</div>
@@ -106,6 +116,8 @@ export default {
 	data() {
 		return {
 			formMainBox: {},
+			lastEditor: {},
+			add_amount: 0,
 		};
 	},
 	created() {
@@ -114,9 +126,22 @@ export default {
 	methods: {
 		getMainBox() {
 			axios.get("api/main-box").then((reponse) => {
-				this.formMainBox = reponse.data.main_box
-			})
-		}
-	}
+				this.formMainBox = reponse.data.main_box;
+				this.lastEditor = reponse.data.last_editor;
+			});
+		},
+		updateBox() {
+			let me = this;
+			if (this.box_id != 0) {
+				axios
+					.put(`api/main-box/${this.formMainBox.id}`, {
+						amount: this.add_amount,
+					})
+					.then(function () {
+						me.getMainBox();
+					});
+			}
+		},
+	},
 };
 </script>

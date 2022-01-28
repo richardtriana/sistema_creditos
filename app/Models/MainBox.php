@@ -18,4 +18,9 @@ class MainBox extends Model
 		'last_update',
 		'last_editor'
 	];
+
+	public function last_editor()
+	{
+		return $this->belongsTo(User::class, 'last_editor');
+	}
 }

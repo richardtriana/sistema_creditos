@@ -23,32 +23,43 @@
 					<form>
 						<div class="modal-body">
 							<div class="form-group">
-								<label for="exampleInputEmail1">Saldo disponible</label>
+								<label for="current_balance">Saldo disponible</label>
 								<input
 									type="number"
 									step="any"
 									class="form-control"
-									id="exampleInputEmail1"
+									id="current_balance"
 									aria-describedby="emailHelp"
+									v-model="formBox.current_balance"
+									disabled
+									readonly
 								/>
 							</div>
 							<div class="form-group">
-								<label for="exampleFormControlSelect1">Sede</label>
-								<select class="form-control" id="exampleFormControlSelect1">
-									<option>1</option>
-									<option>2</option>
-									<option>3</option>
-									<option>4</option>
-									<option>5</option>
+								<label for="headquarter_id">Sede</label>
+								<select
+									class="form-control"
+									id="headquarter_id"
+									v-model="formBox.headquarter_id"
+									disabled
+								>
+									<option
+										v-for="headquarter in headquarterList"
+										:key="headquarter.id"
+										:value="headquarter.id"
+									>
+										{{ headquarter.headquarter }}
+									</option>
 								</select>
 							</div>
 							<div class="form-group">
-								<label for="anadir_saldo">Añadir saldo</label>
+								<label for="add_amount">Añadir saldo</label>
 								<input
 									type="number"
 									step="any"
 									class="form-control"
-									id="anadir_saldo"
+									id="add_amount"
+									v-model="add_amount"
 								/>
 							</div>
 						</div>
@@ -58,9 +69,15 @@
 								class="btn btn-secondary"
 								data-dismiss="modal"
 							>
-								Close
+								Cerrar
 							</button>
-							<button type="submit" class="btn btn-primary">Submit</button>
+							<button
+								type="button"
+								class="btn btn-primary"
+								@click="updateBox()"
+							>
+								Guardar
+							</button>
 						</div>
 					</form>
 				</div>
@@ -69,5 +86,52 @@
 	</div>
 </template>
 <script>
-export default {};
+export default {
+	data() {
+		return {
+			box_id: 0,
+			editar: false,
+			formBox: {},
+			add_amount: 0,
+			headquarterList: {},
+		};
+	},
+	created() {
+		this.listHeadquarters(1);
+	},
+	methods: {
+		showEditBox(box) {
+			this.editar = true;
+			this.box_id = box.id;
+			let me = this;
+			$("#boxModal").modal("show");
+			me.formBox = box;
+			console.log(box);
+		},
+		listHeadquarters() {
+			let me = this;
+			axios.get(`api/headquarters/list-headquarter`).then(function (response) {
+				me.headquarterList = response.data;
+			});
+		},
+
+		updateBox() {
+			let me = this;
+			if (this.box_id != 0) {
+				axios
+					.put(`api/boxes/${this.box_id}`, { amount: this.add_amount })
+					.then(function () {
+						$("#boxModal").modal("hide");
+						me.$emit("list-boxes");
+					});
+			}
+		},
+		resetData() {
+			let me = this;
+			Object.keys(this.formBox).forEach(function (key, index) {
+				me.formBox[key] = "";
+			});
+		},
+	},
+};
 </script>

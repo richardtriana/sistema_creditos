@@ -2607,6 +2607,9 @@ __webpack_require__.r(__webpack_exports__);
       axios.get("api/boxes").then(function (reponse) {
         _this.boxList = reponse.data.boxes;
       });
+    },
+    showEditBox: function showEditBox(box) {
+      this.$refs.CreateEditBox.showEditBox(box);
     }
   }
 });
@@ -2732,7 +2735,71 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({});
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  data: function data() {
+    return {
+      box_id: 0,
+      editar: false,
+      formBox: {},
+      add_amount: 0,
+      headquarterList: {}
+    };
+  },
+  created: function created() {
+    this.listHeadquarters(1);
+  },
+  methods: {
+    showEditBox: function showEditBox(box) {
+      this.editar = true;
+      this.box_id = box.id;
+      var me = this;
+      $("#boxModal").modal("show");
+      me.formBox = box;
+      console.log(box);
+    },
+    listHeadquarters: function listHeadquarters() {
+      var me = this;
+      axios.get("api/headquarters/list-headquarter").then(function (response) {
+        me.headquarterList = response.data;
+      });
+    },
+    updateBox: function updateBox() {
+      var me = this;
+
+      if (this.box_id != 0) {
+        axios.put("api/boxes/".concat(this.box_id), {
+          amount: this.add_amount
+        }).then(function () {
+          $("#boxModal").modal("hide");
+          me.$emit("list-boxes");
+        });
+      }
+    },
+    resetData: function resetData() {
+      var me = this;
+      Object.keys(this.formBox).forEach(function (key, index) {
+        me.formBox[key] = "";
+      });
+    }
+  }
+});
 
 /***/ }),
 
@@ -2850,10 +2917,22 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
-      formMainBox: {}
+      formMainBox: {},
+      lastEditor: {},
+      add_amount: 0
     };
   },
   created: function created() {
@@ -2865,7 +2944,19 @@ __webpack_require__.r(__webpack_exports__);
 
       axios.get("api/main-box").then(function (reponse) {
         _this.formMainBox = reponse.data.main_box;
+        _this.lastEditor = reponse.data.last_editor;
       });
+    },
+    updateBox: function updateBox() {
+      var me = this;
+
+      if (this.box_id != 0) {
+        axios.put("api/main-box/".concat(this.formMainBox.id), {
+          amount: this.add_amount
+        }).then(function () {
+          me.getMainBox();
+        });
+      }
     }
   }
 });
@@ -5000,6 +5091,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _CreateEditHeadquarter_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CreateEditHeadquarter.vue */ "./resources/js/components/headquarters/CreateEditHeadquarter.vue");
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -68927,21 +69024,45 @@ var render = function () {
           _vm.boxList.length > 0
             ? _c(
                 "tbody",
-                _vm._l(_vm.boxList, function (l, index) {
+                _vm._l(_vm.boxList, function (box, index) {
                   return _c("tr", { key: index }, [
                     _c("th", { attrs: { scope: "row" } }, [
                       _vm._v(_vm._s(index + 1)),
                     ]),
                     _vm._v(" "),
-                    _c("td", [_vm._v("x")]),
+                    _c("td", [_vm._v(_vm._s(box.headquarter.headquarter))]),
                     _vm._v(" "),
-                    _c("td", [_vm._v("Otto")]),
+                    _c("td", [_vm._v(_vm._s(box.current_balance))]),
                     _vm._v(" "),
-                    _c("td", [_vm._v("@mdo")]),
+                    _c("td", [_vm._v(_vm._s(box.last_update))]),
                     _vm._v(" "),
-                    _vm._m(2, true),
+                    _c("td", [
+                      _vm._v(
+                        _vm._s(box.last_editor.name) +
+                          " " +
+                          _vm._s(box.last_editor.last_name)
+                      ),
+                    ]),
                     _vm._v(" "),
-                    _vm._m(3, true),
+                    _c("td", [
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-outline-primary",
+                          attrs: {
+                            type: "button",
+                            "data-toggle": "modal",
+                            "data-target": "#boxModal",
+                          },
+                          on: {
+                            click: function ($event) {
+                              return _vm.showEditBox(box)
+                            },
+                          },
+                        },
+                        [_c("i", { staticClass: "bi bi-pencil" })]
+                      ),
+                    ]),
                   ])
                 }),
                 0
@@ -68950,7 +69071,14 @@ var render = function () {
         ]),
       ]),
       _vm._v(" "),
-      _c("create-edit-box"),
+      _c("create-edit-box", {
+        ref: "CreateEditBox",
+        on: {
+          "list-boxes": function ($event) {
+            return _vm.listBoxes()
+          },
+        },
+      }),
     ],
     1
   )
@@ -68976,45 +69104,12 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Saldo disponible")]),
         _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Deuda")]),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Última modificación")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Estado")]),
+        _c("th", [_vm._v("ültimo editor")]),
         _vm._v(" "),
         _c("th", [_vm._v("Opciones")]),
       ]),
-    ])
-  },
-  function () {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("td", [
-      _c("button", { staticClass: "btn btn-outline-success" }, [
-        _c("i", { staticClass: "bi bi-check-circle" }),
-      ]),
-      _vm._v(" "),
-      _c("button", { staticClass: "btn btn-outline-danger" }, [
-        _c("i", { staticClass: "bi bi-x-circle" }),
-      ]),
-    ])
-  },
-  function () {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("td", [
-      _c(
-        "button",
-        {
-          staticClass: "btn btn-outline-primary",
-          attrs: {
-            type: "button",
-            "data-toggle": "modal",
-            "data-target": "#boxModal",
-          },
-        },
-        [_c("i", { staticClass: "bi bi-pencil" })]
-      ),
     ])
   },
 ]
@@ -69083,140 +69178,203 @@ var render = function () {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm._m(0)
+  return _c("div", [
+    _c(
+      "div",
+      {
+        staticClass: "modal fade",
+        attrs: {
+          id: "boxModal",
+          tabindex: "-1",
+          "aria-labelledby": "boxModalLabel",
+          "aria-hidden": "true",
+        },
+      },
+      [
+        _c("div", { staticClass: "modal-dialog" }, [
+          _c("div", { staticClass: "modal-content" }, [
+            _vm._m(0),
+            _vm._v(" "),
+            _c("form", [
+              _c("div", { staticClass: "modal-body" }, [
+                _c("div", { staticClass: "form-group" }, [
+                  _c("label", { attrs: { for: "current_balance" } }, [
+                    _vm._v("Saldo disponible"),
+                  ]),
+                  _vm._v(" "),
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.formBox.current_balance,
+                        expression: "formBox.current_balance",
+                      },
+                    ],
+                    staticClass: "form-control",
+                    attrs: {
+                      type: "number",
+                      step: "any",
+                      id: "current_balance",
+                      "aria-describedby": "emailHelp",
+                      disabled: "",
+                      readonly: "",
+                    },
+                    domProps: { value: _vm.formBox.current_balance },
+                    on: {
+                      input: function ($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.$set(
+                          _vm.formBox,
+                          "current_balance",
+                          $event.target.value
+                        )
+                      },
+                    },
+                  }),
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "form-group" }, [
+                  _c("label", { attrs: { for: "headquarter_id" } }, [
+                    _vm._v("Sede"),
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "select",
+                    {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.formBox.headquarter_id,
+                          expression: "formBox.headquarter_id",
+                        },
+                      ],
+                      staticClass: "form-control",
+                      attrs: { id: "headquarter_id", disabled: "" },
+                      on: {
+                        change: function ($event) {
+                          var $$selectedVal = Array.prototype.filter
+                            .call($event.target.options, function (o) {
+                              return o.selected
+                            })
+                            .map(function (o) {
+                              var val = "_value" in o ? o._value : o.value
+                              return val
+                            })
+                          _vm.$set(
+                            _vm.formBox,
+                            "headquarter_id",
+                            $event.target.multiple
+                              ? $$selectedVal
+                              : $$selectedVal[0]
+                          )
+                        },
+                      },
+                    },
+                    _vm._l(_vm.headquarterList, function (headquarter) {
+                      return _c(
+                        "option",
+                        {
+                          key: headquarter.id,
+                          domProps: { value: headquarter.id },
+                        },
+                        [
+                          _vm._v(
+                            "\n\t\t\t\t\t\t\t\t\t" +
+                              _vm._s(headquarter.headquarter) +
+                              "\n\t\t\t\t\t\t\t\t"
+                          ),
+                        ]
+                      )
+                    }),
+                    0
+                  ),
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "form-group" }, [
+                  _c("label", { attrs: { for: "add_amount" } }, [
+                    _vm._v("Añadir saldo"),
+                  ]),
+                  _vm._v(" "),
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.add_amount,
+                        expression: "add_amount",
+                      },
+                    ],
+                    staticClass: "form-control",
+                    attrs: { type: "number", step: "any", id: "add_amount" },
+                    domProps: { value: _vm.add_amount },
+                    on: {
+                      input: function ($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.add_amount = $event.target.value
+                      },
+                    },
+                  }),
+                ]),
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-footer" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-secondary",
+                    attrs: { type: "button", "data-dismiss": "modal" },
+                  },
+                  [_vm._v("\n\t\t\t\t\t\t\tCerrar\n\t\t\t\t\t\t")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-primary",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function ($event) {
+                        return _vm.updateBox()
+                      },
+                    },
+                  },
+                  [_vm._v("\n\t\t\t\t\t\t\tGuardar\n\t\t\t\t\t\t")]
+                ),
+              ]),
+            ]),
+          ]),
+        ]),
+      ]
+    ),
+  ])
 }
 var staticRenderFns = [
   function () {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", [
+    return _c("div", { staticClass: "modal-header" }, [
+      _c("h5", { staticClass: "modal-title", attrs: { id: "boxModalLabel" } }, [
+        _vm._v("Sede"),
+      ]),
+      _vm._v(" "),
       _c(
-        "div",
+        "button",
         {
-          staticClass: "modal fade",
+          staticClass: "close",
           attrs: {
-            id: "boxModal",
-            tabindex: "-1",
-            "aria-labelledby": "boxModalLabel",
-            "aria-hidden": "true",
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close",
           },
         },
-        [
-          _c("div", { staticClass: "modal-dialog" }, [
-            _c("div", { staticClass: "modal-content" }, [
-              _c("div", { staticClass: "modal-header" }, [
-                _c(
-                  "h5",
-                  {
-                    staticClass: "modal-title",
-                    attrs: { id: "boxModalLabel" },
-                  },
-                  [_vm._v("Sede")]
-                ),
-                _vm._v(" "),
-                _c(
-                  "button",
-                  {
-                    staticClass: "close",
-                    attrs: {
-                      type: "button",
-                      "data-dismiss": "modal",
-                      "aria-label": "Close",
-                    },
-                  },
-                  [
-                    _c("span", { attrs: { "aria-hidden": "true" } }, [
-                      _vm._v("×"),
-                    ]),
-                  ]
-                ),
-              ]),
-              _vm._v(" "),
-              _c("form", [
-                _c("div", { staticClass: "modal-body" }, [
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", { attrs: { for: "exampleInputEmail1" } }, [
-                      _vm._v("Saldo disponible"),
-                    ]),
-                    _vm._v(" "),
-                    _c("input", {
-                      staticClass: "form-control",
-                      attrs: {
-                        type: "number",
-                        step: "any",
-                        id: "exampleInputEmail1",
-                        "aria-describedby": "emailHelp",
-                      },
-                    }),
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c(
-                      "label",
-                      { attrs: { for: "exampleFormControlSelect1" } },
-                      [_vm._v("Sede")]
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "select",
-                      {
-                        staticClass: "form-control",
-                        attrs: { id: "exampleFormControlSelect1" },
-                      },
-                      [
-                        _c("option", [_vm._v("1")]),
-                        _vm._v(" "),
-                        _c("option", [_vm._v("2")]),
-                        _vm._v(" "),
-                        _c("option", [_vm._v("3")]),
-                        _vm._v(" "),
-                        _c("option", [_vm._v("4")]),
-                        _vm._v(" "),
-                        _c("option", [_vm._v("5")]),
-                      ]
-                    ),
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", { attrs: { for: "anadir_saldo" } }, [
-                      _vm._v("Añadir saldo"),
-                    ]),
-                    _vm._v(" "),
-                    _c("input", {
-                      staticClass: "form-control",
-                      attrs: {
-                        type: "number",
-                        step: "any",
-                        id: "anadir_saldo",
-                      },
-                    }),
-                  ]),
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "modal-footer" }, [
-                  _c(
-                    "button",
-                    {
-                      staticClass: "btn btn-secondary",
-                      attrs: { type: "button", "data-dismiss": "modal" },
-                    },
-                    [_vm._v("\n\t\t\t\t\t\t\tClose\n\t\t\t\t\t\t")]
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "button",
-                    {
-                      staticClass: "btn btn-primary",
-                      attrs: { type: "submit" },
-                    },
-                    [_vm._v("Submit")]
-                  ),
-                ]),
-              ]),
-            ]),
-          ]),
-        ]
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
       ),
     ])
   },
@@ -69243,167 +69401,299 @@ var render = function () {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm._m(0)
+  return _c("div", { staticClass: "card" }, [
+    _vm._m(0),
+    _vm._v(" "),
+    _c("div", { staticClass: "card-body" }, [
+      _c("form", { staticClass: "form-row" }, [
+        _c("div", { staticClass: "form-group row col-md-6" }, [
+          _c(
+            "label",
+            {
+              staticClass: "col-sm-4 col-form-label",
+              attrs: { for: "saldo_inicial" },
+            },
+            [_vm._v("Saldo inicial")]
+          ),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-sm-8" }, [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.formMainBox.initial_balance,
+                  expression: "formMainBox.initial_balance",
+                },
+              ],
+              staticClass: "form-control",
+              attrs: {
+                type: "text",
+                readonly: "",
+                id: "saldo_inicial",
+                placeholder: "$",
+              },
+              domProps: { value: _vm.formMainBox.initial_balance },
+              on: {
+                input: function ($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(
+                    _vm.formMainBox,
+                    "initial_balance",
+                    $event.target.value
+                  )
+                },
+              },
+            }),
+          ]),
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-group row col-md-6" }, [
+          _c(
+            "label",
+            {
+              staticClass: "col-sm-4 col-form-label",
+              attrs: { for: "saldo_inicial" },
+            },
+            [_vm._v("Saldo actual")]
+          ),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-sm-8" }, [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.formMainBox.current_balance,
+                  expression: "formMainBox.current_balance",
+                },
+              ],
+              staticClass: "form-control",
+              attrs: {
+                type: "text",
+                readonly: "",
+                id: "saldo_inicial",
+                placeholder: "$",
+              },
+              domProps: { value: _vm.formMainBox.current_balance },
+              on: {
+                input: function ($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(
+                    _vm.formMainBox,
+                    "current_balance",
+                    $event.target.value
+                  )
+                },
+              },
+            }),
+          ]),
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-group row col-md-6" }, [
+          _c(
+            "label",
+            { staticClass: "col-sm-4 col-form-label", attrs: { for: "input" } },
+            [_vm._v("Entradas")]
+          ),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-sm-8" }, [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.formMainBox.input,
+                  expression: "formMainBox.input",
+                },
+              ],
+              staticClass: "form-control",
+              attrs: {
+                type: "text",
+                readonly: "",
+                id: "input",
+                placeholder: "$",
+              },
+              domProps: { value: _vm.formMainBox.input },
+              on: {
+                input: function ($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(_vm.formMainBox, "input", $event.target.value)
+                },
+              },
+            }),
+          ]),
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-group row col-md-6" }, [
+          _c(
+            "label",
+            {
+              staticClass: "col-sm-4 col-form-label",
+              attrs: { for: "output" },
+            },
+            [_vm._v("Salidas")]
+          ),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-sm-8" }, [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.formMainBox.output,
+                  expression: "formMainBox.output",
+                },
+              ],
+              staticClass: "form-control",
+              attrs: {
+                type: "text",
+                readonly: "",
+                id: "output",
+                placeholder: "$",
+              },
+              domProps: { value: _vm.formMainBox.output },
+              on: {
+                input: function ($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(_vm.formMainBox, "output", $event.target.value)
+                },
+              },
+            }),
+          ]),
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-group row col-md-6" }, [
+          _c(
+            "label",
+            {
+              staticClass: "col-sm-4 col-form-label",
+              attrs: { for: "last_update" },
+            },
+            [_vm._v("Última modificacion")]
+          ),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-sm-8" }, [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.formMainBox.last_update,
+                  expression: "formMainBox.last_update",
+                },
+              ],
+              staticClass: "form-control",
+              attrs: {
+                type: "text",
+                readonly: "",
+                disabled: "",
+                id: "last_update",
+              },
+              domProps: { value: _vm.formMainBox.last_update },
+              on: {
+                input: function ($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(_vm.formMainBox, "last_update", $event.target.value)
+                },
+              },
+            }),
+          ]),
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-group row col-md-6" }, [
+          _c(
+            "label",
+            {
+              staticClass: "col-sm-4 col-form-label",
+              attrs: { for: "last_update" },
+            },
+            [_vm._v("Último editor")]
+          ),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-sm-8" }, [
+            _vm._v(
+              "\n\t\t\t\t\t" +
+                _vm._s(_vm.lastEditor.name) +
+                " " +
+                _vm._s(_vm.lastEditor.last_name) +
+                "\n\t\t\t\t"
+            ),
+          ]),
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-group row col-md-6 h5" }, [
+          _c(
+            "label",
+            {
+              staticClass: "col-sm-4 col-form-label",
+              attrs: { for: "saldo_inicial" },
+            },
+            [_vm._v("Añadir saldo")]
+          ),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-sm-8" }, [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.add_amount,
+                  expression: "add_amount",
+                },
+              ],
+              staticClass: "form-control form-control-lg",
+              attrs: { type: "text", id: "saldo_inicial", placeholder: "$" },
+              domProps: { value: _vm.add_amount },
+              on: {
+                input: function ($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.add_amount = $event.target.value
+                },
+              },
+            }),
+          ]),
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "w-100 text-center" }, [
+          _c(
+            "button",
+            {
+              staticClass: "btn btn-primary",
+              staticStyle: { "min-width": "30%" },
+              attrs: { type: "button" },
+              on: {
+                click: function ($event) {
+                  return _vm.updateBox()
+                },
+              },
+            },
+            [_vm._v("\n\t\t\t\t\tGuardar\n\t\t\t\t")]
+          ),
+        ]),
+      ]),
+    ]),
+  ])
 }
 var staticRenderFns = [
   function () {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "card" }, [
-      _c("div", { staticClass: "card-header text-center" }, [
-        _c("h5", [_vm._v("Caja principal")]),
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "card-body" }, [
-        _c("form", { staticClass: "form-row" }, [
-          _c("div", { staticClass: "form-group row col-md-6" }, [
-            _c(
-              "label",
-              {
-                staticClass: "col-sm-4 col-form-label",
-                attrs: { for: "saldo_inicial" },
-              },
-              [_vm._v("Saldo inicial")]
-            ),
-            _vm._v(" "),
-            _c("div", { staticClass: "col-sm-8" }, [
-              _c("input", {
-                staticClass: "form-control",
-                attrs: {
-                  type: "text",
-                  readonly: "",
-                  id: "saldo_inicial",
-                  placeholder: "$",
-                },
-              }),
-            ]),
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "form-group row col-md-6" }, [
-            _c(
-              "label",
-              {
-                staticClass: "col-sm-4 col-form-label",
-                attrs: { for: "saldo_inicial" },
-              },
-              [_vm._v("Saldo actual")]
-            ),
-            _vm._v(" "),
-            _c("div", { staticClass: "col-sm-8" }, [
-              _c("input", {
-                staticClass: "form-control",
-                attrs: {
-                  type: "text",
-                  readonly: "",
-                  id: "saldo_inicial",
-                  placeholder: "$",
-                },
-              }),
-            ]),
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "form-group row col-md-6" }, [
-            _c(
-              "label",
-              {
-                staticClass: "col-sm-4 col-form-label",
-                attrs: { for: "saldo_inicial" },
-              },
-              [_vm._v("Entradas")]
-            ),
-            _vm._v(" "),
-            _c("div", { staticClass: "col-sm-8" }, [
-              _c("input", {
-                staticClass: "form-control",
-                attrs: {
-                  type: "text",
-                  readonly: "",
-                  id: "saldo_inicial",
-                  placeholder: "$",
-                },
-              }),
-            ]),
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "form-group row col-md-6" }, [
-            _c(
-              "label",
-              {
-                staticClass: "col-sm-4 col-form-label",
-                attrs: { for: "saldo_inicial" },
-              },
-              [_vm._v("Salidas")]
-            ),
-            _vm._v(" "),
-            _c("div", { staticClass: "col-sm-8" }, [
-              _c("input", {
-                staticClass: "form-control",
-                attrs: {
-                  type: "text",
-                  readonly: "",
-                  id: "saldo_inicial",
-                  placeholder: "$",
-                },
-              }),
-            ]),
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "form-group row col-md-6" }, [
-            _c(
-              "label",
-              {
-                staticClass: "col-sm-4 col-form-label",
-                attrs: { for: "saldo_inicial" },
-              },
-              [_vm._v("Última modificacion")]
-            ),
-            _vm._v(" "),
-            _c("div", { staticClass: "col-sm-8" }, [
-              _c("input", {
-                staticClass: "form-control",
-                attrs: {
-                  type: "text",
-                  readonly: "",
-                  disabled: "",
-                  id: "saldo_inicial",
-                  placeholder: "18-09-2016",
-                },
-              }),
-            ]),
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "form-group row col-md-6 h5" }, [
-            _c(
-              "label",
-              {
-                staticClass: "col-sm-4 col-form-label",
-                attrs: { for: "saldo_inicial" },
-              },
-              [_vm._v("Añadir saldo")]
-            ),
-            _vm._v(" "),
-            _c("div", { staticClass: "col-sm-8" }, [
-              _c("input", {
-                staticClass: "form-control form-control-lg",
-                attrs: { type: "text", id: "saldo_inicial", placeholder: "$" },
-              }),
-            ]),
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "w-100 text-center" }, [
-            _c(
-              "button",
-              {
-                staticClass: "btn btn-primary",
-                staticStyle: { "min-width": "30%" },
-                attrs: { type: "button" },
-              },
-              [_vm._v("\n\t\t\t\t\tGuardar\n\t\t\t\t")]
-            ),
-          ]),
-        ]),
-      ]),
+    return _c("div", { staticClass: "card-header text-center" }, [
+      _c("h5", [_vm._v("Caja principal")]),
     ])
   },
 ]

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Headquarter extends Model
 {
 	use HasFactory;
-	
+
 	protected $fillable = [
 		'headquarter',
 		'status',
@@ -20,7 +20,6 @@ class Headquarter extends Model
 		'pos_printer',
 		'box_id'
 	];
-
 
 	public function users()
 	{
