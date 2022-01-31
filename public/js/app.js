@@ -4211,6 +4211,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -4808,7 +4819,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  props: ["number_installments", "interest", "capital"],
+  props: ["number_installments", "interest", "capital", "start_date"],
   // capital value total del prestamo
   //tasa de interest que se compraria
   // plazos numero de pagos
@@ -4872,7 +4883,7 @@ __webpack_require__.r(__webpack_exports__);
     }),
     simulateInstallments: function simulateInstallments() {
       var me = this;
-      axios.get("api/installments/calculate-installments?credit_value=".concat(this.capital, "&interest=").concat(this.interest, "&number_installments=").concat(this.number_installments)).then(function (response) {
+      axios.get("api/installments/calculate-installments?credit_value=".concat(this.capital, "&interest=").concat(this.interest, "&number_installments=").concat(this.number_installments, "&start_date=").concat(this.start_date)).then(function (response) {
         return me.listInstallments = response.data.listInstallments, me.installment_value = response.data.installment;
       });
     }
@@ -71475,310 +71486,357 @@ var render = function () {
           },
         },
         [
-          _c("div", { staticClass: "modal-dialog modal-lg" }, [
-            _c("div", { staticClass: "modal-content" }, [
-              _c("div", { staticClass: "modal-header" }, [
-                _c(
-                  "h5",
-                  {
-                    staticClass: "modal-title",
-                    attrs: { id: "formCreditModalLabel" },
-                  },
-                  [_vm._v("Creditos")]
-                ),
-                _vm._v(" "),
-                _c(
-                  "button",
-                  {
-                    staticClass: "close",
-                    attrs: {
-                      type: "button",
-                      "data-dismiss": "modal",
-                      "aria-label": "Close",
+          _c(
+            "div",
+            { staticClass: "modal-dialog modal-lg modal-dialog-scrollable" },
+            [
+              _c("div", { staticClass: "modal-content" }, [
+                _c("div", { staticClass: "modal-header" }, [
+                  _c(
+                    "h5",
+                    {
+                      staticClass: "modal-title",
+                      attrs: { id: "formCreditModalLabel" },
                     },
-                    on: {
-                      click: function ($event) {
-                        ;(_vm.editar = false), _vm.resetData()
+                    [_vm._v("Creditos")]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "button",
+                    {
+                      staticClass: "close",
+                      attrs: {
+                        type: "button",
+                        "data-dismiss": "modal",
+                        "aria-label": "Close",
+                      },
+                      on: {
+                        click: function ($event) {
+                          ;(_vm.editar = false), _vm.resetData()
+                        },
                       },
                     },
-                  },
-                  [
-                    _c("span", { attrs: { "aria-hidden": "true" } }, [
-                      _vm._v("×"),
-                    ]),
-                  ]
-                ),
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "modal-body" }, [
-                _c(
-                  "form",
-                  [
-                    _c("div", { staticClass: "form-row" }, [
-                      _c("div", { staticClass: "form-group col-md-4" }, [
-                        _vm._m(0),
-                        _vm._v(" "),
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.client_name,
-                              expression: "client_name",
-                            },
-                          ],
-                          staticClass: "form-control",
-                          attrs: { type: "text", disabled: "", readonly: "" },
-                          domProps: { value: _vm.client_name },
-                          on: {
-                            input: function ($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.client_name = $event.target.value
-                            },
-                          },
-                        }),
+                    [
+                      _c("span", { attrs: { "aria-hidden": "true" } }, [
+                        _vm._v("×"),
                       ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "form-group col-md-4" }, [
-                        _vm._m(1),
-                        _vm._v(" "),
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.debtor_name,
-                              expression: "debtor_name",
-                            },
-                          ],
-                          staticClass: "form-control",
-                          attrs: { type: "text", disabled: "", readonly: "" },
-                          domProps: { value: _vm.debtor_name },
-                          on: {
-                            input: function ($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.debtor_name = $event.target.value
-                            },
-                          },
-                        }),
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "form-group col-md-4" }, [
-                        _c("label", { attrs: { for: "description" } }, [
-                          _vm._v("Descripción"),
-                        ]),
-                        _vm._v(" "),
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.formCredit.description,
-                              expression: "formCredit.description",
-                            },
-                          ],
-                          staticClass: "form-control",
-                          attrs: { type: "text", id: "description" },
-                          domProps: { value: _vm.formCredit.description },
-                          on: {
-                            input: function ($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.$set(
-                                _vm.formCredit,
-                                "description",
-                                $event.target.value
-                              )
-                            },
-                          },
-                        }),
-                      ]),
-                      _vm._v(" "),
-                      _c(
-                        "div",
-                        { staticClass: "form-group col-md-4" },
-                        [
-                          _c("label", { attrs: { for: "headquarter_id" } }, [
-                            _vm._v("Sedes"),
-                          ]),
+                    ]
+                  ),
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "modal-body" }, [
+                  _c(
+                    "form",
+                    [
+                      _c("div", { staticClass: "form-row" }, [
+                        _c("div", { staticClass: "form-group col-md-4" }, [
+                          _vm._m(0),
                           _vm._v(" "),
-                          _c("v-select", {
-                            attrs: {
-                              options: _vm.headquarterList.data,
-                              label: "headquarter",
-                              "aria-logname": "{}",
-                              reduce: function (headquarter) {
-                                return headquarter.id
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.client_name,
+                                expression: "client_name",
                               },
-                            },
-                            model: {
-                              value: _vm.formCredit.headquarter_id,
-                              callback: function ($$v) {
-                                _vm.$set(_vm.formCredit, "headquarter_id", $$v)
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "text", disabled: "", readonly: "" },
+                            domProps: { value: _vm.client_name },
+                            on: {
+                              input: function ($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.client_name = $event.target.value
                               },
-                              expression: "formCredit.headquarter_id",
                             },
                           }),
-                        ],
-                        1
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "form-group col-md-4" }, [
+                          _vm._m(1),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.debtor_name,
+                                expression: "debtor_name",
+                              },
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "text", disabled: "", readonly: "" },
+                            domProps: { value: _vm.debtor_name },
+                            on: {
+                              input: function ($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.debtor_name = $event.target.value
+                              },
+                            },
+                          }),
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "form-group col-md-4" }, [
+                          _c("label", { attrs: { for: "description" } }, [
+                            _vm._v("Descripción"),
+                          ]),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.formCredit.description,
+                                expression: "formCredit.description",
+                              },
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "text", id: "description" },
+                            domProps: { value: _vm.formCredit.description },
+                            on: {
+                              input: function ($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  _vm.formCredit,
+                                  "description",
+                                  $event.target.value
+                                )
+                              },
+                            },
+                          }),
+                        ]),
+                        _vm._v(" "),
+                        _c(
+                          "div",
+                          { staticClass: "form-group col-md-4" },
+                          [
+                            _c("label", { attrs: { for: "headquarter_id" } }, [
+                              _vm._v("Sedes"),
+                            ]),
+                            _vm._v(" "),
+                            _c("v-select", {
+                              attrs: {
+                                options: _vm.headquarterList.data,
+                                label: "headquarter",
+                                "aria-logname": "{}",
+                                reduce: function (headquarter) {
+                                  return headquarter.id
+                                },
+                              },
+                              model: {
+                                value: _vm.formCredit.headquarter_id,
+                                callback: function ($$v) {
+                                  _vm.$set(
+                                    _vm.formCredit,
+                                    "headquarter_id",
+                                    $$v
+                                  )
+                                },
+                                expression: "formCredit.headquarter_id",
+                              },
+                            }),
+                          ],
+                          1
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "form-group col-md-4" }, [
+                          _c("label", { attrs: { for: "credit_value" } }, [
+                            _vm._v("Valor Credito"),
+                          ]),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.formCredit.credit_value,
+                                expression: "formCredit.credit_value",
+                              },
+                            ],
+                            staticClass: "form-control",
+                            attrs: {
+                              type: "number",
+                              id: "credit_value",
+                              step: "any",
+                            },
+                            domProps: { value: _vm.formCredit.credit_value },
+                            on: {
+                              input: function ($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  _vm.formCredit,
+                                  "credit_value",
+                                  $event.target.value
+                                )
+                              },
+                            },
+                          }),
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "form-group col-md-4" }, [
+                          _c("label", { attrs: { for: "interest" } }, [
+                            _vm._v("Interes"),
+                          ]),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.formCredit.interest,
+                                expression: "formCredit.interest",
+                              },
+                            ],
+                            staticClass: "form-control",
+                            attrs: {
+                              type: "number",
+                              id: "interest",
+                              step: "any",
+                            },
+                            domProps: { value: _vm.formCredit.interest },
+                            on: {
+                              input: function ($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  _vm.formCredit,
+                                  "interest",
+                                  $event.target.value
+                                )
+                              },
+                            },
+                          }),
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "form-group col-md-4" }, [
+                          _c(
+                            "label",
+                            { attrs: { for: "number_installments" } },
+                            [_vm._v("Cantidad Cuotas")]
+                          ),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.formCredit.number_installments,
+                                expression: "formCredit.number_installments",
+                              },
+                            ],
+                            staticClass: "form-control",
+                            attrs: {
+                              type: "number",
+                              id: "number_installments",
+                            },
+                            domProps: {
+                              value: _vm.formCredit.number_installments,
+                            },
+                            on: {
+                              input: function ($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  _vm.formCredit,
+                                  "number_installments",
+                                  $event.target.value
+                                )
+                              },
+                            },
+                          }),
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "form-group col-md-4" }, [
+                          _c("label", { attrs: { for: "start_date" } }, [
+                            _vm._v("Fecha inicio"),
+                          ]),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.formCredit.start_date,
+                                expression: "formCredit.start_date",
+                              },
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "date", id: "start_date" },
+                            domProps: { value: _vm.formCredit.start_date },
+                            on: {
+                              input: function ($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  _vm.formCredit,
+                                  "start_date",
+                                  $event.target.value
+                                )
+                              },
+                            },
+                          }),
+                        ]),
+                      ]),
+                      _vm._v(" "),
+                      _c("simulator", {
+                        ref: "Simulator",
+                        attrs: {
+                          capital: _vm.formCredit.credit_value,
+                          interest: _vm.formCredit.interest,
+                          number_installments:
+                            _vm.formCredit.number_installments,
+                          start_date: _vm.formCredit.start_date,
+                        },
+                      }),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-secondary",
+                          attrs: { type: "button", "data-dismiss": "modal" },
+                          on: {
+                            click: function ($event) {
+                              _vm.editar = false
+                            },
+                          },
+                        },
+                        [_vm._v("\n\t\t\t\t\t\t\tCerrar\n\t\t\t\t\t\t")]
                       ),
                       _vm._v(" "),
-                      _c("div", { staticClass: "form-group col-md-4" }, [
-                        _c("label", { attrs: { for: "credit_value" } }, [
-                          _vm._v("Valor Credito"),
-                        ]),
-                        _vm._v(" "),
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.formCredit.credit_value,
-                              expression: "formCredit.credit_value",
-                            },
-                          ],
-                          staticClass: "form-control",
-                          attrs: {
-                            type: "number",
-                            id: "credit_value",
-                            step: "any",
-                          },
-                          domProps: { value: _vm.formCredit.credit_value },
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-primary rounded",
+                          attrs: { type: "button" },
                           on: {
-                            input: function ($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.$set(
-                                _vm.formCredit,
-                                "credit_value",
-                                $event.target.value
-                              )
+                            click: function ($event) {
+                              _vm.editar ? _vm.editCredit() : _vm.createCredit()
                             },
-                          },
-                        }),
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "form-group col-md-4" }, [
-                        _c("label", { attrs: { for: "interest" } }, [
-                          _vm._v("Interes"),
-                        ]),
-                        _vm._v(" "),
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.formCredit.interest,
-                              expression: "formCredit.interest",
-                            },
-                          ],
-                          staticClass: "form-control",
-                          attrs: {
-                            type: "number",
-                            id: "interest",
-                            step: "any",
-                          },
-                          domProps: { value: _vm.formCredit.interest },
-                          on: {
-                            input: function ($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.$set(
-                                _vm.formCredit,
-                                "interest",
-                                $event.target.value
-                              )
-                            },
-                          },
-                        }),
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "form-group col-md-4" }, [
-                        _c("label", { attrs: { for: "number_installments" } }, [
-                          _vm._v("Cantidad Cuotas"),
-                        ]),
-                        _vm._v(" "),
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.formCredit.number_installments,
-                              expression: "formCredit.number_installments",
-                            },
-                          ],
-                          staticClass: "form-control",
-                          attrs: { type: "number", id: "number_installments" },
-                          domProps: {
-                            value: _vm.formCredit.number_installments,
-                          },
-                          on: {
-                            input: function ($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.$set(
-                                _vm.formCredit,
-                                "number_installments",
-                                $event.target.value
-                              )
-                            },
-                          },
-                        }),
-                      ]),
-                    ]),
-                    _vm._v(" "),
-                    _c("simulator", {
-                      ref: "Simulator",
-                      attrs: {
-                        capital: _vm.formCredit.credit_value,
-                        interest: _vm.formCredit.interest,
-                        number_installments: _vm.formCredit.number_installments,
-                      },
-                    }),
-                    _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-secondary",
-                        attrs: { type: "button", "data-dismiss": "modal" },
-                        on: {
-                          click: function ($event) {
-                            _vm.editar = false
                           },
                         },
-                      },
-                      [_vm._v("\n\t\t\t\t\t\t\tCerrar\n\t\t\t\t\t\t")]
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-primary rounded",
-                        attrs: { type: "button" },
-                        on: {
-                          click: function ($event) {
-                            _vm.editar ? _vm.editCredit() : _vm.createCredit()
-                          },
-                        },
-                      },
-                      [_vm._v("\n\t\t\t\t\t\t\tGuardar\n\t\t\t\t\t\t")]
-                    ),
-                  ],
-                  1
-                ),
+                        [_vm._v("\n\t\t\t\t\t\t\tGuardar\n\t\t\t\t\t\t")]
+                      ),
+                    ],
+                    1
+                  ),
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "modal-footer" }),
               ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "modal-footer" }),
-            ]),
-          ]),
+            ]
+          ),
         ]
       ),
       _vm._v(" "),
@@ -71965,9 +72023,13 @@ var render = function () {
                             _vm._v(" "),
                             _c("td", [_vm._v(_vm._s(credit.document))]),
                             _vm._v(" "),
-                            _c("td", [_vm._v(_vm._s(credit.credit_value))]),
+                            _c("td", { staticClass: "text-right" }, [
+                              _vm._v("$ " + _vm._s(credit.credit_value)),
+                            ]),
                             _vm._v(" "),
-                            _c("td", [_vm._v(_vm._s(credit.paid_value))]),
+                            _c("td", { staticClass: "text-right" }, [
+                              _vm._v("$ " + _vm._s(credit.paid_value)),
+                            ]),
                             _vm._v(" "),
                             _c("td", [
                               _vm._v(_vm._s(credit.number_installments)),
@@ -72297,7 +72359,10 @@ var render = function () {
     [
       _c(
         "div",
-        { staticClass: "modal-dialog modal-lg", attrs: { role: "document" } },
+        {
+          staticClass: "modal-dialog modal-lg modal-dialog-scrollable",
+          attrs: { role: "document" },
+        },
         [
           _c("div", { staticClass: "modal-content" }, [
             _vm._m(0),

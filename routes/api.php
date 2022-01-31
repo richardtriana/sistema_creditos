@@ -54,10 +54,10 @@ Route::resource('/credits', CreditController::class);
 Route::post('/credits/{credit}/change-status',  [CreditController::class, 'changeStatus']);
 Route::get('/credits/{credit}/installments', [CreditController::class, 'installments']);
 
-Route::get('/installments/calculate-installments', [InstallmentController::class, 'calcularInstallments']);
+Route::get('/installments/calculate-installments', [InstallmentController::class, 'calculateInstallments']);
 Route::post('/installment/{id}/pay-installment', [InstallmentController::class, 'payInstallment']);
 
-Route::get('/print-installment', [PrintTicketController::class, 'printInstallment']);
+Route::get('/print-installment', [PrintTicketController::class, 'printPayment']);
 
 Route::resource('/installments', InstallmentController::class);
 

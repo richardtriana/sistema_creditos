@@ -61,7 +61,7 @@ class CreditController extends Controller
 	{
 
 		$listInstallments = new InstallmentController();
-		$listInstallments = $listInstallments->calcularInstallments($request);
+		$listInstallments = $listInstallments->calculateInstallments($request);
 
 		$user_id = Auth::user();
 
@@ -75,7 +75,7 @@ class CreditController extends Controller
 		$credit->number_paid_installments = $request['number_paid_installments'];
 		$credit->day_limit = $request['day_limit'];
 		$credit->status = 1;
-		$credit->start_date = date('Y-m-d');
+		$credit->start_date = $request['start_date'];
 		$credit->interest = $request['interest'];
 		$credit->annual_interest_percentage = $request['annual_interest_percentage'];
 		$credit->credit_value = $request['credit_value'];
@@ -163,6 +163,7 @@ class CreditController extends Controller
 	{
 		$credit_id = $id;
 		$amount = $request['amount'];
+		$amount_paid = $request['amount'];
 
 		$credit = Credit::findOrFail($credit_id);
 		$listInstallments = $credit->installments()->where('status', '0')->get();
@@ -170,9 +171,25 @@ class CreditController extends Controller
 		for ($i = 0; $i < count($listInstallments) && $amount > 0; $i++) {
 			$pay_installment = new InstallmentController();
 			if ($amount > 0) {
-				$balance =	$pay_installment->payInstallment($listInstallments[$i]['id'], $amount, true);
+				$installment_paid =	$pay_installment->payInstallment($listInstallments[$i]['id'], $amount);
+				$balance = $installment_paid['balance'];
 			}
 			$amount = $balance;
+			$no_installment_paid = $installment_paid['no_installment'];
 		}
+
+		$print_cuota = new PrintTicketController;
+		$print_cuota = $print_cuota->printPayment($id, $amount_paid, $no_installment_paid);
+	}
+
+	public function updateValuesCredit($id, $total_amount, $capital, $interest)
+	{
+		$credit_id = $id;
+		$credit = Credit::findOrFail($credit_id);
+
+		$credit->paid_value = $credit->paid_value + $total_amount;
+		$credit->capital_value = $credit->capital_value + $capital;
+		$credit->interest_value = $credit->interest_value + $interest;
+		$credit->save();
 	}
 }

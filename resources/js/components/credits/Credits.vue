@@ -53,8 +53,8 @@
 							<td>{{ credit.id }}</td>
 							<td>{{ credit.name }} {{ credit.last_name }}</td>
 							<td>{{ credit.document }}</td>
-							<td>{{ credit.credit_value }}</td>
-							<td>{{ credit.paid_value }}</td>
+							<td class="text-right">$ {{ credit.credit_value }}</td>
+							<td class="text-right">$ {{ credit.paid_value }}</td>
 							<td>{{ credit.number_installments }}</td>
 							<td>{{ credit.number_paid_installments }}</td>
 							<td>
