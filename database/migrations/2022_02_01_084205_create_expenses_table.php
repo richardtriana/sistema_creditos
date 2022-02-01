@@ -21,6 +21,7 @@ class CreateExpensesTable extends Migration
 			$table->date('date');
 			$table->string('type_output');
 			$table->double('price');
+			$table->boolean('status')->default(1);
 
 			$table->foreign('headquarter_id')
 				->references('id')

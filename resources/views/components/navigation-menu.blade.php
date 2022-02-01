@@ -28,6 +28,9 @@
                     <router-link class="nav-link text-white" to="/proveedores"> Proveedores </router-link>
                 </li>
                 <li class="nav-item">
+                    <router-link class="nav-link text-white" to="/expenses"> Egresos </router-link>
+                </li>
+                <li class="nav-item">
                     <router-link class="nav-link text-white" to="/boxes"> Cajas </router-link>
                 </li>
                 <li class="nav-item">
