@@ -1,35 +1,45 @@
 html {
-    font-size: $font-size-base;
+	font-size: 14px;
 }
 
 body {
-    font-family: $font-family-sans-serif;
+	font-size: $font-size-base;
+	font-family: $font-family-sans-serif;
 }
 
-@media (min-width:1024px) {
-
-    .container {
-        max-width: 95%;
-    }
+@media (min-width: 1024px) {
+	.container {
+		max-width: 95%;
+	}
 }
 
 h1,
 h2,
 h3 {
-    color: $primary;
+	color: $primary;
 }
 
 .page {
-    width: 100%;
-    padding: 1rem;
+	width: 100%;
+	padding: 1rem;
 }
 
 .page-header,
 .page-search,
 .page-content {
-    width: 100%;
-    padding: 1.5rem;
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
-    border: 1px solid #dee2e6 !important;
+	width: 100%;
+	padding: 1.5rem;
+	margin-top: 1.5rem;
+	margin-bottom: 1.5rem;
+	border: 1px solid #dee2e6 !important;
+}
+
+.truncate {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.wrap {
+	max-width: 400px;
 }

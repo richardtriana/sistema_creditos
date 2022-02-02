@@ -46,7 +46,11 @@
                 >
                   <i class="bi bi-currency-dollar"></i> Abonar a crédito
                 </button>
-                <button v-else class="btn btn-outline-secondary my-auto" disabled>
+                <button
+                  v-else
+                  class="btn btn-outline-secondary my-auto"
+                  disabled
+                >
                   <i class="bi bi-currency-dollar"></i> Abonar a crédito
                 </button>
               </div>
@@ -77,12 +81,14 @@
                 <tr v-for="f in listInstallments" :key="f.id">
                   <th>{{ f.payment_date }}</th>
                   <td>{{ f.installment_number }}</td>
-                  <td>{{ f.value }}</td>
-                  <td>{{ f.capital_value }}</td>
-                  <td>{{ f.interest_value }}</td>
-                  <td>{{ f.late_interests_value }}</td>
+                  <td class="text-right">{{ f.value | dollar }}</td>
+                  <td class="text-right">{{ f.capital_value | dollar }}</td>
+                  <td class="text-right">{{ f.interest_value | dollar }}</td>
+                  <td class="text-right">
+                    {{ f.late_interests_value | dollar }}
+                  </td>
                   <td>{{ f.days_past_due }}</td>
-                  <td>{{ f.paid_balance }}</td>
+                  <td class="text-right">{{ f.paid_balance | dollar }}</td>
                   <td>
                     <span v-if="f.status == 0" class="badge badge-secondary"
                       >Pendiente</span

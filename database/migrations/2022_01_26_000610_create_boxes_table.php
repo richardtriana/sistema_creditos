@@ -20,7 +20,7 @@ class CreateBoxesTable extends Migration
 			$table->float('current_balance', 20, 2)->default(0);
 			$table->float('input', 20, 2)->default(0);
 			$table->float('output', 20, 2)->default(0);
-			$table->char('history', 255)->nullable();
+			$table->text('history')->nullable();
 			$table->date('last_update')->nullable();
 			$table->foreignId('last_editor')->nullable();
 

@@ -15514,10 +15514,11 @@ h3 {
 }
 
 html {
-  font-size: 0.9rem;
+  font-size: 14px;
 }
 
 body {
+  font-size: 0.9rem;
   font-family: "Poppins", sans-serif;
 }
 
@@ -15545,4 +15546,14 @@ h3 {
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
   border: 1px solid #dee2e6 !important;
+}
+
+.truncate {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.wrap {
+  max-width: 400px;
 }

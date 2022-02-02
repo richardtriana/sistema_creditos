@@ -11,11 +11,14 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Swal from 'sweetalert2'
 import vSelect from 'vue-select'
+import { dollarFilter } from './filters';
 
 import 'vue-select/dist/vue-select.css';
-Vue.component('v-select', vSelect)
+
+
 import CKEditor from '@ckeditor/ckeditor5-vue2';
 
+Vue.filter('dollar', dollarFilter)
 
 /**
  * The following block of code may be used to automatically register your
@@ -29,7 +32,7 @@ import CKEditor from '@ckeditor/ckeditor5-vue2';
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 // Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Vue.component('pagination', require('laravel-vue-pagination'));
-
+Vue.component('v-select', vSelect)
 
 Vue.use(VueRouter)
 Vue.use(CKEditor)
@@ -48,6 +51,7 @@ const routes = [
     { path: '/headquarters', component: require('./components/headquarters/Headquarters.vue').default },
     { path: '/company', component: require('./components/configurations/Company.vue').default },
     { path: '/boxes', component: require('./components/boxes/Boxes.vue').default },
+    { path: '/expenses', component: require('./components/expenses/Expenses.vue').default },
 
 
 ]
