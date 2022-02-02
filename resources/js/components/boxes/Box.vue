@@ -4,7 +4,7 @@
 			<div class="card-header">
 				<h5>Cajas relacionadas</h5>
 			</div>
-			<table class="table table-sm table-responsive">
+			<table class="table table-sm table-responsive table-bordered">
 				<thead class="thead-light">
 					<tr>
 						<th scope="col">#</th>
@@ -20,7 +20,7 @@
 					<tr v-for="(box, index) in boxList" :key="index">
 						<th scope="row">{{ index + 1 }}</th>
 						<td>{{ box.headquarter.headquarter }}</td>
-						<td>{{ box.current_balance }}</td>
+						<td class="text-right">{{ box.current_balance | dollar }}</td>
 						<td>{{ box.last_update }}</td>
 						<td>{{ box.last_editor.name }} {{ box.last_editor.last_name }}</td>
 						<td>

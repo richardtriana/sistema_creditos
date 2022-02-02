@@ -14,7 +14,7 @@ class TypeExpenseFactory extends Factory
     public function definition()
     {
         return [
-            'desciption' =>  $this->faker->text(50),
+            'description' =>  $this->faker->text(50),
         ];
     }
 }
