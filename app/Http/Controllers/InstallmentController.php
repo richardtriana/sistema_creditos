@@ -107,19 +107,20 @@ class InstallmentController extends Controller
     //
   }
 
-  public function calcularInstallments(Request $request)
+  public function calculateInstallments(Request $request)
   {
     $capital = $request->credit_value;
     $interest = $request->interest;
     $number_installments = $request->number_installments;
+    $start_date = $request->start_date;
 
     $value = $capital;
     $valor_pago_interes = $interest;
     $installment_number = $number_installments;
 
     $payment_date = [];
-    $fechaActual = date('Y-m-d');
-    $mes_actual =  (date("d-m-Y", strtotime($fechaActual . "+ 1 months")));
+    $fechaInicio = $start_date;
+    $mes_actual =  (date("d-m-Y", strtotime($fechaInicio . "+ 1 months")));
 
     $listInstallments = [];
     $pagoInteres = [];
@@ -157,19 +158,17 @@ class InstallmentController extends Controller
     return ['listInstallments' => $listInstallments, 'installment' => (float) number_format($installment, 2, '.', '')];
   }
 
-  public function payInstallment($id, $amount = null, $late_payment = true)
+  public function payInstallment($id, $amount = null)
   {
-    // echo '<pre>';
-    // var_dump('amount', $amount);
-    // echo '</pre>';
-
-
     $installment = Installment::findOrFail($id);
+    $credit_id = $installment->credit->id;
 
     $now = date("Y-m-d");
     $payment_date = $installment->payment_date;
     $payment_date_sub_month = date("Y-m-d", strtotime($payment_date . "- 1 month"));
     $payment_date_add_days = date("Y-m-d", strtotime($payment_date_sub_month . "+ 5 days"));
+
+    $credit_paid = new CreditController;
 
     // Se verifica si la cuota se paga a tiempo
     if ($payment_date >= $now) {
@@ -180,32 +179,41 @@ class InstallmentController extends Controller
         if ($amount >= $amount_to_pay) {
           $installment->paid_balance = $amount_to_pay;
           $balance =  $amount - $amount_to_pay;
+          $credit_paid = $credit_paid->updateValuesCredit($credit_id, $amount, $amount, 0);
         } else {
           $installment->paid_balance = $amount;
           $balance = 0;
+          $credit_paid = $credit_paid->updateValuesCredit($credit_id, $amount, $amount, 0);
         }
       } else {
 
         // Se cobra interes y capital
         $amount_to_pay = $installment->value;
+        $interest = $amount_to_pay - $installment->capital_value;
+
         if ($amount >= $amount_to_pay) {
           $installment->paid_balance = $amount_to_pay;
           $balance = $amount -  $amount_to_pay;
         } else {
           $installment->paid_balance = $amount;
           $balance = 0;
+          $credit_paid = $credit_paid->updateValuesCredit($credit_id, $amount_to_pay, $interest, 0);
         }
       }
     }
 
     if ($payment_date < $now) {
       $amount_to_pay = $installment->value;
+      $interest = $amount_to_pay - $installment->capital_value;
+
       if ($amount >= $amount_to_pay) {
         $installment->paid_balance = $amount_to_pay;
         $balance = $amount - $amount_to_pay;
+        $credit_paid = $credit_paid->updateValuesCredit($credit_id, $amount_to_pay, $interest, 0);
       } else {
         $installment->paid_balance = $amount;
         $balance = 0;
+        $credit_paid = $credit_paid->updateValuesCredit($credit_id, $amount_to_pay, $interest, 0);
       }
     }
 
@@ -213,10 +221,9 @@ class InstallmentController extends Controller
     $installment->payment_date = date('Y-m-d');
     $installment->save();
 
-    $print_cuota = new PrintTicketController;
-    $print_cuota = $print_cuota->printInstallment($id);
+    $no_installment = $installment->installment_number;
 
-    return $balance;
+    return ['balance' => $balance, 'no_installment' => $no_installment];
   }
 
   public function printTable(Request $request)

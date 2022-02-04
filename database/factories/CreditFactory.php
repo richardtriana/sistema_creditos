@@ -34,12 +34,12 @@ class CreditFactory extends Factory
             'start_date' => $this->faker->date('Y-m-d'),
             'interest' => $this->faker->randomNumber(),
             'annual_interest_percentage' => $this->faker->randomNumber(),
-            'interest' => $this->faker->randomNumber(1,100),
+            'interest' => $this->faker->randomNumber(1, 100),
             'installment_value' => $this->faker->randomNumber(),
             'credit_value' => $this->faker->randomNumber(),
-            'paid_value' => $this->faker->randomNumber(),
-            'capital_value' => $this->faker->randomNumber(),
-            'interest_value' => $this->faker->randomNumber(),
+            'paid_value' => 0,
+            'capital_value' => 0,
+            'interest_value' => 0,
             'description' => $this->faker->text(100),
             'disbursement_date' => $this->faker->date('Y-m-d')
         ];

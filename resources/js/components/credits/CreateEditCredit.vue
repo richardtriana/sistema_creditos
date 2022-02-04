@@ -7,7 +7,7 @@
 			aria-labelledby="formCreditModalLabel"
 			aria-hidden="true"
 		>
-			<div class="modal-dialog modal-lg">
+			<div class="modal-dialog modal-lg modal-dialog-scrollable">
 				<div class="modal-content">
 					<div class="modal-header">
 						<h5 class="modal-title" id="formCreditModalLabel">Creditos</h5>
@@ -121,11 +121,22 @@
 										v-model="formCredit.number_installments"
 									/>
 								</div>
+
+								<div class="form-group col-md-4">
+									<label for="start_date">Fecha inicio</label>
+									<input
+										type="date"
+										class="form-control"
+										id="start_date"
+										v-model="formCredit.start_date"
+									/>
+								</div>
 							</div>
 							<simulator
 								:capital="formCredit.credit_value"
 								:interest="formCredit.interest"
 								:number_installments="formCredit.number_installments"
+								:start_date="formCredit.start_date"
 								ref="Simulator"
 							></simulator>
 							<button
