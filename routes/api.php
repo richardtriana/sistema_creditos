@@ -9,7 +9,7 @@ use App\Http\Controllers\HeadquarterController;
 use App\Http\Controllers\InstallmentController;
 use App\Http\Controllers\MainBoxController;
 use App\Http\Controllers\PrintTicketController;
-use App\Http\Controllers\ProveedorController;
+use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\TypeExpenseController;
 use App\Http\Controllers\UserController;
 use App\Models\Company;
@@ -65,8 +65,9 @@ Route::post('/installment/{id}/pay-installment', [InstallmentController::class, 
 
 Route::resource('/main-box',  MainBoxController::class);
 
-Route::resource('/proveedores',  ProveedorController::class);
-Route::post('/proveedores/{proveedor}/change-status',  [ProveedorController::class, 'changeStatus']);
+Route::resource('/providers',  ProviderController::class);
+Route::post('/providers/{provider}/change-status',  [ProviderController::class, 'changeStatus']);
+Route::post('/providers/filter-provider-list',  [ProviderController::class, 'filterProviderList']);
 
 Route::get('/print-installment', [PrintTicketController::class, 'printInstallment']);
 
