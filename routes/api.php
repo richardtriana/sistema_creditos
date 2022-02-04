@@ -55,12 +55,12 @@ Route::resource('/expenses',  ExpenseController::class);
 Route::post('/expenses/{expense}/change-status',  [ExpenseController::class, 'changeStatus']);
 
 
-Route::resource('/headquarters',  HeadquarterController::class);
 Route::get('/headquarters/list-headquarter',  [HeadquarterController::class, 'listHeadquarter']);
+Route::resource('/headquarters',  HeadquarterController::class);
 Route::post('/headquarters/{headquarter}/change-status',  [HeadquarterController::class, 'changeStatus']);
 
+Route::get('/installments/calculate-installments', [InstallmentController::class, 'calculateInstallments']);
 Route::resource('/installments', InstallmentController::class);
-Route::get('/installments/calculate-installments', [InstallmentController::class, 'calcularInstallments']);
 Route::post('/installment/{id}/pay-installment', [InstallmentController::class, 'payInstallment']);
 
 Route::resource('/main-box',  MainBoxController::class);

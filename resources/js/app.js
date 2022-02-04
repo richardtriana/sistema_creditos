@@ -18,7 +18,7 @@ import 'vue-select/dist/vue-select.css';
 
 import CKEditor from '@ckeditor/ckeditor5-vue2';
 
-Vue.filter('dollar', dollarFilter)
+Vue.filter('currency', dollarFilter)
 
 /**
  * The following block of code may be used to automatically register your

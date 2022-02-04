@@ -16,7 +16,7 @@
 							class="form-control"
 							id="saldo_inicial"
 							placeholder="$"
-							v-model="formMainBox.initial_balance"
+							:value="formMainBox.initial_balance | currency"
 						/>
 					</div>
 				</div>
@@ -32,7 +32,7 @@
 							class="form-control"
 							id="saldo_inicial"
 							placeholder="$"
-							v-model="formMainBox.current_balance"
+							:value="formMainBox.current_balance | currency"
 						/>
 					</div>
 				</div>
@@ -46,7 +46,7 @@
 							class="form-control"
 							id="input"
 							placeholder="$"
-							v-model="formMainBox.input"
+							:value="formMainBox.input| currency"
 						/>
 					</div>
 				</div>
@@ -59,7 +59,7 @@
 							class="form-control"
 							id="output"
 							placeholder="$"
-							v-model="formMainBox.output"
+							:value="formMainBox.output | currency"
 						/>
 					</div>
 				</div>
@@ -75,11 +75,12 @@
 							disabled
 							id="last_update"
 							v-model="formMainBox.last_update"
+							v-if="formMainBox.last_editor"
 						/>
 					</div>
 				</div>
 
-				<div class="form-group row col-md-6">
+				<div class="form-group row col-md-6" v-if="formMainBox.last_editor">
 					<label for="last_update" class="col-sm-4 col-form-label"
 						>Último editor</label
 					>
