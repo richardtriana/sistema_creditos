@@ -20,9 +20,13 @@
 					<tr v-for="(box, index) in boxList" :key="index">
 						<th scope="row">{{ index + 1 }}</th>
 						<td>{{ box.headquarter.headquarter }}</td>
-						<td class="text-right">{{ box.current_balance | dollar }}</td>
+						<td class="text-right">{{ box.current_balance | currency }}</td>
 						<td>{{ box.last_update }}</td>
-						<td>{{ box.last_editor.name }} {{ box.last_editor.last_name }}</td>
+						<td>
+							<span v-if="box.last_editor">
+								{{ box.last_editor.name }} {{ box.last_editor.last_name }}
+							</span>
+						</td>
 						<td>
 							<button
 								type="button"

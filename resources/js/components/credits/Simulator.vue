@@ -30,10 +30,10 @@
 							>
 								<td>No. {{ index + 1 }}</td>
 								<td>$ {{ installment.payment_date }}</td>
-								<td class="text-right">{{ installment.installment_value| dollar }}</td>
-								<td class="text-right">$ {{ installment.pagoCapital | dollar}}</td>
-								<td class="text-right">${{ installment.pagoInteres | dollar}}</td>
-								<td class="text-right">$ {{ installment.saldo_capital| dollar }}</td>
+								<td class="text-right">{{ installment.installment_value| currency }}</td>
+								<td class="text-right">$ {{ installment.pagoCapital | currency}}</td>
+								<td class="text-right">${{ installment.pagoInteres | currency}}</td>
+								<td class="text-right">$ {{ installment.saldo_capital| currency }}</td>
 							</tr>
 						</tbody>
 					</table>

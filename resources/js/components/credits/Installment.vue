@@ -81,14 +81,14 @@
                 <tr v-for="f in listInstallments" :key="f.id">
                   <th>{{ f.payment_date }}</th>
                   <td>{{ f.installment_number }}</td>
-                  <td class="text-right">{{ f.value | dollar }}</td>
-                  <td class="text-right">{{ f.capital_value | dollar }}</td>
-                  <td class="text-right">{{ f.interest_value | dollar }}</td>
+                  <td class="text-right">{{ f.value | currency }}</td>
+                  <td class="text-right">{{ f.capital_value | currency }}</td>
+                  <td class="text-right">{{ f.interest_value | currency }}</td>
                   <td class="text-right">
-                    {{ f.late_interests_value | dollar }}
+                    {{ f.late_interests_value | currency }}
                   </td>
                   <td>{{ f.days_past_due }}</td>
-                  <td class="text-right">{{ f.paid_balance | dollar }}</td>
+                  <td class="text-right">{{ f.paid_balance | currency }}</td>
                   <td>
                     <span v-if="f.status == 0" class="badge badge-secondary"
                       >Pendiente</span
