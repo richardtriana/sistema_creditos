@@ -6,7 +6,7 @@
 				type="button"
 				class="btn btn-primary"
 				data-toggle="modal"
-				data-target="#formProveedorModal"
+				data-target="#formProviderModal"
 			>
 				Crear proveedor
 			</button>
@@ -36,7 +36,7 @@
 							<td>{{ p.last_name }}</td>
 							<td>
 								<span v-if="p.type_document == '1'">Cèdula de ciudadania</span>
-								<span v-if="p.type_document == '2'">Passaporte</span>
+								<span v-if="p.type_document == '2'">Pasaporte</span>
 							</td>
 							<td>{{ p.document }}</td>
 							<td>{{ p.phone_1 }}</td>
@@ -76,7 +76,7 @@
 		</div>
 		<create-edit-provider
 			ref="CreateEditProvider"
-			@listar-proveedores="listProviders(1)"
+			@listar-providers="listProviders(1)"
 		/>
 	</div>
 </template>
@@ -95,12 +95,12 @@ export default {
 	methods: {
 		listProviders(page = 1) {
 			let me = this;
-			axios.get("api/proveedores?page=" + page).then(function (response) {
+			axios.get("api/providers?page=" + page).then(function (response) {
 				me.providerList = response.data;
 			});
 		},
-		showData: function (proveedor) {
-			this.$refs.CreateEditProvider.abirEditarProveedor(proveedor);
+		showData: function (provider) {
+			this.$refs.CreateEditProvider.abirEditarProvider(provider);
 		},
 		changeStatus: function (id) {
 			let me = this;
@@ -113,7 +113,7 @@ export default {
 			}).then((result) => {
 				if (result.isConfirmed) {
 					axios
-						.post(`api/proveedores/${id}/change-status`, null, me.$root.config)
+						.post(`api/providers/${id}/change-status`, null, me.$root.config)
 						.then(function () {
 							me.listProviders(1);
 						});

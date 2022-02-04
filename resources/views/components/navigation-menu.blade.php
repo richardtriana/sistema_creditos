@@ -25,7 +25,7 @@
                     <router-link class="nav-link text-white" to="/headquarters"> Sedes </router-link>
                 </li>
                 <li class="nav-item">
-                    <router-link class="nav-link text-white" to="/proveedores"> Proveedores </router-link>
+                    <router-link class="nav-link text-white" to="/providers"> Proveedores </router-link>
                 </li>
                 <li class="nav-item">
                     <router-link class="nav-link text-white" to="/expenses"> Egresos </router-link>
