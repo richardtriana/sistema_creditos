@@ -31,7 +31,7 @@
               <td>{{ e.user_id }}</td>
               <td>{{ e.date }}</td>
               <td>{{ e.type_output }}</td>
-              <td class="text-right">{{ e.price | dollar }}</td>
+              <td class="text-right">{{ e.price | currency }}</td>
               <td>
                 <button
                   v-if="e.status == 0"

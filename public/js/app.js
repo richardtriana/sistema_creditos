@@ -2572,6 +2572,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
@@ -2799,6 +2803,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+//
 //
 //
 //
@@ -4196,6 +4201,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -4799,7 +4815,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  props: ["number_installments", "interest", "capital"],
+  props: ["number_installments", "interest", "capital", "start_date"],
   // capital value total del prestamo
   //tasa de interest que se compraria
   // plazos numero de pagos
@@ -4863,7 +4879,7 @@ __webpack_require__.r(__webpack_exports__);
     }),
     simulateInstallments: function simulateInstallments() {
       var me = this;
-      axios.get("api/installments/calculate-installments?credit_value=".concat(this.capital, "&interest=").concat(this.interest, "&number_installments=").concat(this.number_installments)).then(function (response) {
+      axios.get("api/installments/calculate-installments?credit_value=".concat(this.capital, "&interest=").concat(this.interest, "&number_installments=").concat(this.number_installments, "&start_date=").concat(this.start_date)).then(function (response) {
         return me.listInstallments = response.data.listInstallments, me.installment_value = response.data.installment;
       });
     }
@@ -6082,7 +6098,7 @@ __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js"); // window
 
 
 
-vue__WEBPACK_IMPORTED_MODULE_5__["default"].filter('dollar', _filters__WEBPACK_IMPORTED_MODULE_2__.dollarFilter);
+vue__WEBPACK_IMPORTED_MODULE_5__["default"].filter('currency', _filters__WEBPACK_IMPORTED_MODULE_2__.dollarFilter);
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -70776,17 +70792,23 @@ var render = function () {
                       _c("td", [_vm._v(_vm._s(box.headquarter.headquarter))]),
                       _vm._v(" "),
                       _c("td", { staticClass: "text-right" }, [
-                        _vm._v(_vm._s(_vm._f("dollar")(box.current_balance))),
+                        _vm._v(_vm._s(_vm._f("currency")(box.current_balance))),
                       ]),
                       _vm._v(" "),
                       _c("td", [_vm._v(_vm._s(box.last_update))]),
                       _vm._v(" "),
                       _c("td", [
-                        _vm._v(
-                          _vm._s(box.last_editor.name) +
-                            " " +
-                            _vm._s(box.last_editor.last_name)
-                        ),
+                        box.last_editor
+                          ? _c("span", [
+                              _vm._v(
+                                "\n\t\t\t\t\t\t\t" +
+                                  _vm._s(box.last_editor.name) +
+                                  " " +
+                                  _vm._s(box.last_editor.last_name) +
+                                  "\n\t\t\t\t\t\t"
+                              ),
+                            ])
+                          : _vm._e(),
                       ]),
                       _vm._v(" "),
                       _c("td", [
@@ -71164,14 +71186,6 @@ var render = function () {
           _vm._v(" "),
           _c("div", { staticClass: "col-sm-8" }, [
             _c("input", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.formMainBox.initial_balance,
-                  expression: "formMainBox.initial_balance",
-                },
-              ],
               staticClass: "form-control",
               attrs: {
                 type: "text",
@@ -71179,18 +71193,8 @@ var render = function () {
                 id: "saldo_inicial",
                 placeholder: "$",
               },
-              domProps: { value: _vm.formMainBox.initial_balance },
-              on: {
-                input: function ($event) {
-                  if ($event.target.composing) {
-                    return
-                  }
-                  _vm.$set(
-                    _vm.formMainBox,
-                    "initial_balance",
-                    $event.target.value
-                  )
-                },
+              domProps: {
+                value: _vm._f("currency")(_vm.formMainBox.initial_balance),
               },
             }),
           ]),
@@ -71208,14 +71212,6 @@ var render = function () {
           _vm._v(" "),
           _c("div", { staticClass: "col-sm-8" }, [
             _c("input", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.formMainBox.current_balance,
-                  expression: "formMainBox.current_balance",
-                },
-              ],
               staticClass: "form-control",
               attrs: {
                 type: "text",
@@ -71223,18 +71219,8 @@ var render = function () {
                 id: "saldo_inicial",
                 placeholder: "$",
               },
-              domProps: { value: _vm.formMainBox.current_balance },
-              on: {
-                input: function ($event) {
-                  if ($event.target.composing) {
-                    return
-                  }
-                  _vm.$set(
-                    _vm.formMainBox,
-                    "current_balance",
-                    $event.target.value
-                  )
-                },
+              domProps: {
+                value: _vm._f("currency")(_vm.formMainBox.current_balance),
               },
             }),
           ]),
@@ -71249,14 +71235,6 @@ var render = function () {
           _vm._v(" "),
           _c("div", { staticClass: "col-sm-8" }, [
             _c("input", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.formMainBox.input,
-                  expression: "formMainBox.input",
-                },
-              ],
               staticClass: "form-control",
               attrs: {
                 type: "text",
@@ -71264,15 +71242,7 @@ var render = function () {
                 id: "input",
                 placeholder: "$",
               },
-              domProps: { value: _vm.formMainBox.input },
-              on: {
-                input: function ($event) {
-                  if ($event.target.composing) {
-                    return
-                  }
-                  _vm.$set(_vm.formMainBox, "input", $event.target.value)
-                },
-              },
+              domProps: { value: _vm._f("currency")(_vm.formMainBox.input) },
             }),
           ]),
         ]),
@@ -71289,14 +71259,6 @@ var render = function () {
           _vm._v(" "),
           _c("div", { staticClass: "col-sm-8" }, [
             _c("input", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.formMainBox.output,
-                  expression: "formMainBox.output",
-                },
-              ],
               staticClass: "form-control",
               attrs: {
                 type: "text",
@@ -71304,15 +71266,7 @@ var render = function () {
                 id: "output",
                 placeholder: "$",
               },
-              domProps: { value: _vm.formMainBox.output },
-              on: {
-                input: function ($event) {
-                  if ($event.target.composing) {
-                    return
-                  }
-                  _vm.$set(_vm.formMainBox, "output", $event.target.value)
-                },
-              },
+              domProps: { value: _vm._f("currency")(_vm.formMainBox.output) },
             }),
           ]),
         ]),
@@ -71328,55 +71282,63 @@ var render = function () {
           ),
           _vm._v(" "),
           _c("div", { staticClass: "col-sm-8" }, [
-            _c("input", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.formMainBox.last_update,
-                  expression: "formMainBox.last_update",
-                },
-              ],
-              staticClass: "form-control",
-              attrs: {
-                type: "text",
-                readonly: "",
-                disabled: "",
-                id: "last_update",
-              },
-              domProps: { value: _vm.formMainBox.last_update },
-              on: {
-                input: function ($event) {
-                  if ($event.target.composing) {
-                    return
-                  }
-                  _vm.$set(_vm.formMainBox, "last_update", $event.target.value)
-                },
-              },
-            }),
+            _vm.formMainBox.last_editor
+              ? _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.formMainBox.last_update,
+                      expression: "formMainBox.last_update",
+                    },
+                  ],
+                  staticClass: "form-control",
+                  attrs: {
+                    type: "text",
+                    readonly: "",
+                    disabled: "",
+                    id: "last_update",
+                  },
+                  domProps: { value: _vm.formMainBox.last_update },
+                  on: {
+                    input: function ($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(
+                        _vm.formMainBox,
+                        "last_update",
+                        $event.target.value
+                      )
+                    },
+                  },
+                })
+              : _vm._e(),
           ]),
         ]),
         _vm._v(" "),
-        _c("div", { staticClass: "form-group row col-md-6" }, [
-          _c(
-            "label",
-            {
-              staticClass: "col-sm-4 col-form-label",
-              attrs: { for: "last_update" },
-            },
-            [_vm._v("Último editor")]
-          ),
-          _vm._v(" "),
-          _c("div", { staticClass: "col-sm-8" }, [
-            _vm._v(
-              "\n\t\t\t\t\t" +
-                _vm._s(_vm.lastEditor.name) +
-                " " +
-                _vm._s(_vm.lastEditor.last_name) +
-                "\n\t\t\t\t"
-            ),
-          ]),
-        ]),
+        _vm.formMainBox.last_editor
+          ? _c("div", { staticClass: "form-group row col-md-6" }, [
+              _c(
+                "label",
+                {
+                  staticClass: "col-sm-4 col-form-label",
+                  attrs: { for: "last_update" },
+                },
+                [_vm._v("Último editor")]
+              ),
+              _vm._v(" "),
+              _c("div", { staticClass: "col-sm-8" }, [
+                _vm._v(
+                  "\n\t\t\t\t\t" +
+                    _vm._s(_vm.lastEditor.name) +
+                    " " +
+                    _vm._s(_vm.lastEditor.last_name) +
+                    "\n\t\t\t\t"
+                ),
+              ]),
+            ])
+          : _vm._e(),
         _vm._v(" "),
         _c("div", { staticClass: "form-group row col-md-6 h5" }, [
           _c(
@@ -73221,310 +73183,357 @@ var render = function () {
           },
         },
         [
-          _c("div", { staticClass: "modal-dialog modal-lg" }, [
-            _c("div", { staticClass: "modal-content" }, [
-              _c("div", { staticClass: "modal-header" }, [
-                _c(
-                  "h5",
-                  {
-                    staticClass: "modal-title",
-                    attrs: { id: "formCreditModalLabel" },
-                  },
-                  [_vm._v("Creditos")]
-                ),
-                _vm._v(" "),
-                _c(
-                  "button",
-                  {
-                    staticClass: "close",
-                    attrs: {
-                      type: "button",
-                      "data-dismiss": "modal",
-                      "aria-label": "Close",
+          _c(
+            "div",
+            { staticClass: "modal-dialog modal-lg modal-dialog-scrollable" },
+            [
+              _c("div", { staticClass: "modal-content" }, [
+                _c("div", { staticClass: "modal-header" }, [
+                  _c(
+                    "h5",
+                    {
+                      staticClass: "modal-title",
+                      attrs: { id: "formCreditModalLabel" },
                     },
-                    on: {
-                      click: function ($event) {
-                        ;(_vm.editar = false), _vm.resetData()
+                    [_vm._v("Creditos")]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "button",
+                    {
+                      staticClass: "close",
+                      attrs: {
+                        type: "button",
+                        "data-dismiss": "modal",
+                        "aria-label": "Close",
+                      },
+                      on: {
+                        click: function ($event) {
+                          ;(_vm.editar = false), _vm.resetData()
+                        },
                       },
                     },
-                  },
-                  [
-                    _c("span", { attrs: { "aria-hidden": "true" } }, [
-                      _vm._v("×"),
-                    ]),
-                  ]
-                ),
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "modal-body" }, [
-                _c(
-                  "form",
-                  [
-                    _c("div", { staticClass: "form-row" }, [
-                      _c("div", { staticClass: "form-group col-md-4" }, [
-                        _vm._m(0),
-                        _vm._v(" "),
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.client_name,
-                              expression: "client_name",
-                            },
-                          ],
-                          staticClass: "form-control",
-                          attrs: { type: "text", disabled: "", readonly: "" },
-                          domProps: { value: _vm.client_name },
-                          on: {
-                            input: function ($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.client_name = $event.target.value
-                            },
-                          },
-                        }),
+                    [
+                      _c("span", { attrs: { "aria-hidden": "true" } }, [
+                        _vm._v("×"),
                       ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "form-group col-md-4" }, [
-                        _vm._m(1),
-                        _vm._v(" "),
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.debtor_name,
-                              expression: "debtor_name",
-                            },
-                          ],
-                          staticClass: "form-control",
-                          attrs: { type: "text", disabled: "", readonly: "" },
-                          domProps: { value: _vm.debtor_name },
-                          on: {
-                            input: function ($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.debtor_name = $event.target.value
-                            },
-                          },
-                        }),
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "form-group col-md-4" }, [
-                        _c("label", { attrs: { for: "description" } }, [
-                          _vm._v("Descripción"),
-                        ]),
-                        _vm._v(" "),
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.formCredit.description,
-                              expression: "formCredit.description",
-                            },
-                          ],
-                          staticClass: "form-control",
-                          attrs: { type: "text", id: "description" },
-                          domProps: { value: _vm.formCredit.description },
-                          on: {
-                            input: function ($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.$set(
-                                _vm.formCredit,
-                                "description",
-                                $event.target.value
-                              )
-                            },
-                          },
-                        }),
-                      ]),
-                      _vm._v(" "),
-                      _c(
-                        "div",
-                        { staticClass: "form-group col-md-4" },
-                        [
-                          _c("label", { attrs: { for: "headquarter_id" } }, [
-                            _vm._v("Sedes"),
-                          ]),
+                    ]
+                  ),
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "modal-body" }, [
+                  _c(
+                    "form",
+                    [
+                      _c("div", { staticClass: "form-row" }, [
+                        _c("div", { staticClass: "form-group col-md-4" }, [
+                          _vm._m(0),
                           _vm._v(" "),
-                          _c("v-select", {
-                            attrs: {
-                              options: _vm.headquarterList.data,
-                              label: "headquarter",
-                              "aria-logname": "{}",
-                              reduce: function (headquarter) {
-                                return headquarter.id
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.client_name,
+                                expression: "client_name",
                               },
-                            },
-                            model: {
-                              value: _vm.formCredit.headquarter_id,
-                              callback: function ($$v) {
-                                _vm.$set(_vm.formCredit, "headquarter_id", $$v)
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "text", disabled: "", readonly: "" },
+                            domProps: { value: _vm.client_name },
+                            on: {
+                              input: function ($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.client_name = $event.target.value
                               },
-                              expression: "formCredit.headquarter_id",
                             },
                           }),
-                        ],
-                        1
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "form-group col-md-4" }, [
+                          _vm._m(1),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.debtor_name,
+                                expression: "debtor_name",
+                              },
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "text", disabled: "", readonly: "" },
+                            domProps: { value: _vm.debtor_name },
+                            on: {
+                              input: function ($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.debtor_name = $event.target.value
+                              },
+                            },
+                          }),
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "form-group col-md-4" }, [
+                          _c("label", { attrs: { for: "description" } }, [
+                            _vm._v("Descripción"),
+                          ]),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.formCredit.description,
+                                expression: "formCredit.description",
+                              },
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "text", id: "description" },
+                            domProps: { value: _vm.formCredit.description },
+                            on: {
+                              input: function ($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  _vm.formCredit,
+                                  "description",
+                                  $event.target.value
+                                )
+                              },
+                            },
+                          }),
+                        ]),
+                        _vm._v(" "),
+                        _c(
+                          "div",
+                          { staticClass: "form-group col-md-4" },
+                          [
+                            _c("label", { attrs: { for: "headquarter_id" } }, [
+                              _vm._v("Sedes"),
+                            ]),
+                            _vm._v(" "),
+                            _c("v-select", {
+                              attrs: {
+                                options: _vm.headquarterList.data,
+                                label: "headquarter",
+                                "aria-logname": "{}",
+                                reduce: function (headquarter) {
+                                  return headquarter.id
+                                },
+                              },
+                              model: {
+                                value: _vm.formCredit.headquarter_id,
+                                callback: function ($$v) {
+                                  _vm.$set(
+                                    _vm.formCredit,
+                                    "headquarter_id",
+                                    $$v
+                                  )
+                                },
+                                expression: "formCredit.headquarter_id",
+                              },
+                            }),
+                          ],
+                          1
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "form-group col-md-4" }, [
+                          _c("label", { attrs: { for: "credit_value" } }, [
+                            _vm._v("Valor Credito"),
+                          ]),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.formCredit.credit_value,
+                                expression: "formCredit.credit_value",
+                              },
+                            ],
+                            staticClass: "form-control",
+                            attrs: {
+                              type: "number",
+                              id: "credit_value",
+                              step: "any",
+                            },
+                            domProps: { value: _vm.formCredit.credit_value },
+                            on: {
+                              input: function ($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  _vm.formCredit,
+                                  "credit_value",
+                                  $event.target.value
+                                )
+                              },
+                            },
+                          }),
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "form-group col-md-4" }, [
+                          _c("label", { attrs: { for: "interest" } }, [
+                            _vm._v("Interes"),
+                          ]),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.formCredit.interest,
+                                expression: "formCredit.interest",
+                              },
+                            ],
+                            staticClass: "form-control",
+                            attrs: {
+                              type: "number",
+                              id: "interest",
+                              step: "any",
+                            },
+                            domProps: { value: _vm.formCredit.interest },
+                            on: {
+                              input: function ($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  _vm.formCredit,
+                                  "interest",
+                                  $event.target.value
+                                )
+                              },
+                            },
+                          }),
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "form-group col-md-4" }, [
+                          _c(
+                            "label",
+                            { attrs: { for: "number_installments" } },
+                            [_vm._v("Cantidad Cuotas")]
+                          ),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.formCredit.number_installments,
+                                expression: "formCredit.number_installments",
+                              },
+                            ],
+                            staticClass: "form-control",
+                            attrs: {
+                              type: "number",
+                              id: "number_installments",
+                            },
+                            domProps: {
+                              value: _vm.formCredit.number_installments,
+                            },
+                            on: {
+                              input: function ($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  _vm.formCredit,
+                                  "number_installments",
+                                  $event.target.value
+                                )
+                              },
+                            },
+                          }),
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "form-group col-md-4" }, [
+                          _c("label", { attrs: { for: "start_date" } }, [
+                            _vm._v("Fecha inicio"),
+                          ]),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.formCredit.start_date,
+                                expression: "formCredit.start_date",
+                              },
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "date", id: "start_date" },
+                            domProps: { value: _vm.formCredit.start_date },
+                            on: {
+                              input: function ($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  _vm.formCredit,
+                                  "start_date",
+                                  $event.target.value
+                                )
+                              },
+                            },
+                          }),
+                        ]),
+                      ]),
+                      _vm._v(" "),
+                      _c("simulator", {
+                        ref: "Simulator",
+                        attrs: {
+                          capital: _vm.formCredit.credit_value,
+                          interest: _vm.formCredit.interest,
+                          number_installments:
+                            _vm.formCredit.number_installments,
+                          start_date: _vm.formCredit.start_date,
+                        },
+                      }),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-secondary",
+                          attrs: { type: "button", "data-dismiss": "modal" },
+                          on: {
+                            click: function ($event) {
+                              _vm.editar = false
+                            },
+                          },
+                        },
+                        [_vm._v("\n\t\t\t\t\t\t\tCerrar\n\t\t\t\t\t\t")]
                       ),
                       _vm._v(" "),
-                      _c("div", { staticClass: "form-group col-md-4" }, [
-                        _c("label", { attrs: { for: "credit_value" } }, [
-                          _vm._v("Valor Credito"),
-                        ]),
-                        _vm._v(" "),
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.formCredit.credit_value,
-                              expression: "formCredit.credit_value",
-                            },
-                          ],
-                          staticClass: "form-control",
-                          attrs: {
-                            type: "number",
-                            id: "credit_value",
-                            step: "any",
-                          },
-                          domProps: { value: _vm.formCredit.credit_value },
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-primary rounded",
+                          attrs: { type: "button" },
                           on: {
-                            input: function ($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.$set(
-                                _vm.formCredit,
-                                "credit_value",
-                                $event.target.value
-                              )
+                            click: function ($event) {
+                              _vm.editar ? _vm.editCredit() : _vm.createCredit()
                             },
-                          },
-                        }),
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "form-group col-md-4" }, [
-                        _c("label", { attrs: { for: "interest" } }, [
-                          _vm._v("Interes"),
-                        ]),
-                        _vm._v(" "),
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.formCredit.interest,
-                              expression: "formCredit.interest",
-                            },
-                          ],
-                          staticClass: "form-control",
-                          attrs: {
-                            type: "number",
-                            id: "interest",
-                            step: "any",
-                          },
-                          domProps: { value: _vm.formCredit.interest },
-                          on: {
-                            input: function ($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.$set(
-                                _vm.formCredit,
-                                "interest",
-                                $event.target.value
-                              )
-                            },
-                          },
-                        }),
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "form-group col-md-4" }, [
-                        _c("label", { attrs: { for: "number_installments" } }, [
-                          _vm._v("Cantidad Cuotas"),
-                        ]),
-                        _vm._v(" "),
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.formCredit.number_installments,
-                              expression: "formCredit.number_installments",
-                            },
-                          ],
-                          staticClass: "form-control",
-                          attrs: { type: "number", id: "number_installments" },
-                          domProps: {
-                            value: _vm.formCredit.number_installments,
-                          },
-                          on: {
-                            input: function ($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.$set(
-                                _vm.formCredit,
-                                "number_installments",
-                                $event.target.value
-                              )
-                            },
-                          },
-                        }),
-                      ]),
-                    ]),
-                    _vm._v(" "),
-                    _c("simulator", {
-                      ref: "Simulator",
-                      attrs: {
-                        capital: _vm.formCredit.credit_value,
-                        interest: _vm.formCredit.interest,
-                        number_installments: _vm.formCredit.number_installments,
-                      },
-                    }),
-                    _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-secondary",
-                        attrs: { type: "button", "data-dismiss": "modal" },
-                        on: {
-                          click: function ($event) {
-                            _vm.editar = false
                           },
                         },
-                      },
-                      [_vm._v("\n\t\t\t\t\t\t\tCerrar\n\t\t\t\t\t\t")]
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-primary rounded",
-                        attrs: { type: "button" },
-                        on: {
-                          click: function ($event) {
-                            _vm.editar ? _vm.editCredit() : _vm.createCredit()
-                          },
-                        },
-                      },
-                      [_vm._v("\n\t\t\t\t\t\t\tGuardar\n\t\t\t\t\t\t")]
-                    ),
-                  ],
-                  1
-                ),
+                        [_vm._v("\n\t\t\t\t\t\t\tGuardar\n\t\t\t\t\t\t")]
+                      ),
+                    ],
+                    1
+                  ),
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "modal-footer" }),
               ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "modal-footer" }),
-            ]),
-          ]),
+            ]
+          ),
         ]
       ),
       _vm._v(" "),
@@ -73713,13 +73722,13 @@ var render = function () {
                             _vm._v(" "),
                             _c("td", { staticClass: "text-right" }, [
                               _vm._v(
-                                _vm._s(_vm._f("dollar")(credit.credit_value))
+                                _vm._s(_vm._f("currency")(credit.credit_value))
                               ),
                             ]),
                             _vm._v(" "),
                             _c("td", { staticClass: "text-right" }, [
                               _vm._v(
-                                _vm._s(_vm._f("dollar")(credit.paid_value))
+                                _vm._s(_vm._f("currency")(credit.paid_value))
                               ),
                             ]),
                             _vm._v(" "),
@@ -74042,7 +74051,10 @@ var render = function () {
     [
       _c(
         "div",
-        { staticClass: "modal-dialog modal-lg", attrs: { role: "document" } },
+        {
+          staticClass: "modal-dialog modal-lg modal-dialog-scrollable",
+          attrs: { role: "document" },
+        },
         [
           _c("div", { staticClass: "modal-content" }, [
             _vm._m(0),
@@ -74151,21 +74163,23 @@ var render = function () {
                         _c("td", [_vm._v(_vm._s(f.installment_number))]),
                         _vm._v(" "),
                         _c("td", { staticClass: "text-right" }, [
-                          _vm._v(_vm._s(_vm._f("dollar")(f.value))),
+                          _vm._v(_vm._s(_vm._f("currency")(f.value))),
                         ]),
                         _vm._v(" "),
                         _c("td", { staticClass: "text-right" }, [
-                          _vm._v(_vm._s(_vm._f("dollar")(f.capital_value))),
+                          _vm._v(_vm._s(_vm._f("currency")(f.capital_value))),
                         ]),
                         _vm._v(" "),
                         _c("td", { staticClass: "text-right" }, [
-                          _vm._v(_vm._s(_vm._f("dollar")(f.interest_value))),
+                          _vm._v(_vm._s(_vm._f("currency")(f.interest_value))),
                         ]),
                         _vm._v(" "),
                         _c("td", { staticClass: "text-right" }, [
                           _vm._v(
                             "\n                  " +
-                              _vm._s(_vm._f("dollar")(f.late_interests_value)) +
+                              _vm._s(
+                                _vm._f("currency")(f.late_interests_value)
+                              ) +
                               "\n                "
                           ),
                         ]),
@@ -74173,7 +74187,7 @@ var render = function () {
                         _c("td", [_vm._v(_vm._s(f.days_past_due))]),
                         _vm._v(" "),
                         _c("td", { staticClass: "text-right" }, [
-                          _vm._v(_vm._s(_vm._f("dollar")(f.paid_balance))),
+                          _vm._v(_vm._s(_vm._f("currency")(f.paid_balance))),
                         ]),
                         _vm._v(" "),
                         _c("td", [
@@ -74376,7 +74390,7 @@ var render = function () {
                       _c("td", { staticClass: "text-right" }, [
                         _vm._v(
                           _vm._s(
-                            _vm._f("dollar")(installment.installment_value)
+                            _vm._f("currency")(installment.installment_value)
                           )
                         ),
                       ]),
@@ -74384,21 +74398,23 @@ var render = function () {
                       _c("td", { staticClass: "text-right" }, [
                         _vm._v(
                           "$ " +
-                            _vm._s(_vm._f("dollar")(installment.pagoCapital))
+                            _vm._s(_vm._f("currency")(installment.pagoCapital))
                         ),
                       ]),
                       _vm._v(" "),
                       _c("td", { staticClass: "text-right" }, [
                         _vm._v(
                           "$" +
-                            _vm._s(_vm._f("dollar")(installment.pagoInteres))
+                            _vm._s(_vm._f("currency")(installment.pagoInteres))
                         ),
                       ]),
                       _vm._v(" "),
                       _c("td", { staticClass: "text-right" }, [
                         _vm._v(
                           "$ " +
-                            _vm._s(_vm._f("dollar")(installment.saldo_capital))
+                            _vm._s(
+                              _vm._f("currency")(installment.saldo_capital)
+                            )
                         ),
                       ]),
                     ])
@@ -74748,7 +74764,7 @@ var render = function () {
                           _c("td", [_vm._v(_vm._s(e.type_output))]),
                           _vm._v(" "),
                           _c("td", { staticClass: "text-right" }, [
-                            _vm._v(_vm._s(_vm._f("dollar")(e.price))),
+                            _vm._v(_vm._s(_vm._f("currency")(e.price))),
                           ]),
                           _vm._v(" "),
                           _c("td", [
@@ -91674,7 +91690,7 @@ Vue.compile = compileToFunctions;
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"axios","version":"0.21.4","description":"Promise based HTTP client for the browser and node.js","main":"index.js","scripts":{"test":"grunt test","start":"node ./sandbox/server.js","build":"NODE_ENV=production grunt build","preversion":"npm test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json","postversion":"git push && git push --tags","examples":"node ./examples/server.js","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","fix":"eslint --fix lib/**/*.js"},"repository":{"type":"git","url":"https://github.com/axios/axios.git"},"keywords":["xhr","http","ajax","promise","node"],"author":"Matt Zabriskie","license":"MIT","bugs":{"url":"https://github.com/axios/axios/issues"},"homepage":"https://axios-http.com","devDependencies":{"coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.3.0","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^23.0.0","grunt-karma":"^4.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^4.0.2","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^6.3.2","karma-chrome-launcher":"^3.1.0","karma-firefox-launcher":"^2.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^4.3.6","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.8","karma-webpack":"^4.0.2","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^8.2.1","sinon":"^4.5.0","terser-webpack-plugin":"^4.2.3","typescript":"^4.0.5","url-search-params":"^0.10.0","webpack":"^4.44.2","webpack-dev-server":"^3.11.0"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"jsdelivr":"dist/axios.min.js","unpkg":"dist/axios.min.js","typings":"./index.d.ts","dependencies":{"follow-redirects":"^1.14.0"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}]}');
+module.exports = JSON.parse('{"_args":[["axios@0.21.4","C:\\\\xampp\\\\htdocs\\\\creditos"]],"_development":true,"_from":"axios@0.21.4","_id":"axios@0.21.4","_inBundle":false,"_integrity":"sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==","_location":"/axios","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"axios@0.21.4","name":"axios","escapedName":"axios","rawSpec":"0.21.4","saveSpec":null,"fetchSpec":"0.21.4"},"_requiredBy":["#DEV:/"],"_resolved":"https://registry.npmjs.org/axios/-/axios-0.21.4.tgz","_spec":"0.21.4","_where":"C:\\\\xampp\\\\htdocs\\\\creditos","author":{"name":"Matt Zabriskie"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"bugs":{"url":"https://github.com/axios/axios/issues"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}],"dependencies":{"follow-redirects":"^1.14.0"},"description":"Promise based HTTP client for the browser and node.js","devDependencies":{"coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.3.0","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^23.0.0","grunt-karma":"^4.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^4.0.2","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^6.3.2","karma-chrome-launcher":"^3.1.0","karma-firefox-launcher":"^2.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^4.3.6","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.8","karma-webpack":"^4.0.2","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^8.2.1","sinon":"^4.5.0","terser-webpack-plugin":"^4.2.3","typescript":"^4.0.5","url-search-params":"^0.10.0","webpack":"^4.44.2","webpack-dev-server":"^3.11.0"},"homepage":"https://axios-http.com","jsdelivr":"dist/axios.min.js","keywords":["xhr","http","ajax","promise","node"],"license":"MIT","main":"index.js","name":"axios","repository":{"type":"git","url":"git+https://github.com/axios/axios.git"},"scripts":{"build":"NODE_ENV=production grunt build","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","examples":"node ./examples/server.js","fix":"eslint --fix lib/**/*.js","postversion":"git push && git push --tags","preversion":"npm test","start":"node ./sandbox/server.js","test":"grunt test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json"},"typings":"./index.d.ts","unpkg":"dist/axios.min.js","version":"0.21.4"}');
 
 /***/ })
 
