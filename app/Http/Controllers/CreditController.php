@@ -21,7 +21,7 @@ class CreditController extends Controller
 		$credits = Credit::select();
 
 		if ($request->credit && ($request->credit != '')) {
-			$credits  =     $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
+			$credits  =   $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
 				->where('document', 'LIKE', "%$request->credit%")
 				->orWhere('name', 'LIKE', "%$request->credit%")
 				->orWhere('email', 'LIKE', "%$request->credit%")
@@ -67,6 +67,7 @@ class CreditController extends Controller
 
 		$credit = new Credit();
 		$credit->client_id = $request['client_id'];
+		$credit->provider_id = $request['provider_id'];
 		$credit->debtor_id = $request['debtor_id'];
 		$credit->user_id = 1;
 		$credit->debtor = $request['debtor'];
@@ -110,6 +111,7 @@ class CreditController extends Controller
 	{
 		$credit = Credit::find($request->id);
 		$credit->client_id = $request['client_id'];
+		$credit->provider_id = $request['provider_id'];
 		$credit->debtor_id = $request['debtor_id'];
 		$credit->debtor = $request['debtor'];
 		$credit->headquarter_id = $request['headquarter_id'];
