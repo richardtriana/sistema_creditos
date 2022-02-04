@@ -26,7 +26,6 @@ class BoxFactory extends Factory
 			'current_balance' => $this->faker->randomNumber(),
 			'input' => $this->faker->randomNumber(),
 			'output' => $this->faker->randomNumber(),
-			'history' => $this->faker->text(200),
 			'last_update' => $this->faker->date('Y-m-d'),
 			'last_editor'  => $this->faker->numberBetween(1, 10)
 		];
