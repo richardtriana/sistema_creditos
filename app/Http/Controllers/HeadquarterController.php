@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Box;
 use App\Models\Headquarter;
 use Illuminate\Http\Request;
 
@@ -58,6 +59,10 @@ class HeadquarterController extends Controller
 		$headquarter->pos_printer = $request['pos_printer'];
 		$headquarter->phone = $request['phone'];
 		$headquarter->save();
+
+		$box = new Box();
+		$box->headquarter_id = $headquarter->id;
+		$box->save();
 	}
 
 	/**
