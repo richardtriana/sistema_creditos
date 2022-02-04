@@ -71,6 +71,29 @@
 								</div>
 
 								<div class="form-group col-md-4">
+									<div class="">
+										<label for="provider_id" class="col-form-label"
+											>Proveedor</label
+										>
+										<button
+											class="btn btn-outline-primary mb-2"
+											type="button"
+											data-toggle="modal"
+											data-target="#addProviderModal"
+										>
+											<i class="bi bi-card-checklist"></i> Añadir Proveedor
+										</button>
+									</div>
+									<input
+										type="text"
+										class="form-control"
+										disabled
+										readonly
+										v-model="provider_name"
+									/>
+								</div>
+
+								<div class="form-group col-md-4">
 									<label for="description">Descripción</label>
 									<input
 										type="text"
@@ -162,25 +185,27 @@
 		</div>
 		<add-client @add-client="receiveClient($event)" />
 		<add-debtor @add-debtor="receiveDebtor($event)" />
+		<add-provider @add-provider="receiveProvider($event)" />
 	</div>
 </template>
 
 <script>
 import AddClient from "../clients/AddClient.vue";
 import AddDebtor from "../clients/AddDebtor.vue";
+import AddProvider from "../providers/AddProvider.vue";
 import Simulator from "./Simulator.vue";
 export default {
-	components: { Simulator, AddClient, AddDebtor },
+	components: { Simulator, AddClient, AddDebtor, AddProvider },
 	data() {
 		return {
 			editar: false,
 			headquarterList: [],
-			clientList: [],
 			formCredit: {
 				client_id: "",
 				debtor_id: "",
 				headquarter_id: "",
 				user_id: "",
+				provider_id: "",
 				number_installments: "",
 				number_paid_installments: "",
 				number_paid_installments: "",
@@ -200,23 +225,17 @@ export default {
 			},
 			client_name: "",
 			debtor_name: "",
+			provider_name: "",
 		};
 	},
 	created() {
 		this.listHeadquarters(1);
-		this.listClients(1);
 	},
 	methods: {
 		listHeadquarters(page = 1) {
 			let me = this;
 			axios.get(`api/headquarters?page=${page}`).then(function (response) {
 				me.headquarterList = response.data;
-			});
-		},
-		listClients(page = 1) {
-			let me = this;
-			axios.get(`api/clients?page=${page}`).then(function (response) {
-				me.clientList = response.data;
 			});
 		},
 		createCredit() {
@@ -251,6 +270,10 @@ export default {
 		receiveDebtor(debtor) {
 			this.formCredit.debtor_id = debtor.id;
 			this.debtor_name = `${debtor.name} ${debtor.last_name}`;
+		},
+		receiveProvider(provider) {
+			this.formCredit.provider_id = provider.id;
+			this.provider_name = `${provider.name} ${provider.last_name}`;
 		},
 		resetData() {
 			let me = this;

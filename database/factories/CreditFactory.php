@@ -26,6 +26,7 @@ class CreditFactory extends Factory
             'user_id' => $this->faker->numberBetween(1, 10),
             'debtor_id' => $this->faker->numberBetween(1, 10),
             'headquarter_id' => $this->faker->numberBetween(1, 3),
+            'provider_id' => $this->faker->numberBetween(1, 3),
             'number_installments' => $this->faker->randomNumber(1, 36),
             'number_paid_installments' => $this->faker->randomNumber(1, 36),
             'day_limit' => $this->faker->randomNumber(),
