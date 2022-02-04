@@ -17,6 +17,7 @@ class CreateCreditsTable extends Migration
             $table->id();
             $table->foreignId('client_id');
             $table->foreignId('debtor_id')->nullable();
+            $table->foreignId('provider_id')->nullable();
             $table->foreignId('headquarter_id');
             $table->foreignId('user_id');
             $table->integer('number_installments');
@@ -48,10 +49,13 @@ class CreateCreditsTable extends Migration
                 ->references('id')
                 ->on('clients');
 
+            $table->foreign('provider_id')
+                ->references('id')
+                ->on('providers');
+
             $table->foreign('user_id')
                 ->references('id')
-                ->on('users')
-                ->onDelete('cascade');
+                ->on('users');
 
             $table->timestamps();
         });

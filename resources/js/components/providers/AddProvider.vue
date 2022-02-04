@@ -24,10 +24,10 @@
             <input
               type="text"
               class="form-control"
-              placeholder="Documento | Nombre de cliente"
+              placeholder="Documento | Nombre de providere"
               aria-label=" with two button addons"
               aria-describedby="button-addon4"
-              v-model="filters.client"
+              v-model="filters.provider"
               @keyup="searchProvider()"
             />
             <div class="input-group-append" id="button-addon4">
@@ -36,7 +36,7 @@
                 type="button"
                 @click="searchProvider()"
               >
-                Buscar Providere
+                Buscar Proveedor
               </button>
             </div>
           </div>
@@ -54,21 +54,21 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="client in ProviderList.data" v-bind:key="client.id">
-                <th scope="row">{{ client.code }}</th>
-                <td>{{ client.name }}</td>
-                <td>{{ client.document }}</td>
-                <td>{{ client.address }}</td>
-                <td>{{ client.mobile }}</td>
-                <td>{{ client.email }}</td>
+              <tr v-for="provider in ProviderList.data" v-bind:key="provider.id">
+                <th scope="row">{{ provider.code }}</th>
+                <td>{{ provider.name }}</td>
+                <td>{{ provider.document }}</td>
+                <td>{{ provider.address }}</td>
+                <td>{{ provider.mobile }}</td>
+                <td>{{ provider.email }}</td>
                 <td>
-                  {{ client.contact }}
+                  {{ provider.contact }}
                 </td>
 
                 <td>
                   <button
                     class="btn btn-outline-secondary"
-                    @click="$emit('add-client', client)"
+                    @click="$emit('add-provider', provider)"
                     data-dismiss="modal"
                   >
                     <i class="bi bi-plus-circle"></i>
@@ -90,12 +90,12 @@
 
 <script>
 export default {
-  name: "add-client",
+  name: "add-provider",
   data() {
     return {
       ProviderList: {},
       filters: {
-        client: "",
+        provider: "",
       },
     };
   },
@@ -106,18 +106,18 @@ export default {
     listProviders() {
       let me = this;
       axios
-        .post("api/clients/filter-client-list", null)
+        .post("api/providers/filter-provider-list", null)
         .then(function (response) {
           me.ProviderList = response;
         });
     },
     searchProvider() {
       let me = this;
-      if (me.filters.client == "") {
+      if (me.filters.provider == "") {
         return false;
       }
-      var url = `api/clients/filter-client-list?client=${me.filters.client}`;
-      if (me.filters.client.length >= 3) {
+      var url = `api/providers/filter-provider-list?provider=${me.filters.provider}`;
+      if (me.filters.provider.length >= 3) {
         axios
           .post(url, null)
           .then(function (response) {
@@ -125,7 +125,6 @@ export default {
           })
           .catch(function (error) {
             $("#no-results").toast("show");
-
             console.log(error);
           });
       }
