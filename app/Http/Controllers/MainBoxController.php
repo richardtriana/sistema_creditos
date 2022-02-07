@@ -96,4 +96,11 @@ class MainBoxController extends Controller
 	{
 		//
 	}
+
+	public function currentBalance()
+	{
+		$main_box = MainBox::first();
+		$current_balance = $main_box->current_balance;
+		return $current_balance;
+	}
 }

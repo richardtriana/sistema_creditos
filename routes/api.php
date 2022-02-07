@@ -54,7 +54,7 @@ Route::get('/credits/{credit}/installments', [CreditController::class, 'installm
 Route::resource('/expenses',  ExpenseController::class);
 Route::post('/expenses/{expense}/change-status',  [ExpenseController::class, 'changeStatus']);
 
-
+Route::get('/headquarters/list-all-headquarters',  [HeadquarterController::class, 'listAllHeadquarters']);
 Route::get('/headquarters/list-headquarter',  [HeadquarterController::class, 'listHeadquarter']);
 Route::resource('/headquarters',  HeadquarterController::class);
 Route::post('/headquarters/{headquarter}/change-status',  [HeadquarterController::class, 'changeStatus']);
@@ -63,6 +63,7 @@ Route::get('/installments/calculate-installments', [InstallmentController::class
 Route::resource('/installments', InstallmentController::class);
 Route::post('/installment/{id}/pay-installment', [InstallmentController::class, 'payInstallment']);
 
+Route::get('/main-box/current-balance', [MainBoxController::class, 'currentBalance']);
 Route::resource('/main-box',  MainBoxController::class);
 
 Route::resource('/providers',  ProviderController::class);
@@ -72,7 +73,6 @@ Route::post('/providers/filter-provider-list',  [ProviderController::class, 'fil
 Route::get('/print-installment', [PrintTicketController::class, 'printInstallment']);
 
 Route::resource('/type-expenses',  TypeExpenseController::class);
-
 
 Route::resource('/users',  UserController::class);
 Route::post('/users/{user}/change-status',  [UserController::class, 'changeStatus']);

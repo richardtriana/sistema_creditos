@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Box;
+use App\Models\MainBox;
 use Illuminate\Http\Request;
 
 class BoxController extends Controller
@@ -92,5 +93,17 @@ class BoxController extends Controller
 	public function destroy(Box $box)
 	{
 		//
+	}
+
+	public function addAmountBox($id, $amount)
+	{
+		$main_box = MainBox::first();
+		$main_box->current_balance = $main_box->current_balance + $amount;
+		$main_box->save();
+
+		$box_id = $id;
+		$box = Box::findOrFail($box_id);
+		$box->current_balance = $box->current_balance + $amount;
+		$box->save();
 	}
 }

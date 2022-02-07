@@ -6,6 +6,7 @@ use App\Models\Client;
 use App\Models\Headquarter;
 use App\Models\Credit;
 use App\Models\Installment;
+use App\Models\MainBox;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -98,6 +99,10 @@ class CreditController extends Controller
 			$installment->capital_value = $new_installment['pagoCapital'];
 			$installment->save();
 		}
+
+		$main_box = MainBox::first();
+		$main_box->current_balance = $main_box->current_balance - $credit->credit_value;
+		$main_box->save();
 	}
 
 	/**
@@ -123,10 +128,6 @@ class CreditController extends Controller
 		$credit->annual_interest_percentage = $request['annual_interest_percentage'];
 		$credit->user_id = $request['user_id'];
 		$credit->installment_value = $request['installment_value'];
-		$credit->credit_value = $request['credit_value'];
-		$credit->paid_value = $request['paid_value'];
-		$credit->capital_value = $request['capital_value'];
-		$credit->interest_value = $request['interest_value'];
 		$credit->description = $request['description'];
 		$credit->disbursement_date = date('Y-m-d');
 		$credit->save();

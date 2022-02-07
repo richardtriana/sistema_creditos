@@ -22,6 +22,14 @@
 					</div>
 					<form>
 						<div class="modal-body">
+							<div class="card text-primary mb-3">
+								<div class="card-header">
+									Saldo máximo permitido:
+									<b>
+										{{ root_data.current_balance_main_box | currency }}
+									</b>
+								</div>
+							</div>
 							<div class="form-group">
 								<label for="current_balance">Saldo disponible</label>
 								<input
@@ -60,6 +68,12 @@
 									class="form-control"
 									id="add_amount"
 									v-model="add_amount"
+									:max="root_data.current_balance_main_box"
+									@keyup="
+										add_amount > root_data.current_balance_main_box
+											? (add_amount = root_data.current_balance_main_box)
+											: (add_amount = add_amount)
+									"
 								/>
 							</div>
 						</div>
@@ -94,9 +108,10 @@ export default {
 			formBox: {},
 			add_amount: 0,
 			headquarterList: {},
+			root_data: this.$root.$data,
 		};
 	},
-	created() {
+	mounted() {
 		this.listHeadquarters(1);
 	},
 	methods: {
@@ -110,7 +125,7 @@ export default {
 		},
 		listHeadquarters() {
 			let me = this;
-			axios.get(`api/headquarters/list-headquarter`).then(function (response) {
+			axios.get(`api/headquarters/list-all-headquarters`).then(function (response) {
 				me.headquarterList = response.data;
 			});
 		},

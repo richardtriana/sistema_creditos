@@ -15,7 +15,7 @@
 							type="button"
 							class="close"
 							data-dismiss="modal"
-							@click="(editar = false), resetData()"
+							@click="(edit = false), resetData()"
 							aria-label="Close"
 						>
 							<span aria-hidden="true">&times;</span>
@@ -47,7 +47,24 @@
 									/>
 								</div>
 
-								<div class="form-group col-md-4">
+								<div
+									class="form-group col-md-3 form-check d-flex align-items-center pl-md-5"
+								>
+									<input
+										type="checkbox"
+										class="form-check-input"
+										id="debtor"
+										v-model="formCredit.debtor"
+									/>
+									<label class="form-check-label" for="debtor"
+										>¿Usa codeudor?</label
+									>
+								</div>
+
+								<div
+									class="form-group col-md-5"
+									:class="[formCredit.debtor ? '' : 'opacity-50']"
+								>
 									<div class="">
 										<label for="debtor_id" class="col-form-label"
 											>Codeudor</label
@@ -57,6 +74,7 @@
 											type="button"
 											data-toggle="modal"
 											data-target="#addDebtorModal"
+											:disabled="!formCredit.debtor"
 										>
 											<i class="bi bi-card-checklist"></i> Añadir codeudor
 										</button>
@@ -69,8 +87,26 @@
 										v-model="debtor_name"
 									/>
 								</div>
+								<div class="col-md-4"></div>
 
-								<div class="form-group col-md-4">
+								<div
+									class="form-group col-md-3 form-check d-flex align-items-center pl-md-5"
+								>
+									<input
+										type="checkbox"
+										class="form-check-input"
+										id="provider"
+										v-model="formCredit.provider"
+									/>
+									<label class="form-check-label" for="provider"
+										>¿Usa Proveedor?</label
+									>
+								</div>
+
+								<div
+									class="form-group col-md-4"
+									:class="[formCredit.provider ? '' : 'opacity-50']"
+								>
 									<div class="">
 										<label for="provider_id" class="col-form-label"
 											>Proveedor</label
@@ -80,6 +116,7 @@
 											type="button"
 											data-toggle="modal"
 											data-target="#addProviderModal"
+											:disabled="!formCredit.provider"
 										>
 											<i class="bi bi-card-checklist"></i> Añadir Proveedor
 										</button>
@@ -106,17 +143,28 @@
 								<div class="form-group col-md-4">
 									<label for="headquarter_id">Sedes</label>
 									<v-select
-										:options="headquarterList.data"
+										:options="headquarterList"
 										label="headquarter"
 										aria-logname="{}"
-										:reduce="(headquarter) => headquarter.id"
+										:reduce="(headquarter) => headquarter"
 										v-model="formCredit.headquarter_id"
+										@input="setSelected"
 									>
 									</v-select>
 								</div>
 								<div class="form-group col-md-4">
 									<label for="credit_value">Valor Credito</label>
 									<input
+										v-if="edit"
+										type="text"
+										class="form-control"
+										id="credit_value"
+										step="any"
+										:value="formCredit.credit_value | currency"
+										:disabled="edit"
+									/>
+									<input
+										v-if="!edit"
 										type="number"
 										class="form-control"
 										id="credit_value"
@@ -125,13 +173,14 @@
 									/>
 								</div>
 								<div class="form-group col-md-4">
-									<label for="interest">Interes</label>
+									<label for="interest">Interés (%)</label>
 									<input
 										type="number"
 										class="form-control"
 										id="interest"
 										v-model="formCredit.interest"
 										step="any"
+										:disabled="edit"
 									/>
 								</div>
 
@@ -142,6 +191,7 @@
 										class="form-control"
 										id="number_installments"
 										v-model="formCredit.number_installments"
+										:disabled="edit"
 									/>
 								</div>
 
@@ -152,6 +202,7 @@
 										class="form-control"
 										id="start_date"
 										v-model="formCredit.start_date"
+										:disabled="edit"
 									/>
 								</div>
 							</div>
@@ -161,19 +212,20 @@
 								:number_installments="formCredit.number_installments"
 								:start_date="formCredit.start_date"
 								ref="Simulator"
+								v-if="!edit"
 							></simulator>
 							<button
 								type="button"
 								class="btn btn-secondary"
 								data-dismiss="modal"
-								@click="editar = false"
+								@click="edit = false"
 							>
 								Cerrar
 							</button>
 							<button
 								type="button"
 								class="btn btn-primary rounded"
-								@click="editar ? editCredit() : createCredit()"
+								@click="edit ? editCredit() : createCredit()"
 							>
 								Guardar
 							</button>
@@ -198,7 +250,7 @@ export default {
 	components: { Simulator, AddClient, AddDebtor, AddProvider },
 	data() {
 		return {
-			editar: false,
+			edit: false,
 			headquarterList: [],
 			formCredit: {
 				client_id: "",
@@ -210,7 +262,8 @@ export default {
 				number_paid_installments: "",
 				number_paid_installments: "",
 				day_limit: "",
-				debtor: "",
+				debtor: 0,
+				provider: 0,
 				status: "1",
 				start_date: "",
 				interest: "",
@@ -232,11 +285,13 @@ export default {
 		this.listHeadquarters(1);
 	},
 	methods: {
-		listHeadquarters(page = 1) {
+		listHeadquarters() {
 			let me = this;
-			axios.get(`api/headquarters?page=${page}`).then(function (response) {
-				me.headquarterList = response.data;
-			});
+			axios
+				.get(`api/headquarters/list-all-headquarters`)
+				.then(function (response) {
+					me.headquarterList = response.data;
+				});
 		},
 		createCredit() {
 			let me = this;
@@ -247,7 +302,7 @@ export default {
 			});
 		},
 		showEditCredit(credit) {
-			this.editar = true;
+			this.edit = true;
 			let me = this;
 			$("#formCreditModal").modal("show");
 			me.formCredit = credit;
@@ -261,7 +316,7 @@ export default {
 					me.resetData();
 				});
 			this.$emit("list-credits");
-			this.editar = false;
+			this.edit = false;
 		},
 		receiveClient(client) {
 			this.formCredit.client_id = client.id;
@@ -280,6 +335,11 @@ export default {
 			Object.keys(this.formCredit).forEach(function (key, index) {
 				me.formCredit[key] = "";
 			});
+		},
+		setSelected(headquarter) {
+			console.log(headquarter);
+			this.formCredit.headquarter_id = headquarter.id;
+			
 		},
 	},
 };

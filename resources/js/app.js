@@ -17,6 +17,7 @@ import 'vue-select/dist/vue-select.css';
 
 
 import CKEditor from '@ckeditor/ckeditor5-vue2';
+import axios from 'axios';
 
 Vue.filter('currency', dollarFilter)
 
@@ -42,22 +43,22 @@ window.Swal = Swal
 
 
 const routes = [
-    { path: '', component: require('./components/Front/Home.vue').default },
-    { path: '/clients', component: require('./components/clients/Clients.vue').default },
-    { path: '/users', component: require('./components/users/Users.vue').default },
-    { path: '/providers', component: require('./components/providers/Providers.vue').default },
-    { path: '/credits', component: require('./components/credits/Credits.vue').default },
-    { path: '/credits/:credit_id/installments', component: require('./components/credits/Installment.vue').default, props: true, name: 'installments' },
-    { path: '/headquarters', component: require('./components/headquarters/Headquarters.vue').default },
-    { path: '/company', component: require('./components/configurations/Company.vue').default },
-    { path: '/boxes', component: require('./components/boxes/Boxes.vue').default },
-    { path: '/expenses', component: require('./components/expenses/Expenses.vue').default },
+	{ path: '', component: require('./components/Front/Home.vue').default },
+	{ path: '/clients', component: require('./components/clients/Clients.vue').default },
+	{ path: '/users', component: require('./components/users/Users.vue').default },
+	{ path: '/providers', component: require('./components/providers/Providers.vue').default },
+	{ path: '/credits', component: require('./components/credits/Credits.vue').default },
+	{ path: '/credits/:credit_id/installments', component: require('./components/credits/Installment.vue').default, props: true, name: 'installments' },
+	{ path: '/headquarters', component: require('./components/headquarters/Headquarters.vue').default },
+	{ path: '/company', component: require('./components/configurations/Company.vue').default },
+	{ path: '/boxes', component: require('./components/boxes/Boxes.vue').default },
+	{ path: '/expenses', component: require('./components/expenses/Expenses.vue').default },
 
 
 ]
 
 const router = new VueRouter({
-    routes // short for `routes: routes`
+	routes // short for `routes: routes`
 })
 
 export default router;
@@ -69,6 +70,19 @@ export default router;
  */
 
 const app = new Vue({
-    el: '#app',
-    router
+	el: '#app',
+	router,
+	data: {
+		current_balance_main_box: 0
+	},
+	methods: {
+		getCurrentBalanceMainBox() {
+			axios.get(`api/main-box/current-balance`).then(response => {
+				this.current_balance_main_box = response.data;
+			})
+		}
+	},
+	mounted() {
+		this.getCurrentBalanceMainBox();
+	}
 });

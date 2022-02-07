@@ -15557,3 +15557,7 @@ h3 {
 .wrap {
   max-width: 400px;
 }
+
+.opacity-50 {
+  opacity: 0.5;
+}
