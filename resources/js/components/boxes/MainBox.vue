@@ -46,7 +46,7 @@
 							class="form-control"
 							id="input"
 							placeholder="$"
-							:value="formMainBox.input| currency"
+							:value="formMainBox.input | currency"
 						/>
 					</div>
 				</div>
@@ -103,7 +103,12 @@
 					</div>
 				</div>
 				<div class="w-100 text-center">
-					<button class="btn btn-primary" type="button" style="min-width: 30%" @click="updateBox()">
+					<button
+						class="btn btn-primary"
+						type="button"
+						style="min-width: 30%"
+						@click="updateBox()"
+					>
 						Guardar
 					</button>
 				</div>

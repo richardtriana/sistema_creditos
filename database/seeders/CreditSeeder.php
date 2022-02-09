@@ -17,7 +17,7 @@ class CreditSeeder extends Seeder
     {
         Credit::factory()
         ->has(Installment::factory()->count(3))
-        ->count(10)
+        ->count(1)
         ->create();
     }
 }

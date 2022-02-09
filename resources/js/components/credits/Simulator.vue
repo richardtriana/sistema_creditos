@@ -30,10 +30,18 @@
 							>
 								<td>No. {{ index + 1 }}</td>
 								<td>$ {{ installment.payment_date }}</td>
-								<td class="text-right">{{ installment.installment_value| currency }}</td>
-								<td class="text-right">$ {{ installment.pagoCapital | currency}}</td>
-								<td class="text-right">${{ installment.pagoInteres | currency}}</td>
-								<td class="text-right">$ {{ installment.saldo_capital| currency }}</td>
+								<td class="text-right">
+									{{ installment.installment_value | currency }}
+								</td>
+								<td class="text-right">
+									$ {{ installment.pagoCapital | currency }}
+								</td>
+								<td class="text-right">
+									${{ installment.pagoInteres | currency }}
+								</td>
+								<td class="text-right">
+									$ {{ installment.saldo_capital | currency }}
+								</td>
 							</tr>
 						</tbody>
 					</table>
@@ -53,8 +61,6 @@
 </template>
 
 <script>
-import moment from "moment";
-
 export default {
 	props: ["number_installments", "interest", "capital", "start_date"],
 	// capital value total del prestamo

@@ -124,18 +124,18 @@
               class="alert alert-danger"
               style="margin: 2px auto; width: 30%"
             >
-              <p>No se encontraron resultados.</p>
-              <p>Crear user.</p>
+              <p>No se encontraron cleintes con creditos.</p>
+              <p>Crear cliente.</p>
             </div>
             <div class="alert alert-info" style="margin: 2px auto; width: 30%">
-              Crear un nuevo Client
+              Crear un nuevo Cliente
               <button
                 type="button"
-                class="btn btn-success"
+                class="btn btn-primary"
                 data-toggle="modal"
                 data-target="#formClientModal"
               >
-                Crear Client
+                Crear cliente
               </button>
             </div>
           </div>
@@ -154,7 +154,11 @@
       </section>
     </div>
 
-    <!-- <create-edit-client ref="CreateEditClient" @list-clients="listCredits(1)" /> -->
+    <modal-create-edit-client
+      ref="ModalCreateEditClient"
+      @list-clients="listCredits(1)"
+    />
+
     <create-edit-credit ref="CreateEditCredit" @list-credits="listCredits(1)" />
 
     <installment ref="Installment" />
@@ -163,11 +167,17 @@
 <script>
 import CreateEditCredit from "./CreateEditCredit.vue";
 import Simulator from "./Simulator.vue";
-import CreateEditClient from "./../clients/CreateEditClient.vue";
+
 import Installment from "./Installment.vue";
+import ModalCreateEditClient from "../clients/ModalCreateEditClient.vue";
 
 export default {
-  components: { CreateEditCredit, Simulator, CreateEditClient, Installment },
+  components: {
+    CreateEditCredit,
+    Simulator,
+    ModalCreateEditClient,
+    Installment,
+  },
 
   props: {
     installment: {
@@ -211,7 +221,7 @@ export default {
       this.$refs.Installment.listCreditInstallments(credit);
     },
     showDataClient: function (client) {
-      this.$refs.CreateEditClient.showEditClient(client);
+      this.$refs.ModalCreateEditClient.showEditClient(client);
     },
     changeStatus: function (id) {
       let me = this;

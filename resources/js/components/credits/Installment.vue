@@ -78,31 +78,37 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="f in listInstallments" :key="f.id">
-                  <th>{{ f.payment_date }}</th>
-                  <td>{{ f.installment_number }}</td>
-                  <td class="text-right">{{ f.value | currency }}</td>
-                  <td class="text-right">{{ f.capital_value | currency }}</td>
-                  <td class="text-right">{{ f.interest_value | currency }}</td>
+                <tr v-for="quote in listInstallments" :key="quote.id">
+                  <th>{{ quote.payment_date }}</th>
+                  <td>{{ quote.installment_number }}</td>
+                  <td class="text-right">{{ quote.value | currency }}</td>
                   <td class="text-right">
-                    {{ f.late_interests_value | currency }}
+                    {{ quote.capital_value | currency }}
                   </td>
-                  <td>{{ f.days_past_due }}</td>
-                  <td class="text-right">{{ f.paid_balance | currency }}</td>
+                  <td class="text-right">
+                    {{ quote.interest_value | currency }}
+                  </td>
+                  <td class="text-right">
+                    {{ quote.late_interests_value | currency }}
+                  </td>
+                  <td>{{ quote.days_past_due }}</td>
+                  <td class="text-right">
+                    {{ quote.paid_balance | currency }}
+                  </td>
                   <td>
-                    <span v-if="f.status == 0" class="badge badge-secondary"
+                    <span v-if="quote.status == 0" class="badge badge-secondary"
                       >Pendiente</span
                     >
-                    <span v-if="f.status == 1" class="badge badge-success"
+                    <span v-if="quote.status == 1" class="badge badge-success"
                       >Pagado</span
                     >
                   </td>
                   <td>
                     <button
-                      @click="payInstallment(f.id)"
+                      @click="payInstallment(quote)"
                       type="button"
                       class="btn btn-sm btn-success"
-                      v-if="f.status == 0"
+                      v-if="quote.status == 0"
                     >
                       Pagar
                     </button>
@@ -118,7 +124,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">
-            Close
+            Cerrar
           </button>
         </div>
       </div>
@@ -146,20 +152,41 @@ export default {
         });
     },
 
-    payInstallment(id) {
+    payInstallment(quote) {
       let me = this;
-      axios.post(`api/installment/${id}/pay-installment`).then(function () {
-        me.listCreditInstallments(me.id_credit);
-      });
+      var data = {
+        amount: quote.value,
+      };
+      if (quote.value > 0) {
+        axios
+          .post(`api/installment/${quote.id}/pay-installment`, data)
+          .then(function () {
+            me.listCreditInstallments(me.id_credit);
+          });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "El valor debe ser mayor a 0 ",
+        });
+      }
     },
 
     payCredit() {
       var data = {
         amount: this.amount_value,
       };
-      axios
-        .post(`api/credits/pay-credit-installments/${this.id_credit}`, data)
-        .then(this.listCreditInstallments(this.id_credit));
+      if (this.amount_value > 0) {
+        axios
+          .post(`api/credits/pay-credit-installments/${this.id_credit}`, data)
+          .then(this.listCreditInstallments(this.id_credit));
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "El valor debe ser mayor a 0 ",
+        });
+      }
     },
 
     printTable() {

@@ -132,4 +132,10 @@ class HeadquarterController extends Controller
 		$headquarters = Headquarter::select()->where('status', 1)->get();
 		return $headquarters;
 	}
+
+	public function listAllHeadquarters()
+	{
+		$headquarters = Headquarter::select()->get();
+		return $headquarters;
+	}
 }

@@ -18,8 +18,8 @@ class HeadquarterSeeder extends Seeder
     public function run()
     {
         Headquarter::factory()
-            ->has(User::factory()->count(3))
-            ->count(5)
+            // ->has(User::factory()->count(1))
+            ->count(1)
             ->create();
     }
 }
