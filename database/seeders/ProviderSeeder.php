@@ -16,7 +16,7 @@ class ProviderSeeder extends Seeder
   {
     //
     Provider::factory()
-    ->count(10)
-    ->create();
+      ->count(1)
+      ->create();
   }
 }

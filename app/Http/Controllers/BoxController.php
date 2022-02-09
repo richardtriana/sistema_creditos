@@ -82,6 +82,9 @@ class BoxController extends Controller
 		}
 		$box->current_balance = $box->current_balance + $amount;
 		$box->save();
+
+		$update_main_box = new MainBoxController();
+		$update_main_box->subAmountMainBox($amount);
 	}
 
 	/**
@@ -97,13 +100,19 @@ class BoxController extends Controller
 
 	public function addAmountBox($id, $amount)
 	{
-		$main_box = MainBox::first();
-		$main_box->current_balance = $main_box->current_balance + $amount;
-		$main_box->save();
-
 		$box_id = $id;
 		$box = Box::findOrFail($box_id);
 		$box->current_balance = $box->current_balance + $amount;
+		$box->input = $box->input + $amount;
+		$box->save();
+	}
+
+	public function subAmountBox($id, $amount)
+	{
+		$box_id = $id;
+		$box = Box::findOrFail($box_id);
+		$box->current_balance = $box->current_balance - $amount;
+		$box->output = $box->output + $amount;
 		$box->save();
 	}
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Box;
 use App\Models\Client;
 use App\Models\Headquarter;
 use App\Models\Credit;
@@ -174,7 +175,7 @@ class CreditController extends Controller
 		for ($i = 0; $i < count($listInstallments) && $amount > 0; $i++) {
 			$pay_installment = new InstallmentController();
 			if ($amount > 0) {
-				$installment_paid =	$pay_installment->payInstallment($listInstallments[$i]['id'], $amount);
+				$installment_paid =	$pay_installment->payInstallment($listInstallments[$i]['id'], $amount, $request);
 				$balance = $installment_paid['balance'];
 			}
 			$amount = $balance;
@@ -183,12 +184,20 @@ class CreditController extends Controller
 
 		$print_cuota = new PrintTicketController;
 		$print_cuota = $print_cuota->printPayment($id, $amount_paid, $no_installment_paid);
+
+		return 'ok';
 	}
 
 	public function updateValuesCredit($id, $total_amount, $capital, $interest)
 	{
 		$credit_id = $id;
 		$credit = Credit::findOrFail($credit_id);
+		$headquarter_id = $credit->headquarter->id;
+
+		$box = Box::where('headquarter_id', $headquarter_id)->firstOrFail();
+		
+		$add_amount_box = new BoxController();
+		$add_amount_box->addAmountBox($box->id, $total_amount);
 
 		$credit->paid_value = $credit->paid_value + $total_amount;
 		$credit->capital_value = $credit->capital_value + $capital;

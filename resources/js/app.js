@@ -58,7 +58,8 @@ const routes = [
 ]
 
 const router = new VueRouter({
-	routes // short for `routes: routes`
+	routes, // short for `routes: routes`
+	linkActiveClass: "active",
 })
 
 export default router;
@@ -78,7 +79,7 @@ const app = new Vue({
 	methods: {
 		getCurrentBalanceMainBox() {
 			axios.get(`api/main-box/current-balance`).then(response => {
-				this.current_balance_main_box = response.data;
+				return this.current_balance_main_box = response.data;
 			})
 		}
 	},

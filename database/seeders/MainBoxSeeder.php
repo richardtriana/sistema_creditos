@@ -15,7 +15,7 @@ class MainBoxSeeder extends Seeder
     public function run()
     {
         MainBox::factory()
-			->count(10)
+			->count(1)
 			->create();
     }
 }

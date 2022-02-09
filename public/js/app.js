@@ -2306,9 +2306,24 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  data: function data() {
+    return {
+      root_data: this.$root.$data
+    };
+  },
   components: {
     MainBox: _MainBox_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
     Box: _Box_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
@@ -2328,6 +2343,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2475,6 +2501,13 @@ __webpack_require__.r(__webpack_exports__);
       Object.keys(this.formBox).forEach(function (key, index) {
         me.formBox[key] = "";
       });
+    },
+    cashRegister: function cashRegister(box) {
+      var _this = this;
+
+      axios.post("api/main-box/cash-register/".concat(box.id), box).then(function () {
+        return _this.$emit("list-boxes");
+      })["finally"]($("#boxModal").modal("hide"));
     }
   }
 });
@@ -3983,6 +4016,31 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -4009,9 +4067,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         number_installments: "",
         number_paid_installments: ""
       }, _defineProperty(_formCredit, "number_paid_installments", ""), _defineProperty(_formCredit, "day_limit", ""), _defineProperty(_formCredit, "debtor", 0), _defineProperty(_formCredit, "provider", 0), _defineProperty(_formCredit, "status", "1"), _defineProperty(_formCredit, "start_date", ""), _defineProperty(_formCredit, "interest", ""), _defineProperty(_formCredit, "annual_interest_percentage", 0), _defineProperty(_formCredit, "installment_value", ""), _defineProperty(_formCredit, "credit_value", ""), _defineProperty(_formCredit, "paid_value", ""), _defineProperty(_formCredit, "capital_value", ""), _defineProperty(_formCredit, "interest_value", ""), _defineProperty(_formCredit, "description", ""), _defineProperty(_formCredit, "disbursement_date", ""), _formCredit),
-      client_name: "",
-      debtor_name: "",
-      provider_name: ""
+      client_name: "Agregar con el botón",
+      debtor_name: "Agregar con el botón",
+      provider_name: "Agregar con el botón",
+      root_data: this.$root.$data
     };
   },
   created: function created() {
@@ -4029,7 +4088,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       axios.post("api/credits", this.formCredit).then(function () {
         $("#formCreditModal").modal("hide");
         me.resetData();
-        this.$emit("list-credits");
+        me.$emit("list-credits");
       });
     },
     showEditCredit: function showEditCredit(credit) {
@@ -4064,10 +4123,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       Object.keys(this.formCredit).forEach(function (key, index) {
         me.formCredit[key] = "";
       });
-    },
-    setSelected: function setSelected(headquarter) {
-      console.log(headquarter);
-      this.formCredit.headquarter_id = headquarter.id;
     }
   }
 });
@@ -4087,8 +4142,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _CreateEditCredit_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CreateEditCredit.vue */ "./resources/js/components/credits/CreateEditCredit.vue");
 /* harmony import */ var _Simulator_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Simulator.vue */ "./resources/js/components/credits/Simulator.vue");
-/* harmony import */ var _clients_CreateEditClient_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./../clients/CreateEditClient.vue */ "./resources/js/components/clients/CreateEditClient.vue");
-/* harmony import */ var _Installment_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Installment.vue */ "./resources/js/components/credits/Installment.vue");
+/* harmony import */ var _Installment_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Installment.vue */ "./resources/js/components/credits/Installment.vue");
+/* harmony import */ var _clients_ModalCreateEditClient_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../clients/ModalCreateEditClient.vue */ "./resources/js/components/clients/ModalCreateEditClient.vue");
+//
+//
+//
+//
 //
 //
 //
@@ -4259,8 +4318,8 @@ __webpack_require__.r(__webpack_exports__);
   components: {
     CreateEditCredit: _CreateEditCredit_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
     Simulator: _Simulator_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
-    CreateEditClient: _clients_CreateEditClient_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
-    Installment: _Installment_vue__WEBPACK_IMPORTED_MODULE_3__["default"]
+    ModalCreateEditClient: _clients_ModalCreateEditClient_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
+    Installment: _Installment_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   props: {
     installment: {
@@ -4302,7 +4361,7 @@ __webpack_require__.r(__webpack_exports__);
       this.$refs.Installment.listCreditInstallments(credit);
     },
     showDataClient: function showDataClient(client) {
-      this.$refs.CreateEditClient.showEditClient(client);
+      this.$refs.ModalCreateEditClient.showEditClient(client);
     },
     changeStatus: function changeStatus(id) {
       var me = this;
@@ -4474,6 +4533,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -4491,17 +4556,38 @@ __webpack_require__.r(__webpack_exports__);
         me.listInstallments = response.data;
       });
     },
-    payInstallment: function payInstallment(id) {
+    payInstallment: function payInstallment(quote) {
       var me = this;
-      axios.post("api/installment/".concat(id, "/pay-installment"), this.amount_value).then(function () {
-        me.listCreditInstallments(me.id_credit);
-      });
+      var data = {
+        amount: quote.value
+      };
+
+      if (quote.value > 0) {
+        axios.post("api/installment/".concat(quote.id, "/pay-installment"), data).then(function () {
+          me.listCreditInstallments(me.id_credit);
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "El valor debe ser mayor a 0 "
+        });
+      }
     },
     payCredit: function payCredit() {
       var data = {
         amount: this.amount_value
       };
-      axios.post("api/credits/pay-credit-installments/".concat(this.id_credit), data).then(this.listCreditInstallments(this.id_credit));
+
+      if (this.amount_value > 0) {
+        axios.post("api/credits/pay-credit-installments/".concat(this.id_credit), data).then(this.listCreditInstallments(this.id_credit));
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "El valor debe ser mayor a 0 "
+        });
+      }
     },
     printTable: function printTable() {
       var _this = this;
@@ -4680,6 +4766,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _type_expenses_CreateEditTypeExpense_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./type-expenses/CreateEditTypeExpense.vue */ "./resources/js/components/expenses/type-expenses/CreateEditTypeExpense.vue");
+//
+//
 //
 //
 //
@@ -6401,8 +6489,9 @@ var routes = [{
   component: __webpack_require__(/*! ./components/expenses/Expenses.vue */ "./resources/js/components/expenses/Expenses.vue")["default"]
 }];
 var router = new vue_router__WEBPACK_IMPORTED_MODULE_7__["default"]({
-  routes: routes // short for `routes: routes`
-
+  routes: routes,
+  // short for `routes: routes`
+  linkActiveClass: "active"
 });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (router);
 /**
@@ -6422,7 +6511,7 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_6__["default"]({
       var _this = this;
 
       axios__WEBPACK_IMPORTED_MODULE_5___default().get("api/main-box/current-balance").then(function (response) {
-        _this.current_balance_main_box = response.data;
+        return _this.current_balance_main_box = response.data;
       });
     }
   },
@@ -49211,7 +49300,19 @@ var render = function () {
     _c(
       "div",
       { staticClass: "page-content" },
-      [_c("main-box"), _vm._v(" "), _c("box")],
+      [
+        _c("main-box"),
+        _vm._v(" "),
+        _vm.root_data.current_balance_main_box > 0 ? _c("box") : _vm._e(),
+        _vm._v(" "),
+        _vm.root_data.current_balance_main_box <= 0
+          ? _c(
+              "div",
+              { staticClass: "card w-100 mt-5 bg-warning text-white" },
+              [_vm._m(1)]
+            )
+          : _vm._e(),
+      ],
       1
     ),
   ])
@@ -49222,7 +49323,23 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "page-header" }, [
-      _c("h3", [_vm._v("\n\t\t\tCajas\n\t\t")]),
+      _c("h3", [_vm._v("Cajas")]),
+    ])
+  },
+  function () {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "card-body" }, [
+      _c("i", { staticClass: "bi bi-exclamation-diamond-fill" }),
+      _vm._v(" "),
+      _c("div", { staticClass: "h5" }, [
+        _vm._v(
+          "\n          Debe añadir saldo a la caja principal para visualizar las otras cajas\n        "
+        ),
+      ]),
+      _vm._v(" "),
+      _c("span", [_vm._v("Por favor, recargue la página al finalizar")]),
     ])
   },
 ]
@@ -49270,17 +49387,17 @@ var render = function () {
                 _c("div", { staticClass: "card text-primary mb-3" }, [
                   _c("div", { staticClass: "card-header" }, [
                     _vm._v(
-                      "\n\t\t\t\t\t\t\t\tSaldo máximo permitido:\n\t\t\t\t\t\t\t\t"
+                      "\n                Saldo máximo permitido:\n                "
                     ),
                     _c("b", [
                       _vm._v(
-                        "\n\t\t\t\t\t\t\t\t\t" +
+                        "\n                  " +
                           _vm._s(
                             _vm._f("currency")(
                               _vm.root_data.current_balance_main_box
                             )
                           ) +
-                          "\n\t\t\t\t\t\t\t\t"
+                          "\n                "
                       ),
                     ]),
                   ]),
@@ -49372,9 +49489,9 @@ var render = function () {
                         },
                         [
                           _vm._v(
-                            "\n\t\t\t\t\t\t\t\t\t" +
+                            "\n                  " +
                               _vm._s(headquarter.headquarter) +
-                              "\n\t\t\t\t\t\t\t\t"
+                              "\n                "
                           ),
                         ]
                       )
@@ -49420,6 +49537,25 @@ var render = function () {
                       },
                     },
                   }),
+                  _vm._v(" "),
+                  _c(
+                    "small",
+                    {
+                      staticClass: "form-text text-muted",
+                      attrs: { id: "addAmountHelpBlock" },
+                    },
+                    [
+                      _vm._v(
+                        "\n                Monto máximo\n                " +
+                          _vm._s(
+                            _vm._f("currency")(
+                              _vm.root_data.current_balance_main_box
+                            )
+                          ) +
+                          "\n              "
+                      ),
+                    ]
+                  ),
                 ]),
               ]),
               _vm._v(" "),
@@ -49427,10 +49563,19 @@ var render = function () {
                 _c(
                   "button",
                   {
-                    staticClass: "btn btn-secondary",
-                    attrs: { type: "button", "data-dismiss": "modal" },
+                    staticClass: "btn btn-primary",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function ($event) {
+                        return _vm.cashRegister(_vm.formBox)
+                      },
+                    },
                   },
-                  [_vm._v("\n\t\t\t\t\t\t\tCerrar\n\t\t\t\t\t\t")]
+                  [
+                    _vm._v(
+                      "\n              Realizar Arqueo de caja\n            "
+                    ),
+                  ]
                 ),
                 _vm._v(" "),
                 _c(
@@ -49444,7 +49589,16 @@ var render = function () {
                       },
                     },
                   },
-                  [_vm._v("\n\t\t\t\t\t\t\tGuardar\n\t\t\t\t\t\t")]
+                  [_vm._v("\n              Guardar\n            ")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-secondary",
+                    attrs: { type: "button", "data-dismiss": "modal" },
+                  },
+                  [_vm._v("\n              Cerrar\n            ")]
                 ),
               ]),
             ]),
@@ -51588,7 +51742,7 @@ var render = function () {
                           "div",
                           {
                             staticClass:
-                              "form-group col-md-3 form-check d-flex align-items-center pl-md-5",
+                              "\n                  form-group\n                  col-md-3\n                  form-check\n                  d-flex\n                  align-items-center\n                  pl-md-5\n                ",
                           },
                           [
                             _c("input", {
@@ -51683,7 +51837,7 @@ var render = function () {
                                     staticClass: "bi bi-card-checklist",
                                   }),
                                   _vm._v(
-                                    " Añadir codeudor\n\t\t\t\t\t\t\t\t\t"
+                                    " Añadir codeudor\n                  "
                                   ),
                                 ]
                               ),
@@ -51723,7 +51877,7 @@ var render = function () {
                           "div",
                           {
                             staticClass:
-                              "form-group col-md-3 form-check d-flex align-items-center pl-md-5",
+                              "\n                  form-group\n                  col-md-3\n                  form-check\n                  d-flex\n                  align-items-center\n                  pl-md-5\n                ",
                           },
                           [
                             _c("input", {
@@ -51788,7 +51942,7 @@ var render = function () {
                         _c(
                           "div",
                           {
-                            staticClass: "form-group col-md-4",
+                            staticClass: "form-group col-md-5",
                             class: [
                               _vm.formCredit.provider ? "" : "opacity-50",
                             ],
@@ -51820,7 +51974,7 @@ var render = function () {
                                     staticClass: "bi bi-card-checklist",
                                   }),
                                   _vm._v(
-                                    " Añadir Proveedor\n\t\t\t\t\t\t\t\t\t"
+                                    " Añadir Proveedor\n                  "
                                   ),
                                 ]
                               ),
@@ -51891,7 +52045,7 @@ var render = function () {
                           { staticClass: "form-group col-md-4" },
                           [
                             _c("label", { attrs: { for: "headquarter_id" } }, [
-                              _vm._v("Sedes"),
+                              _vm._v("Sede"),
                             ]),
                             _vm._v(" "),
                             _c("v-select", {
@@ -51900,10 +52054,9 @@ var render = function () {
                                 label: "headquarter",
                                 "aria-logname": "{}",
                                 reduce: function (headquarter) {
-                                  return headquarter
+                                  return headquarter.id
                                 },
                               },
-                              on: { input: _vm.setSelected },
                               model: {
                                 value: _vm.formCredit.headquarter_id,
                                 callback: function ($$v) {
@@ -51957,11 +52110,20 @@ var render = function () {
                                   type: "number",
                                   id: "credit_value",
                                   step: "any",
+                                  max: _vm.root_data.current_balance_main_box,
                                 },
                                 domProps: {
                                   value: _vm.formCredit.credit_value,
                                 },
                                 on: {
+                                  keyup: function ($event) {
+                                    _vm.formCredit.credit_value >
+                                    _vm.root_data.current_balance_main_box
+                                      ? (_vm.formCredit.credit_value =
+                                          _vm.root_data.current_balance_main_box)
+                                      : (_vm.formCredit.credit_value =
+                                          _vm.formCredit.credit_value)
+                                  },
                                   input: function ($event) {
                                     if ($event.target.composing) {
                                       return
@@ -51975,6 +52137,25 @@ var render = function () {
                                 },
                               })
                             : _vm._e(),
+                          _vm._v(" "),
+                          _c(
+                            "small",
+                            {
+                              staticClass: "form-text text-muted",
+                              attrs: { id: "addAmountHelpBlock" },
+                            },
+                            [
+                              _vm._v(
+                                "\n                  Monto máximo\n                  " +
+                                  _vm._s(
+                                    _vm._f("currency")(
+                                      _vm.root_data.current_balance_main_box
+                                    )
+                                  ) +
+                                  "\n                "
+                              ),
+                            ]
+                          ),
                         ]),
                         _vm._v(" "),
                         _c("div", { staticClass: "form-group col-md-4" }, [
@@ -52115,7 +52296,7 @@ var render = function () {
                             },
                           },
                         },
-                        [_vm._v("\n\t\t\t\t\t\t\tCerrar\n\t\t\t\t\t\t")]
+                        [_vm._v("\n              Cerrar\n            ")]
                       ),
                       _vm._v(" "),
                       _c(
@@ -52129,7 +52310,7 @@ var render = function () {
                             },
                           },
                         },
-                        [_vm._v("\n\t\t\t\t\t\t\tGuardar\n\t\t\t\t\t\t")]
+                        [_vm._v("\n              Guardar\n            ")]
                       ),
                     ],
                     1
@@ -52194,7 +52375,7 @@ var staticRenderFns = [
         },
         [
           _c("i", { staticClass: "bi bi-card-checklist" }),
-          _vm._v(" Añadir cliente\n\t\t\t\t\t\t\t\t\t"),
+          _vm._v(" Añadir cliente\n                  "),
         ]
       ),
     ])
@@ -52478,6 +52659,15 @@ var render = function () {
         ]
       ),
       _vm._v(" "),
+      _c("modal-create-edit-client", {
+        ref: "ModalCreateEditClient",
+        on: {
+          "list-clients": function ($event) {
+            return _vm.listCredits(1)
+          },
+        },
+      }),
+      _vm._v(" "),
       _c("create-edit-credit", {
         ref: "CreateEditCredit",
         on: {
@@ -52566,9 +52756,9 @@ var staticRenderFns = [
         staticStyle: { margin: "2px auto", width: "30%" },
       },
       [
-        _c("p", [_vm._v("No se encontraron resultados.")]),
+        _c("p", [_vm._v("No se encontraron cleintes con creditos.")]),
         _vm._v(" "),
-        _c("p", [_vm._v("Crear user.")]),
+        _c("p", [_vm._v("Crear cliente.")]),
       ]
     )
   },
@@ -52583,18 +52773,18 @@ var staticRenderFns = [
         staticStyle: { margin: "2px auto", width: "30%" },
       },
       [
-        _vm._v("\n            Crear un nuevo Client\n            "),
+        _vm._v("\n            Crear un nuevo Cliente\n            "),
         _c(
           "button",
           {
-            staticClass: "btn btn-success",
+            staticClass: "btn btn-primary",
             attrs: {
               type: "button",
               "data-toggle": "modal",
               "data-target": "#formClientModal",
             },
           },
-          [_vm._v("\n              Crear Client\n            ")]
+          [_vm._v("\n              Crear cliente\n            ")]
         ),
       ]
     )
@@ -52699,7 +52889,7 @@ var render = function () {
                             },
                             [
                               _c("i", { staticClass: "bi bi-currency-dollar" }),
-                              _vm._v(" Abonar a crédito\n\t\t\t\t\t\t\t"),
+                              _vm._v(" Abonar a crédito\n              "),
                             ]
                           )
                         : _c(
@@ -52710,7 +52900,7 @@ var render = function () {
                             },
                             [
                               _c("i", { staticClass: "bi bi-currency-dollar" }),
-                              _vm._v(" Abonar a crédito\n\t\t\t\t\t\t\t"),
+                              _vm._v(" Abonar a crédito\n              "),
                             ]
                           ),
                     ]),
@@ -52728,7 +52918,7 @@ var render = function () {
                         },
                         [
                           _c("i", { staticClass: "bi bi-file-pdf" }),
-                          _vm._v(" Tabla de amortización\n\t\t\t\t\t\t\t"),
+                          _vm._v(" Tabla de amortización\n              "),
                         ]
                       ),
                     ]),
@@ -52742,42 +52932,54 @@ var render = function () {
                   _vm._v(" "),
                   _c(
                     "tbody",
-                    _vm._l(_vm.listInstallments, function (f) {
-                      return _c("tr", { key: f.id }, [
-                        _c("th", [_vm._v(_vm._s(f.payment_date))]),
+                    _vm._l(_vm.listInstallments, function (quote) {
+                      return _c("tr", { key: quote.id }, [
+                        _c("th", [_vm._v(_vm._s(quote.payment_date))]),
                         _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(f.installment_number))]),
-                        _vm._v(" "),
-                        _c("td", { staticClass: "text-right" }, [
-                          _vm._v(_vm._s(_vm._f("currency")(f.value))),
-                        ]),
+                        _c("td", [_vm._v(_vm._s(quote.installment_number))]),
                         _vm._v(" "),
                         _c("td", { staticClass: "text-right" }, [
-                          _vm._v(_vm._s(_vm._f("currency")(f.capital_value))),
-                        ]),
-                        _vm._v(" "),
-                        _c("td", { staticClass: "text-right" }, [
-                          _vm._v(_vm._s(_vm._f("currency")(f.interest_value))),
+                          _vm._v(_vm._s(_vm._f("currency")(quote.value))),
                         ]),
                         _vm._v(" "),
                         _c("td", { staticClass: "text-right" }, [
                           _vm._v(
-                            "\n\t\t\t\t\t\t\t\t\t" +
-                              _vm._s(
-                                _vm._f("currency")(f.late_interests_value)
-                              ) +
-                              "\n\t\t\t\t\t\t\t\t"
+                            "\n                  " +
+                              _vm._s(_vm._f("currency")(quote.capital_value)) +
+                              "\n                "
                           ),
                         ]),
                         _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(f.days_past_due))]),
+                        _c("td", { staticClass: "text-right" }, [
+                          _vm._v(
+                            "\n                  " +
+                              _vm._s(_vm._f("currency")(quote.interest_value)) +
+                              "\n                "
+                          ),
+                        ]),
                         _vm._v(" "),
                         _c("td", { staticClass: "text-right" }, [
-                          _vm._v(_vm._s(_vm._f("currency")(f.paid_balance))),
+                          _vm._v(
+                            "\n                  " +
+                              _vm._s(
+                                _vm._f("currency")(quote.late_interests_value)
+                              ) +
+                              "\n                "
+                          ),
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(quote.days_past_due))]),
+                        _vm._v(" "),
+                        _c("td", { staticClass: "text-right" }, [
+                          _vm._v(
+                            "\n                  " +
+                              _vm._s(_vm._f("currency")(quote.paid_balance)) +
+                              "\n                "
+                          ),
                         ]),
                         _vm._v(" "),
                         _c("td", [
-                          f.status == 0
+                          quote.status == 0
                             ? _c(
                                 "span",
                                 { staticClass: "badge badge-secondary" },
@@ -52785,7 +52987,7 @@ var render = function () {
                               )
                             : _vm._e(),
                           _vm._v(" "),
-                          f.status == 1
+                          quote.status == 1
                             ? _c(
                                 "span",
                                 { staticClass: "badge badge-success" },
@@ -52795,7 +52997,7 @@ var render = function () {
                         ]),
                         _vm._v(" "),
                         _c("td", [
-                          f.status == 0
+                          quote.status == 0
                             ? _c(
                                 "button",
                                 {
@@ -52803,13 +53005,13 @@ var render = function () {
                                   attrs: { type: "button" },
                                   on: {
                                     click: function ($event) {
-                                      return _vm.payInstallment(f.id)
+                                      return _vm.payInstallment(quote)
                                     },
                                   },
                                 },
                                 [
                                   _vm._v(
-                                    "\n\t\t\t\t\t\t\t\t\t\tPagar\n\t\t\t\t\t\t\t\t\t"
+                                    "\n                    Pagar\n                  "
                                   ),
                                 ]
                               )
@@ -52821,7 +53023,7 @@ var render = function () {
                                 },
                                 [
                                   _vm._v(
-                                    "\n\t\t\t\t\t\t\t\t\t\tPagar\n\t\t\t\t\t\t\t\t\t"
+                                    "\n                    Pagar\n                  "
                                   ),
                                 ]
                               ),
@@ -52914,7 +53116,7 @@ var staticRenderFns = [
           staticClass: "btn btn-secondary",
           attrs: { type: "button", "data-dismiss": "modal" },
         },
-        [_vm._v("\n\t\t\t\t\tClose\n\t\t\t\t")]
+        [_vm._v("\n          Cerrar\n        ")]
       ),
     ])
   },
@@ -53169,6 +53371,7 @@ var render = function () {
                   {
                     staticClass:
                       "btn btn-light text-success rounded border-success mt-4",
+                    attrs: { type: "button" },
                     on: {
                       click: function ($event) {
                         _vm.show_type_output = true
@@ -53185,6 +53388,7 @@ var render = function () {
                   {
                     staticClass:
                       "btn btn-light text-danger rounded border-danger mt-4",
+                    attrs: { type: "button" },
                     on: {
                       click: function ($event) {
                         _vm.show_type_output = false
@@ -71108,7 +71312,7 @@ Vue.compile = compileToFunctions;
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"_args":[["axios@0.21.4","C:\\\\xampp\\\\htdocs\\\\creditos"]],"_development":true,"_from":"axios@0.21.4","_id":"axios@0.21.4","_inBundle":false,"_integrity":"sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==","_location":"/axios","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"axios@0.21.4","name":"axios","escapedName":"axios","rawSpec":"0.21.4","saveSpec":null,"fetchSpec":"0.21.4"},"_requiredBy":["#DEV:/"],"_resolved":"https://registry.npmjs.org/axios/-/axios-0.21.4.tgz","_spec":"0.21.4","_where":"C:\\\\xampp\\\\htdocs\\\\creditos","author":{"name":"Matt Zabriskie"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"bugs":{"url":"https://github.com/axios/axios/issues"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}],"dependencies":{"follow-redirects":"^1.14.0"},"description":"Promise based HTTP client for the browser and node.js","devDependencies":{"coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.3.0","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^23.0.0","grunt-karma":"^4.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^4.0.2","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^6.3.2","karma-chrome-launcher":"^3.1.0","karma-firefox-launcher":"^2.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^4.3.6","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.8","karma-webpack":"^4.0.2","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^8.2.1","sinon":"^4.5.0","terser-webpack-plugin":"^4.2.3","typescript":"^4.0.5","url-search-params":"^0.10.0","webpack":"^4.44.2","webpack-dev-server":"^3.11.0"},"homepage":"https://axios-http.com","jsdelivr":"dist/axios.min.js","keywords":["xhr","http","ajax","promise","node"],"license":"MIT","main":"index.js","name":"axios","repository":{"type":"git","url":"git+https://github.com/axios/axios.git"},"scripts":{"build":"NODE_ENV=production grunt build","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","examples":"node ./examples/server.js","fix":"eslint --fix lib/**/*.js","postversion":"git push && git push --tags","preversion":"npm test","start":"node ./sandbox/server.js","test":"grunt test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json"},"typings":"./index.d.ts","unpkg":"dist/axios.min.js","version":"0.21.4"}');
+module.exports = JSON.parse('{"name":"axios","version":"0.21.4","description":"Promise based HTTP client for the browser and node.js","main":"index.js","scripts":{"test":"grunt test","start":"node ./sandbox/server.js","build":"NODE_ENV=production grunt build","preversion":"npm test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json","postversion":"git push && git push --tags","examples":"node ./examples/server.js","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","fix":"eslint --fix lib/**/*.js"},"repository":{"type":"git","url":"https://github.com/axios/axios.git"},"keywords":["xhr","http","ajax","promise","node"],"author":"Matt Zabriskie","license":"MIT","bugs":{"url":"https://github.com/axios/axios/issues"},"homepage":"https://axios-http.com","devDependencies":{"coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.3.0","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^23.0.0","grunt-karma":"^4.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^4.0.2","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^6.3.2","karma-chrome-launcher":"^3.1.0","karma-firefox-launcher":"^2.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^4.3.6","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.8","karma-webpack":"^4.0.2","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^8.2.1","sinon":"^4.5.0","terser-webpack-plugin":"^4.2.3","typescript":"^4.0.5","url-search-params":"^0.10.0","webpack":"^4.44.2","webpack-dev-server":"^3.11.0"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"jsdelivr":"dist/axios.min.js","unpkg":"dist/axios.min.js","typings":"./index.d.ts","dependencies":{"follow-redirects":"^1.14.0"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}]}');
 
 /***/ })
 

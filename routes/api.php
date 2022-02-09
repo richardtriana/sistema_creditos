@@ -63,6 +63,7 @@ Route::get('/installments/calculate-installments', [InstallmentController::class
 Route::resource('/installments', InstallmentController::class);
 Route::post('/installment/{id}/pay-installment', [InstallmentController::class, 'payInstallment']);
 
+Route::post('/main-box/cash-register/{box}', [MainBoxController::class, 'cashRegister']);
 Route::get('/main-box/current-balance', [MainBoxController::class, 'currentBalance']);
 Route::resource('/main-box',  MainBoxController::class);
 

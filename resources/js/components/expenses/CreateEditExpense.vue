@@ -46,6 +46,7 @@
           </div>
           <div class="form-group col-1">
             <button
+              type="button"
               class="btn btn-light text-success rounded border-success mt-4"
               v-if="!show_type_output"
               @click="show_type_output = true"
@@ -53,6 +54,7 @@
               <i class="bi bi-plus-circle"></i>
             </button>
             <button
+              type="button"
               class="btn btn-light text-danger rounded border-danger mt-4"
               v-if="show_type_output"
               @click="show_type_output = false"

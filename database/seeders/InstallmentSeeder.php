@@ -16,7 +16,7 @@ class InstallmentSeeder extends Seeder
 	public function run()
 	{
 		Installment::factory()
-			->count(20)
+			->count(5)
 			->create();
 	}
 }
