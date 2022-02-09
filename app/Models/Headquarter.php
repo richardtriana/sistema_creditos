@@ -17,8 +17,7 @@ class Headquarter extends Model
 		'email',
 		'legal_representative',
 		'phone',
-		'pos_printer',
-		'box_id'
+		'pos_printer'
 	];
 
 	public function users()
@@ -33,6 +32,6 @@ class Headquarter extends Model
 
 	public function box()
 	{
-		return $this->hasOne(Box::class);
+		return $this->hasMany(Box::class);
 	}
 }

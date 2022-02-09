@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Box;
 use App\Models\MainBox;
 use Illuminate\Http\Request;
 
@@ -95,5 +96,38 @@ class MainBoxController extends Controller
 	public function destroy(MainBox $mainBox)
 	{
 		//
+	}
+
+	public function currentBalance()
+	{
+		$main_box = MainBox::first();
+		$current_balance = $main_box->current_balance;
+		return $current_balance;
+	}
+
+	public function addAmountMainBox($amount)
+	{
+		$main_box = MainBox::first();
+		if ($main_box->initial_balance == 0) {
+			$main_box->initial_balance =  $amount;
+		}
+		$main_box->current_balance = $main_box->current_balance + $amount;
+		$main_box->save();
+	}
+
+	public function subAmountMainBox($amount)
+	{
+		$main_box = MainBox::first();
+		$main_box->current_balance = $main_box->current_balance - $amount;
+		$main_box->save();
+	}
+
+	public function cashRegister(Box $box)
+	{
+		$this->addAmountMainBox($box->current_balance);
+
+		$box->current_balance = 0;
+		$box->initial_balance = 0;
+		$box->save();
 	}
 }
