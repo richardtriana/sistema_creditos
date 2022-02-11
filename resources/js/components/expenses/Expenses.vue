@@ -12,8 +12,8 @@
       </button>
     </div>
     <div class="page-content">
-      <section>
-        <table class="table table-bordered table-sm table-responsive">
+      <section class="table-responsive">
+        <table class="table table-bordered table-sm">
           <thead>
             <tr>
               <th>Motivo</th>

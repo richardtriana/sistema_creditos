@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="page-header d-flex justify-content-between p-4 border my-2">
-      <h3>Creditos</h3>
+      <h3>Creditos con clientes</h3>
       <button
         type="button"
         class="btn btn-primary"
@@ -27,10 +27,10 @@
     </div>
 
     <div class="page-content mt-4" style="width: 100%">
-      <section class="">
-        <table class="table table-sm table-bordered table-responsive">
+      <section class="table-responsive">
+        <table class="table table-sm table-bordered ">
           <thead>
-            <tr>
+            <tr class="text-center">
               <th>ID</th>
               <th>Cliente</th>
               <th>Nro. Documento</th>

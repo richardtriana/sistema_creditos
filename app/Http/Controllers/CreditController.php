@@ -73,6 +73,7 @@ class CreditController extends Controller
 		$credit->debtor_id = $request['debtor_id'];
 		$credit->user_id = 1;
 		$credit->debtor = $request['debtor'];
+		$credit->provider = $request['provider'];
 		$credit->headquarter_id = $request['headquarter_id'];
 		$credit->number_installments = $request['number_installments'];
 		$credit->number_paid_installments = $request['number_paid_installments'];
@@ -101,6 +102,11 @@ class CreditController extends Controller
 			$installment->save();
 		}
 
+		if ($request['provider_id']) {
+			$credit_provider = new CreditProviderController();
+			$credit_provider->store($request, $credit->id);
+		}
+
 		$main_box = MainBox::first();
 		$main_box->current_balance = $main_box->current_balance - $credit->credit_value;
 		$main_box->save();
@@ -120,6 +126,7 @@ class CreditController extends Controller
 		$credit->provider_id = $request['provider_id'];
 		$credit->debtor_id = $request['debtor_id'];
 		$credit->debtor = $request['debtor'];
+		$credit->provider = $request['provider'];
 		$credit->headquarter_id = $request['headquarter_id'];
 		$credit->number_installments = $request['number_installments'];
 		$credit->number_paid_installments = $request['number_paid_installments'];
@@ -195,7 +202,7 @@ class CreditController extends Controller
 		$headquarter_id = $credit->headquarter->id;
 
 		$box = Box::where('headquarter_id', $headquarter_id)->firstOrFail();
-		
+
 		$add_amount_box = new BoxController();
 		$add_amount_box->addAmountBox($box->id, $total_amount);
 
