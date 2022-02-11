@@ -1,5 +1,5 @@
 html {
-	font-size: 14px;
+	font-size: 0.625rem;
 }
 
 body {
@@ -69,5 +69,10 @@ h3 {
 
 	.nav-link {
 		color: $white;
+
+		> i {
+			margin-right: 0.5rem;
+			margin-left: 0.5rem;
+		}
 	}
 }
