@@ -22,15 +22,16 @@ class CreditFactory extends Factory
     public function definition()
     {
         return [
-            'client_id' => $this->faker->numberBetween(1, 10),
-            'user_id' => $this->faker->numberBetween(1, 10),
-            'debtor_id' => $this->faker->numberBetween(1, 10),
-            'headquarter_id' => $this->faker->numberBetween(1, 3),
-            'provider_id' => $this->faker->numberBetween(1, 3),
+            'client_id' => 1,
+            'user_id' => 1,
+            'debtor_id' => 1,
+            'headquarter_id' => 1,
+            'provider_id' => 1,
             'number_installments' => $this->faker->randomNumber(1, 36),
             'number_paid_installments' => $this->faker->randomNumber(1, 36),
             'day_limit' => $this->faker->randomNumber(),
             'debtor' => $this->faker->boolean(),
+            'provider' => $this->faker->boolean(),
             'status' => $this->faker->boolean(),
             'start_date' => $this->faker->date('Y-m-d'),
             'interest' => $this->faker->randomNumber(),

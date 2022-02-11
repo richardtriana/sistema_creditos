@@ -24,6 +24,7 @@ class CreateCreditsTable extends Migration
             $table->integer('number_paid_installments')->nullable()->default(0);
             $table->integer('day_limit')->nullable()->default(1);
             $table->boolean('debtor')->comment('Solo se confirma si tiene deudor');
+            $table->boolean('provider')->comment('Solo se confirma si tiene proveedor');
             $table->tinyInteger('status')->default(0)->nullable();
             $table->date('start_date');
             $table->float('interest', 20, 2)->default(3);
