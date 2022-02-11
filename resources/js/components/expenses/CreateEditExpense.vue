@@ -37,11 +37,12 @@
             <label for="type_output">Seleccionar tipo de salida</label>
             <v-select
               :options="expenseTypeList"
-              label="type_output"
+              label="description"
               aria-logname="{}"
               :reduce="(expenseType) => expenseType.description"
               v-model="formExpense.type_output"
             >
+
             </v-select>
           </div>
           <div class="form-group col-1">
