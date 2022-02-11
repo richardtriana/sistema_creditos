@@ -19,7 +19,7 @@
             type="text"
             class="form-control truncate"
             id="description"
-            placeholder="Example input placeholder"
+            placeholder="Descripción del gasto a realizar"
             v-model="formExpense.description"
           />
         </div>
@@ -37,7 +37,7 @@
             <label for="type_output">Seleccionar tipo de salida</label>
             <v-select
               :options="expenseTypeList"
-              label="description"
+              label="type_output"
               aria-logname="{}"
               :reduce="(expenseType) => expenseType.description"
               v-model="formExpense.type_output"

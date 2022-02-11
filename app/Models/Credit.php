@@ -32,7 +32,8 @@ class Credit extends Model
         'capital_value',
         'interest_value',
         'disbursement_date',
-        'description'
+        'description',
+        'provider'
     ];
 
     protected $with = [

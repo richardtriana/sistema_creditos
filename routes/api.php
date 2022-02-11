@@ -4,6 +4,7 @@ use App\Http\Controllers\BoxController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CreditController;
+use App\Http\Controllers\CreditProviderController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\HeadquarterController;
 use App\Http\Controllers\InstallmentController;
@@ -50,6 +51,9 @@ Route::post('/credits/pay-credit-installments/{id}', [CreditController::class, '
 Route::resource('/credits', CreditController::class);
 Route::post('/credits/{credit}/change-status',  [CreditController::class, 'changeStatus']);
 Route::get('/credits/{credit}/installments', [CreditController::class, 'installments']);
+
+Route::post('/credit-providers/pay-credit-provider/{credit_provider}', [CreditProviderController::class, 'payCreditProvider']);
+Route::resource('/credit-providers', CreditProviderController::class);
 
 Route::resource('/expenses',  ExpenseController::class);
 Route::post('/expenses/{expense}/change-status',  [ExpenseController::class, 'changeStatus']);
