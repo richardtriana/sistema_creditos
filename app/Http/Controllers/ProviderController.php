@@ -25,8 +25,7 @@ class ProviderController extends Controller
 	{
 
 		$provider = new Provider();
-		$provider->name = $request['name'];
-		$provider->last_name = $request['last_name'];
+		$provider->business_name = $request['business_name'];
 		$provider->type_document = $request['type_document'];
 		$provider->document = $request['document'];
 		$provider->phone_1 = $request['phone_1'];
@@ -49,8 +48,7 @@ class ProviderController extends Controller
 	public function update(Request $request, Provider $provider)
 	{
 		$provider = Provider::find($request->id);
-		$provider->name = $request['name'];
-		$provider->last_name = $request['last_name'];
+		$provider->business_name = $request['business_name'];
 		$provider->type_document = $request['type_document'];
 		$provider->document = $request['document'];
 		$provider->phone_1 = $request['phone_1'];
@@ -77,7 +75,7 @@ class ProviderController extends Controller
 			$providers = Provider::select()
 				->where('status', 1)
 				->where('document', 'LIKE', "%$request->provider%")
-				->orWhere('name', 'LIKE', "%$request->provider%")
+				->orWhere('business_name', 'LIKE', "%$request->provider%")
 				->get(20);
 		}
 

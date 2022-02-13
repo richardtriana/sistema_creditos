@@ -13,13 +13,12 @@
     </div>
     <div class="page-search d-flex justify-content-between p-4 border my-2">
       <div class="form-group col-8 m-auto">
-        <label for="search_client">Buscar Cliente...</label>
         <input
           type="text"
           id="search_client"
           name="search_client"
           class="form-control"
-          placeholder="Nombres | Documento"
+          placeholder="Buscar cliente | Documento"
           @keypress="listCredits()"
           v-model="search_client"
         />
@@ -28,7 +27,7 @@
 
     <div class="page-content mt-4" style="width: 100%">
       <section class="table-responsive">
-        <table class="table table-sm table-bordered ">
+        <table class="table table-sm table-bordered">
           <thead>
             <tr class="text-center">
               <th>ID</th>
@@ -37,7 +36,7 @@
               <th>Valor crédito</th>
               <th>Valor Abonado</th>
               <th>Nro Cuotas</th>
-              <th>Cuotas</th>
+              <th>Cuotas pagadas</th>
               <th>Estado</th>
               <th>Ver Cuotas</th>
               <th>
@@ -119,26 +118,33 @@
               </td>
             </tr>
           </tbody>
-          <div v-else>
-            <div
-              class="alert alert-danger"
-              style="margin: 2px auto; width: 30%"
-            >
-              <p>No se encontraron cleintes con creditos.</p>
-              <p>Crear cliente.</p>
-            </div>
-            <div class="alert alert-info" style="margin: 2px auto; width: 30%">
-              Crear un nuevo Cliente
-              <button
-                type="button"
-                class="btn btn-primary"
-                data-toggle="modal"
-                data-target="#formClientModal"
-              >
-                Crear cliente
-              </button>
-            </div>
-          </div>
+          <tbody v-else>
+            <tr>
+              <td colspan="11">
+                <div
+                  class="alert alert-danger text-center"
+                  style="margin: 2px auto; width: 30%"
+                >
+                  <p>No se encontraron clientes con creditos.</p>
+                  <p>Crear cliente.</p>
+                </div>
+                <div
+                  class="alert alert-info"
+                  style="margin: 2px auto; width: 30%"
+                >
+                  Crear un nuevo Cliente
+                  <button
+                    type="button"
+                    class="btn btn-primary"
+                    data-toggle="modal"
+                    data-target="#formClientModal"
+                  >
+                    Crear cliente
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
         </table>
         <pagination
           :align="'center'"

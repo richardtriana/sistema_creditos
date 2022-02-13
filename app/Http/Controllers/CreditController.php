@@ -89,27 +89,26 @@ class CreditController extends Controller
 		$credit->description = $request['description'];
 		$credit->disbursement_date = date('Y-m-d');
 		$credit->installment_value = $listInstallments['installment'];
-		$credit->save();
-
-		foreach ($listInstallments['listInstallments'] as $new_installment) {
-			$installment = new Installment();
-			$installment->credit_id = $credit->id;
-			$installment->installment_number = $new_installment['installment_number'];
-			$installment->value = $new_installment['installment_value'];
-			$installment->payment_date = $new_installment['payment_date'];
-			$installment->interest_value = $new_installment['pagoInteres'];
-			$installment->capital_value = $new_installment['pagoCapital'];
-			$installment->save();
+		if ($credit->save()) {
+			foreach ($listInstallments['listInstallments'] as $new_installment) {
+				$installment = new Installment();
+				$installment->credit_id = $credit->id;
+				$installment->installment_number = $new_installment['installment_number'];
+				$installment->value = $new_installment['installment_value'];
+				$installment->payment_date = $new_installment['payment_date'];
+				$installment->interest_value = $new_installment['pagoInteres'];
+				$installment->capital_value = $new_installment['pagoCapital'];
+				$installment->capital_balance = $new_installment['saldo_capital'];
+				$installment->save();
+			}
+			if ($request['provider_id']) {
+				$credit_provider = new CreditProviderController();
+				$credit_provider->store($request, $credit->id);
+			}
+			$main_box = MainBox::first();
+			$main_box->current_balance = $main_box->current_balance - $credit->credit_value;
+			$main_box->save();
 		}
-
-		if ($request['provider_id']) {
-			$credit_provider = new CreditProviderController();
-			$credit_provider->store($request, $credit->id);
-		}
-
-		$main_box = MainBox::first();
-		$main_box->current_balance = $main_box->current_balance - $credit->credit_value;
-		$main_box->save();
 	}
 
 	/**
@@ -188,11 +187,8 @@ class CreditController extends Controller
 			$amount = $balance;
 			$no_installment_paid = $installment_paid['no_installment'];
 		}
-
 		$print_cuota = new PrintTicketController;
 		$print_cuota = $print_cuota->printPayment($id, $amount_paid, $no_installment_paid);
-
-		return 'ok';
 	}
 
 	public function updateValuesCredit($id, $total_amount, $capital, $interest)

@@ -74,7 +74,14 @@ const app = new Vue({
 	el: '#app',
 	router,
 	data: {
-		current_balance_main_box: 0
+		current_balance_main_box: 0,
+		type_documents: {
+			'CC': 'Cédula de ciudadania',
+			'NIT': 'NIT',
+			'TI': 'Tarjeta de identidad',
+			'PP': 'Pasaporte',
+			'CE': 'Cédula de extranjería'
+		}
 	},
 	methods: {
 		getCurrentBalanceMainBox() {
