@@ -12,9 +12,9 @@
             Calcular
           </button>
 
-          <table id="lista-tabla" class="table">
+          <table id="lista-tabla" class="table table-bordered">
             <thead>
-              <tr>
+              <tr class="text-center">
                 <th>Nro.Cuota</th>
                 <th>Fecha</th>
                 <th>Cuota</th>

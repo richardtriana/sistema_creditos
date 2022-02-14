@@ -25,7 +25,7 @@
                 {{ c.client_id }}
               </td> -->
               <td>
-                {{ c.provider.name }}  {{ c.provider.last_name }}
+                {{ c.provider.business_name }}  
               </td>
               <td class="text-right">
                 {{ c.credit_value | currency }}
@@ -71,6 +71,7 @@ import PayCreditProvider from "./PayCreditProvider.vue";
 import ShowHistoryCreditProvider from "./ShowHistoryCreditProvider.vue";
 export default {
   components: { ShowHistoryCreditProvider, PayCreditProvider },
+  name: 'credit-providers',
   data() {
     return {
       creditProvidersList: {},

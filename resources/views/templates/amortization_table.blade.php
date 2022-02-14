@@ -76,8 +76,6 @@
           <th>Abono Capital</th>
           <th>Abono Interés</th>
           <th>Saldo capital</th>
-          <th>Mora</th>
-          <th>Días de mora</th>
         </tr>
       </thead>
       <tbody>
@@ -89,8 +87,7 @@
           <td>{{ $f->capital_value}}</td>
           <td>{{ $f->interest_value}}</td>
           <td>{{ $f->capital_balance}}</td>
-          <td>{{ $f->late_interests_value}}</td>
-          <td>{{ $f->days_past_due}}</td>
+       
         </tr>
         @endforeach
 

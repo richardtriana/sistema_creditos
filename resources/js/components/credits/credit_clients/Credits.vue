@@ -19,7 +19,7 @@
           name="search_client"
           class="form-control"
           placeholder="Buscar cliente | Documento"
-          @keypress="listCredits()"
+          @keyup="listCredits()"
           v-model="search_client"
         />
       </div>
@@ -36,7 +36,6 @@
               <th>Valor crédito</th>
               <th>Valor Abonado</th>
               <th>Nro Cuotas</th>
-              <th>Cuotas pagadas</th>
               <th>Estado</th>
               <th>Ver Cuotas</th>
               <th>
@@ -55,10 +54,8 @@
               <td class="text-right">{{ credit.credit_value | currency }}</td>
               <td class="text-right">{{ credit.paid_value | currency }}</td>
               <td>{{ credit.number_installments }}</td>
-              <td>{{ credit.number_paid_installments }}</td>
               <td>
-                <span v-if="credit.status == 1">Activo</span>
-                <span v-if="credit.status == 0">Inactivo</span>
+                {{ creditStatus[credit.status] }}
               </td>
               <td class="text-center">
                 <button
@@ -79,7 +76,7 @@
                   <i class="bi bi-eye-slash"></i>
                 </button>
               </td>
-              <td>
+              <td class=" text-center">
                 <button
                   class="btn btn-outline-primary"
                   @click="
@@ -89,7 +86,7 @@
                   <i class="bi bi-file-pdf"></i>
                 </button>
               </td>
-              <td class="text-left">
+              <td class="text-right">
                 <button
                   v-if="credit.status == 1"
                   class="btn btn-outline-primary"
@@ -102,16 +99,16 @@
                 </button>
 
                 <button
-                  v-if="credit.status == 1"
+                  v-if="credit.status == 0"
                   class="btn btn-outline-danger"
-                  @click="changeStatus(credit.id)"
+                  @click="changeStatus(credit.id,2 )"
                 >
                   <i class="bi bi-trash"></i>
                 </button>
                 <button
                   v-if="credit.status == 0"
                   class="btn btn-outline-success"
-                  @click="changeStatus(credit.id)"
+                  @click="changeStatus(credit.id,1)"
                 >
                   <i class="bi bi-check2-circle"></i>
                 </button>
@@ -167,34 +164,35 @@
 
     <create-edit-credit ref="CreateEditCredit" @list-credits="listCredits(1)" />
 
-    <installment ref="Installment" />
+    <modal-installment ref="ModalInstallment" />
   </div>
 </template>
 <script>
 import CreateEditCredit from "./CreateEditCredit.vue";
-import Simulator from "./Simulator.vue";
 
-import Installment from "./Installment.vue";
-import ModalCreateEditClient from "../clients/ModalCreateEditClient.vue";
+import ModalCreateEditClient from "../../clients/ModalCreateEditClient.vue";
+import Simulator from "../credit_helpers/Simulator.vue";
+import ModalInstallment from '../credit_helpers/ModalInstallment.vue';
 
 export default {
   components: {
     CreateEditCredit,
     Simulator,
     ModalCreateEditClient,
-    Installment,
+    ModalInstallment,
   },
-
-  props: {
-    installment: {
-      type: Object,
-    },
-  },
+ 
   data() {
     return {
       search_client: "",
+      status: 1,
       creditList: {},
       clientList: {},
+      creditStatus: {
+        0: "Pendiente",
+        1: "Aprobado",
+        2: "Rechazado",
+      },
     };
   },
   created() {
@@ -204,7 +202,7 @@ export default {
     listCredits(page = 1) {
       let me = this;
       axios
-        .get(`api/credits?page=${page}&credit=${this.search_client}`)
+        .get(`api/credits?page=${page}&credit=${this.search_client}&status=${this.status}`)
         .then(function (response) {
           me.creditList = response.data;
         });
@@ -224,13 +222,16 @@ export default {
       this.$refs.Simulator.openSimulator();
     },
     showInstallment: function (credit) {
-      this.$refs.Installment.listCreditInstallments(credit);
+      this.$refs.ModalInstallment.listCreditInstallments(credit,1);
     },
     showDataClient: function (client) {
       this.$refs.ModalCreateEditClient.showEditClient(client);
     },
-    changeStatus: function (id) {
+    changeStatus: function (id, status) {
       let me = this;
+       var data = {
+        status: status,
+      };
 
       Swal.fire({
         title: "¿Quieres cambiar el status del credito?",
@@ -240,7 +241,7 @@ export default {
       }).then((result) => {
         if (result.isConfirmed) {
           axios
-            .post("api/credits/" + id + "/change-status", null, me.$root.config)
+            .post(`api/credits/${id}/change-status`, data, me.$root.config)
             .then(function () {
               me.listCredits(1);
             });

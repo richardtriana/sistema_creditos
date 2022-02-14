@@ -21,22 +21,22 @@ class CreditController extends Controller
 	public function index(Request $request)
 	{
 		$credits = Credit::select();
+		$status = $request->status != null ? $request->status : 1;
 
 		if ($request->credit && ($request->credit != '')) {
 			$credits  =   $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
+				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document')
 				->where('document', 'LIKE', "%$request->credit%")
 				->orWhere('name', 'LIKE', "%$request->credit%")
 				->orWhere('email', 'LIKE', "%$request->credit%")
 				->orWhere('last_name', 'LIKE', "%$request->credit%")
-				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document');
+				->where('credits.status', $status);
 		} else {
 			$credits  =     $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
-				->where('document', 'LIKE', "%$request->credit%")
-				->orWhere('name', 'LIKE', "%$request->credit%")
-				->orWhere('email', 'LIKE', "%$request->credit%")
-				->orWhere('last_name', 'LIKE', "%$request->credit%")
-				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document');
+				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document')
+				->where('credits.status', $status);
 		}
+
 
 		$credits = $credits->paginate(10);
 
@@ -78,7 +78,7 @@ class CreditController extends Controller
 		$credit->number_installments = $request['number_installments'];
 		$credit->number_paid_installments = $request['number_paid_installments'];
 		$credit->day_limit = $request['day_limit'];
-		$credit->status = 1;
+		$credit->status = 0;
 		$credit->start_date = $request['start_date'];
 		$credit->interest = $request['interest'];
 		$credit->annual_interest_percentage = $request['annual_interest_percentage'];
@@ -89,6 +89,7 @@ class CreditController extends Controller
 		$credit->description = $request['description'];
 		$credit->disbursement_date = date('Y-m-d');
 		$credit->installment_value = $listInstallments['installment'];
+
 		if ($credit->save()) {
 			foreach ($listInstallments['listInstallments'] as $new_installment) {
 				$installment = new Installment();
@@ -99,15 +100,21 @@ class CreditController extends Controller
 				$installment->interest_value = $new_installment['pagoInteres'];
 				$installment->capital_value = $new_installment['pagoCapital'];
 				$installment->capital_balance = $new_installment['saldo_capital'];
-				$installment->save();
+				if (!$installment->save()) {
+					Credit::findOrFail($credit->id)->delete();
+					return false;
+				}
 			}
-			if ($request['provider_id']) {
+			if ($request['provider_id'] != NULL && $request['provider_id'] != 0) {
 				$credit_provider = new CreditProviderController();
 				$credit_provider->store($request, $credit->id);
 			}
-			$main_box = MainBox::first();
-			$main_box->current_balance = $main_box->current_balance - $credit->credit_value;
-			$main_box->save();
+
+			if ($request['provider_id'] == NULL || $request['provider_id'] == 0) {
+				$main_box = MainBox::first();
+				$main_box->current_balance = $main_box->current_balance - $credit->credit_value;
+				$main_box->save();
+			}
 		}
 	}
 
@@ -154,11 +161,11 @@ class CreditController extends Controller
 		return redirect('credit')->with('mensaje', 'Credit eliminado correctamente');
 	}
 
-	public function changeStatus(Credit $credit)
+	public function changeStatus(Request $request,  Credit $credit)
 	{
 		//
 		$cre = Credit::find($credit->id);
-		$cre->status = !$cre->status;
+		$cre->status = $request->status;
 		$cre->save();
 	}
 

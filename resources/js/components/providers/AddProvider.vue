@@ -47,7 +47,7 @@
                 <th>Razón social</th>
                 <th>Documento</th>
                 <th>Direccion</th>
-                <th>Telefono</th>
+
                 <th>Correo</th>
                 <th>Contacto</th>
                 <th>Opciones</th>
@@ -62,10 +62,11 @@
                 <td>{{ provider.business_name }}</td>
                 <td>{{ provider.document }}</td>
                 <td>{{ provider.address }}</td>
-                <td>{{ provider.mobile }}</td>
+
                 <td>{{ provider.email }}</td>
                 <td>
-                  {{ provider.contact }}
+                  {{ provider.phone_1 }} <br />
+                  {{ provider.phone_2 }}
                 </td>
 
                 <td>
