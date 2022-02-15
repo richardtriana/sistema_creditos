@@ -61,70 +61,7 @@
               </div>
             </div>
           </div>
-          <section>
-            <table class="table table-sm">
-              <thead>
-                <tr>
-                  <th>Fecha de vencimiento</th>
-                  <th>Nro. Cuota</th>
-                  <th>Valor</th>
-                  <th>Abono Capital</th>
-                  <th>Abono Interés</th>
-                  <th>Saldo capital</th>
-                  <th>Mora</th>
-                  <th>Dias de mora</th>
-                  <th>Valor abonado</th>
-                  <th>Estado</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="quote in listInstallments" :key="quote.id">
-                  <th>{{ quote.payment_date }}</th>
-                  <td>{{ quote.installment_number }}</td>
-                  <td class="text-right">{{ quote.value | currency }}</td>
-                  <td class="text-right">
-                    {{ quote.capital_value | currency }}
-                  </td>
-                  <td class="text-right">
-                    {{ quote.interest_value | currency }}
-                  </td>
-                  <td class="text-right">
-                    {{ quote.capital_balance | currency }}
-                  </td>
-                  <td class="text-right">
-                    {{ quote.late_interests_value | currency }}
-                  </td>
-                  <td>{{ quote.days_past_due }}</td>
-                  <td class="text-right">
-                    {{ quote.paid_balance | currency }}
-                  </td>
-                  <td>
-                    <span v-if="quote.status == 0" class="badge badge-secondary"
-                      >Pendiente</span
-                    >
-                    <span v-if="quote.status == 1" class="badge badge-success"
-                      >Pagado</span
-                    >
-                  </td>
-                  <td>
-                    <button
-                      @click="payInstallment(quote)"
-                      type="button"
-                      class="btn btn-sm btn-success"
-                      v-if="quote.status == 0"
-                    >
-                      Pagar
-                    </button>
-
-                    <button v-else class="btn btn-sm btn-secondary" disabled>
-                      Pagar
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </section>
+          <installment ref="Installment" />
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">
@@ -136,44 +73,24 @@
   </div>
 </template>
 <script>
+import Installment from "./Installment.vue";
 export default {
+  components: { Installment },
   data() {
     return {
       id_credit: 0,
+      allow_payment: 0,
       listInstallments: [],
       listInstallmentsPaid: [],
       amount_value: 0,
+      allow_payment: 1,
     };
   },
   methods: {
-    listCreditInstallments(credit_id) {
-      this.id_credit = credit_id;
-      let me = this;
-      axios
-        .get(`api/credits/${credit_id}/installments`)
-        .then(function (response) {
-          me.listInstallments = response.data;
-        });
-    },
-
-    payInstallment(quote) {
-      let me = this;
-      var data = {
-        amount: quote.value,
-      };
-      if (quote.value > 0) {
-        axios
-          .post(`api/installment/${quote.id}/pay-installment`, data)
-          .then(function () {
-            me.listCreditInstallments(me.id_credit);
-          });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "El valor debe ser mayor a 0 ",
-        });
-      }
+    listCreditInstallments: function (credit, allow_payment) {
+      this.id_credit = credit;
+      this.allow_payment = allow_payment;
+      this.$refs.Installment.listCreditInstallments(credit, allow_payment);
     },
 
     payCredit() {
@@ -183,7 +100,13 @@ export default {
       if (this.amount_value > 0) {
         axios
           .post(`api/credits/pay-credit-installments/${this.id_credit}`, data)
-          .then(this.listCreditInstallments(this.id_credit));
+          // .then(this.listCreditInstallments(this.id_credit))
+          .finally(
+            this.$refs.Installment.listCreditInstallments(
+              this.id_credit,
+              this.allow_payment
+            )
+          );
       } else {
         Swal.fire({
           icon: "error",

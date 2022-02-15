@@ -57,12 +57,19 @@
                 id="add_amount"
                 placeholder="$ 0"
                 v-model="add_amount"
+                :max="root_data.current_balance_main_box"
                 @keyup="
-                  add_amount > formCreditProvider.pending_value
+                  add_amount > formCreditProvider.pending_value &&
+                  formCreditProvider.pending_value <
+                    root_data.current_balance_main_box
                     ? (add_amount = formCreditProvider.pending_value)
                     : (add_amount = add_amount)
                 "
               />
+              <small id="addAmountHelpBlock" class="form-text text-muted">
+                Monto máximo
+                {{ root_data.current_balance_main_box | currency }}
+              </small>
             </div>
           </form>
         </div>
@@ -89,6 +96,7 @@ export default {
     return {
       formCreditProvider: {},
       add_amount: 0,
+      root_data: this.$root.$data,
     };
   },
   methods: {

@@ -23,15 +23,13 @@
         </div>
         <div class="modal-body">
           <div v-if="listItems.length > 0">
-            <ul class="list-group">
-              <li
-                class="list-group-item"
-                v-for="(l, index) in listItems"
-                :key="index"
-              >
-                {{ l }}
-              </li>
-            </ul>
+            <table class="table table-sm table-bordered">
+              <tr v-for="(l, key) in listItems" :key="key">
+                <td>Asesor : {{ l.Asesor }}</td>
+                <td>Fecha : {{ l.Fecha }}</td>
+                <td>Monto : {{ l.Monto | currency }}</td>
+              </tr>
+            </table>
           </div>
 
           <div class="card" v-else>
