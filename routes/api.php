@@ -11,6 +11,7 @@ use App\Http\Controllers\InstallmentController;
 use App\Http\Controllers\MainBoxController;
 use App\Http\Controllers\PrintTicketController;
 use App\Http\Controllers\ProviderController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TypeExpenseController;
 use App\Http\Controllers\UserController;
 use App\Models\Company;
@@ -77,6 +78,8 @@ Route::post('/providers/{provider}/change-status',  [ProviderController::class, 
 Route::post('/providers/filter-provider-list',  [ProviderController::class, 'filterProviderList']);
 
 Route::get('/print-installment', [PrintTicketController::class, 'printInstallment']);
+
+Route::get('/reports/credits', [ReportController::class, 'ReportCredits']);
 
 Route::resource('/type-expenses',  TypeExpenseController::class);
 

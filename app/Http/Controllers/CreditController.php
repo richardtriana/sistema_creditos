@@ -190,18 +190,18 @@ class CreditController extends Controller
 			}
 		}
 
-		// if ($credit->provider_id == null || $credit->provider_id == 0) {
-		// 	if ($request->status  == 1) {
-		// 		$update_main_box = new MainBoxController();
-		// 		$update_main_box->subAmountMainBox($credit->credit_value);
-		// 	}
+		if ($credit->provider_id == null || $credit->provider_id == 0) {
+			if ($request->status  == 1) {
+				$update_main_box = new MainBoxController();
+				$update_main_box->subAmountMainBox($credit->credit_value);
+			}
 
-		// 	if ($request->status  == 2 && $credit->status == 1) {
-		// 		$update_main_box = new MainBoxController();
-		// 		$update_main_box->addAmountMainBox($credit->credit_value);
-		// 	}
-		// 	$credit->status = $request->status;
-		// }
+			if ($request->status  == 2 && $credit->status == 1) {
+				$update_main_box = new MainBoxController();
+				$update_main_box->addAmountMainBox($credit->credit_value);
+			}
+			$credit->status = $request->status;
+		}
 
 
 		$credit->save();

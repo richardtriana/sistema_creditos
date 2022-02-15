@@ -57,27 +57,34 @@ const routes = [
 	{
 		path: "/credits",
 		component: require("./components/credits/AllCredits.vue").default,
-		name: 'credits',
+		name: "credits",
 		children: [
 			{
 				path: "credit-clients",
-				component: require("./components/credits/credit_clients/Credits.vue").default,
+				component: require("./components/credits/credit_clients/Credits.vue")
+					.default,
 				name: "credit-clients",
 			},
 			{
 				path: "credit_clients/:credit_id/installments",
-				component: require("./components/credits/credit_helpers/Installment.vue").default,
+				component:
+					require("./components/credits/credit_helpers/Installment.vue")
+						.default,
 				props: true,
 				name: "installments",
 			},
 			{
 				path: "credit-providers",
-				component: require("./components/credits/credit_providers/CreditProviders.vue").default,
+				component:
+					require("./components/credits/credit_providers/CreditProviders.vue")
+						.default,
 				name: "credit-providers",
 			},
 			{
 				path: "outsanding-credits",
-				component: require("./components/credits/outstanding_credits/Disbursements.vue").default,
+				component:
+					require("./components/credits/outstanding_credits/Disbursements.vue")
+						.default,
 				name: "outsanding-credits",
 			},
 		],
@@ -98,6 +105,18 @@ const routes = [
 	{
 		path: "/expenses",
 		component: require("./components/expenses/Expenses.vue").default,
+	},
+	{
+		path: "/reports",
+		component: require("./components/reports/ReportsDashboard.vue").default,
+		name: "reports",
+		children: [
+			{
+				path: "credit",
+				component: require("./components/reports/ReportCredits.vue").default,
+				name: "report-credit",
+			},
+		],
 	},
 ];
 
