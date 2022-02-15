@@ -12,8 +12,7 @@ class Provider extends Model
   protected $table = 'providers';
 
   protected $fillable = [
-    'name',
-    'last_name',
+    'business_name',
     'type_document',
     'document',
     'phone_1',

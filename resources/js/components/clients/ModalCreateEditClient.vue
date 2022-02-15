@@ -23,7 +23,7 @@ export default {
 	},
 	methods: {
 		listClients() {
-			me.$emit("list-clients");
+			this.$emit("list-clients");
 		},
 
 		showEditClient(client) {

@@ -66,10 +66,11 @@
               <thead>
                 <tr>
                   <th>Fecha de vencimiento</th>
-                  <th scope="col">Nro. Cuota</th>
-                  <th scope="col">Valor</th>
-                  <th scope="col">Capital</th>
-                  <th>Interés</th>
+                  <th>Nro. Cuota</th>
+                  <th>Valor</th>
+                  <th>Abono Capital</th>
+                  <th>Abono Interés</th>
+                  <th>Saldo capital</th>
                   <th>Mora</th>
                   <th>Dias de mora</th>
                   <th>Valor abonado</th>
@@ -87,6 +88,9 @@
                   </td>
                   <td class="text-right">
                     {{ quote.interest_value | currency }}
+                  </td>
+                  <td class="text-right">
+                    {{ quote.capital_balance | currency }}
                   </td>
                   <td class="text-right">
                     {{ quote.late_interests_value | currency }}

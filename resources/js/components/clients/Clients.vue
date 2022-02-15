@@ -45,7 +45,10 @@
               <td>{{ c.id }}</td>
               <td>{{ c.name }} {{ c.last_name }}</td>
               <td>{{ c.document }}</td>
-              <td>( {{ c.phone_1 }} ) - ( {{ c.phone_2 }} )</td>
+              <td>
+                {{ c.phone_1 }} <br />
+                {{ c.phone_2 }}
+              </td>
               <td>{{ c.email }}</td>
               <td>{{ c.address }}</td>
               <td>

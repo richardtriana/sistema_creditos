@@ -282,7 +282,7 @@ export default {
         debtor_id: "",
         headquarter_id: "",
         user_id: "",
-        provider_id: 0,
+        provider_id: "",
         number_installments: "",
         number_paid_installments: "",
         number_paid_installments: "",
