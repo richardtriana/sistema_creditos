@@ -17,7 +17,7 @@ class CreateClientsTable extends Migration
       $table->id();
       $table->string('name');
       $table->string('last_name');
-      $table->string('type_document')->default('CC');
+      $table->char('type_document')->default('CC');
       $table->string('document', 20);
       $table->string('phone_1')->default(null)->nullable();
       $table->string('phone_2')->default(null)->nullable();

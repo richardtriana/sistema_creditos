@@ -62,7 +62,7 @@
                     class="form-check-input"
                     id="debtor"
                     v-model="formCredit.debtor"
-                    value="true"
+                    value="0"
                   />
                   <label class="form-check-label" for="debtor"
                     >¿Usa codeudor?</label

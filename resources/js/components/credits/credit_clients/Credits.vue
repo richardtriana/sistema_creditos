@@ -12,16 +12,29 @@
       </button>
     </div>
     <div class="page-search d-flex justify-content-between p-4 border my-2">
-      <div class="form-group col-8 m-auto">
-        <input
-          type="text"
-          id="search_client"
-          name="search_client"
-          class="form-control"
-          placeholder="Buscar cliente | Documento"
-          @keyup="listCredits()"
-          v-model="search_client"
-        />
+      <div class="form-row col-8 m-auto">
+        <div class="col">
+          <input
+            type="text"
+            id="search_client"
+            name="search_client"
+            class="form-control col"
+            placeholder="Buscar cliente | Documento"
+            @keyup="listCredits()"
+            v-model="search_client"
+          />
+        </div>
+        <div class="col">
+          <select
+            name="status"
+            id="status"
+            v-model="status"
+            class="custom-select col"
+            @click="listCredits()"
+          >
+            <option v-for="(st, index) in creditStatus" :value="index" :key="index"> {{st}}</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -76,7 +89,7 @@
                   <i class="bi bi-eye-slash"></i>
                 </button>
               </td>
-              <td class=" text-center">
+              <td class="text-center">
                 <button
                   class="btn btn-outline-primary"
                   @click="
@@ -101,14 +114,14 @@
                 <button
                   v-if="credit.status == 0"
                   class="btn btn-outline-danger"
-                  @click="changeStatus(credit.id,2 )"
+                  @click="changeStatus(credit.id, 2)"
                 >
                   <i class="bi bi-trash"></i>
                 </button>
                 <button
                   v-if="credit.status == 0"
                   class="btn btn-outline-success"
-                  @click="changeStatus(credit.id,1)"
+                  @click="changeStatus(credit.id, 1)"
                 >
                   <i class="bi bi-check2-circle"></i>
                 </button>
@@ -171,17 +184,15 @@
 import CreateEditCredit from "./CreateEditCredit.vue";
 
 import ModalCreateEditClient from "../../clients/ModalCreateEditClient.vue";
-import Simulator from "../credit_helpers/Simulator.vue";
-import ModalInstallment from '../credit_helpers/ModalInstallment.vue';
+import ModalInstallment from "../credit_helpers/ModalInstallment.vue";
 
 export default {
   components: {
     CreateEditCredit,
-    Simulator,
     ModalCreateEditClient,
     ModalInstallment,
   },
- 
+
   data() {
     return {
       search_client: "",
@@ -192,6 +203,7 @@ export default {
         0: "Pendiente",
         1: "Aprobado",
         2: "Rechazado",
+        3: "Pendiente pago a proveedor",
       },
     };
   },
@@ -202,7 +214,9 @@ export default {
     listCredits(page = 1) {
       let me = this;
       axios
-        .get(`api/credits?page=${page}&credit=${this.search_client}&status=${this.status}`)
+        .get(
+          `api/credits?page=${page}&credit=${this.search_client}&status=${this.status}`
+        )
         .then(function (response) {
           me.creditList = response.data;
         });
@@ -218,18 +232,16 @@ export default {
     showData: function (credit) {
       this.$refs.CreateEditCredit.showEditCredit(credit);
     },
-    simularCredit: function () {
-      this.$refs.Simulator.openSimulator();
-    },
+
     showInstallment: function (credit) {
-      this.$refs.ModalInstallment.listCreditInstallments(credit,1);
+      this.$refs.ModalInstallment.listCreditInstallments(credit, 1);
     },
     showDataClient: function (client) {
       this.$refs.ModalCreateEditClient.showEditClient(client);
     },
     changeStatus: function (id, status) {
       let me = this;
-       var data = {
+      var data = {
         status: status,
       };
 

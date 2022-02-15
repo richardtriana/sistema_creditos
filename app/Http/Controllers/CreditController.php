@@ -6,6 +6,7 @@ use App\Models\Box;
 use App\Models\Client;
 use App\Models\Headquarter;
 use App\Models\Credit;
+use App\Models\CreditProvider;
 use App\Models\Installment;
 use App\Models\MainBox;
 use Illuminate\Http\Request;
@@ -74,11 +75,15 @@ class CreditController extends Controller
 		$credit->user_id = 1;
 		$credit->debtor = $request['debtor'];
 		$credit->provider = $request['provider'];
+		if ($request['provider'] != null && $request['provider'] != 0) {
+			$credit->status = 3;
+		} else {
+			$credit->status = 0;
+		}
 		$credit->headquarter_id = $request['headquarter_id'];
 		$credit->number_installments = $request['number_installments'];
 		$credit->number_paid_installments = $request['number_paid_installments'];
 		$credit->day_limit = $request['day_limit'];
-		$credit->status = 0;
 		$credit->start_date = $request['start_date'];
 		$credit->interest = $request['interest'];
 		$credit->annual_interest_percentage = $request['annual_interest_percentage'];
@@ -158,15 +163,48 @@ class CreditController extends Controller
 	{
 		$credit = Credit::findOrFail($id);
 		$credit->destroy($id);
-		return redirect('credit')->with('mensaje', 'Credit eliminado correctamente');
+		return redirect('credit')->with('mensaje', 'Credito eliminado correctamente');
 	}
 
 	public function changeStatus(Request $request,  Credit $credit)
 	{
-		//
-		$cre = Credit::find($credit->id);
-		$cre->status = $request->status;
-		$cre->save();
+		$credit_provider = '';
+		if ($credit->provider_id != null && $credit->provider_id != 0) {
+			$credit_provider = CreditProvider::where('credit_id', $credit->id)->first();
+
+			if ($credit_provider != null) {
+
+				if ($credit_provider->pending_value <= 0) {
+					if ($request->status  == 1) {
+						$update_main_box = new MainBoxController();
+						$update_main_box->subAmountMainBox($credit->credit_value);
+					}
+
+					if ($request->status  == 2 && $credit->status == 1) {
+						$update_main_box = new MainBoxController();
+						$update_main_box->addAmountMainBox($credit->credit_value);
+					}
+
+					$credit->status = $request->status;
+				}
+			}
+		}
+
+		// if ($credit->provider_id == null || $credit->provider_id == 0) {
+		// 	if ($request->status  == 1) {
+		// 		$update_main_box = new MainBoxController();
+		// 		$update_main_box->subAmountMainBox($credit->credit_value);
+		// 	}
+
+		// 	if ($request->status  == 2 && $credit->status == 1) {
+		// 		$update_main_box = new MainBoxController();
+		// 		$update_main_box->addAmountMainBox($credit->credit_value);
+		// 	}
+		// 	$credit->status = $request->status;
+		// }
+
+
+		$credit->save();
 	}
 
 	public function installments(Request $request, $id)
@@ -213,5 +251,21 @@ class CreditController extends Controller
 		$credit->capital_value = $credit->capital_value + $capital;
 		$credit->interest_value = $credit->interest_value + $interest;
 		$credit->save();
+	}
+
+	public function generalInformation(Credit $credit)
+	{
+		$credit = Credit::findOrFail($credit->id);
+		$data = array();
+
+		if ($credit->provider_id != null && $credit->provider_id != 0) {
+			$provider = $credit->provider()->firstOrFail();
+			$data['provider'] = $provider;
+		}
+		if ($credit->debtor_id != null && $credit->debtor_id != 0) {
+			$debtor = $credit->debtor()->firstOrFail();
+			$data['debtor'] = $debtor;
+		}
+		return $data;
 	}
 }

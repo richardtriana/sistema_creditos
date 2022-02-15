@@ -23,7 +23,7 @@ class CreateUsersTable extends Migration
             $table->string('password')->default(null)->nullable();
             $table->string('phone')->default(null)->nullable();
             $table->string('address')->default(null)->nullable();
-            $table->string('type_document')->default('CC')->nullable();
+            $table->char('type_document')->default('CC')->nullable();
             $table->string('document')->default(null)->nullable();
             $table->string('photo')->default(null)->nullable();
             $table->tinyInteger('status')->default(1);

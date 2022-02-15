@@ -2,6 +2,14 @@
   <div class="page">
     <div class="page-header d-flex justify-content-between p-4 border my-2">
       <h3>Creditos pendientes</h3>
+      <button
+        type="button"
+        class="btn btn-primary"
+        data-toggle="modal"
+        data-target="#formCreditModal"
+      >
+        Crear Credito
+      </button>
     </div>
     <div class="page-search d-flex justify-content-between p-4 border my-2">
       <div class="form-group col-8 m-auto">
@@ -52,7 +60,7 @@
                   class="btn btn-outline-primary"
                   data-toggle="modal"
                   data-target="#creditInformationModal"
-                  @click="showInformation(credit.id)"
+                  @click="showInformation(credit)"
                 >
                   <i class="bi bi-eye"></i>
 
@@ -103,20 +111,21 @@
       </section>
     </div>
 
-    <modal-installment ref="ModalInstallment" />
-    <credit-information  ref="CreditInformation"/>
+    <credit-information
+      ref="CreditInformation"
+      @list-credits="listCredits(1)"
+    />
+    <create-edit-credit ref="CreateEditCredit" @list-credits="listCredits(1)" />
   </div>
 </template>
 <script>
-import ModalInstallment from "../credit_helpers/ModalInstallment.vue";
+import CreateEditCredit from "../credit_clients/CreateEditCredit.vue";
 
-import Simulator from "../credit_helpers/Simulator.vue";
 import CreditInformation from "./CreditInformation.vue";
 export default {
   components: {
-    Simulator,
-    ModalInstallment,
     CreditInformation,
+    CreateEditCredit,
   },
   props: {
     installment: {
@@ -133,6 +142,7 @@ export default {
         0: "Pendiente",
         1: "Aprobado",
         2: "Rechazado",
+        3: "Pendiente pago a proveedor",
       },
     };
   },
@@ -149,10 +159,6 @@ export default {
         .then(function (response) {
           me.creditList = response.data;
         });
-    },
-
-    showInstallment: function (credit) {
-      this.$refs.ModalInstallment.listCreditInstallments(credit, 0);
     },
 
     changeStatus: function (id, status) {
@@ -178,10 +184,12 @@ export default {
         }
       });
     },
-    showInformation(credit_id) {
-      this.$refs.CreditInformation.showInformation(credit_id, 0);
-
-    }
+    showData: function (credit) {
+      this.$refs.CreateEditCredit.showEditCredit(credit);
+    },
+    showInformation(credit) {
+      this.$refs.CreditInformation.showInformation(credit, 0);
+    },
   },
 };
 </script>

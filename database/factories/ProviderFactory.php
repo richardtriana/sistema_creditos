@@ -23,7 +23,7 @@ class ProviderFactory extends Factory
     {
       return [
         'business_name' => $this->faker->company(),
-        'type_document' => $this->faker->numberBetween(1,2),
+        'type_document' => 'NIT',
         'document' => $this->faker->randomNumber(),
         'phone_1' => $this->faker->phoneNumber(),
         'phone_2' => $this->faker->phoneNumber(),
