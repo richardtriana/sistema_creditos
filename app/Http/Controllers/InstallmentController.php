@@ -223,7 +223,7 @@ class InstallmentController extends Controller
     $company = Company::first();
 
     $credit_id = $request->credit_id;
-    $credit = Credit::find($credit_id)->first();
+    $credit = Credit::where('id', $credit_id)->first();
     $client = $credit->client()->first();
     $installments = $credit->installments()->get();
 
