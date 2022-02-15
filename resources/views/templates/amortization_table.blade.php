@@ -70,13 +70,12 @@
     <table class="table">
       <thead>
         <tr>
-          <th scope="col">#</th>
-          <th scope="col">Fecha</th>
-          <th scope="col">Valor</th>
-          <th scope="col">Capital</th>
-          <th scope="col">Interés</th>
-          <th scope="col">Mora</th>
-          <th scope="col">Días de mora</th>
+          <th>#</th>
+          <th>Fecha</th>
+          <th>Valor</th>
+          <th>Abono Capital</th>
+          <th>Abono Interés</th>
+          <th>Saldo capital</th>
         </tr>
       </thead>
       <tbody>
@@ -87,8 +86,8 @@
           <td>{{ $f->value}}</td>
           <td>{{ $f->capital_value}}</td>
           <td>{{ $f->interest_value}}</td>
-          <td>{{ $f->late_interests_value}}</td>
-          <td>{{ $f->days_past_due}}</td>
+          <td>{{ $f->capital_balance}}</td>
+       
         </tr>
         @endforeach
 

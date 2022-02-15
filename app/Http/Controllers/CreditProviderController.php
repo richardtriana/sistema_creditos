@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Box;
 use App\Models\CreditProvider;
+use App\Models\MainBox;
 use Illuminate\Http\Request;
 
 class CreditProviderController extends Controller
@@ -29,6 +30,18 @@ class CreditProviderController extends Controller
 	public function store(Request $request, $credit_id)
 	{
 		$credit_provider = new CreditProvider();
+		$data = ([
+			'Asesor' => 1,
+			'Fecha' => date('Y-m-d'),
+			'Monto' => 0
+		]);
+		if ($credit_provider->history != null) {
+			$history = (array) json_decode($credit_provider->history);
+		} else {
+			$history = array();
+		}
+		array_push($history, $data);
+
 		$credit_provider->last_editor = 1;
 		$credit_provider->credit_id = $credit_id;
 		$credit_provider->provider_id = $request['provider_id'];
@@ -38,6 +51,7 @@ class CreditProviderController extends Controller
 		$credit_provider->paid_value = 0;
 		$credit_provider->pending_value = $request['credit_value'];
 		$credit_provider->last_paid = date('Y-m-d');
+		$credit_provider->history = json_encode($history);
 		$credit_provider->save();
 	}
 
@@ -47,8 +61,14 @@ class CreditProviderController extends Controller
 		$credit_provider->pending_value = $credit_provider->pending_value - $request['amount'];
 		$credit_provider->save();
 
-		$box = Box::where('headquarter_id', $credit_provider->headquarter_id)->firstOrFail();
-		$sub_amount_box = new BoxController();
-		$sub_amount_box->subAmountBox($box->id, $request['amount']);
+		$main_box = MainBox::first();
+		$main_box->current_balance = $main_box->current_balance - $credit_provider->paid_value;
+		$main_box->save();
+
+		if ($credit_provider->pending_value <= 0) {
+			$credit = $credit_provider->credit()->first();
+			$credit->status = 1;
+			$credit->save();
+		}
 	}
 }

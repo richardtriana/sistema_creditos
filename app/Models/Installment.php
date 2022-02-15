@@ -21,7 +21,8 @@ class Installment extends Model
     'capital_value',
     'paid_balance',
     'payment_register',
-    'status'
+    'status',
+    'capital_balance'
   ];
 
   public function credit()

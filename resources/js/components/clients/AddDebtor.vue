@@ -47,7 +47,6 @@
 								<th scope="col">Nombres</th>
 								<th>Documento</th>
 								<th scope="col">Direccion</th>
-								<th>Telefono</th>
 								<th>Correo</th>
 								<th>Contacto</th>
 								<th>Opciones</th>
@@ -59,10 +58,10 @@
 								<td>{{ debtor.name }}</td>
 								<td>{{ debtor.document }}</td>
 								<td>{{ debtor.address }}</td>
-								<td>{{ debtor.mobile }}</td>
 								<td>{{ debtor.email }}</td>
 								<td>
-									{{ debtor.contact }}
+									{{ debtor.phone_1 }} <br>
+									{{ debtor.phone_2 }}
 								</td>
 
 								<td>

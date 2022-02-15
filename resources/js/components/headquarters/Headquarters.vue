@@ -13,13 +13,13 @@
     </div>
     <div class="page-search d-flex justify-content-between p-4 border my-2">
       <div class="form-group col-8 m-auto">
-        <label for="search_headquarter">Buscar...</label>
+        <!-- <label for="search_headquarter">Buscar...</label> -->
         <input
           type="text"
           id="search_headquarter"
           name="search_headquarter"
           class="form-control"
-          placeholder="Nombres | Documento"
+          placeholder="Buscar sede"
           @keypress="listHeadquarters(1)"
           v-model="search_headquarter"
         />
@@ -29,7 +29,7 @@
       <section class="table-responsive">
         <table class="table table-sm table-bordered">
           <thead>
-            <tr>
+            <tr class="text-center">
               <th>id</th>
               <th>Sede</th>
               <th>NIT</th>
@@ -51,7 +51,7 @@
               <td>{{ headquarter.email }}</td>
               <td>{{ headquarter.legal_representative }}</td>
               <td>{{ headquarter.phone }}</td>
-              <td>
+              <td class="text-right">
                 <button
                   v-if="headquarter.status == 1"
                   class="btn btn-outline-danger"
@@ -67,8 +67,7 @@
                   <i class="bi bi-check2-circle"></i>
                 </button>
               </td>
-
-              <td class="text-center">
+              <td class="text-right">
                 <button
                   v-if="headquarter.status == 1"
                   class="btn btn-outline-primary"

@@ -24,7 +24,7 @@ class ClientFactory extends Factory
 		return [
 			'name' => $this->faker->firstName(),
 			'last_name' => $this->faker->lastName(),
-			'type_document' => $this->faker->boolean(),
+			'type_document' => 'CC',
 			'document' => $this->faker->randomNumber(),
 			'birth_date' => $this->faker->date(),
 			'email' => $this->faker->email(),

@@ -30,6 +30,7 @@ class InstallmentFactory extends Factory
       'late_interests_value' =>  $this->faker->randomFloat(4, 10, 60000),
       'interest_value' => $this->faker->randomFloat(4, 10, 60000),
       'capital_value' => $this->faker->randomFloat(4, 10, 60000),
+      'capital_balance' => $this->faker->randomFloat(4, 10, 60000),
       'payment_register' => $this->faker->date('Y-m-d', 'now'),
       'status' => $this->faker->boolean()
     ];

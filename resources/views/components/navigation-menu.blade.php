@@ -11,27 +11,18 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <!-- Left Side Of Navbar -->
       <ul class="navbar-nav mr-auto">
-
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownConfigurations" role="button" data-toggle="dropdown" aria-expanded="false">
             <i class="bi bi-cash-coin"></i>Creditos
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdownConfigurations">
-            <router-link class="dropdown-item" to="/credits"> Clientes </router-link>
-            <router-link class="dropdown-item" to="credit-providers"> Proveedores </router-link>
+            <router-link class="dropdown-item" :to="{ name: 'outsanding-credits' }"> Creditos pendientes </router-link>
+            <router-link class="dropdown-item" :to="{ name: 'credit-clients' }"> Clientes </router-link>
+            <router-link class="dropdown-item" :to="{ name: 'credit-providers' }"> Proveedores </router-link>
           </div>
-        </li>
-
-        <li class="nav-item">
-        </li>
-        <li class="nav-item">
-          <router-link class="nav-link" to="/headquarters"><i class="bi bi-house-door"></i> Sedes </router-link>
         </li>
         <li class="nav-item">
           <router-link class="nav-link" to="/expenses"><i class="bi bi-bag-dash"></i> Egresos </router-link>
-        </li>
-        <li class="nav-item">
-          <router-link class="nav-link" to="/boxes"> <i class="bi bi-box"></i>Cajas </router-link>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownPeople" role="button" data-toggle="dropdown" aria-expanded="false">
@@ -42,7 +33,12 @@
             <router-link class="dropdown-item" to="/clients"> Clientes </router-link>
           </div>
         </li>
-
+        <li class="nav-item">
+          <router-link class="nav-link" to="/boxes"> <i class="bi bi-box"></i>Cajas </router-link>
+        </li>
+        <li class="nav-item">
+          <router-link class="nav-link" to="/headquarters"><i class="bi bi-house-door"></i> Sedes </router-link>
+        </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownConfigurations" role="button" data-toggle="dropdown" aria-expanded="false">
             <i class="bi bi-gear"></i> Configuraciones
@@ -76,8 +72,7 @@
           </a>
 
           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
-                                                 document.getElementById('logout-form').submit();">
+            <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();document.getElementById('logout-form').submit();">
               {{ __('Logout') }}
             </a>
 

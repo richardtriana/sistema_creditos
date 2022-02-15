@@ -62,6 +62,7 @@
                     class="form-check-input"
                     id="debtor"
                     v-model="formCredit.debtor"
+                    value="0"
                   />
                   <label class="form-check-label" for="debtor"
                     >¿Usa codeudor?</label
@@ -263,16 +264,18 @@
     <add-client @add-client="receiveClient($event)" />
     <add-debtor @add-debtor="receiveDebtor($event)" />
     <add-provider @add-provider="receiveProvider($event)" />
+  
   </div>
 </template>
 
 <script>
-import AddClient from "../clients/AddClient.vue";
-import AddDebtor from "../clients/AddDebtor.vue";
-import AddProvider from "../providers/AddProvider.vue";
-import Simulator from "./Simulator.vue";
+import AddClient from '../../clients/AddClient.vue';
+import AddDebtor from '../../clients/AddDebtor.vue';
+import AddProvider from '../../providers/AddProvider.vue';
+
+import Simulator from '../credit_helpers/Simulator.vue';
 export default {
-  components: { Simulator, AddClient, AddDebtor, AddProvider },
+  components: { Simulator, AddClient, AddDebtor,  AddProvider },
   data() {
     return {
       edit: false,
@@ -282,7 +285,7 @@ export default {
         debtor_id: "",
         headquarter_id: "",
         user_id: "",
-        provider_id: 0,
+        provider_id: "",
         number_installments: "",
         number_paid_installments: "",
         number_paid_installments: "",
@@ -354,7 +357,7 @@ export default {
     },
     receiveProvider(provider) {
       this.formCredit.provider_id = provider.id;
-      this.provider_name = `${provider.name} ${provider.last_name}`;
+      this.provider_name = `${provider.business_name}`;
     },
     resetData() {
       let me = this;

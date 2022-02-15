@@ -5,11 +5,14 @@
       id="formProviderModal"
       tabindex="-1"
       aria-labelledby="formProviderModalLabel"
-      aria-hidden="true">
+      aria-hidden="true"
+    >
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="formProviderModalLabel">Modal proveedores</h5>
+            <h5 class="modal-title" id="formProviderModalLabel">
+              Modal proveedores
+            </h5>
             <button
               type="button"
               class="close"
@@ -23,22 +26,13 @@
           <div class="modal-body">
             <form>
               <div class="form-row">
-                <div class="form-group col-md-4">
-                  <label for="name">Nombres</label>
+                <div class="form-group col-md-8">
+                  <label for="business_name">Razón social</label>
                   <input
                     type="text"
                     class="form-control"
-                    id="name"
-                    v-model="formProvider.name"
-                  />
-                </div>
-                <div class="form-group col-md-4">
-                  <label for="Apellidos">Apellidos</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="Apellidos"
-                    v-model="formProvider.last_name"
+                    id="business_name"
+                    v-model="formProvider.business_name"
                   />
                 </div>
                 <div class="form-group col-md-4">
@@ -50,8 +44,13 @@
                     v-model="formProvider.type_document"
                   >
                     <option value="0" disabled>--Seleccionar--</option>
-                    <option value="1">Cédula de ciudadanía</option>
-                    <option value="2">Passaporte</option>
+                    <option
+                      v-for="(d, key) in type_documents"
+                      :key="key"
+                      :value="key"
+                    >
+                      {{ d }}
+                    </option>
                   </select>
                 </div>
                 <div class="form-group col-md-4">
@@ -117,7 +116,7 @@
             <button
               type="button"
               class="btn btn-primary rounded"
-              @click="editar ? editarProvider() : crearProvider()"
+              @click="editar ? editProvider() : createProvider()"
             >
               Guardar
             </button>
@@ -134,33 +133,33 @@ export default {
     return {
       editar: false,
       formProvider: {
-        name: "",
-        last_name: "",
-        type_document: 0,
+        business_name: "",
+        type_document: "CC",
         document: 0,
         phone_1: "",
         phone_2: "",
         email: "",
       },
+      type_documents: this.$root.$data.type_documents,
     };
   },
 
   methods: {
-    crearProvider() {
+    createProvider() {
       let me = this;
       axios.post("api/providers", this.formProvider).then(function () {
         $("#formProviderModal").modal("hide");
         me.formProvider = {};
-        this.$emit("listar-providers");
+        this.$emit("list-providers");
       });
     },
-    abirEditarProvider(provider) {
+    showEditProvider(provider) {
       this.editar = true;
       let me = this;
       $("#formProviderModal").modal("show");
       me.formProvider = provider;
     },
-    editarProvider() {
+    editProvider() {
       let me = this;
       axios
         .put("api/providers/" + this.formProvider.id, this.formProvider)
@@ -168,7 +167,7 @@ export default {
           $("#formProviderModal").modal("hide");
           me.formProvider = {};
         });
-      this.$emit("listar-providers");
+      this.$emit("list-providers");
 
       this.editar = false;
     },

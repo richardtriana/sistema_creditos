@@ -43,11 +43,10 @@
           <table class="table table-bordered table-sm table-responsive">
             <thead>
               <tr>
-                <th scope="col">#</th>
-                <th scope="col">Nombres</th>
+                <th>#</th>
+                <th>Nombres</th>
                 <th>Documento</th>
-                <th scope="col">Direccion</th>
-                <th>Telefono</th>
+                <th>Direccion</th>
                 <th>Correo</th>
                 <th>Contacto</th>
                 <th>Opciones</th>
@@ -59,12 +58,11 @@
                 <td>{{ client.name }}</td>
                 <td>{{ client.document }}</td>
                 <td>{{ client.address }}</td>
-                <td>{{ client.mobile }}</td>
                 <td>{{ client.email }}</td>
                 <td>
-                  {{ client.contact }}
+                  {{ client.phone_1 }} <br />
+                  {{ client.phone_2 }}
                 </td>
-
                 <td>
                   <button
                     class="btn btn-outline-secondary"

@@ -12,23 +12,35 @@
       </button>
     </div>
     <div class="page-search d-flex justify-content-between p-4 border my-2">
-      <div class="form-group col-8 m-auto">
-        <label for="search_client">Buscar Cliente...</label>
-        <input
-          type="text"
-          id="search_client"
-          name="search_client"
-          class="form-control"
-          placeholder="Nombres | Documento"
-          @keypress="listCredits()"
-          v-model="search_client"
-        />
+      <div class="form-row col-8 m-auto">
+        <div class="col">
+          <input
+            type="text"
+            id="search_client"
+            name="search_client"
+            class="form-control col"
+            placeholder="Buscar cliente | Documento"
+            @keyup="listCredits()"
+            v-model="search_client"
+          />
+        </div>
+        <div class="col">
+          <select
+            name="status"
+            id="status"
+            v-model="status"
+            class="custom-select col"
+            @click="listCredits()"
+          >
+            <option v-for="(st, index) in creditStatus" :value="index" :key="index"> {{st}}</option>
+          </select>
+        </div>
       </div>
     </div>
 
     <div class="page-content mt-4" style="width: 100%">
       <section class="table-responsive">
-        <table class="table table-sm table-bordered ">
+        <table class="table table-sm table-bordered">
           <thead>
             <tr class="text-center">
               <th>ID</th>
@@ -37,7 +49,6 @@
               <th>Valor crédito</th>
               <th>Valor Abonado</th>
               <th>Nro Cuotas</th>
-              <th>Cuotas</th>
               <th>Estado</th>
               <th>Ver Cuotas</th>
               <th>
@@ -56,10 +67,8 @@
               <td class="text-right">{{ credit.credit_value | currency }}</td>
               <td class="text-right">{{ credit.paid_value | currency }}</td>
               <td>{{ credit.number_installments }}</td>
-              <td>{{ credit.number_paid_installments }}</td>
               <td>
-                <span v-if="credit.status == 1">Activo</span>
-                <span v-if="credit.status == 0">Inactivo</span>
+                {{ creditStatus[credit.status] }}
               </td>
               <td class="text-center">
                 <button
@@ -80,7 +89,7 @@
                   <i class="bi bi-eye-slash"></i>
                 </button>
               </td>
-              <td>
+              <td class="text-center">
                 <button
                   class="btn btn-outline-primary"
                   @click="
@@ -90,7 +99,7 @@
                   <i class="bi bi-file-pdf"></i>
                 </button>
               </td>
-              <td class="text-left">
+              <td class="text-right">
                 <button
                   v-if="credit.status == 1"
                   class="btn btn-outline-primary"
@@ -103,42 +112,49 @@
                 </button>
 
                 <button
-                  v-if="credit.status == 1"
+                  v-if="credit.status == 0"
                   class="btn btn-outline-danger"
-                  @click="changeStatus(credit.id)"
+                  @click="changeStatus(credit.id, 2)"
                 >
                   <i class="bi bi-trash"></i>
                 </button>
                 <button
                   v-if="credit.status == 0"
                   class="btn btn-outline-success"
-                  @click="changeStatus(credit.id)"
+                  @click="changeStatus(credit.id, 1)"
                 >
                   <i class="bi bi-check2-circle"></i>
                 </button>
               </td>
             </tr>
           </tbody>
-          <div v-else>
-            <div
-              class="alert alert-danger"
-              style="margin: 2px auto; width: 30%"
-            >
-              <p>No se encontraron cleintes con creditos.</p>
-              <p>Crear cliente.</p>
-            </div>
-            <div class="alert alert-info" style="margin: 2px auto; width: 30%">
-              Crear un nuevo Cliente
-              <button
-                type="button"
-                class="btn btn-primary"
-                data-toggle="modal"
-                data-target="#formClientModal"
-              >
-                Crear cliente
-              </button>
-            </div>
-          </div>
+          <tbody v-else>
+            <tr>
+              <td colspan="11">
+                <div
+                  class="alert alert-danger text-center"
+                  style="margin: 2px auto; width: 30%"
+                >
+                  <p>No se encontraron clientes con creditos.</p>
+                  <p>Crear cliente.</p>
+                </div>
+                <div
+                  class="alert alert-info"
+                  style="margin: 2px auto; width: 30%"
+                >
+                  Crear un nuevo Cliente
+                  <button
+                    type="button"
+                    class="btn btn-primary"
+                    data-toggle="modal"
+                    data-target="#formClientModal"
+                  >
+                    Crear cliente
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
         </table>
         <pagination
           :align="'center'"
@@ -161,34 +177,34 @@
 
     <create-edit-credit ref="CreateEditCredit" @list-credits="listCredits(1)" />
 
-    <installment ref="Installment" />
+    <modal-installment ref="ModalInstallment" />
   </div>
 </template>
 <script>
 import CreateEditCredit from "./CreateEditCredit.vue";
-import Simulator from "./Simulator.vue";
 
-import Installment from "./Installment.vue";
-import ModalCreateEditClient from "../clients/ModalCreateEditClient.vue";
+import ModalCreateEditClient from "../../clients/ModalCreateEditClient.vue";
+import ModalInstallment from "../credit_helpers/ModalInstallment.vue";
 
 export default {
   components: {
     CreateEditCredit,
-    Simulator,
     ModalCreateEditClient,
-    Installment,
+    ModalInstallment,
   },
 
-  props: {
-    installment: {
-      type: Object,
-    },
-  },
   data() {
     return {
       search_client: "",
+      status: 1,
       creditList: {},
       clientList: {},
+      creditStatus: {
+        0: "Pendiente",
+        1: "Aprobado",
+        2: "Rechazado",
+        3: "Pendiente pago a proveedor",
+      },
     };
   },
   created() {
@@ -198,7 +214,9 @@ export default {
     listCredits(page = 1) {
       let me = this;
       axios
-        .get(`api/credits?page=${page}&credit=${this.search_client}`)
+        .get(
+          `api/credits?page=${page}&credit=${this.search_client}&status=${this.status}`
+        )
         .then(function (response) {
           me.creditList = response.data;
         });
@@ -214,17 +232,18 @@ export default {
     showData: function (credit) {
       this.$refs.CreateEditCredit.showEditCredit(credit);
     },
-    simularCredit: function () {
-      this.$refs.Simulator.openSimulator();
-    },
+
     showInstallment: function (credit) {
-      this.$refs.Installment.listCreditInstallments(credit);
+      this.$refs.ModalInstallment.listCreditInstallments(credit, 1);
     },
     showDataClient: function (client) {
       this.$refs.ModalCreateEditClient.showEditClient(client);
     },
-    changeStatus: function (id) {
+    changeStatus: function (id, status) {
       let me = this;
+      var data = {
+        status: status,
+      };
 
       Swal.fire({
         title: "¿Quieres cambiar el status del credito?",
@@ -234,7 +253,7 @@ export default {
       }).then((result) => {
         if (result.isConfirmed) {
           axios
-            .post("api/credits/" + id + "/change-status", null, me.$root.config)
+            .post(`api/credits/${id}/change-status`, data, me.$root.config)
             .then(function () {
               me.listCredits(1);
             });

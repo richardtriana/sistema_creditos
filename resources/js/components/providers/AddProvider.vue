@@ -43,26 +43,30 @@
           <table class="table table-bordered table-sm table-responsive">
             <thead>
               <tr>
-                <th scope="col">#</th>
-                <th scope="col">Nombres</th>
+                <th>#</th>
+                <th>Razón social</th>
                 <th>Documento</th>
-                <th scope="col">Direccion</th>
-                <th>Telefono</th>
+                <th>Direccion</th>
+
                 <th>Correo</th>
                 <th>Contacto</th>
                 <th>Opciones</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="provider in ProviderList.data" v-bind:key="provider.id">
+              <tr
+                v-for="provider in ProviderList.data"
+                v-bind:key="provider.id"
+              >
                 <th scope="row">{{ provider.code }}</th>
-                <td>{{ provider.name }}</td>
+                <td>{{ provider.business_name }}</td>
                 <td>{{ provider.document }}</td>
                 <td>{{ provider.address }}</td>
-                <td>{{ provider.mobile }}</td>
+
                 <td>{{ provider.email }}</td>
                 <td>
-                  {{ provider.contact }}
+                  {{ provider.phone_1 }} <br />
+                  {{ provider.phone_2 }}
                 </td>
 
                 <td>

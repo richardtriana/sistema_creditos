@@ -22,9 +22,8 @@ class ProviderFactory extends Factory
     public function definition()
     {
       return [
-        'name' => $this->faker->firstName(),
-        'last_name' => $this->faker->lastName(),
-        'type_document' => $this->faker->numberBetween(1,2),
+        'business_name' => $this->faker->company(),
+        'type_document' => 'NIT',
         'document' => $this->faker->randomNumber(),
         'phone_1' => $this->faker->phoneNumber(),
         'phone_2' => $this->faker->phoneNumber(),
