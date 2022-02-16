@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Headquarter;
 use App\Models\Credit;
 use App\Models\CreditProvider;
+use App\Models\Entry;
 use App\Models\Installment;
 use App\Models\MainBox;
 use Illuminate\Http\Request;
@@ -221,6 +222,7 @@ class CreditController extends Controller
 		$amount_paid = $request['amount'];
 
 		$credit = Credit::findOrFail($credit_id);
+		$client = $credit->client()->first();
 		$listInstallments = $credit->installments()->where('status', '0')->get();
 
 		for ($i = 0; $i < count($listInstallments) && $amount > 0; $i++) {
@@ -234,6 +236,18 @@ class CreditController extends Controller
 		}
 		$print_cuota = new PrintTicketController;
 		$print_cuota = $print_cuota->printPayment($id, $amount_paid, $no_installment_paid);
+
+
+
+		$entry =  new Entry();
+		$entry->headquarter_id = $credit->headquarter_id;
+		$entry->user_id = 1;
+		$entry->credit_id = $credit->id;
+		$entry->description = "Cliente: {$client->name} {$client->last_name}";
+		$entry->date = date('Y-m-d');
+		$entry->type_entry = 'Abono a crédito';
+		$entry->price = $amount;
+		$entry->save();
 	}
 
 	public function updateValuesCredit($id, $total_amount, $capital, $interest)

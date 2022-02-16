@@ -107,14 +107,18 @@ const routes = [
 		component: require("./components/expenses/Expenses.vue").default,
 	},
 	{
+		path: "/entries",
+		component: require("./components/entries/Entries.vue").default,
+	},
+	{
 		path: "/reports",
 		component: require("./components/reports/ReportsDashboard.vue").default,
 		name: "reports",
 		children: [
 			{
 				path: "credit",
-				component: require("./components/reports/ReportCredits.vue").default,
-				name: "report-credit",
+				component: require("./components/reports/ReportPortfolio.vue").default,
+				name: "report-portfolio",
 			},
 		],
 	},

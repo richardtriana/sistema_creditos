@@ -114,14 +114,12 @@ class UserController extends Controller
 
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
         User::destroy($id);
         return redirect('user')->with('mensaje', 'User eliminado correctamente');
     }
 
     public function changeStatus(User $user)
     {
-        //
         $u = User::find($user->id);
         $u->status = !$u->status;
         $u->save();

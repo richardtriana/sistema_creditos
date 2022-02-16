@@ -37,8 +37,34 @@
                   step="any"
                   class="form-control"
                   id="current_balance"
-                  aria-describedby="emailHelp"
+                  aria-describedby="current_balanceHelp"
                   v-model="formBox.current_balance"
+                  disabled
+                  readonly
+                />
+              </div>
+              <div class="form-group">
+                <label for="input">Entradas</label>
+                <input
+                  type="number"
+                  step="any"
+                  class="form-control"
+                  id="input"
+                  aria-describedby="inputlHelp"
+                  v-model="formBox.input"
+                  disabled
+                  readonly
+                />
+              </div>
+              <div class="form-group">
+                <label for="output">Salidas</label>
+                <input
+                  type="number"
+                  step="any"
+                  class="form-control"
+                  id="output"
+                  aria-describedby="outputlHelp"
+                  v-model="formBox.output"
                   disabled
                   readonly
                 />
@@ -162,6 +188,7 @@ export default {
     },
 
     cashRegister(box) {
+      box.add_amount = this.add_amount;
       axios
         .post(`api/main-box/cash-register/${box.id}`, box)
         .then(() => this.$emit("list-boxes"))
