@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="page-header">
-      <h3>Reporte de clientes</h3>
+      <h3>Reporte de cartera</h3>
     </div>
     <div class="page-content">
       <section class="table-responsive">
@@ -16,8 +16,8 @@
               <th>Nro. Cuota</th>
             </tr>
           </thead>
-          <tbody v-if="reportCreditsList.data">
-            <tr v-for="report in reportCreditsList.data" :key="report.id">
+          <tbody v-if="ReportPortfolioList.data">
+            <tr v-for="report in ReportPortfolioList.data" :key="report.id">
               <td>{{ report.credit_id }}</td>
               <td>{{ report.name }} {{ report.last_name }}</td>
               <td class="text-right">{{ report.credit_value | currency }}</td>
@@ -38,9 +38,9 @@
         </table>
         <pagination
           :align="'center'"
-          :data="reportCreditsList"
+          :data="ReportPortfolioList"
           :limit="2"
-          @pagination-change-page="listReportCredits"
+          @pagination-change-page="listReportPortfolio"
         >
           <span slot="prev-nav"><i class="bi bi-chevron-double-left"></i></span>
           <span slot="next-nav"
@@ -56,19 +56,19 @@
 export default {
   data() {
     return {
-      reportCreditsList: {},
+      ReportPortfolioList: {},
       now: new Date().toISOString().slice(0, 10),
     };
   },
   methods: {
-    listReportCredits(page=1) {
-      axios.get(`api/reports/credits?page=${page}`).then((response) => {
-        this.reportCreditsList = response.data;
+    listReportPortfolio(page=1) {
+      axios.get(`api/reports/portfolio?page=${page}`).then((response) => {
+        this.ReportPortfolioList = response.data;
       });
     },
   },
   mounted() {
-    this.listReportCredits();
+    this.listReportPortfolio();
   },
 };
 </script>

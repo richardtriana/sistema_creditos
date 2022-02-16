@@ -58,7 +58,7 @@
 
 <script>
 import Simulator from "../credits/credit_helpers/Simulator.vue";
-import Disbursements from "../credits/outstanding_credits/Disbursements.vue";
+import Disbursements from "../credits/outstanding_credits/Portfolio.vue";
 
 export default {
   components: { Simulator, Disbursements },

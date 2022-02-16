@@ -2,7 +2,7 @@
   <div class="container">
     <a class="navbar-brand" href="{{ url('/') }}">
       {{-- {{ config('app.name', 'Laravel') }} --}}
-      <img src="{{ asset('images/logo.jpeg') }}" alt="" srcset="" width="100">
+      <img src="{{ asset('logo.jpeg') }}" alt="" srcset="" width="100">
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
@@ -24,6 +24,9 @@
           </div>
         </li>
         <li class="nav-item">
+          <router-link class="nav-link" to="/entries"><i class="bi bi-bag-dash"></i> Ingresos </router-link>
+        </li>
+        <li class="nav-item">
           <router-link class="nav-link" to="/expenses"><i class="bi bi-bag-dash"></i> Egresos </router-link>
         </li>
         <li class="nav-item dropdown">
@@ -32,7 +35,7 @@
             <i class="bi bi-cash-coin"></i>Reportes
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdownConfigurations">
-            <router-link class="dropdown-item"  :to="{ name: 'report-credit' }"> Reporte de creditos </router-link>
+            <router-link class="dropdown-item"  :to="{ name: 'report-portfolio' }"> Cartera </router-link>
           </div>
         </li>
         <li class="nav-item dropdown">

@@ -15,7 +15,7 @@ class CreateExpensesTable extends Migration
 	{
 		Schema::create('expenses', function (Blueprint $table) {
 			$table->id();
-			$table->foreignId('headquarter_id');
+			$table->foreignId('headquarter_id')->nullable();
 			$table->foreignId('user_id');
 			$table->string('description');
 			$table->date('date');
