@@ -61,8 +61,6 @@ class PrintTicketController extends Controller
             $printer->text("\n");
             $printer->text("\n");
             $printer->setTextSize(1, 1);
-            // $printer->text("Cajero(a): ");
-            // $printer->text($system_user->name . "\n");
             $printer->setEmphasis(false);
 
             $printer->text(sprintf('%-20s %-20s', 'Client', $client->name . ' ' . $client->last_name));
@@ -173,11 +171,11 @@ class PrintTicketController extends Controller
 
     public function printEntry(Entry $entry)
     {
-        
+
         $company = Company::first();
         // Orden
         $headquarter = Headquarter::findOrFail($entry->headquarter_id)->first();
-        
+
 
         if (!$headquarter->pos_printer || $headquarter->pos_printer == '') {
             return false;
@@ -219,9 +217,8 @@ class PrintTicketController extends Controller
             $printer->text("\n");
             $printer->text($entry->type_entry);
             $printer->text("\n");
-            $printer->setTextSize(1, 1);
-            // $printer->text("Cajero(a): ");
-            // $printer->text($system_user->name . "\n");
+            $printer->setJustification(Printer::JUSTIFY_LEFT);
+
             $printer->setEmphasis(false);
 
             $printer->text(sprintf('%-20s %-20s', 'Client', $client->name . ' ' . $client->last_name));

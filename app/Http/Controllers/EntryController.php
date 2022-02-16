@@ -38,7 +38,7 @@ class EntryController extends Controller
 		$entry->description = "Cliente: {$client->name} {$client->last_name}";
 		$entry->date = date('Y-m-d');
 		$entry->type_entry = 'Pago de cuota';
-		$entry->price = $request['value'];
+		$entry->price = $request->data['value'] - $request['value'];
 		$entry->save();
 	}
 }
