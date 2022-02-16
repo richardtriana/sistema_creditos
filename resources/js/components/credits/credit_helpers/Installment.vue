@@ -93,11 +93,18 @@ export default {
       var data = {
         amount: quote.value,
       };
+
       if (quote.value > 0) {
         axios
           .post(`api/installment/${quote.id}/pay-installment`, data)
-          .then(function () {
-            me.listCreditInstallments(me.id_credit);
+          .then(function (response) {
+            me.listCreditInstallments(me.id_credit, 1);
+            var entry = {
+              data: quote,
+              value: response.data.balance,
+            };
+
+            axios.post(`api/entries`, entry);
           });
       } else {
         Swal.fire({

@@ -96,17 +96,6 @@ class InstallmentController extends Controller
     $installment->save();
   }
 
-  /**
-   * Remove the specified resource from storage.
-   *
-   * @param  \App\Models\Installment  $installment
-   * @return \Illuminate\Http\Response
-   */
-  public function destroy(Installment $installment)
-  {
-    //
-  }
-
   public function calculateInstallments(Request $request)
   {
     $capital = $request->credit_value;

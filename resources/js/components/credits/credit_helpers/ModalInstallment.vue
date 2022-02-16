@@ -100,7 +100,7 @@ export default {
       if (this.amount_value > 0) {
         axios
           .post(`api/credits/pay-credit-installments/${this.id_credit}`, data)
-          // .then(this.listCreditInstallments(this.id_credit))
+          .then(this.listCreditInstallments(this.id_credit, 1))
           .finally(
             this.$refs.Installment.listCreditInstallments(
               this.id_credit,

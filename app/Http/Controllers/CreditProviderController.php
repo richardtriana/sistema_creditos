@@ -31,9 +31,9 @@ class CreditProviderController extends Controller
 	{
 		$credit_provider = new CreditProvider();
 		$data = ([
-			'Asesor' => 1,
+			'Asesor' => 'Richard Peña',
 			'Fecha' => date('Y-m-d'),
-			'Monto' => 0
+			'Monto' => $request['credit_value']
 		]);
 		if ($credit_provider->history != null) {
 			$history = (array) json_decode($credit_provider->history);
@@ -57,8 +57,23 @@ class CreditProviderController extends Controller
 
 	public function payCreditProvider(CreditProvider $credit_provider, Request $request)
 	{
+
+		$data = ([
+			'Asesor' => 'Richard Peña',
+			'Fecha' => date('Y-m-d'),
+			'Monto' => $request['amount']
+		]);
+		if ($credit_provider->history != null) {
+			$history = (array) json_decode($credit_provider->history);
+		} else {
+			$history = array();
+		}
+		array_push($history, $data);
+		
 		$credit_provider->paid_value = $credit_provider->paid_value + $request['amount'];
 		$credit_provider->pending_value = $credit_provider->pending_value - $request['amount'];
+		$credit_provider->history = json_encode($history);
+
 		$credit_provider->save();
 
 		$main_box = MainBox::first();

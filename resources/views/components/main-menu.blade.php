@@ -1,7 +1,7 @@
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary justify-content-between">
     <a class="navbar-brand" href="#">
-        <img src="{{ asset('images/logo.jpeg') }}" alt="" srcset="" width="100">
+        <img src="{{ asset('logo.jpeg') }}" alt="" srcset="" width="100">
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
         aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">

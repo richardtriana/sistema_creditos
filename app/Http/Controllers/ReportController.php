@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
-	public function ReportCredits()
+	public function ReportPortfolio()
 	{
 		$now = date("Y-m-d");
 		$payment_date_add_days = date("Y-m-d", strtotime($now . "+ 5 days"));
