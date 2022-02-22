@@ -58,6 +58,9 @@ Route::get('/credits/{credit}/installments', [CreditController::class, 'installm
 Route::post('/credit-providers/pay-credit-provider/{credit_provider}', [CreditProviderController::class, 'payCreditProvider']);
 Route::resource('/credit-providers', CreditProviderController::class);
 
+Route::get('/entries/show-entry/{entry}', [EntryController::class, 'showEntry']);
+Route::resource('/entries',  EntryController::class);
+
 Route::resource('/expenses',  ExpenseController::class);
 Route::post('/expenses/{expense}/change-status',  [ExpenseController::class, 'changeStatus']);
 
@@ -82,7 +85,6 @@ Route::get('/print-installment', [PrintTicketController::class, 'printInstallmen
 Route::get('/print-entry/{entry}', [PrintTicketController::class, 'printEntry']);
 
 Route::get('/reports/portfolio', [ReportController::class, 'ReportPortfolio']);
-Route::resource('/entries',  EntryController::class);
 
 Route::resource('/type-expenses',  TypeExpenseController::class);
 
