@@ -18,8 +18,18 @@ class ReportController extends Controller
 			->whereNull('payment_register')
 			->leftJoin('credits', 'installments.credit_id', 'credits.id')
 			->leftJoin('clients', 'credits.client_id', 'clients.id')
-			->paginate(10);
+			->paginate(15);
 
 		return $installments;
+	}
+
+
+	public function ReportGeneralCredits(Request $request)
+	{
+		$credits = Credit::select()->paginate(15);
+		$total_credits = new CreditController;
+		$total_credits = $total_credits->getTotalValueCredits();
+
+		return ['credits' => $credits, 'total_credits' => $total_credits];
 	}
 }

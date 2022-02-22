@@ -12,6 +12,7 @@ use App\Models\Installment;
 use App\Models\MainBox;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class CreditController extends Controller
 {
@@ -281,5 +282,16 @@ class CreditController extends Controller
 			$data['debtor'] = $debtor;
 		}
 		return $data;
+	}
+
+	public function getTotalValueCredits()
+	{
+		$credits = Credit::select(
+			DB::raw('SUM(credit_value) as credit_value '),
+			DB::raw('SUM(paid_value) as paid_value'),
+			DB::raw('SUM(interest_value) as interest_value'),
+			DB::raw('SUM(capital_value) as capital_value')
+		)->first();
+		return $credits;
 	}
 }

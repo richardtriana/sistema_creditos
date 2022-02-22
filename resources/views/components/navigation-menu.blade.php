@@ -35,7 +35,9 @@
             <i class="bi bi-cash-coin"></i>Reportes
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdownConfigurations">
-            <router-link class="dropdown-item"  :to="{ name: 'report-portfolio' }"> Cartera </router-link>
+            <router-link class="dropdown-item" :to="{ name: 'report-portfolio' }"> Cartera </router-link>
+            <router-link class="dropdown-item" :to="{ name: 'report-general-credits' }"> Reporte general de créditos
+            </router-link>
           </div>
         </li>
         <li class="nav-item dropdown">
