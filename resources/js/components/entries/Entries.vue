@@ -21,7 +21,8 @@
               <th>Valor</th>
               <th>Tipo de Salida</th>
               <th>Descripción</th>
-              <th>Reimprimir</th>
+              <th>Reimprimir Ticket</th>
+              <th>Ver Factura</th>
             </tr>
           </thead>
           <tbody v-if="entryList.data && entryList.data.length > 0">
@@ -34,9 +35,21 @@
               <td>
                 <button
                   class="btn btn-outline-success"
-                  @click="printEntry(e.id)"
+                  @click="printEntryTicket(e.id)"
+                  type="button"
                 >
-                  <i class="bi bi-receipt-cutoff"></i>                             
+                  <i class="bi bi-receipt-cutoff"></i>
+                </button>
+              </td>
+              <td>
+                <button
+                  class="btn btn-success"
+                  type="button"
+                  @click="
+                    printEntryPdf(e.id, e.user.name + '_' + e.user.last_name)
+                  "
+                >
+                  <i class="bi bi-eye"></i>
                 </button>
               </td>
             </tr>
@@ -78,7 +91,16 @@ export default {
           me.entryList = response.data;
         });
     },
-    printEntry(id) {
+    printEntryPdf(entry_id, client) {
+      axios.get(`api/entries/show-entry/${entry_id}`).then((response) => {
+        const pdf = response.data.pdf;
+        var a = document.createElement("a");
+        a.href = "data:application/pdf;base64," + pdf;
+        a.download = `credit_${entry_id}-${client}.pdf`;
+        a.click();
+      });
+    },
+    printEntryTicket(id) {
       axios.get(`api/print-entry/${id}`);
     },
   },
