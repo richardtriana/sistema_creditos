@@ -85,6 +85,8 @@ Route::get('/print-installment', [PrintTicketController::class, 'printInstallmen
 Route::get('/print-entry/{entry}', [PrintTicketController::class, 'printEntry']);
 
 Route::get('/reports/portfolio', [ReportController::class, 'ReportPortfolio']);
+Route::get('/reports/general-credits', [ReportController::class, 'ReportGeneralCredits']);
+Route::resource('/entries',  EntryController::class);
 
 Route::resource('/type-expenses',  TypeExpenseController::class);
 

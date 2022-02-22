@@ -7230,6 +7230,116 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/reports/ReportCreditsGeneral.vue?vue&type=script&lang=js&":
+/*!***********************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/reports/ReportCreditsGeneral.vue?vue&type=script&lang=js& ***!
+  \***********************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  data: function data() {
+    return {
+      ReportGeneralCreditsList: {},
+      ReportTotalValues: {}
+    };
+  },
+  methods: {
+    listReportGeneralCredits: function listReportGeneralCredits() {
+      var _this = this;
+
+      var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+      axios.get("api/reports/general-credits?page=".concat(page)).then(function (response) {
+        _this.ReportGeneralCreditsList = response.data.credits;
+        _this.ReportTotalValues = response.data.total_credits;
+      });
+    }
+  },
+  mounted: function mounted() {
+    this.listReportGeneralCredits();
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/reports/ReportPortfolio.vue?vue&type=script&lang=js&":
 /*!******************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/reports/ReportPortfolio.vue?vue&type=script&lang=js& ***!
@@ -7854,9 +7964,13 @@ var routes = [{
   component: __webpack_require__(/*! ./components/reports/ReportsDashboard.vue */ "./resources/js/components/reports/ReportsDashboard.vue")["default"],
   name: "reports",
   children: [{
-    path: "credit",
+    path: "portfolio",
     component: __webpack_require__(/*! ./components/reports/ReportPortfolio.vue */ "./resources/js/components/reports/ReportPortfolio.vue")["default"],
     name: "report-portfolio"
+  }, {
+    path: "credit",
+    component: __webpack_require__(/*! ./components/reports/ReportCreditsGeneral.vue */ "./resources/js/components/reports/ReportCreditsGeneral.vue")["default"],
+    name: "report-general-credits"
   }]
 }];
 var router = new vue_router__WEBPACK_IMPORTED_MODULE_7__["default"]({
@@ -49781,6 +49895,45 @@ component.options.__file = "resources/js/components/providers/Providers.vue"
 
 /***/ }),
 
+/***/ "./resources/js/components/reports/ReportCreditsGeneral.vue":
+/*!******************************************************************!*\
+  !*** ./resources/js/components/reports/ReportCreditsGeneral.vue ***!
+  \******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _ReportCreditsGeneral_vue_vue_type_template_id_8b731706___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ReportCreditsGeneral.vue?vue&type=template&id=8b731706& */ "./resources/js/components/reports/ReportCreditsGeneral.vue?vue&type=template&id=8b731706&");
+/* harmony import */ var _ReportCreditsGeneral_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ReportCreditsGeneral.vue?vue&type=script&lang=js& */ "./resources/js/components/reports/ReportCreditsGeneral.vue?vue&type=script&lang=js&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _ReportCreditsGeneral_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _ReportCreditsGeneral_vue_vue_type_template_id_8b731706___WEBPACK_IMPORTED_MODULE_0__.render,
+  _ReportCreditsGeneral_vue_vue_type_template_id_8b731706___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/reports/ReportCreditsGeneral.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
 /***/ "./resources/js/components/reports/ReportPortfolio.vue":
 /*!*************************************************************!*\
   !*** ./resources/js/components/reports/ReportPortfolio.vue ***!
@@ -50465,6 +50618,22 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/reports/ReportCreditsGeneral.vue?vue&type=script&lang=js&":
+/*!*******************************************************************************************!*\
+  !*** ./resources/js/components/reports/ReportCreditsGeneral.vue?vue&type=script&lang=js& ***!
+  \*******************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ReportCreditsGeneral_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ReportCreditsGeneral.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/reports/ReportCreditsGeneral.vue?vue&type=script&lang=js&");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ReportCreditsGeneral_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
 /***/ "./resources/js/components/reports/ReportPortfolio.vue?vue&type=script&lang=js&":
 /*!**************************************************************************************!*\
   !*** ./resources/js/components/reports/ReportPortfolio.vue?vue&type=script&lang=js& ***!
@@ -51086,6 +51255,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Providers_vue_vue_type_template_id_c24b724c___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
 /* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Providers_vue_vue_type_template_id_c24b724c___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Providers.vue?vue&type=template&id=c24b724c& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/providers/Providers.vue?vue&type=template&id=c24b724c&");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/reports/ReportCreditsGeneral.vue?vue&type=template&id=8b731706&":
+/*!*************************************************************************************************!*\
+  !*** ./resources/js/components/reports/ReportCreditsGeneral.vue?vue&type=template&id=8b731706& ***!
+  \*************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ReportCreditsGeneral_vue_vue_type_template_id_8b731706___WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ReportCreditsGeneral_vue_vue_type_template_id_8b731706___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ReportCreditsGeneral_vue_vue_type_template_id_8b731706___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ReportCreditsGeneral.vue?vue&type=template&id=8b731706& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/reports/ReportCreditsGeneral.vue?vue&type=template&id=8b731706&");
 
 
 /***/ }),
@@ -59232,6 +59418,194 @@ var staticRenderFns = [
         _c("th", [_vm._v("Estado")]),
         _vm._v(" "),
         _c("th", [_vm._v("Opciones")]),
+      ]),
+    ])
+  },
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/reports/ReportCreditsGeneral.vue?vue&type=template&id=8b731706&":
+/*!****************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/reports/ReportCreditsGeneral.vue?vue&type=template&id=8b731706& ***!
+  \****************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* binding */ render),
+/* harmony export */   "staticRenderFns": () => (/* binding */ staticRenderFns)
+/* harmony export */ });
+var render = function () {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "page" }, [
+    _vm._m(0),
+    _vm._v(" "),
+    _c("div", { staticClass: "page-content" }, [
+      _c(
+        "section",
+        { staticClass: "table-responsive" },
+        [
+          _c("table", { staticClass: "table table-sm table-bordered" }, [
+            _vm._m(1),
+            _vm._v(" "),
+            _vm.ReportGeneralCreditsList.data
+              ? _c(
+                  "tbody",
+                  _vm._l(_vm.ReportGeneralCreditsList.data, function (report) {
+                    return _c("tr", { key: report.id }, [
+                      _c("td", { staticClass: "text-right" }, [
+                        _vm._v(_vm._s(report.id)),
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(report.client.name) +
+                            " " +
+                            _vm._s(report.client.last_name)
+                        ),
+                      ]),
+                      _vm._v(" "),
+                      _c("td", { staticClass: "text-right" }, [
+                        _vm._v(_vm._s(_vm._f("currency")(report.credit_value))),
+                      ]),
+                      _vm._v(" "),
+                      _c("td", { staticClass: "text-center" }, [
+                        _vm._v(_vm._s(report.number_installments)),
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(report.status))]),
+                      _vm._v(" "),
+                      _c("td", { staticClass: "text-right" }, [
+                        _vm._v(_vm._s(_vm._f("currency")(report.paid_value))),
+                      ]),
+                      _vm._v(" "),
+                      _c("td", { staticClass: "text-right" }, [
+                        _vm._v(
+                          _vm._s(_vm._f("currency")(report.capital_value))
+                        ),
+                      ]),
+                      _vm._v(" "),
+                      _c("td", { staticClass: "text-right" }, [
+                        _vm._v(
+                          _vm._s(_vm._f("currency")(report.interest_value))
+                        ),
+                      ]),
+                    ])
+                  }),
+                  0
+                )
+              : _vm._e(),
+          ]),
+          _vm._v(" "),
+          _c(
+            "pagination",
+            {
+              attrs: {
+                align: "center",
+                data: _vm.ReportGeneralCreditsList,
+                limit: 2,
+              },
+              on: { "pagination-change-page": _vm.listReportGeneralCredits },
+            },
+            [
+              _c("span", { attrs: { slot: "prev-nav" }, slot: "prev-nav" }, [
+                _c("i", { staticClass: "bi bi-chevron-double-left" }),
+              ]),
+              _vm._v(" "),
+              _c("span", { attrs: { slot: "next-nav" }, slot: "next-nav" }, [
+                _c("i", { staticClass: "bi bi-chevron-double-right" }),
+              ]),
+            ]
+          ),
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c("section", { staticClass: "table-responsive" }, [
+        _c("h5", [_vm._v("Totalizado:")]),
+        _vm._v(" "),
+        _c("table", { staticClass: "table table-sm table-bordered" }, [
+          _c("tr", [
+            _c("th", [_vm._v("Total Valor créditos")]),
+            _vm._v(" "),
+            _c("td", [
+              _vm._v(
+                _vm._s(_vm._f("currency")(_vm.ReportTotalValues.credit_value))
+              ),
+            ]),
+          ]),
+          _vm._v(" "),
+          _c("tr", [
+            _c("th", [_vm._v("Total abonado")]),
+            _vm._v(" "),
+            _c("td", [
+              _vm._v(
+                _vm._s(_vm._f("currency")(_vm.ReportTotalValues.paid_value))
+              ),
+            ]),
+          ]),
+          _vm._v(" "),
+          _c("tr", [
+            _c("th", [_vm._v("Total abono a capital")]),
+            _vm._v(" "),
+            _c("td", [
+              _vm._v(
+                _vm._s(_vm._f("currency")(_vm.ReportTotalValues.capital_value))
+              ),
+            ]),
+          ]),
+          _vm._v(" "),
+          _c("tr", [
+            _c("th", [_vm._v("Total abonado a intereses")]),
+            _vm._v(" "),
+            _c("td", [
+              _vm._v(
+                _vm._s(_vm._f("currency")(_vm.ReportTotalValues.interest_value))
+              ),
+            ]),
+          ]),
+        ]),
+      ]),
+    ]),
+  ])
+}
+var staticRenderFns = [
+  function () {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "page-header" }, [
+      _c("h3", [_vm._v("Reporte general de créditos")]),
+    ])
+  },
+  function () {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", { staticClass: "text-center" }, [
+        _c("th", [_vm._v("#")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Cliente")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Valor crédito")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Número de cuotas")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Estado")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Total abonado")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Abono a capital")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Abono a intereses")]),
       ]),
     ])
   },
