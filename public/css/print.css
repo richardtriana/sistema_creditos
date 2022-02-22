@@ -1,0 +1,38 @@
+@page {
+	size: A7;
+	margin: 0;
+	padding: 10px;
+}
+
+body {
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	font-size: 9px;
+	line-height: 10px;
+}
+header {
+	width: 100%;
+}
+
+.table {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+.table th,
+.table td {
+	border: 1px solid #e4e4e4;
+	padding: 5px;
+}
+
+.table th,
+table th {
+	text-align: left;
+}
+
+.text-center {
+	text-align: center !important;
+}
+small {
+	font-size: 7px;
+	color: gray;
+}

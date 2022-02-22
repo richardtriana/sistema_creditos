@@ -5894,6 +5894,19 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -5912,7 +5925,16 @@ __webpack_require__.r(__webpack_exports__);
         me.entryList = response.data;
       });
     },
-    printEntry: function printEntry(id) {
+    printEntryPdf: function printEntryPdf(entry_id, client) {
+      axios.get("api/entries/show-entry/".concat(entry_id)).then(function (response) {
+        var pdf = response.data.pdf;
+        var a = document.createElement("a");
+        a.href = "data:application/pdf;base64," + pdf;
+        a.download = "credit_".concat(entry_id, "-").concat(client, ".pdf");
+        a.click();
+      });
+    },
+    printEntryTicket: function printEntryTicket(id) {
       axios.get("api/print-entry/".concat(id));
     }
   }
@@ -57075,13 +57097,33 @@ var render = function () {
                           "button",
                           {
                             staticClass: "btn btn-outline-success",
+                            attrs: { type: "button" },
                             on: {
                               click: function ($event) {
-                                return _vm.printEntry(e.id)
+                                return _vm.printEntryTicket(e.id)
                               },
                             },
                           },
                           [_c("i", { staticClass: "bi bi-receipt-cutoff" })]
+                        ),
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-success",
+                            attrs: { type: "button" },
+                            on: {
+                              click: function ($event) {
+                                return _vm.printEntryPdf(
+                                  e.id,
+                                  e.user.name + "_" + e.user.last_name
+                                )
+                              },
+                            },
+                          },
+                          [_c("i", { staticClass: "bi bi-eye" })]
                         ),
                       ]),
                     ])
@@ -57158,7 +57200,9 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Descripción")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Reimprimir")]),
+        _c("th", [_vm._v("Reimprimir Ticket")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Ver Factura")]),
       ]),
     ])
   },
