@@ -13,9 +13,19 @@ class ReportController extends Controller
 		$now = date("Y-m-d");
 		$payment_date_add_days = date("Y-m-d", strtotime($now . "+ 5 days"));
 
-		$installments = Installment::select('installments.*', 'credits.client_id', 'clients.name', 'clients.last_name', 'credits.credit_value')
+		$installments = Installment::select(
+			'installments.*',
+			'credits.client_id',
+			'clients.name',
+			'clients.last_name',
+			'clients.phone_1',
+			'clients.phone_2',
+			'credits.credit_value',
+			'credits.status',
+		)
 			->whereDate('payment_date', '<=', $payment_date_add_days)
 			->whereNull('payment_register')
+			->where('credits.status', 1)
 			->leftJoin('credits', 'installments.credit_id', 'credits.id')
 			->leftJoin('clients', 'credits.client_id', 'clients.id')
 			->paginate(15);

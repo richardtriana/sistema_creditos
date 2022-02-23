@@ -17,7 +17,8 @@ class CreditProvider extends Model
 		'credit_value',
 		'paid_value',
 		'pending_value',
-		'last_paid'
+		'last_paid',
+		'status'
 	];
 
 	protected $with = [

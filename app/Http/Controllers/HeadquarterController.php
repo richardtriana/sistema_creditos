@@ -50,8 +50,8 @@ class HeadquarterController extends Controller
 		$validate = Validator::make($request->all(), [
 			'headquarter' => 'required|string|min:3|max:50',
 			'status' => 'required|boolean',
-			'address' => 'nullable|boolean',
-			'nit' => 'nullable|boolean',
+			'address' => 'nullable|string',
+			'nit' => 'nullable|string',
 			'email' => 'required|email:rfc,dns|unique:users|max:255',
 			'legal_representative' => 'required|string'
 		]);

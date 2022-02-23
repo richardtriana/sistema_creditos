@@ -148,7 +148,7 @@
             <button
               type="button"
               class="btn btn-primary rounded"
-              @click="editar ? editarUser() : crearUser()"
+              @click="editar ? editUser() : createUser()"
             >
               Guardar
             </button>
@@ -182,12 +182,12 @@ export default {
       type_documents: this.$root.$data.type_documents,
     };
   },
-  // Function crearUsers
+  // Function createUsers
   created() {
     this.listHeadquarters(1);
   },
   methods: {
-    crearUser() {
+    createUser() {
       let me = this;
       axios.post("api/users", this.formUser).then(function () {
         $("#formUserModal").modal("hide");
@@ -200,7 +200,7 @@ export default {
       $("#formUserModal").modal("show");
       me.formUser = client;
     },
-    editarUser() {
+    editUser() {
       let me = this;
       axios
         .put("api/users/" + this.formUser.id, this.formUser)

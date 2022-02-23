@@ -24,6 +24,7 @@ class CreateCreditProvidersTable extends Migration
 			$table->double('pending_value')->default(0);
 			$table->date('last_paid')->nullable();
 			$table->json('history')->nullable();
+			$table->tinyInteger('status')->default(0);
 
 			$table->foreign('headquarter_id')
 				->references('id')

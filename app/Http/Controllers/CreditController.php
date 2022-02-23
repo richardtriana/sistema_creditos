@@ -25,6 +25,7 @@ class CreditController extends Controller
 	{
 		$credits = Credit::select();
 		$status = $request->status != null ? $request->status : 1;
+		$status = $status == 0 ? [0, 3] : [$request->status];
 
 		if ($request->credit && ($request->credit != '')) {
 			$credits  =   $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
@@ -33,16 +34,13 @@ class CreditController extends Controller
 				->orWhere('name', 'LIKE', "%$request->credit%")
 				->orWhere('email', 'LIKE', "%$request->credit%")
 				->orWhere('last_name', 'LIKE', "%$request->credit%")
-				->where('credits.status', $status);
+				->whereIn('credits.status', $status);
 		} else {
 			$credits  =     $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
 				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document')
-				->where('credits.status', $status);
+				->whereIn('credits.status', $status);
 		}
-
-
 		$credits = $credits->paginate(10);
-
 		return $credits;
 	}
 
@@ -116,12 +114,6 @@ class CreditController extends Controller
 				$credit_provider = new CreditProviderController();
 				$credit_provider->store($request, $credit->id);
 			}
-
-			if ($request['provider_id'] == NULL || $request['provider_id'] == 0) {
-				$main_box = MainBox::first();
-				$main_box->current_balance = $main_box->current_balance - $credit->credit_value;
-				$main_box->save();
-			}
 		}
 	}
 
@@ -175,7 +167,6 @@ class CreditController extends Controller
 			$credit_provider = CreditProvider::where('credit_id', $credit->id)->first();
 
 			if ($credit_provider != null) {
-
 				if ($credit_provider->pending_value <= 0) {
 					if ($request->status  == 1) {
 						$update_main_box = new MainBoxController();
@@ -186,9 +177,10 @@ class CreditController extends Controller
 						$update_main_box = new MainBoxController();
 						$update_main_box->addAmountMainBox($credit->credit_value);
 					}
-
-					$credit->status = $request->status;
 				}
+				$credit->status = $request->status;
+				$credit_provider->status = $request->status;
+				$credit_provider->save();
 			}
 		}
 
@@ -197,15 +189,12 @@ class CreditController extends Controller
 				$update_main_box = new MainBoxController();
 				$update_main_box->subAmountMainBox($credit->credit_value);
 			}
-
 			if ($request->status  == 2 && $credit->status == 1) {
 				$update_main_box = new MainBoxController();
 				$update_main_box->addAmountMainBox($credit->credit_value);
 			}
 			$credit->status = $request->status;
 		}
-
-
 		$credit->save();
 	}
 
@@ -237,8 +226,6 @@ class CreditController extends Controller
 		}
 		$print_cuota = new PrintTicketController;
 		$print_cuota = $print_cuota->printPayment($id, $amount_paid, $no_installment_paid);
-
-
 
 		$entry =  new Entry();
 		$entry->headquarter_id = $credit->headquarter_id;

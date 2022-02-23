@@ -122,7 +122,8 @@ const routes = [
 			},
 			{
 				path: "credit",
-				component: require("./components/reports/ReportCreditsGeneral.vue").default,
+				component: require("./components/reports/ReportCreditsGeneral.vue")
+					.default,
 				name: "report-general-credits",
 			},
 		],
