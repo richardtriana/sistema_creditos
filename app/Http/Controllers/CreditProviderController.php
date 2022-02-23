@@ -16,8 +16,9 @@ class CreditProviderController extends Controller
 	 */
 	public function index(Request $request)
 	{
-		$credit_providers = CreditProvider::select();
-		$credit_providers = $credit_providers->paginate(10);
+		$credit_providers = CreditProvider::select()
+			->where('status', 1)
+			->paginate(10);
 		return $credit_providers;
 	}
 
@@ -30,18 +31,12 @@ class CreditProviderController extends Controller
 	public function store(Request $request, $credit_id)
 	{
 		$credit_provider = new CreditProvider();
-		$data = ([
-			'Asesor' => 'Richard Peña',
-			'Fecha' => date('Y-m-d'),
-			'Monto' => $request['credit_value']
-		]);
+
 		if ($credit_provider->history != null) {
 			$history = (array) json_decode($credit_provider->history);
 		} else {
 			$history = array();
 		}
-		array_push($history, $data);
-
 		$credit_provider->last_editor = 1;
 		$credit_provider->credit_id = $credit_id;
 		$credit_provider->provider_id = $request['provider_id'];
@@ -69,16 +64,15 @@ class CreditProviderController extends Controller
 			$history = array();
 		}
 		array_push($history, $data);
-		
+
 		$credit_provider->paid_value = $credit_provider->paid_value + $request['amount'];
 		$credit_provider->pending_value = $credit_provider->pending_value - $request['amount'];
 		$credit_provider->history = json_encode($history);
 
 		$credit_provider->save();
 
-		$main_box = MainBox::first();
-		$main_box->current_balance = $main_box->current_balance - $credit_provider->paid_value;
-		$main_box->save();
+		$update_main_box = new MainBoxController();
+		$update_main_box->subAmountMainBox($request['amount']);
 
 		if ($credit_provider->pending_value <= 0) {
 			$credit = $credit_provider->credit()->first();

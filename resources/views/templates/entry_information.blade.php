@@ -10,8 +10,9 @@
 </head>
 
 <body>
-  <img src="{{ $company->logo}}" alt="" srcset="" width="100">
-  <header class="text-center">
+
+  <header class="text-center"> 
+    <img src="{{ $company->logo}}" alt="" srcset="" width="150">
     <h2>
       {{ $company->name}}
     </h2>

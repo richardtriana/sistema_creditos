@@ -135,6 +135,7 @@ export default {
 				this.formMainBox = reponse.data.main_box;
 				this.lastEditor = reponse.data.last_editor;
 			});
+			this.$root.getCurrentBalanceMainBox();
 		},
 		updateBox() {
 			let me = this;

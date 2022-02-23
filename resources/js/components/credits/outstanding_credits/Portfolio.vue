@@ -123,6 +123,7 @@ import CreateEditCredit from "../credit_clients/CreateEditCredit.vue";
 
 import CreditInformation from "./CreditInformation.vue";
 export default {
+  name: 'portfolio',
   components: {
     CreditInformation,
     CreateEditCredit,

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="page-header d-flex justify-content-between p-4 border my-2">
-      <h3>Créditos con proveedores</h3>
+      <h3>Pago a proveedores</h3>
     </div>
     <div class="page-content">
       <section class="table-responsive">
@@ -9,7 +9,6 @@
           <thead>
             <tr class="text-center">
               <th># Crédito</th>
-              <!-- <th>Cliente</th> -->
               <th>Proveedor</th>
               <th>Valor crédito</th>
               <th>Saldo abonado</th>
@@ -21,9 +20,6 @@
           <tbody>
             <tr v-for="c in creditProvidersList.data" :key="c.id">
               <td># {{ c.credit_id }}</td>
-              <!-- <td>
-                {{ c.client_id }}
-              </td> -->
               <td>
                 {{ c.provider.business_name }}  
               </td>
@@ -62,7 +58,7 @@
       </section>
     </div>
     <show-history-credit-provider ref="ShowHistoryCreditProvider" />
-    <pay-credit-provider ref="PayCreditProvider" />
+    <pay-credit-provider ref="PayCreditProvider" @list-providers="listCreditProviders()" />
   </div>
 </template>
 

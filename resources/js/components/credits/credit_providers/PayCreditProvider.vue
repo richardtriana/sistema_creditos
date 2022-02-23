@@ -115,6 +115,7 @@ export default {
         .then(() => {
           $("#payCreditProviderModal").modal("hide");
         });
+        this.$emit('list-providers')
     },
   },
 };

@@ -18,10 +18,6 @@ class DatabaseSeeder extends Seeder
     $this->call(UserSeeder::class);
     $this->call(MainBoxSeeder::class);
     $this->call(BoxSeeder::class);
-    $this->call(ClientSeeder::class);
-    $this->call(ProviderSeeder::class);
-    $this->call(TypeExpenseSeeder::class);
-    $this->call(CreditSeeder::class);
-    $this->call(CreditProviderSeeder::class);
+
   }
 }

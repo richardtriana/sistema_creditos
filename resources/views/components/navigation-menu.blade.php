@@ -20,7 +20,7 @@
           <div class="dropdown-menu" aria-labelledby="navbarDropdownConfigurations">
             <router-link class="dropdown-item" :to="{ name: 'outsanding-credits' }"> Creditos pendientes </router-link>
             <router-link class="dropdown-item" :to="{ name: 'credit-clients' }"> Clientes </router-link>
-            <router-link class="dropdown-item" :to="{ name: 'credit-providers' }"> Proveedores </router-link>
+            <router-link class="dropdown-item" :to="{ name: 'credit-providers' }"> Pago a  proveedores </router-link>
           </div>
         </li>
         <li class="nav-item">

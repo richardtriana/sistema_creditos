@@ -2106,7 +2106,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _credits_credit_helpers_Simulator_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../credits/credit_helpers/Simulator.vue */ "./resources/js/components/credits/credit_helpers/Simulator.vue");
-/* harmony import */ var _credits_outstanding_credits_Portfolio_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../credits/outstanding_credits/Portfolio.vue */ "./resources/js/components/credits/outstanding_credits/Portfolio.vue");
+/* harmony import */ var _credits_outstanding_credits_Disbursements_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../credits/outstanding_credits/Disbursements.vue */ "./resources/js/components/credits/outstanding_credits/Disbursements.vue");
 //
 //
 //
@@ -2170,7 +2170,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
     Simulator: _credits_credit_helpers_Simulator_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
-    Disbursements: _credits_outstanding_credits_Portfolio_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
+    Disbursements: _credits_outstanding_credits_Disbursements_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
   },
   data: function data() {
     return {
@@ -2278,6 +2278,7 @@ __webpack_require__.r(__webpack_exports__);
       axios.get("api/boxes").then(function (reponse) {
         _this.boxList = reponse.data.boxes;
       });
+      this.$root.getCurrentBalanceMainBox();
     },
     showEditBox: function showEditBox(box) {
       this.$refs.CreateEditBox.showEditBox(box);
@@ -2698,6 +2699,7 @@ __webpack_require__.r(__webpack_exports__);
         _this.formMainBox = reponse.data.main_box;
         _this.lastEditor = reponse.data.last_editor;
       });
+      this.$root.getCurrentBalanceMainBox();
     },
     updateBox: function updateBox() {
       var me = this;
@@ -4394,6 +4396,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 
 
@@ -4423,6 +4431,7 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     listCredits: function listCredits() {
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+      this.$root.getCurrentBalanceMainBox();
       var me = this;
       axios.get("api/credits?page=".concat(page, "&credit=").concat(this.search_client, "&status=").concat(this.status)).then(function (response) {
         me.creditList = response.data;
@@ -4959,10 +4968,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -5120,6 +5125,7 @@ __webpack_require__.r(__webpack_exports__);
       axios.post("api/credit-providers/pay-credit-provider/".concat(this.formCreditProvider.id), data).then(function () {
         $("#payCreditProviderModal").modal("hide");
       });
+      this.$emit('list-providers');
     }
   }
 });
@@ -5551,212 +5557,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  components: {
-    CreditInformation: _CreditInformation_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
-    CreateEditCredit: _credit_clients_CreateEditCredit_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
-  },
-  props: {
-    installment: {
-      type: Object
-    }
-  },
-  data: function data() {
-    return {
-      search_client: "",
-      status: 0,
-      creditList: {},
-      clientList: {},
-      creditStatus: {
-        0: "Pendiente",
-        1: "Aprobado",
-        2: "Rechazado",
-        3: "Pendiente pago a proveedor"
-      }
-    };
-  },
-  created: function created() {
-    this.listCredits(1);
-  },
-  methods: {
-    listCredits: function listCredits() {
-      var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-      var me = this;
-      axios.get("api/credits?page=".concat(page, "&credit=").concat(this.search_client, "&status=").concat(this.status)).then(function (response) {
-        me.creditList = response.data;
-      });
-    },
-    changeStatus: function changeStatus(id, status) {
-      var me = this;
-      var data = {
-        status: status
-      };
-      Swal.fire({
-        title: "¿Quieres cambiar el status del credito?",
-        showDenyButton: true,
-        denyButtonText: "Cancelar",
-        confirmButtonText: "Guardar"
-      }).then(function (result) {
-        if (result.isConfirmed) {
-          axios.post("api/credits/".concat(id, "/change-status"), data, me.$root.config).then(function () {
-            me.listCredits(1);
-          });
-          Swal.fire("Cambios realizados!", "", "success");
-        } else if (result.isDenied) {
-          Swal.fire("Operación no realizada", "", "info");
-        }
-      });
-    },
-    showData: function showData(credit) {
-      this.$refs.CreateEditCredit.showEditCredit(credit);
-    },
-    showInformation: function showInformation(credit) {
-      this.$refs.CreditInformation.showInformation(credit, 0);
-    }
-  }
-});
-
-/***/ }),
-
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/credits/outstanding_credits/Portfolio.vue?vue&type=script&lang=js&":
-/*!********************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/credits/outstanding_credits/Portfolio.vue?vue&type=script&lang=js& ***!
-  \********************************************************************************************************************************************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _credit_clients_CreateEditCredit_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../credit_clients/CreateEditCredit.vue */ "./resources/js/components/credits/credit_clients/CreateEditCredit.vue");
-/* harmony import */ var _CreditInformation_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CreditInformation.vue */ "./resources/js/components/credits/outstanding_credits/CreditInformation.vue");
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: "disbursements",
   components: {
     CreditInformation: _CreditInformation_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
     CreateEditCredit: _credit_clients_CreateEditCredit_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
@@ -5834,14 +5638,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-//
-//
-//
-//
-//
-//
-//
-//
 //
 //
 //
@@ -7314,12 +7110,17 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
       ReportGeneralCreditsList: {},
-      ReportTotalValues: {}
+      ReportTotalValues: {},
+      creditStatus: {
+        0: "Pendiente",
+        1: "Aprobado",
+        2: "Rechazado",
+        3: "Pendiente pago a proveedor"
+      }
     };
   },
   methods: {
@@ -7351,6 +7152,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -7642,12 +7452,12 @@ __webpack_require__.r(__webpack_exports__);
       type_documents: this.$root.$data.type_documents
     };
   },
-  // Function crearUsers
+  // Function createUsers
   created: function created() {
     this.listHeadquarters(1);
   },
   methods: {
-    crearUser: function crearUser() {
+    createUser: function createUser() {
       var me = this;
       axios.post("api/users", this.formUser).then(function () {
         $("#formUserModal").modal("hide");
@@ -7660,7 +7470,7 @@ __webpack_require__.r(__webpack_exports__);
       $("#formUserModal").modal("show");
       me.formUser = client;
     },
-    editarUser: function editarUser() {
+    editUser: function editUser() {
       var me = this;
       axios.put("api/users/" + this.formUser.id, this.formUser).then(function () {
         $("#formUserModal").modal("hide");
@@ -49466,45 +49276,6 @@ component.options.__file = "resources/js/components/credits/outstanding_credits/
 
 /***/ }),
 
-/***/ "./resources/js/components/credits/outstanding_credits/Portfolio.vue":
-/*!***************************************************************************!*\
-  !*** ./resources/js/components/credits/outstanding_credits/Portfolio.vue ***!
-  \***************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _Portfolio_vue_vue_type_template_id_3832d81e___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Portfolio.vue?vue&type=template&id=3832d81e& */ "./resources/js/components/credits/outstanding_credits/Portfolio.vue?vue&type=template&id=3832d81e&");
-/* harmony import */ var _Portfolio_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Portfolio.vue?vue&type=script&lang=js& */ "./resources/js/components/credits/outstanding_credits/Portfolio.vue?vue&type=script&lang=js&");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
-
-
-
-
-
-/* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _Portfolio_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _Portfolio_vue_vue_type_template_id_3832d81e___WEBPACK_IMPORTED_MODULE_0__.render,
-  _Portfolio_vue_vue_type_template_id_3832d81e___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
-  false,
-  null,
-  null,
-  null
-  
-)
-
-/* hot reload */
-if (false) { var api; }
-component.options.__file = "resources/js/components/credits/outstanding_credits/Portfolio.vue"
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
-
-/***/ }),
-
 /***/ "./resources/js/components/entries/Entries.vue":
 /*!*****************************************************!*\
   !*** ./resources/js/components/entries/Entries.vue ***!
@@ -50442,22 +50213,6 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/credits/outstanding_credits/Portfolio.vue?vue&type=script&lang=js&":
-/*!****************************************************************************************************!*\
-  !*** ./resources/js/components/credits/outstanding_credits/Portfolio.vue?vue&type=script&lang=js& ***!
-  \****************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Portfolio_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Portfolio.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/credits/outstanding_credits/Portfolio.vue?vue&type=script&lang=js&");
- /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Portfolio_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
-
-/***/ }),
-
 /***/ "./resources/js/components/entries/Entries.vue?vue&type=script&lang=js&":
 /*!******************************************************************************!*\
   !*** ./resources/js/components/entries/Entries.vue?vue&type=script&lang=js& ***!
@@ -51072,23 +50827,6 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/credits/outstanding_credits/Portfolio.vue?vue&type=template&id=3832d81e&":
-/*!**********************************************************************************************************!*\
-  !*** ./resources/js/components/credits/outstanding_credits/Portfolio.vue?vue&type=template&id=3832d81e& ***!
-  \**********************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "render": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Portfolio_vue_vue_type_template_id_3832d81e___WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Portfolio_vue_vue_type_template_id_3832d81e___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
-/* harmony export */ });
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Portfolio_vue_vue_type_template_id_3832d81e___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Portfolio.vue?vue&type=template&id=3832d81e& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/credits/outstanding_credits/Portfolio.vue?vue&type=template&id=3832d81e&");
-
-
-/***/ }),
-
 /***/ "./resources/js/components/entries/Entries.vue?vue&type=template&id=754d31f6&":
 /*!************************************************************************************!*\
   !*** ./resources/js/components/entries/Entries.vue?vue&type=template&id=754d31f6& ***!
@@ -51554,11 +51292,11 @@ var render = function () {
                         box.last_editor
                           ? _c("span", [
                               _vm._v(
-                                "\n                  " +
+                                "\n\t\t\t\t\t\t\t\t" +
                                   _vm._s(box.last_editor.name) +
                                   " " +
                                   _vm._s(box.last_editor.last_name) +
-                                  "\n                "
+                                  "\n\t\t\t\t\t\t\t"
                               ),
                             ])
                           : _vm._e(),
@@ -51618,7 +51356,7 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("thead", { staticClass: "thead-light" }, [
-      _c("tr", [
+      _c("tr", { staticClass: "text-center" }, [
         _c("th", { attrs: { scope: "col" } }, [_vm._v("#")]),
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Sede")]),
@@ -54962,7 +54700,7 @@ var render = function () {
                   return _c(
                     "option",
                     { key: index, domProps: { value: index } },
-                    [_vm._v(" " + _vm._s(st))]
+                    [_vm._v("\n\t\t\t\t\t\t" + _vm._s(st) + "\n\t\t\t\t\t")]
                   )
                 }),
                 0
@@ -55018,9 +54756,9 @@ var render = function () {
                           _vm._v(" "),
                           _c("td", [
                             _vm._v(
-                              "\n              " +
+                              "\n\t\t\t\t\t\t\t" +
                                 _vm._s(_vm.creditStatus[credit.status]) +
-                                "\n            "
+                                "\n\t\t\t\t\t\t"
                             ),
                           ]),
                           _vm._v(" "),
@@ -55094,7 +54832,7 @@ var render = function () {
                                   [_c("i", { staticClass: "bi bi-pen" })]
                                 ),
                             _vm._v(" "),
-                            credit.status == 0
+                            credit.status != 1 && credit.status != 2
                               ? _c(
                                   "button",
                                   {
@@ -55105,11 +54843,11 @@ var render = function () {
                                       },
                                     },
                                   },
-                                  [_c("i", { staticClass: "bi bi-trash" })]
+                                  [_c("i", { staticClass: "bi bi-x-circle" })]
                                 )
                               : _vm._e(),
                             _vm._v(" "),
-                            credit.status == 0
+                            credit.status != 1 && credit.status != 2
                               ? _c(
                                   "button",
                                   {
@@ -55196,7 +54934,7 @@ var staticRenderFns = [
           "page-header d-flex justify-content-between p-4 border my-2",
       },
       [
-        _c("h3", [_vm._v("Creditos con clientes")]),
+        _c("h3", [_vm._v("Creditos")]),
         _vm._v(" "),
         _c(
           "button",
@@ -55208,7 +54946,7 @@ var staticRenderFns = [
               "data-target": "#formCreditModal",
             },
           },
-          [_vm._v("\n      Crear Credito\n    ")]
+          [_vm._v("\n\t\t\tCrear Credito\n\t\t")]
         ),
       ]
     )
@@ -55236,9 +54974,9 @@ var staticRenderFns = [
         _c("th", [_vm._v("Ver Cuotas")]),
         _vm._v(" "),
         _c("th", [
-          _vm._v("\n              Tabla de "),
+          _vm._v("\n\t\t\t\t\t\t\tTabla de "),
           _c("br"),
-          _vm._v("\n              amortización\n            "),
+          _vm._v("\n\t\t\t\t\t\t\tamortización\n\t\t\t\t\t\t"),
         ]),
         _vm._v(" "),
         _c("th", [_vm._v("Opciones")]),
@@ -55272,7 +55010,7 @@ var staticRenderFns = [
           },
           [
             _vm._v(
-              "\n                Crear un nuevo Cliente\n                "
+              "\n\t\t\t\t\t\t\t\tCrear un nuevo Cliente\n\t\t\t\t\t\t\t\t"
             ),
             _c(
               "button",
@@ -55284,7 +55022,7 @@ var staticRenderFns = [
                   "data-target": "#formClientModal",
                 },
               },
-              [_vm._v("\n                  Crear cliente\n                ")]
+              [_vm._v("\n\t\t\t\t\t\t\t\t\tCrear cliente\n\t\t\t\t\t\t\t\t")]
             ),
           ]
         ),
@@ -55908,7 +55646,14 @@ var render = function () {
       _vm._v(" "),
       _c("show-history-credit-provider", { ref: "ShowHistoryCreditProvider" }),
       _vm._v(" "),
-      _c("pay-credit-provider", { ref: "PayCreditProvider" }),
+      _c("pay-credit-provider", {
+        ref: "PayCreditProvider",
+        on: {
+          "list-providers": function ($event) {
+            return _vm.listCreditProviders()
+          },
+        },
+      }),
     ],
     1
   )
@@ -55924,7 +55669,7 @@ var staticRenderFns = [
         staticClass:
           "page-header d-flex justify-content-between p-4 border my-2",
       },
-      [_c("h3", [_vm._v("Créditos con proveedores")])]
+      [_c("h3", [_vm._v("Pago a proveedores")])]
     )
   },
   function () {
@@ -56727,9 +56472,9 @@ var render = function () {
                           _vm._v(" "),
                           _c("td", [
                             _vm._v(
-                              "\n              " +
+                              "\n\t\t\t\t\t\t\t" +
                                 _vm._s(_vm.creditStatus[credit.status]) +
-                                "\n            "
+                                "\n\t\t\t\t\t\t"
                             ),
                           ]),
                           _vm._v(" "),
@@ -56752,7 +56497,7 @@ var render = function () {
                               [
                                 _c("i", { staticClass: "bi bi-eye" }),
                                 _vm._v(
-                                  "\n\n                Información general\n              "
+                                  "\n\n\t\t\t\t\t\t\t\tInformación general\n\t\t\t\t\t\t\t"
                                 ),
                               ]
                             ),
@@ -56771,7 +56516,7 @@ var render = function () {
                               },
                               [
                                 _c("i", { staticClass: "bi bi-check2-circle" }),
-                                _vm._v(" Aprobar\n              "),
+                                _vm._v(" Aprobar\n\t\t\t\t\t\t\t"),
                               ]
                             ),
                             _vm._v(" "),
@@ -56787,7 +56532,7 @@ var render = function () {
                               },
                               [
                                 _c("i", { staticClass: "bi bi-x-circle" }),
-                                _vm._v(" Rechazar\n              "),
+                                _vm._v(" Rechazar\n\t\t\t\t\t\t\t"),
                               ]
                             ),
                           ]),
@@ -56869,313 +56614,7 @@ var staticRenderFns = [
               "data-target": "#formCreditModal",
             },
           },
-          [_vm._v("\n      Crear Credito\n    ")]
-        ),
-      ]
-    )
-  },
-  function () {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", { staticClass: "text-center" }, [
-        _c("th", [_vm._v("ID")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Cliente")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Nro. Documento")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Valor crédito")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Valor Abonado")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Nro Cuotas")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Estado")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Información crédito")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Opciones")]),
-      ]),
-    ])
-  },
-  function () {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("tr", [
-      _c("td", { attrs: { colspan: "11" } }, [
-        _c(
-          "div",
-          {
-            staticClass: "alert alert-danger text-center",
-            staticStyle: { margin: "2px auto", width: "30%" },
-          },
-          [_c("p", [_vm._v("No se encontraron clientes con creditos.")])]
-        ),
-      ]),
-    ])
-  },
-]
-render._withStripped = true
-
-
-
-/***/ }),
-
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/credits/outstanding_credits/Portfolio.vue?vue&type=template&id=3832d81e&":
-/*!*************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/credits/outstanding_credits/Portfolio.vue?vue&type=template&id=3832d81e& ***!
-  \*************************************************************************************************************************************************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "render": () => (/* binding */ render),
-/* harmony export */   "staticRenderFns": () => (/* binding */ staticRenderFns)
-/* harmony export */ });
-var render = function () {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    { staticClass: "page" },
-    [
-      _vm._m(0),
-      _vm._v(" "),
-      _c(
-        "div",
-        {
-          staticClass:
-            "page-search d-flex justify-content-between p-4 border my-2",
-        },
-        [
-          _c("div", { staticClass: "form-group col-8 m-auto" }, [
-            _c("input", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.search_client,
-                  expression: "search_client",
-                },
-              ],
-              staticClass: "form-control",
-              attrs: {
-                type: "text",
-                id: "search_client",
-                name: "search_client",
-                placeholder: "Buscar cliente | Documento",
-              },
-              domProps: { value: _vm.search_client },
-              on: {
-                keyup: function ($event) {
-                  return _vm.listCredits()
-                },
-                input: function ($event) {
-                  if ($event.target.composing) {
-                    return
-                  }
-                  _vm.search_client = $event.target.value
-                },
-              },
-            }),
-          ]),
-        ]
-      ),
-      _vm._v(" "),
-      _c(
-        "div",
-        { staticClass: "page-content mt-4", staticStyle: { width: "100%" } },
-        [
-          _c(
-            "section",
-            { staticClass: "table-responsive" },
-            [
-              _c("table", { staticClass: "table table-sm table-bordered" }, [
-                _vm._m(1),
-                _vm._v(" "),
-                _vm.creditList.data && _vm.creditList.data.length > 0
-                  ? _c(
-                      "tbody",
-                      _vm._l(_vm.creditList.data, function (credit) {
-                        return _c("tr", { key: credit.index }, [
-                          _c("td", [_vm._v(_vm._s(credit.id))]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(credit.name) +
-                                " " +
-                                _vm._s(credit.last_name)
-                            ),
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [_vm._v(_vm._s(credit.document))]),
-                          _vm._v(" "),
-                          _c("td", { staticClass: "text-right" }, [
-                            _vm._v(
-                              _vm._s(_vm._f("currency")(credit.credit_value))
-                            ),
-                          ]),
-                          _vm._v(" "),
-                          _c("td", { staticClass: "text-right" }, [
-                            _vm._v(
-                              _vm._s(_vm._f("currency")(credit.paid_value))
-                            ),
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(_vm._s(credit.number_installments)),
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              "\n              " +
-                                _vm._s(_vm.creditStatus[credit.status]) +
-                                "\n            "
-                            ),
-                          ]),
-                          _vm._v(" "),
-                          _c("td", { staticClass: "text-center" }, [
-                            _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-outline-primary",
-                                attrs: {
-                                  type: "button",
-                                  "data-toggle": "modal",
-                                  "data-target": "#creditInformationModal",
-                                },
-                                on: {
-                                  click: function ($event) {
-                                    return _vm.showInformation(credit)
-                                  },
-                                },
-                              },
-                              [
-                                _c("i", { staticClass: "bi bi-eye" }),
-                                _vm._v(
-                                  "\n\n                Información general\n              "
-                                ),
-                              ]
-                            ),
-                          ]),
-                          _vm._v(" "),
-                          _c("td", { staticClass: "text-left" }, [
-                            _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-outline-success",
-                                on: {
-                                  click: function ($event) {
-                                    return _vm.changeStatus(credit.id, 1)
-                                  },
-                                },
-                              },
-                              [
-                                _c("i", { staticClass: "bi bi-check2-circle" }),
-                                _vm._v(" Aprobar\n              "),
-                              ]
-                            ),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-outline-danger",
-                                on: {
-                                  click: function ($event) {
-                                    return _vm.changeStatus(credit.id, 2)
-                                  },
-                                },
-                              },
-                              [
-                                _c("i", { staticClass: "bi bi-x-circle" }),
-                                _vm._v(" Rechazar\n              "),
-                              ]
-                            ),
-                          ]),
-                        ])
-                      }),
-                      0
-                    )
-                  : _c("tbody", [_vm._m(2)]),
-              ]),
-              _vm._v(" "),
-              _c(
-                "pagination",
-                {
-                  attrs: { align: "center", data: _vm.creditList, limit: 2 },
-                  on: { "pagination-change-page": _vm.listCredits },
-                },
-                [
-                  _c(
-                    "span",
-                    { attrs: { slot: "prev-nav" }, slot: "prev-nav" },
-                    [_c("i", { staticClass: "bi bi-chevron-double-left" })]
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "span",
-                    { attrs: { slot: "next-nav" }, slot: "next-nav" },
-                    [_c("i", { staticClass: "bi bi-chevron-double-right" })]
-                  ),
-                ]
-              ),
-            ],
-            1
-          ),
-        ]
-      ),
-      _vm._v(" "),
-      _c("credit-information", {
-        ref: "CreditInformation",
-        on: {
-          "list-credits": function ($event) {
-            return _vm.listCredits(1)
-          },
-        },
-      }),
-      _vm._v(" "),
-      _c("create-edit-credit", {
-        ref: "CreateEditCredit",
-        on: {
-          "list-credits": function ($event) {
-            return _vm.listCredits(1)
-          },
-        },
-      }),
-    ],
-    1
-  )
-}
-var staticRenderFns = [
-  function () {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c(
-      "div",
-      {
-        staticClass:
-          "page-header d-flex justify-content-between p-4 border my-2",
-      },
-      [
-        _c("h3", [_vm._v("Creditos pendientes")]),
-        _vm._v(" "),
-        _c(
-          "button",
-          {
-            staticClass: "btn btn-primary",
-            attrs: {
-              type: "button",
-              "data-toggle": "modal",
-              "data-target": "#formCreditModal",
-            },
-          },
-          [_vm._v("\n      Crear Credito\n    ")]
+          [_vm._v("\n\t\t\tCrear Credito\n\t\t")]
         ),
       ]
     )
@@ -57352,22 +56791,7 @@ var staticRenderFns = [
         staticClass:
           "page-header d-flex justify-content-between p-4 border my-2",
       },
-      [
-        _c("h3", [_vm._v("Ingresos")]),
-        _vm._v(" "),
-        _c(
-          "button",
-          {
-            staticClass: "btn btn-primary",
-            attrs: {
-              type: "button",
-              "data-toggle": "modal",
-              "data-target": "#entryModal",
-            },
-          },
-          [_vm._v("\n      Crear Egreso\n    ")]
-        ),
-      ]
+      [_c("h3", [_vm._v("Ingresos")])]
     )
   },
   function () {
@@ -59480,7 +58904,9 @@ var render = function () {
                         _vm._v(_vm._s(report.number_installments)),
                       ]),
                       _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(report.status))]),
+                      _c("td", [
+                        _vm._v(_vm._s(_vm.creditStatus[report.status])),
+                      ]),
                       _vm._v(" "),
                       _c("td", { staticClass: "text-right" }, [
                         _vm._v(_vm._s(_vm._f("currency")(report.paid_value))),
@@ -59656,22 +59082,40 @@ var render = function () {
                         ),
                       ]),
                       _vm._v(" "),
+                      _c("td", [
+                        _vm._v(
+                          "\n              " + _vm._s(report.phone_1) + " "
+                        ),
+                        _c("br"),
+                        _vm._v(
+                          "\n              " +
+                            _vm._s(report.phone_2) +
+                            "\n\n            "
+                        ),
+                      ]),
+                      _vm._v(" "),
                       _c("td", { staticClass: "text-right" }, [
-                        _vm._v(_vm._s(_vm._f("currency")(report.credit_value))),
+                        _vm._v(_vm._s(_vm._f("currency")(report.value))),
                       ]),
                       _vm._v(" "),
                       _c("td", { staticClass: "text-center" }, [
                         _vm._v(_vm._s(report.payment_date)),
                       ]),
                       _vm._v(" "),
-                      _c("td", [
+                      _c("td", { staticClass: "text-center" }, [
                         report.payment_date > _vm.now
                           ? _c("span", { staticClass: "text-success" }, [
-                              _vm._v("A tiempo"),
+                              _vm._v("Próximo a vencer"),
                             ])
                           : _vm._e(),
                         _vm._v(" "),
-                        report.payment_date <= _vm.now
+                        (report.payment_date = _vm.now)
+                          ? _c("span", { staticClass: "text-warning" }, [
+                              _vm._v("Vence hoy"),
+                            ])
+                          : _vm._e(),
+                        _vm._v(" "),
+                        report.payment_date < _vm.now
                           ? _c("span", { staticClass: "text-danger" }, [
                               _vm._v("En mora"),
                             ])
@@ -59737,7 +59181,12 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Cliente")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Valor crédito")]),
+        _c("th", [
+          _vm._v("Contacto "),
+          _c("i", { staticClass: "bi bi-telephone" }),
+        ]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Valor cuota")]),
         _vm._v(" "),
         _c("th", [_vm._v("Fecha de pago cuota")]),
         _vm._v(" "),
@@ -60222,7 +59671,7 @@ var render = function () {
                   attrs: { type: "button" },
                   on: {
                     click: function ($event) {
-                      _vm.editar ? _vm.editarUser() : _vm.crearUser()
+                      _vm.editar ? _vm.editUser() : _vm.createUser()
                     },
                   },
                 },
@@ -60434,7 +59883,14 @@ var render = function () {
         ),
       ]),
       _vm._v(" "),
-      _c("create-edit-user", { ref: "CreateEditUser" }),
+      _c("create-edit-user", {
+        ref: "CreateEditUser",
+        on: {
+          "listar-users": function ($event) {
+            return _vm.listUsers(1)
+          },
+        },
+      }),
     ],
     1
   )
