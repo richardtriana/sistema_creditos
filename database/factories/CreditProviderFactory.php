@@ -19,6 +19,7 @@ class CreditProviderFactory extends Factory
 			'headquarter_id' => 1,
 			'last_editor' => 1,
 			'credit_value' => 0,
+			'status' => 0,
 			'paid_value' => 0,
 			'pending_value' => 0,
 			'last_paid' => $this->faker->date('Y-m-d'),

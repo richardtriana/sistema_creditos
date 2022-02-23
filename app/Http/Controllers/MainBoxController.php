@@ -131,7 +131,6 @@ class MainBoxController extends Controller
 	public function cashRegister(Box $box, Request $request)
 	{
 		$this->addAmountMainBox($request->add_amount);
-
 		$box->current_balance = $box->current_balance - $request->add_amount;
 		$box->initial_balance = 0;
 		$box->input = 0;

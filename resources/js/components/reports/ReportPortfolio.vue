@@ -10,7 +10,8 @@
             <tr class="text-center">
               <th>#</th>
               <th>Cliente</th>
-              <th>Valor crédito</th>
+              <th>Contacto <i class="bi bi-telephone"></i></th>
+              <th>Valor cuota</th>
               <th>Fecha de pago cuota</th>
               <th>Estado</th>
               <th>Nro. Cuota</th>
@@ -20,13 +21,21 @@
             <tr v-for="report in ReportPortfolioList.data" :key="report.id">
               <td>{{ report.credit_id }}</td>
               <td>{{ report.name }} {{ report.last_name }}</td>
-              <td class="text-right">{{ report.credit_value | currency }}</td>
-              <td class="text-center">{{ report.payment_date }}</td>
               <td>
+                {{ report.phone_1 }} <br>
+                {{ report.phone_2 }}
+
+              </td>
+              <td class="text-right">{{ report.value | currency }}</td>
+              <td class="text-center">{{ report.payment_date }}</td>
+              <td class="text-center">
                 <span class="text-success" v-if="report.payment_date > now"
-                  >A tiempo</span
+                  >Próximo a vencer</span
                 >
-                <span class="text-danger" v-if="report.payment_date <= now"
+                <span class="text-warning" v-if="report.payment_date = now"
+                  >Vence hoy</span
+                >
+                <span class="text-danger" v-if="report.payment_date < now"
                   >En mora</span
                 >
               </td>
