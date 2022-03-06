@@ -84,8 +84,7 @@ Route::group(['middleware' => ['auth:api']], function () {
 
 	//Entries
 	Route::resource('/entries',  EntryController::class);
-
-
+	
 	//Expenses
 	Route::resource('/expenses',  ExpenseController::class);
 	Route::post('/expenses/{expense}/change-status',  [ExpenseController::class, 'changeStatus']);

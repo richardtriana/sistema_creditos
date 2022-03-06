@@ -21,9 +21,9 @@ class CreditController extends Controller
 {
 
 	public function __construct()
-	{
+	{	 
 		$this->middleware('auth:api')->except('index');
-		$this->middleware('permission:credit.index')->only('installments', 'payMultipleInstallments', 'generalInformation', 'show');
+		$this->middleware('permission:credit.index')->only('installments','payMultipleInstallments', 'generalInformation', 'show');
 		$this->middleware('permission:credit.store')->only('store');
 		$this->middleware('permission:credit.update')->only('update', 'updateValuesCredit');
 		$this->middleware('permission:credit.delete')->only('delete');

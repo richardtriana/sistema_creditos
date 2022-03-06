@@ -378,17 +378,11 @@ export default {
     },
     createCredit() {
       let me = this;
-      me.$root.assignErrors(false, me.formErrors);
-      axios
-        .post("api/credits", this.formCredit, me.$root.config)
-        .then(function () {
-          $("#formCreditModal").modal("hide");
-          me.resetData();
-          me.$emit("list-credits");
-        })
-        .catch(response =>{
-          me.$root.assignErrors(response, me.formErrors);
-        });
+      axios.post("api/credits", this.formCredit, me.$root.config).then(function () {
+        $("#formCreditModal").modal("hide");
+        me.resetData();
+        me.$emit("list-credits");
+      });
     },
     showEditCredit(credit) {
       this.edit = true;
