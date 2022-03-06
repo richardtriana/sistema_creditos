@@ -7,6 +7,7 @@
         class="btn btn-primary"
         data-toggle="modal"
         data-target="#formClientModal"
+        v-if="$root.validatePermission('client-store')"
       >
         Crear cliente
       </button>
@@ -36,8 +37,8 @@
               <th>Celular</th>
               <th>Correo Electronico</th>
               <th>Dirección</th>
-              <th>Estado</th>
-              <th>Opciones</th>
+              <th  v-if="$root.validatePermission('client-status')">Estado</th>
+              <th  v-if="$root.validatePermission('client-update')">Opciones</th>
             </tr>
           </thead>
           <tbody>
@@ -51,7 +52,7 @@
               </td>
               <td>{{ c.email }}</td>
               <td>{{ c.address }}</td>
-              <td>
+              <td v-if="$root.validatePermission('client-status')">
                 <button
                   class="btn"
                   :class="
@@ -63,7 +64,7 @@
                   <i class="bi bi-x-circle" v-if="c.status == 0"></i>
                 </button>
               </td>
-              <td v-if="c.status == 1" class="text-center">
+              <td v-if="c.status == 1 && $root.validatePermission('client-update')" class="text-center">
                 <button class="btn btn-outline-primary" @click="showData(c)">
                   <i class="bi bi-pen"></i>
                 </button>
@@ -105,7 +106,7 @@ export default {
     listClients(page = 1) {
       let me = this;
       axios
-        .get(`api/clients?page=${page}&client=${this.search_client}`)
+        .get(`api/clients?page=${page}&client=${this.search_client}`, me.$root.config)
         .then(function (response) {
           me.clientList = response.data;
         });

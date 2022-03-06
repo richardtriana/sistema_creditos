@@ -7,6 +7,8 @@
         class="btn btn-primary"
         data-toggle="modal"
         data-target="#formUserModal"
+        v-if="$root.validatePermission('user-store')"
+        @click="$refs.CreateEditUser.resetData()"
       >
         Crear usuario
       </button>
@@ -39,7 +41,7 @@
               <th>Sede</th>
               <th>Rol</th>
               <th>Estado</th>
-              <th>Opciones</th>
+              <th v-if="$root.validatePermission('user-status') || $root.validatePermission('user-update')">Opciones</th>
             </tr>
           </thead>
           <tbody>
@@ -53,8 +55,7 @@
               <td>{{ user.headquarter.headquarter }}</td>
 
               <td>
-                <span v-if="user.rol_id == 1">Administrador</span>
-                <span v-if="user.rol_id == 2">Operario</span>
+                {{ user.roles[0].name }}
               </td>
 
               <td>
@@ -62,28 +63,30 @@
                 <span v-if="user.status == 0">Inactivo</span>
               </td>
 
-              <td class="text-right">
+              <td class="text-right" v-if="$root.validatePermission('user-status') || $root.validatePermission('user-update')">
                 <button
-                  v-if="user.status == 1"
+                  v-if="user.status == 1 && $root.validatePermission('user-update')"
                   class="btn btn-outline-primary"
                   @click="showData(user)"
                 >
                   <i class="bi bi-pen"></i>
                 </button>
-                <button
-                  v-if="user.status == 1"
-                  class="btn btn-outline-danger"
-                  @click="changeStatus(user.id)"
-                >
-                  <i class="bi bi-trash"></i>
-                </button>
-                <button
-                  v-if="user.status == 0"
-                  class="btn btn-outline-success"
-                  @click="changeStatus(user.id)"
-                >
-                  <i class="bi bi-check2-circle"></i>
-                </button>
+                <div class="d-inline">
+                  <button
+                    v-if="user.status == 1"
+                    class="btn btn-outline-danger"
+                    @click="changeStatus(user.id)"
+                  >
+                    <i class="bi bi-trash"></i>
+                  </button>
+                  <button
+                    v-if="user.status == 0"
+                    class="btn btn-outline-success"
+                    @click="changeStatus(user.id)"
+                  >
+                    <i class="bi bi-check2-circle"></i>
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -101,7 +104,7 @@
         </pagination>
       </section>
     </div>
-    <create-edit-user ref="CreateEditUser" />
+    <create-edit-user ref="CreateEditUser" @list-users="listUsers()" />
   </div>
 </template>
 
@@ -122,13 +125,13 @@ export default {
     listUsers(page = 1) {
       let me = this;
       axios
-        .get(`api/users?page=${page}&user=${this.search_user}`)
+        .get(`api/users?page=${page}&user=${this.search_user}`, me.$root.config)
         .then(function (response) {
           me.userList = response.data;
         });
     },
     showData: function (ususario) {
-      this.$refs.CreateEditUser.abirEditarUser(ususario);
+      this.$refs.CreateEditUser.showEditarUser(ususario);
     },
     changeStatus: function (id) {
       let me = this;

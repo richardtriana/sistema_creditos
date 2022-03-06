@@ -62,7 +62,7 @@ export default {
   },
   methods: {
     listReportCredits(page=1) {
-      axios.get(`api/reports/credits?page=${page}`).then((response) => {
+      axios.get(`api/reports/credits?page=${page}`, this.$root.config).then((response) => {
         this.reportCreditsList = response.data;
       });
     },

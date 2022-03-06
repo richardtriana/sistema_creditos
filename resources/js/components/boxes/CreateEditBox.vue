@@ -137,7 +137,7 @@ export default {
     listHeadquarters() {
       let me = this;
       axios
-        .get(`api/headquarters/list-all-headquarters`)
+        .get(`api/headquarters/list-all-headquarters`, me.$root.config)
         .then(function (response) {
           me.headquarterList = response.data;
         });
@@ -147,7 +147,7 @@ export default {
       let me = this;
       if (this.box_id != 0) {
         axios
-          .put(`api/boxes/${this.box_id}`, { amount: this.add_amount })
+          .put(`api/boxes/${this.box_id}`, { amount: this.add_amount }, me.$root.config)
           .then(function () {
             $("#boxModal").modal("hide");
             me.$emit("list-boxes");
@@ -163,7 +163,7 @@ export default {
 
     cashRegister(box) {
       axios
-        .post(`api/main-box/cash-register/${box.id}`, box)
+        .post(`api/main-box/cash-register/${box.id}`, box, this.$root.config)
         .then(() => this.$emit("list-boxes"))
         .finally($("#boxModal").modal("hide"));
     },

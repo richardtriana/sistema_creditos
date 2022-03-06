@@ -82,7 +82,7 @@ export default {
 
       let me = this;
       axios
-        .get(`api/credits/${credit_id}/installments`)
+        .get(`api/credits/${credit_id}/installments`, me.$root.config)
         .then(function (response) {
           me.listInstallments = response.data;
         });
@@ -95,7 +95,7 @@ export default {
       };
       if (quote.value > 0) {
         axios
-          .post(`api/installment/${quote.id}/pay-installment`, data)
+          .post(`api/installment/${quote.id}/pay-installment`, data, me.$root.config)
           .then(function () {
             me.listCreditInstallments(me.id_credit);
           });

@@ -14,6 +14,16 @@ use Illuminate\Support\Facades\Auth;
 
 class CreditController extends Controller
 {
+
+	public function __construct()
+	{	 
+		$this->middleware('auth:api')->except('index');
+		$this->middleware('permission:credit.index')->only('installments','payMultipleInstallments', 'generalInformation', 'show');
+		$this->middleware('permission:credit.store')->only('store');
+		$this->middleware('permission:credit.update')->only('update', 'updateValuesCredit');
+		$this->middleware('permission:credit.delete')->only('delete');
+		$this->middleware('permission:credit.status')->only('changeStatus');
+	}
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -25,7 +35,7 @@ class CreditController extends Controller
 		$status = $request->status != null ? $request->status : 1;
 
 		if ($request->credit && ($request->credit != '')) {
-			$credits  =   $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
+			$credits  =   $credits->leftJoin('clients as c', 'c.id', 'credits.client_id')
 				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document')
 				->where('document', 'LIKE', "%$request->credit%")
 				->orWhere('name', 'LIKE', "%$request->credit%")
@@ -33,7 +43,7 @@ class CreditController extends Controller
 				->orWhere('last_name', 'LIKE', "%$request->credit%")
 				->where('credits.status', $status);
 		} else {
-			$credits  =     $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
+			$credits  =     $credits->leftJoin('clients as c', 'c.id', 'credits.client_id')
 				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document')
 				->where('credits.status', $status);
 		}

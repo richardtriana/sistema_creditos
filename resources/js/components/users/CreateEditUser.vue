@@ -34,6 +34,9 @@
                     id="nombre"
                     v-model="formUser.name"
                   />
+                  <small id="name_help" class="form-text text-danger">{{
+                    formErrors.name
+                  }}</small>
                 </div>
                 <div class="form-group col-md-4">
                   <label for="name">Apellidos</label>
@@ -43,15 +46,33 @@
                     id="name"
                     v-model="formUser.last_name"
                   />
+                  <small id="last_name_help" class="form-text text-danger">{{
+                    formErrors.last_name
+                  }}</small>
                 </div>
                 <div class="form-group col-md-4">
                   <label for="email">Email</label>
                   <input
-                    type="text"
+                    type="email"
                     class="form-control"
                     id="email"
                     v-model="formUser.email"
                   />
+                  <small id="email_help" class="form-text text-danger">{{
+                    formErrors.email
+                  }}</small>
+                </div>
+                <div class="form-group col-md-4">
+                  <label for="email">Username</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="username"
+                    v-model="formUser.username"
+                  />
+                  <small id="username_help" class="form-text text-danger">{{
+                    formErrors.username
+                  }}</small>
                 </div>
                 <div class="form-group col-md-4">
                   <label for="phone">Celular</label>
@@ -61,6 +82,9 @@
                     id="phone"
                     v-model="formUser.phone"
                   />
+                  <small id="phone_help" class="form-text text-danger">{{
+                    formErrors.phone
+                  }}</small>
                 </div>
                 <div class="form-group col-md-4">
                   <label for="type_document">Tipo Documento</label>
@@ -70,7 +94,7 @@
                     class="custom-select"
                     v-model="formUser.type_document"
                   >
-                    <option value="0" disabled>--Seleccionar--</option>
+                    <option value="0" disabled selected>--Seleccionar--</option>
                     <option
                       v-for="(d, key) in type_documents"
                       :key="key"
@@ -79,19 +103,26 @@
                       {{ d }}
                     </option>
                   </select>
+                  <small
+                    id="type_document_help"
+                    class="form-text text-danger"
+                    >{{ formErrors.type_document }}</small
+                  >
                 </div>
                 <div class="form-group col-md-4">
                   <label for="document">Nro. Documento</label>
-
                   <input
                     type="number"
                     class="form-control"
                     id="document"
                     v-model="formUser.document"
                   />
+                  <small id="document_help" class="form-text text-danger">{{
+                    formErrors.document
+                  }}</small>
                 </div>
                 <div class="form-group col-md-4">
-                  <label for="address">Direccion</label>
+                  <label for="address">Dirección</label>
 
                   <input
                     type="text"
@@ -99,6 +130,9 @@
                     id="address"
                     v-model="formUser.address"
                   />
+                  <small id="address_help" class="form-text text-danger">{{
+                    formErrors.address
+                  }}</small>
                 </div>
                 <div class="form-group col-md-4">
                   <label for="headquarter_id">Sede</label>
@@ -109,19 +143,32 @@
                     v-model="formUser.headquarter_id"
                   >
                   </v-select>
+                  <small
+                    id="headquarter_id_help"
+                    class="form-text text-danger"
+                    >{{ formErrors.headquarter_id }}</small
+                  >
                 </div>
                 <div class="form-group col-md-4">
-                  <label for="rol_id">Rol</label>
+                  <label for="rol">Rol</label>
                   <select
-                    name="rol_id"
-                    id="rol_id"
+                    name="rol"
+                    id="rol"
                     class="custom-select"
-                    v-model="formUser.rol_id"
+                    v-model="formUser.rol"
                   >
-                    <option value="0" disabled>--Seleccionar--</option>
-                    <option value="1">Administrador</option>
-                    <option value="2">Operario</option>
+                    <option value="" disabled selected>--Seleccionar--</option>
+                    <option
+                      v-for="rol in listRoles"
+                      :value="rol.id"
+                      :key="rol.id"
+                    >
+                      {{ rol.name }}
+                    </option>
                   </select>
+                  <small id="rol_id_help" class="form-text text-danger">{{
+                    formErrors.rol
+                  }}</small>
                 </div>
                 <div class="form-group col-md-4">
                   <label for="password">Contraseña</label>
@@ -129,9 +176,31 @@
                     type="password"
                     class="form-control"
                     id="password"
+                    name="password"
+                    placeholder="Ingresar contraseña"
                     v-model="formUser.password"
-                    autocomplete="false"
+                    pattern="^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{8,16}$"
+                    required
                   />
+                  <small id="password_help" class="form-text text-danger">{{
+                    formErrors.password
+                  }}</small>
+                </div>
+                <div class="form-group col-md-4">
+                  <label for="password">Confirmar contraseña</label>
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="password_confirmation"
+                    name="password_confirmation"
+                    placeholder="Ingresar contraseña"
+                    v-model="formUser.password_confirmation"
+                    pattern="^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{8,16}$"
+                    required
+                  />
+                  <small id="passwordHelp" class="form-text text-danger">{{
+                    formErrors.password
+                  }}</small>
                 </div>
               </div>
             </form>
@@ -148,7 +217,7 @@
             <button
               type="button"
               class="btn btn-primary rounded"
-              @click="editar ? editarUser() : crearUser()"
+              @click="formUser.id ? editarUser() : crearUser()"
             >
               Guardar
             </button>
@@ -167,7 +236,9 @@ export default {
       headquarterList: [],
       formUser: {
         name: "",
+        last_name:"",
         email: "",
+        username: "",
         password: "",
         nombre: "",
         phone: "",
@@ -176,37 +247,77 @@ export default {
         document: 0,
         photo: "",
         status: "1",
-        rol_id: "",
         headquarter_id: "",
+        rol: "",
+      },
+      formErrors: {
+        name: "",
+        last_name:"",
+        email: "",
+        username:"",
+        password: "",
+        nombre: "",
+        phone: "",
+        address: "",
+        type_document: "",
+        document: "",
+        photo: "",
+        status: "",
+        headquarter_id: "",
+        rol: "",
       },
       type_documents: this.$root.$data.type_documents,
+      listRoles: [],
     };
   },
   // Function crearUsers
   created() {
     this.listHeadquarters(1);
+    this.getRoles();
   },
   methods: {
-    crearUser() {
-      let me = this;
-      axios.post("api/users", this.formUser).then(function () {
-        $("#formUserModal").modal("hide");
-        me.$emit("listar-users");
+    getRoles() {
+      axios.get("api/roles/getAllRoles", this.$root.config).then((response) => {
+        this.listRoles = response.data.roles;
       });
     },
-    abirEditarUser(client) {
+    crearUser() {
+      let me = this;
+      me.assignErrors(false);
+
+      axios.post("api/users", me.formUser, me.$root.config).then(function () {
+        $("#formUserModal").modal("hide");
+        me.resetData();
+        me.$emit("list-users");
+      })
+      .catch((response)=>{
+        me.assignErrors(response);
+      });
+    },
+    showEditarUser(user) {
+  
       this.editar = true;
       let me = this;
       $("#formUserModal").modal("show");
-      me.formUser = client;
+
+      Object.keys(user).forEach(function (key, index) {
+        me.formUser[key] = user[key];
+      });
+      me.formUser.rol = user.roles.length > 0 ? user.roles[0].id : "";
     },
     editarUser() {
       let me = this;
+      
+      me.assignErrors(false);
       axios
-        .put("api/users/" + this.formUser.id, this.formUser)
+        .put("api/users/" + this.formUser.id, this.formUser, me.$root.config)
         .then(function () {
           $("#formUserModal").modal("hide");
-          me.$emit("listar-users");
+          me.resetData();
+          me.$emit("list-users");
+        })
+        .catch(response => {
+          me.assignErrors(response);
         });
       this.editar = false;
     },
@@ -215,13 +326,34 @@ export default {
       Object.keys(this.formUser).forEach(function (key, index) {
         me.formUser[key] = "";
       });
+      me.assignErrors(false);
     },
 
     listHeadquarters(page = 1) {
       let me = this;
-      axios.get(`api/headquarters?page=${page}`).then(function (response) {
-        me.headquarterList = response.data;
-      });
+      axios
+        .get(`api/headquarters?page=${page}`, me.$root.config)
+        .then(function (response) {
+          me.headquarterList = response.data;
+        });
+    },
+    assignErrors(response) {
+      
+      let me = this;
+
+      if (response) {
+        let errors = response.response.data.errors;
+
+        Object.keys(me.formErrors).forEach(function (key, index) {
+          if (errors[key] != undefined) {
+            me.formErrors[key] = errors[key][0];
+          }
+        });
+      } else {
+        Object.keys(me.formErrors).forEach(function (key, index) {
+          me.formErrors[key] = "";
+        });
+      }
     },
   },
 };

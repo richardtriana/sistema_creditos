@@ -7,6 +7,7 @@
         class="btn btn-primary"
         data-toggle="modal"
         data-target="#formCreditModal"
+        v-if="$root.validatePermission('credit-store')"
       >
         Crear Credito
       </button>
@@ -37,9 +38,9 @@
               <th>Valor Abonado</th>
               <th>Nro Cuotas</th>
               <th>Estado</th>
-              <th>Información crédito</th>
+              <th v-if="$root.validatePermission('credit-index')">Información crédito</th>
 
-              <th>Opciones</th>
+              <th v-if="$root.validatePermission('credit-status')">Opciones</th>
             </tr>
           </thead>
           <!-- <tbody> -->
@@ -54,7 +55,7 @@
               <td>
                 {{ creditStatus[credit.status] }}
               </td>
-              <td class="text-center">
+              <td class="text-center" v-if="$root.validatePermission('credit-index')">
                 <button
                   type="button"
                   class="btn btn-outline-primary"
@@ -68,7 +69,7 @@
                 </button>
               </td>
 
-              <td class="text-left">
+              <td class="text-left" v-if="$root.validatePermission('credit-status')">
                 <button
                   class="btn btn-outline-success"
                   @click="changeStatus(credit.id, 1)"
@@ -154,7 +155,7 @@ export default {
       let me = this;
       axios
         .get(
-          `api/credits?page=${page}&credit=${this.search_client}&status=${this.status}`
+          `api/credits?page=${page}&credit=${this.search_client}&status=${this.status}`, me.$root.config
         )
         .then(function (response) {
           me.creditList = response.data;

@@ -238,10 +238,10 @@ export default {
 	},
 	created() {
 		// this.$root.validateToken();
-		this.getCofiguration();
+		this.getConfiguration();
 	},
 	methods: {
-		getCofiguration() {
+		getConfiguration() {
 			axios.get("api/configurations").then((response) => {
 				if (response.data.company) {
 					this.formConfiguration = response.data.company;

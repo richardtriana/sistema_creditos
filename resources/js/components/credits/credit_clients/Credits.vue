@@ -7,6 +7,7 @@
         class="btn btn-primary"
         data-toggle="modal"
         data-target="#formCreditModal"
+        v-if="$root.validatePermission('credit-store')"
       >
         Crear Credito
       </button>
@@ -50,12 +51,12 @@
               <th>Valor Abonado</th>
               <th>Nro Cuotas</th>
               <th>Estado</th>
-              <th>Ver Cuotas</th>
-              <th>
+              <th v-if="$root.validatePermission('credit-index')">Ver Cuotas</th>
+              <th v-if="$root.validatePermission('credit-index')">
                 Tabla de <br />
                 amortización
               </th>
-              <th>Opciones</th>
+              <th v-if="$root.validatePermission('credit-update') || $root.validatePermission('credit-status')">Opciones</th>
             </tr>
           </thead>
           <!-- <tbody> -->
@@ -70,7 +71,7 @@
               <td>
                 {{ creditStatus[credit.status] }}
               </td>
-              <td class="text-center">
+              <td class="text-center" v-if="$root.validatePermission('credit-index')">
                 <button
                   data-toggle="modal"
                   data-target="#cuotasModal"
@@ -89,7 +90,7 @@
                   <i class="bi bi-eye-slash"></i>
                 </button>
               </td>
-              <td class="text-center">
+              <td class="text-center" v-if="$root.validatePermission('credit-index')">
                 <button
                   class="btn btn-outline-primary"
                   @click="
@@ -99,32 +100,35 @@
                   <i class="bi bi-file-pdf"></i>
                 </button>
               </td>
-              <td class="text-right">
-                <button
-                  v-if="credit.status == 1"
-                  class="btn btn-outline-primary"
-                  @click="showData(credit)"
-                >
-                  <i class="bi bi-pen"></i>
-                </button>
-                <button v-else class="btn btn-outline-secondary" disabled>
-                  <i class="bi bi-pen"></i>
-                </button>
-
-                <button
-                  v-if="credit.status == 0"
-                  class="btn btn-outline-danger"
-                  @click="changeStatus(credit.id, 2)"
-                >
-                  <i class="bi bi-trash"></i>
-                </button>
-                <button
-                  v-if="credit.status == 0"
-                  class="btn btn-outline-success"
-                  @click="changeStatus(credit.id, 1)"
-                >
-                  <i class="bi bi-check2-circle"></i>
-                </button>
+              <td class="text-right" v-if="$root.validatePermission('credit-update') || $root.validatePermission('credit-status')">
+                <div v-if="$root.validatePermission('credit-update')" class="d-inline">
+                  <button
+                    v-if="credit.status == 1"
+                    class="btn btn-outline-primary"
+                    @click="showData(credit)"
+                  >
+                    <i class="bi bi-pen"></i>
+                  </button>
+                  <button v-else class="btn btn-outline-secondary" disabled>
+                    <i class="bi bi-pen"></i>
+                  </button>
+                </div>
+                <div v-if="$root.validatePermission('credit-status')" class="d-inline">
+                  <button
+                    v-if="credit.status == 0"
+                    class="btn btn-outline-danger"
+                    @click="changeStatus(credit.id, 2)"
+                  >
+                    <i class="bi bi-trash"></i>
+                  </button>
+                  <button
+                    v-if="credit.status == 0"
+                    class="btn btn-outline-success"
+                    @click="changeStatus(credit.id, 1)"
+                  >
+                    <i class="bi bi-check2-circle"></i>
+                  </button>
+                </div>  
               </td>
             </tr>
           </tbody>
@@ -215,7 +219,7 @@ export default {
       let me = this;
       axios
         .get(
-          `api/credits?page=${page}&credit=${this.search_client}&status=${this.status}`
+          `api/credits?page=${page}&credit=${this.search_client}&status=${this.status}`, me.$root.config
         )
         .then(function (response) {
           me.creditList = response.data;
@@ -224,7 +228,7 @@ export default {
     listClients(page = 1) {
       let me = this;
       axios
-        .get(`api/clients?page=${page}&client=${this.search_client}`)
+        .get(`api/clients?page=${page}&client=${this.search_client}`, me.$root.config)
         .then(function (response) {
           me.clientList = response.data;
         });
@@ -265,7 +269,7 @@ export default {
     },
     printTable(credit_id, client) {
       axios
-        .get(`api/credits/amortization-table?credit_id=${credit_id}`)
+        .get(`api/credits/amortization-table?credit_id=${credit_id}`, this.$root.config)
         .then((response) => {
           const pdf = response.data.pdf;
           var a = document.createElement("a");

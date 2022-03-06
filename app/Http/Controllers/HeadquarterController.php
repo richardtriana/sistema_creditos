@@ -9,6 +9,13 @@ use Illuminate\Http\Request;
 
 class HeadquarterController extends Controller
 {
+	public function __construct()
+	{
+		$this->middleware('permission:headquarter.index', ['only' => ['index','show', 'listHeadquarter', 'listAllHeadquarters']]);
+		$this->middleware('permission:headquarter.store', ['only' => ['store']]);
+		$this->middleware('permission:headquarter.update', ['only' => ['update', 'create']]);
+		$this->middleware('permission:headquarter.status', ['only' => ['changeStatus']]);
+	}
 	/**
 	 * Display a listing of the resource.
 	 *

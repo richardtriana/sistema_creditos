@@ -13,7 +13,7 @@
               <th scope="col">Saldo disponible</th>
               <th scope="col">Última modificación</th>
               <th>ültimo editor</th>
-              <th>Opciones</th>
+              <th v-if="$root.validatePermission('box-update')">Opciones</th>
               <!-- <th>Eliminar</th> -->
             </tr>
           </thead>
@@ -28,7 +28,7 @@
                   {{ box.last_editor.name }} {{ box.last_editor.last_name }}
                 </span>
               </td>
-              <td>
+              <td v-if="$root.validatePermission('box-update')">
                 <button
                   type="button"
                   class="btn btn-outline-primary"
@@ -67,7 +67,7 @@ export default {
   },
   methods: {
     listBoxes() {
-      axios.get("api/boxes").then((reponse) => {
+      axios.get("api/boxes", this.$root.config).then((reponse) => {
         this.boxList = reponse.data.boxes;
       });
     },

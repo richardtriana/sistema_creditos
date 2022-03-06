@@ -110,7 +110,8 @@ export default {
       axios
         .post(
           `api/credit-providers/pay-credit-provider/${this.formCreditProvider.id}`,
-          data
+          data,
+          this.$root.config
         )
         .then(() => {
           $("#payCreditProviderModal").modal("hide");

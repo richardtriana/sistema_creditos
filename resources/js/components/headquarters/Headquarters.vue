@@ -7,6 +7,7 @@
         class="btn btn-primary"
         data-toggle="modal"
         data-target="#formHeadquarterModal"
+        v-if="$root.validatePermission('headquarter-store')"
       >
         Crear Sede
       </button>
@@ -36,8 +37,8 @@
               <th>Correo Contacto</th>
               <th>Representante</th>
               <th>Celular Contacto</th>
-              <th>Estado</th>
-              <th>Opciones</th>
+              <th v-if="$root.validatePermission('headquarter-status')">Estado</th>
+              <th v-if="$root.validatePermission('headquarter-update')">Opciones</th>
             </tr>
           </thead>
           <tbody>
@@ -51,7 +52,7 @@
               <td>{{ headquarter.email }}</td>
               <td>{{ headquarter.legal_representative }}</td>
               <td>{{ headquarter.phone }}</td>
-              <td class="text-right">
+              <td class="text-right" v-if="$root.validatePermission('headquarter-status')">
                 <button
                   v-if="headquarter.status == 1"
                   class="btn btn-outline-danger"
@@ -67,7 +68,7 @@
                   <i class="bi bi-check2-circle"></i>
                 </button>
               </td>
-              <td class="text-right">
+              <td class="text-right" v-if="$root.validatePermission('headquarter-update')">
                 <button
                   v-if="headquarter.status == 1"
                   class="btn btn-outline-primary"
@@ -114,7 +115,8 @@ export default {
       let me = this;
       axios
         .get(
-          `api/headquarters?page=${page}&headquarter=${this.search_headquarter}`
+          `api/headquarters?page=${page}&headquarter=${this.search_headquarter}`,
+          me.$root.config
         )
         .then(function (response) {
           me.headquarterList = response.data;

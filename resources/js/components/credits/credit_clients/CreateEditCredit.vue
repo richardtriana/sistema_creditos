@@ -317,14 +317,14 @@ export default {
     listHeadquarters() {
       let me = this;
       axios
-        .get(`api/headquarters/list-all-headquarters`)
+        .get(`api/headquarters/list-all-headquarters`, me.$root.config)
         .then(function (response) {
           me.headquarterList = response.data;
         });
     },
     createCredit() {
       let me = this;
-      axios.post("api/credits", this.formCredit).then(function () {
+      axios.post("api/credits", this.formCredit, me.$root.config).then(function () {
         $("#formCreditModal").modal("hide");
         me.resetData();
         me.$emit("list-credits");
@@ -339,7 +339,7 @@ export default {
     editCredit() {
       let me = this;
       axios
-        .put("api/credits/" + this.formCredit.id, this.formCredit)
+        .put("api/credits/" + this.formCredit.id, this.formCredit, me.$root.config)
         .then(function () {
           $("#formCreditModal").modal("hide");
           me.resetData();

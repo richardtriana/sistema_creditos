@@ -8,6 +8,12 @@ use Illuminate\Http\Request;
 
 class BoxController extends Controller
 {
+	public function __construct()
+	{
+		$this->middleware('permission:box.index', ['only' => ['index','show']]);
+		$this->middleware('permission:box.update', ['only' => ['update', 'addAmountBox','subAmountBox']]);
+	}
+
 	/**
 	 * Display a listing of the resource.
 	 *
