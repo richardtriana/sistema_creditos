@@ -99,8 +99,12 @@ export default {
       };
       if (this.amount_value > 0) {
         axios
-          .post(`api/credits/pay-credit-installments/${this.id_credit}`, data)
-          .then(this.listCreditInstallments(this.id_credit, 1))
+          .post(
+            `api/credits/pay-credit-installments/${this.id_credit}`,
+            data,
+            this.$root.config
+          )
+          .then(this.listCreditInstallments(this.id_credit))
           .finally(
             this.$refs.Installment.listCreditInstallments(
               this.id_credit,
@@ -118,7 +122,10 @@ export default {
 
     printTable() {
       axios
-        .get(`api/credits/amortization-table?credit_id=${this.id_credit}`)
+        .get(
+          `api/credits/amortization-table?credit_id=${this.id_credit}`,
+          this.$root.config
+        )
         .then((response) => {
           const pdf = response.data.pdf;
           var a = document.createElement("a");

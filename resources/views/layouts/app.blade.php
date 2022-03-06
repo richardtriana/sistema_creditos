@@ -27,11 +27,8 @@
 <body class="bg-gray">
     <div id="app">
 
-        @guest
-        @component('components.main-menu')@endcomponent
-        @else
-        @component('components.navigation-menu')@endcomponent
-        @endguest
+        @component('components.navigation-menu')
+        @endcomponent
 
         <main class="p-4 bg-light container">
             @yield('content')

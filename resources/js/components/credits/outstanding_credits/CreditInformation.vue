@@ -168,7 +168,7 @@ export default {
     },
     consultAdditionalInfoCredit(credit_id) {
       axios
-        .get(`api/credits/general-information/${credit_id}`)
+        .get(`api/credits/general-information/${credit_id}`, this.$root.config)
         .then((response) => {
           this.provider_info = response.data.provider;
           this.debtor_info = response.data.debtor;

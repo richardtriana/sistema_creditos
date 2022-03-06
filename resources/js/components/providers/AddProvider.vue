@@ -110,7 +110,7 @@ export default {
     listProviders() {
       let me = this;
       axios
-        .post("api/providers/filter-provider-list", null)
+        .post("api/providers/filter-provider-list", null, me.$root.config)
         .then(function (response) {
           me.ProviderList = response;
         });
@@ -123,7 +123,7 @@ export default {
       var url = `api/providers/filter-provider-list?provider=${me.filters.provider}`;
       if (me.filters.provider.length >= 3) {
         axios
-          .post(url, null)
+          .post(url, null, me.$root.config)
           .then(function (response) {
             me.ProviderList = response;
           })

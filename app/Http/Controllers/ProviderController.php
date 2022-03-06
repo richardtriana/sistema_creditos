@@ -7,6 +7,14 @@ use Illuminate\Http\Request;
 
 class ProviderController extends Controller
 {
+	public function __construct()
+	{
+		$this->middleware('permission:provider.index', ['only' => ['index','show','filterProviderList']]);
+		$this->middleware('permission:provider.store', ['only' => ['store']]);
+		$this->middleware('permission:provider.update', ['only' => ['update']]);
+		$this->middleware('permission:provider.delete', ['only' => ['create']]);
+		$this->middleware('permission:provider.status', ['only' => ['changeStatus']]);
+	}
 	public function index()
 	{
 		//

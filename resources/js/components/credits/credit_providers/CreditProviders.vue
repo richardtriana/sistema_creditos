@@ -5,7 +5,7 @@
     </div>
     <div class="page-content">
       <section class="table-responsive">
-        <table class="table table-sm table-bordered">
+        <table class="table table-sm table-bordered" v-if="$root.validatePermission('provider-index')">
           <thead>
             <tr class="text-center">
               <th># Crédito</th>
@@ -14,7 +14,7 @@
               <th>Saldo abonado</th>
               <th>Saldo pendiente</th>
               <th>Historial de cambios</th>
-              <th>Abonar</th>
+              <th v-if="$root.validatePermission('provider-update')">Abonar</th>
             </tr>
           </thead>
           <tbody>
@@ -42,7 +42,7 @@
                   <i class="bi bi-clock-history"></i>
                 </button>
               </td>
-              <td class="text-right">
+              <td class="text-right" v-if="$root.validatePermission('provider-update')">
                 <button
                   class="btn btn-outline-success"
                   data-toggle="modal"
@@ -75,7 +75,7 @@ export default {
   },
   methods: {
     listCreditProviders() {
-      axios.get(`api/credit-providers`).then((response) => {
+      axios.get(`api/credit-providers`, this.$root.config).then((response) => {
         this.creditProvidersList = response.data;
       });
     },

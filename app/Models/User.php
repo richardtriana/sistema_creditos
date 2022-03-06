@@ -2,21 +2,26 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Authenticatable implements Authorizable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
      *
      * @var string[]
      */
+
+    protected $guard_name = "api";
+
     protected $fillable = [
         'id', 'last_name', 'email', 'password', 'name', 'phone', 'address', 'type_document', 'document', 'photo', 'headquarter_id', 'rol_id', 'status'
     ];
@@ -41,7 +46,8 @@ class User extends Authenticatable
     ];
 
     protected $with = [
-        'headquarter'
+        'headquarter',
+        'roles'
     ];
 
 

@@ -82,12 +82,14 @@ export default {
   },
   methods: {
     listReportPortfolio(page = 1) {
-      axios.get(`api/reports/portfolio?page=${page}`).then((response) => {
-        this.ReportPortfolioList = response.data;
-      });
+      axios
+        .get(`api/reports/portfolio?page=${page}`, this.$root.config)
+        .then((response) => {
+          this.ReportPortfolioList = response.data;
+        });
     },
     getCompanyInformation() {
-      axios.get("api/configurations").then((response) => {
+      axios.get("api/configurations", this.$root.config).then((response) => {
         if (response.data.company) {
           this.infoCompany = response.data.company;
         }
@@ -97,7 +99,7 @@ export default {
 
   mounted() {
     this.listReportPortfolio();
-		this.getCompanyInformation()
+    this.getCompanyInformation();
   },
 };
 </script>

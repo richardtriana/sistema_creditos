@@ -7,6 +7,7 @@
 				class="btn btn-primary"
 				data-toggle="modal"
 				data-target="#formProviderModal"
+				v-if="$root.validatePermission('provider-store')"
 			>
 				Crear proveedor
 			</button>
@@ -24,8 +25,8 @@
 							<th>Celular2</th>
 							<th>Correo Electrónico</th>
 							<th>Dirección</th>
-							<th>Estado</th>
-							<th>Opciones</th>
+							<th v-if="$root.validatePermission('provider-status')">Estado</th>
+							<th v-if="$root.validatePermission('provider-update')">Opciones</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -42,7 +43,7 @@
 							<td>{{ p.phone_2 }}</td>
 							<td>{{ p.email }}</td>
 							<td>{{ p.address }}</td>
-							<td class="text-right">
+							<td class="text-right" v-if="$root.validatePermission('provider-status')">
 								<button
 									class="btn"
 									:class="
@@ -54,7 +55,7 @@
 									<i class="bi bi-x-circle" v-if="p.status == 0"></i>
 								</button>
 							</td>
-							<td class="text-right">
+							<td class="text-right" v-if="$root.validatePermission('provider-update')">
 								<button class="btn btn-outline-primary" @click="showData(p)">
 									<i class="bi bi-pen"></i>
 								</button>
@@ -94,7 +95,7 @@ export default {
 	methods: {
 		listProviders(page = 1) {
 			let me = this;
-			axios.get("api/providers?page=" + page).then(function (response) {
+			axios.get("api/providers?page=" + page, me.$root.config).then(function (response) {
 				me.providerList = response.data;
 			});
 		},

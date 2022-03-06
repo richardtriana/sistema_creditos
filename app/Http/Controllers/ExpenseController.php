@@ -8,6 +8,14 @@ use Illuminate\Http\Request;
 
 class ExpenseController extends Controller
 {
+	public function __construct()
+	{
+		$this->middleware('permission:expense.index', ['only' => ['index','show']]);
+		$this->middleware('permission:expense.store', ['only' => ['store']]);
+		$this->middleware('permission:expense.update', ['only' => ['update']]);
+		$this->middleware('permission:expense.delete', ['only' => ['destroy']]);
+		$this->middleware('permission:expense.status', ['only' => ['changeStatus']]);
+	}
 	/**
 	 * Display a listing of the resource.
 	 *

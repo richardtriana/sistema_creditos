@@ -253,12 +253,11 @@ export default {
     };
   },
   created() {
-    // this.$root.validateToken();
-    this.getCofiguration();
+    this.getConfiguration();
   },
   methods: {
-    getCofiguration() {
-      axios.get("api/configurations").then((response) => {
+    getConfiguration() {
+      axios.get("api/configurations", this.$root.config).then((response) => {
         if (response.data.company) {
           this.formConfiguration = response.data.company;
           this.formConfiguration.condition_quotation =

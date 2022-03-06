@@ -147,7 +147,7 @@ export default {
   methods: {
     createProvider() {
       let me = this;
-      axios.post("api/providers", this.formProvider).then(function () {
+      axios.post("api/providers", this.formProvider, me.$root.config).then(function () {
         $("#formProviderModal").modal("hide");
         me.formProvider = {};
         this.$emit("list-providers");
@@ -162,7 +162,7 @@ export default {
     editProvider() {
       let me = this;
       axios
-        .put("api/providers/" + this.formProvider.id, this.formProvider)
+        .put("api/providers/" + this.formProvider.id, this.formProvider, me.$root.config)
         .then(function () {
           $("#formProviderModal").modal("hide");
           me.formProvider = {};
