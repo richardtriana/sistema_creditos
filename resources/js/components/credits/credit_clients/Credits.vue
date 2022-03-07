@@ -61,6 +61,8 @@
 								Tabla de <br />
 								amortización
 							</th>
+							<th>Paz y salvo</th>
+							<th>Recoger crédito</th>
 							<th>Opciones</th>
 						</tr>
 					</thead>
@@ -69,7 +71,7 @@
 						<tr v-for="credit in creditList.data" :key="credit.index">
 							<td>{{ credit.id }}</td>
 							<td>{{ credit.name }} {{ credit.last_name }}</td>
-							<td>{{ credit.document }}</td>
+							<td>{{ credit.type_document }} {{ credit.document }}</td>
 							<td class="text-right">{{ credit.credit_value | currency }}</td>
 							<td class="text-right">{{ credit.paid_value | currency }}</td>
 							<td>{{ credit.number_installments }}</td>
@@ -105,6 +107,34 @@
 									<i class="bi bi-file-pdf"></i>
 								</button>
 							</td>
+							<td>
+								<div v-if="credit.status == 4">
+									<button
+										type="button"
+										class="btn btn-outline-success"
+										@click="
+											downloadReceiptPDF(
+												credit.id,
+												credit.name + '_' + credit.last_name
+											)
+										"
+									>
+										<i class="bi bi-file-earmark-pdf"></i>
+										Descargar
+									</button>
+								</div>
+								<div v-else>No disponible por el momento</div>
+							</td>
+							<td>
+								<button
+									v-if="credit.status == 1"
+									class="btn btn-outline-primary"
+									@click="collectCredit(credit.id)"
+								>
+									<i class="bi bi-box-arrow-in-down"></i>
+									Recoger
+								</button>
+							</td>
 							<td class="text-right">
 								<button
 									v-if="credit.status == 1"
@@ -118,14 +148,14 @@
 								</button>
 
 								<button
-									v-if="credit.status != 1 && credit.status != 2"
+									v-if="credit.status == 0 || credit.status == 3"
 									class="btn btn-outline-danger"
 									@click="changeStatus(credit.id, 2)"
 								>
 									<i class="bi bi-x-circle"></i>
 								</button>
 								<button
-									v-if="credit.status != 1 && credit.status != 2"
+									v-if="credit.status == 0 || credit.status == 3"
 									class="btn btn-outline-success"
 									@click="changeStatus(credit.id, 1)"
 								>
@@ -210,6 +240,7 @@ export default {
 				1: "Aprobado",
 				2: "Rechazado",
 				3: "Pendiente pago a proveedor",
+				4: "Completado",
 			},
 		};
 	},
@@ -280,6 +311,42 @@ export default {
 					a.download = `credit_${credit_id}-${client}.pdf`;
 					a.click();
 				});
+		},
+		downloadReceiptPDF(credit_id, client) {
+			axios
+				.get(`api/credits/download-Receipt-PDF/${credit_id}`)
+				.then((response) => {
+					const pdf = response.data.pdf;
+					var a = document.createElement("a");
+					a.href = "data:application/pdf;base64," + pdf;
+					a.download = `paz-y-salvo-credito_${credit_id}-${client}.pdf`;
+					a.click();
+				});
+		},
+		collectCredit(credit_id) {
+			let me = this;
+
+			Swal.fire({
+				title: "¿Seguro de recoger el crédito?",
+				showDenyButton: true,
+				denyButtonText: `Cancelar`,
+				confirmButtonText: `Guardar`,
+			}).then((result) => {
+				if (result.isConfirmed) {
+					axios
+						.post(
+							`api/credits/collect-credit/${credit_id}`,
+							null,
+							me.$root.config
+						)
+						.then(function () {
+							me.listCredits(1);
+						});
+					Swal.fire("Cambios realizados!", "", "success");
+				} else if (result.isDenied) {
+					Swal.fire("Operación no realizada", "", "info");
+				}
+			});
 		},
 	},
 };

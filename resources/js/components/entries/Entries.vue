@@ -7,7 +7,7 @@
 			<section class="table-responsive">
 				<table class="table table-bordered table-sm">
 					<thead>
-						<tr>
+						<tr class="text-center">
 							<th>Responsable</th>
 							<th>Fecha</th>
 							<th>Valor</th>
