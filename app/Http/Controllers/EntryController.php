@@ -66,7 +66,7 @@ class EntryController extends Controller
 		];
 
 		$pdf = PDF::loadView('templates.entry_information', $details);
-		$pdf = $pdf->download('amortization_table.pdf');
+		$pdf = $pdf->download('entry_information.pdf');
 
 		$data = [
 			'status' => 200,

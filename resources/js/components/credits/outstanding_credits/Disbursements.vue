@@ -143,6 +143,7 @@ export default {
 				1: "Aprobado",
 				2: "Rechazado",
 				3: "Pendiente pago a proveedor",
+				4: 'Completado'
 			},
 		};
 	},

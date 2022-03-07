@@ -176,7 +176,6 @@ class PrintTicketController extends Controller
 		// Orden
 		$headquarter = Headquarter::findOrFail($entry->headquarter_id)->first();
 
-
 		if (!$headquarter->pos_printer || $headquarter->pos_printer == '') {
 			return false;
 		}
@@ -187,62 +186,62 @@ class PrintTicketController extends Controller
 		// Config de impresora
 		$connector = new WindowsPrintConnector($headquarter->pos_printer);
 
-		// try {
-
-		$printer = new Printer($connector);
-		$printer->initialize();
-		$printer->setJustification(Printer::JUSTIFY_CENTER);
 		try {
-			$logo = EscposImage::load('logo.jpg');
-			$printer->bitImage($logo);
-		} catch (Exception $e) {
-			/* Images not supported on your PHP, or image file not found */
-			//$printer->text($e->getMessage() . "\n");
+
+			$printer = new Printer($connector);
+			$printer->initialize();
+			$printer->setJustification(Printer::JUSTIFY_CENTER);
+			try {
+				$logo = EscposImage::load('logo.jpg');
+				$printer->bitImage($logo);
+			} catch (Exception $e) {
+				/* Images not supported on your PHP, or image file not found */
+				//$printer->text($e->getMessage() . "\n");
+			}
+
+			$printer->setTextSize(1, 2);
+			$printer->setEmphasis(true);
+			$printer->text($company->name . "\n");
+			$printer->setEmphasis(true);
+			$printer->text('Sede ' . $headquarter->headquarter . "\n");
+			$printer->setTextSize(1, 1);
+			$printer->setEmphasis(false);
+			$printer->text("NIT: ");
+			$printer->text($headquarter->nit . "\n");
+			$printer->text("Dirección: ");
+			$printer->text($headquarter->address . "\n");
+			$printer->text("\n");
+			$printer->setEmphasis(true);
+			$printer->text($entry->type_entry);
+			$printer->text("\n");
+			$printer->setJustification(Printer::JUSTIFY_LEFT);
+			$printer->setEmphasis(false);
+			$printer->text(sprintf('%-20s %-20s', 'Client', $client->name . ' ' . $client->last_name));
+			$printer->text("\n");
+			$printer->text(sprintf('%-20s %-20s', 'Fecha', date('Y-m-d h:i:s A')));
+			$printer->text("\n");
+			$printer->text(sprintf('%-20s %-20s', 'Valor Crédito: ', ' $ ' . $credit->credit_value));
+			$printer->text("\n");
+			$printer->text(sprintf('%-20s %-20s', 'Monto Cancelado: ', '$ ' .  $entry->price));
+			$printer->text("\n");
+			$printer->text('Descripcion: ' . $credit->description);
+			$printer->text("\n");
+			$printer->text("\n");
+			$printer->setLineSpacing(2);
+			$printer->setEmphasis(false);
+			$printer->setJustification(Printer::JUSTIFY_CENTER);
+
+			$printer->setFont(Printer::MODE_FONT_B);
+			$printer->text("Tecnoplus");
+			$printer->text("\nwww.tecnoplus.com\n");
+			$printer->cut();
+			$printer->pulse();
+			$printer->close();
+
+			return redirect()->back()->with("mensaje", "Ticket impreso");
+		} catch (\Throwable $th) {
+			echo $th;
+			return 'No se pudo imprimir';
 		}
-
-		$printer->setTextSize(1, 2);
-		$printer->setEmphasis(true);
-		$printer->text($company->name . "\n");
-		$printer->setEmphasis(true);
-		$printer->text('Sede ' . $headquarter->headquarter . "\n");
-		$printer->setTextSize(1, 1);
-		$printer->setEmphasis(false);
-		$printer->text("NIT: ");
-		$printer->text($headquarter->nit . "\n");
-		$printer->text("Dirección: ");
-		$printer->text($headquarter->address . "\n");
-		$printer->text("\n");
-		$printer->setEmphasis(true);
-		$printer->text($entry->type_entry);
-		$printer->text("\n");
-		$printer->setJustification(Printer::JUSTIFY_LEFT);
-		$printer->setEmphasis(false);
-		$printer->text(sprintf('%-20s %-20s', 'Client', $client->name . ' ' . $client->last_name));
-		$printer->text("\n");
-		$printer->text(sprintf('%-20s %-20s', 'Fecha', date('Y-m-d h:i:s A')));
-		$printer->text("\n");
-		$printer->text(sprintf('%-20s %-20s', 'Valor Crédito: ', ' $ ' . $credit->credit_value));
-		$printer->text("\n");
-		$printer->text(sprintf('%-20s %-20s', 'Monto Cancelado: ', '$ ' .  $entry->price));
-		$printer->text("\n");
-		$printer->text('Descripcion: ' . $credit->description);
-		$printer->text("\n");
-		$printer->text("\n");
-		$printer->setLineSpacing(2);
-		$printer->setEmphasis(false);
-		$printer->setJustification(Printer::JUSTIFY_CENTER);
-
-		$printer->setFont(Printer::MODE_FONT_B);
-		$printer->text("Tecnoplus");
-		$printer->text("\nwww.tecnoplus.com\n");
-		$printer->cut();
-		$printer->pulse();
-		$printer->close();
-
-		//     return redirect()->back()->with("mensaje", "Ticket impreso");
-		// } catch (\Throwable $th) {
-		//     echo $th;
-		//     return 'No se pudo imprimir';
-		// }
 	}
 }

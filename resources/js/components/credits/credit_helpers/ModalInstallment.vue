@@ -25,7 +25,7 @@
             class="page-header d-flex justify-content-between p-4 border my-2"
           >
             <div class="form-row w-100">
-              <div class="form-group col-2">
+              <!-- <div class="form-group col-2">
                 <label for="amount">Monto a pagar</label>
               </div>
               <div class="form-group col-4">
@@ -53,7 +53,7 @@
                 >
                   <i class="bi bi-currency-dollar"></i> Abonar a crédito
                 </button>
-              </div>
+              </div> -->
               <div class="form-group col-3">
                 <button class="btn btn-outline-primary" @click="printTable()">
                   <i class="bi bi-file-pdf"></i> Tabla de amortización

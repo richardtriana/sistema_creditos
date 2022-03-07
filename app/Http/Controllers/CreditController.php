@@ -3,16 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Box;
-use App\Models\Client;
-use App\Models\Headquarter;
+use App\Models\Company;
 use App\Models\Credit;
 use App\Models\CreditProvider;
 use App\Models\Entry;
+use App\Models\Headquarter;
 use App\Models\Installment;
-use App\Models\MainBox;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
+use PDF;
 
 class CreditController extends Controller
 {
@@ -29,7 +30,7 @@ class CreditController extends Controller
 
 		if ($request->credit && ($request->credit != '')) {
 			$credits  =   $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
-				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document')
+				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document')
 				->where('document', 'LIKE', "%$request->credit%")
 				->orWhere('name', 'LIKE', "%$request->credit%")
 				->orWhere('email', 'LIKE', "%$request->credit%")
@@ -37,7 +38,7 @@ class CreditController extends Controller
 				->whereIn('credits.status', $status);
 		} else {
 			$credits  =     $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
-				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document')
+				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document')
 				->whereIn('credits.status', $status);
 		}
 		$credits = $credits->paginate(10);
@@ -252,7 +253,39 @@ class CreditController extends Controller
 		$credit->paid_value = $credit->paid_value + $total_amount;
 		$credit->capital_value = $credit->capital_value + $capital;
 		$credit->interest_value = $credit->interest_value + $interest;
+		if ($credit->capital_value >= $credit->credit_value) {
+			$credit->status = 4;
+			$credit->finish_date = date('Y-m-d');
+		}
 		$credit->save();
+	}
+
+	public function downloadReceiptPDF(Credit $credit)
+	{
+		$company = Company::first();
+		$client = $credit->client()->first();
+		$installments = $credit->installments()->get();
+		$headquarter = $credit->headquarter()->first();
+
+		$details = [
+			'company' => $company,
+			'credit' => $credit,
+			'client' => $client,
+			'installments' => $installments,
+			'headquarter' => $headquarter,
+			'url' => URL::to('/')
+		];
+
+		$pdf = PDF::loadView('templates.receipt_completed_credit', $details);
+		$pdf = $pdf->download('receipt_completed_credit.pdf');
+
+		$data = [
+			'status' => 200,
+			'pdf' => base64_encode($pdf),
+			'message' => 'Tabla generada en pdf'
+		];
+
+		return response()->json($data);
 	}
 
 	public function generalInformation(Credit $credit)
@@ -280,5 +313,31 @@ class CreditController extends Controller
 			DB::raw('SUM(capital_value) as capital_value')
 		)->first();
 		return $credits;
+	}
+
+	function collectCredit(Credit $credit)
+	{
+
+		$client = $credit->client()->first();
+
+		$credit->status = 4;
+		$credit->finish_date = date('Y-m-d');
+		$credit->paid_value = $credit->credit_value;
+		$credit->capital_value = $credit->credit_value;
+		$credit->interest_value = 0;
+		$credit->save();
+
+		$update_main_box = new MainBoxController();
+		$update_main_box->addAmountMainBox($credit->credit_value);
+
+		$entry =  new Entry();
+		$entry->headquarter_id = $credit->headquarter_id;
+		$entry->user_id = 1;
+		$entry->credit_id = $credit->id;
+		$entry->description = "Cliente: {$client->name} {$client->last_name}";
+		$entry->date = date('Y-m-d');
+		$entry->type_entry = 'Recoger crédito';
+		$entry->price = $credit->credit_value;
+		$entry->save();
 	}
 }
