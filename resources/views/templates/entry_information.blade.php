@@ -11,7 +11,7 @@
 
 <body>
 
-  <header class="text-center"> 
+  <header class="text-center">
     <img src="{{ $company->logo}}" alt="" srcset="" width="150">
     <h2>
       {{ $company->name}}
@@ -22,7 +22,7 @@
     <p>NIT:{{$headquarter->nit}} </p>
     <p>Dirección: {{$headquarter->address}}</p>
     <br>
-    <strong>Pago de cuota</strong>
+    <h2><strong>Pago de cuota</strong></h2>
   </header>
   <section>
     <table class="table">
@@ -59,7 +59,7 @@
       </tr>
     </table>
   </section>
-
+  <br><br>
   <footer>
     <small>Tecnoplus Créditos</small> <br>
     <small>

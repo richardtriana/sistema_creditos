@@ -32,6 +32,7 @@ class Credit extends Model
         'capital_value',
         'interest_value',
         'disbursement_date',
+        'finish_date',
         'description',
         'provider'
     ];

@@ -48,7 +48,9 @@ Route::get('/company-logo', function () {
 	return $image;
 });
 
+Route::post('/credits/collect-credit/{credit}', [CreditController::class, 'collectCredit']);
 Route::get('/credits/general-information/{credit}', [CreditController::class, 'generalInformation']);
+Route::get('/credits/download-Receipt-PDF/{credit}', [CreditController::class, 'downloadReceiptPDF']);
 Route::get('/credits/amortization-table', [InstallmentController::class, 'printTable']);
 Route::post('/credits/pay-credit-installments/{id}', [CreditController::class, 'payMultipleInstallments']);
 Route::resource('/credits', CreditController::class);

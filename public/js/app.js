@@ -4402,6 +4402,36 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -4421,7 +4451,8 @@ __webpack_require__.r(__webpack_exports__);
         0: "Pendiente",
         1: "Aprobado",
         2: "Rechazado",
-        3: "Pendiente pago a proveedor"
+        3: "Pendiente pago a proveedor",
+        4: "Completado"
       }
     };
   },
@@ -4481,6 +4512,33 @@ __webpack_require__.r(__webpack_exports__);
         a.href = "data:application/pdf;base64," + pdf;
         a.download = "credit_".concat(credit_id, "-").concat(client, ".pdf");
         a.click();
+      });
+    },
+    downloadReceiptPDF: function downloadReceiptPDF(credit_id, client) {
+      axios.get("api/credits/download-Receipt-PDF/".concat(credit_id)).then(function (response) {
+        var pdf = response.data.pdf;
+        var a = document.createElement("a");
+        a.href = "data:application/pdf;base64," + pdf;
+        a.download = "paz-y-salvo-credito_".concat(credit_id, "-").concat(client, ".pdf");
+        a.click();
+      });
+    },
+    collectCredit: function collectCredit(credit_id) {
+      var me = this;
+      Swal.fire({
+        title: "¿Seguro de recoger el crédito?",
+        showDenyButton: true,
+        denyButtonText: "Cancelar",
+        confirmButtonText: "Guardar"
+      }).then(function (result) {
+        if (result.isConfirmed) {
+          axios.post("api/credits/collect-credit/".concat(credit_id), null, me.$root.config).then(function () {
+            me.listCredits(1);
+          });
+          Swal.fire("Cambios realizados!", "", "success");
+        } else if (result.isDenied) {
+          Swal.fire("Operación no realizada", "", "info");
+        }
       });
     }
   }
@@ -5580,7 +5638,8 @@ __webpack_require__.r(__webpack_exports__);
         0: "Pendiente",
         1: "Aprobado",
         2: "Rechazado",
-        3: "Pendiente pago a proveedor"
+        3: "Pendiente pago a proveedor",
+        4: 'Completado'
       }
     };
   },
@@ -7119,7 +7178,8 @@ __webpack_require__.r(__webpack_exports__);
         0: "Pendiente",
         1: "Aprobado",
         2: "Rechazado",
-        3: "Pendiente pago a proveedor"
+        3: "Pendiente pago a proveedor",
+        4: 'Completado'
       }
     };
   },
@@ -7152,6 +7212,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -54736,7 +54806,13 @@ var render = function () {
                             ),
                           ]),
                           _vm._v(" "),
-                          _c("td", [_vm._v(_vm._s(credit.document))]),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(credit.type_document) +
+                                " " +
+                                _vm._s(credit.document)
+                            ),
+                          ]),
                           _vm._v(" "),
                           _c("td", { staticClass: "text-right" }, [
                             _vm._v(
@@ -54809,6 +54885,62 @@ var render = function () {
                             ),
                           ]),
                           _vm._v(" "),
+                          _c("td", [
+                            credit.status == 4
+                              ? _c("div", [
+                                  _c(
+                                    "button",
+                                    {
+                                      staticClass: "btn btn-outline-success",
+                                      attrs: { type: "button" },
+                                      on: {
+                                        click: function ($event) {
+                                          return _vm.downloadReceiptPDF(
+                                            credit.id,
+                                            credit.name + "_" + credit.last_name
+                                          )
+                                        },
+                                      },
+                                    },
+                                    [
+                                      _c("i", {
+                                        staticClass: "bi bi-file-earmark-pdf",
+                                      }),
+                                      _vm._v(
+                                        "\n\t\t\t\t\t\t\t\t\tDescargar\n\t\t\t\t\t\t\t\t"
+                                      ),
+                                    ]
+                                  ),
+                                ])
+                              : _c("div", [
+                                  _vm._v("No disponible por el momento"),
+                                ]),
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            credit.status == 1
+                              ? _c(
+                                  "button",
+                                  {
+                                    staticClass: "btn btn-outline-primary",
+                                    on: {
+                                      click: function ($event) {
+                                        return _vm.collectCredit(credit.id)
+                                      },
+                                    },
+                                  },
+                                  [
+                                    _c("i", {
+                                      staticClass: "bi bi-box-arrow-in-down",
+                                    }),
+                                    _vm._v(
+                                      "\n\t\t\t\t\t\t\t\tRecoger\n\t\t\t\t\t\t\t"
+                                    ),
+                                  ]
+                                )
+                              : _vm._e(),
+                          ]),
+                          _vm._v(" "),
                           _c("td", { staticClass: "text-right" }, [
                             credit.status == 1
                               ? _c(
@@ -54832,7 +54964,7 @@ var render = function () {
                                   [_c("i", { staticClass: "bi bi-pen" })]
                                 ),
                             _vm._v(" "),
-                            credit.status != 1 && credit.status != 2
+                            credit.status == 0 || credit.status == 3
                               ? _c(
                                   "button",
                                   {
@@ -54847,7 +54979,7 @@ var render = function () {
                                 )
                               : _vm._e(),
                             _vm._v(" "),
-                            credit.status != 1 && credit.status != 2
+                            credit.status == 0 || credit.status == 3
                               ? _c(
                                   "button",
                                   {
@@ -54978,6 +55110,10 @@ var staticRenderFns = [
           _c("br"),
           _vm._v("\n\t\t\t\t\t\t\tamortización\n\t\t\t\t\t\t"),
         ]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Paz y salvo")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Recoger crédito")]),
         _vm._v(" "),
         _c("th", [_vm._v("Opciones")]),
       ]),
@@ -55247,72 +55383,6 @@ var render = function () {
                   },
                   [
                     _c("div", { staticClass: "form-row w-100" }, [
-                      _vm._m(1),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "form-group col-4" }, [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.amount_value,
-                              expression: "amount_value",
-                            },
-                          ],
-                          staticClass: "form-control",
-                          attrs: {
-                            type: "number",
-                            step: "any",
-                            id: "amount",
-                            placeholder: "$",
-                          },
-                          domProps: { value: _vm.amount_value },
-                          on: {
-                            input: function ($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.amount_value = $event.target.value
-                            },
-                          },
-                        }),
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "form-group col-3" }, [
-                        _vm.amount_value > 0
-                          ? _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-outline-primary my-auto",
-                                on: {
-                                  click: function ($event) {
-                                    return _vm.payCredit()
-                                  },
-                                },
-                              },
-                              [
-                                _c("i", {
-                                  staticClass: "bi bi-currency-dollar",
-                                }),
-                                _vm._v(" Abonar a crédito\n              "),
-                              ]
-                            )
-                          : _c(
-                              "button",
-                              {
-                                staticClass:
-                                  "btn btn-outline-secondary my-auto",
-                                attrs: { disabled: "" },
-                              },
-                              [
-                                _c("i", {
-                                  staticClass: "bi bi-currency-dollar",
-                                }),
-                                _vm._v(" Abonar a crédito\n              "),
-                              ]
-                            ),
-                      ]),
-                      _vm._v(" "),
                       _c("div", { staticClass: "form-group col-3" }, [
                         _c(
                           "button",
@@ -55339,7 +55409,7 @@ var render = function () {
               1
             ),
             _vm._v(" "),
-            _vm._m(2),
+            _vm._m(1),
           ]),
         ]
       ),
@@ -55370,14 +55440,6 @@ var staticRenderFns = [
         },
         [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
       ),
-    ])
-  },
-  function () {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group col-2" }, [
-      _c("label", { attrs: { for: "amount" } }, [_vm._v("Monto a pagar")]),
     ])
   },
   function () {
@@ -56799,7 +56861,7 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("thead", [
-      _c("tr", [
+      _c("tr", { staticClass: "text-center" }, [
         _c("th", [_vm._v("Responsable")]),
         _vm._v(" "),
         _c("th", [_vm._v("Fecha")]),
@@ -59083,15 +59145,45 @@ var render = function () {
                       ]),
                       _vm._v(" "),
                       _c("td", [
-                        _vm._v(
-                          "\n              " + _vm._s(report.phone_1) + " "
-                        ),
+                        report.phone_1 != null
+                          ? _c(
+                              "a",
+                              {
+                                attrs: {
+                                  target: "_blank",
+                                  href:
+                                    "https://wa.me/57" +
+                                    report.phone_1 +
+                                    "?text=Le%20escribimos%20desde%20Grucosur%20con%20el%20fin%20de%20informarle%20el%20estado%20de%20su%20credito",
+                                },
+                              },
+                              [
+                                _c("i", { staticClass: "bi bi-whatsapp" }),
+                                _vm._v(" " + _vm._s(report.phone_1)),
+                              ]
+                            )
+                          : _vm._e(),
+                        _vm._v(" "),
                         _c("br"),
-                        _vm._v(
-                          "\n              " +
-                            _vm._s(report.phone_2) +
-                            "\n\n            "
-                        ),
+                        _vm._v(" "),
+                        report.phone_2 != null
+                          ? _c(
+                              "a",
+                              {
+                                attrs: {
+                                  target: "_blank",
+                                  href:
+                                    "https://wa.me/57" +
+                                    report.phone_2 +
+                                    "?text=Le%20escribimos%20desde%20Grucosur%20con%20el%20fin%20de%20informarle%20el%20estado%20de%20su%20credito",
+                                },
+                              },
+                              [
+                                _c("i", { staticClass: "bi bi-whatsapp" }),
+                                _vm._v(" " + _vm._s(report.phone_2)),
+                              ]
+                            )
+                          : _vm._e(),
                       ]),
                       _vm._v(" "),
                       _c("td", { staticClass: "text-right" }, [
@@ -59109,7 +59201,7 @@ var render = function () {
                             ])
                           : _vm._e(),
                         _vm._v(" "),
-                        (report.payment_date = _vm.now)
+                        report.payment_date == _vm.now
                           ? _c("span", { staticClass: "text-warning" }, [
                               _vm._v("Vence hoy"),
                             ])
@@ -59124,9 +59216,9 @@ var render = function () {
                       _vm._v(" "),
                       _c("td", [
                         _vm._v(
-                          "\n              " +
+                          "\n\t\t\t\t\t\t\t" +
                             _vm._s(report.installment_number) +
-                            "\n            "
+                            "\n\t\t\t\t\t\t"
                         ),
                       ]),
                     ])

@@ -35,6 +35,7 @@ class CreateCreditsTable extends Migration
             $table->float('capital_value', 20, 4)->nullable()->default(0);
             $table->float('interest_value', 20, 4)->nullable()->default(0);
             $table->date('disbursement_date')->nullable();
+            $table->date('finish_date')->nullable();
             $table->text('description')->nullable();
 
             $table->foreign('headquarter_id')
