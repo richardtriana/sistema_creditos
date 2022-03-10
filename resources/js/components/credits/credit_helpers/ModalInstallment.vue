@@ -123,7 +123,7 @@ export default {
           const pdf = response.data.pdf;
           var a = document.createElement("a");
           a.href = "data:application/pdf;base64," + pdf;
-          a.download = `credit_${this.id_credit}.pdf`;
+          a.download = `credit_${this.id_credit}-${Date.now()}.pdf`;
           a.click();
         });
     },

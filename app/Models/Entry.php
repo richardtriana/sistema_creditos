@@ -24,4 +24,13 @@ class Entry extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function credit()
+    {
+        return $this->belongsTo(Credit::class, 'credit_id');
+    }
+    public function headquarter()
+    {
+        return $this->belongsTo(Headquarter::class, 'headquarter_id');
+    }
 }

@@ -150,6 +150,7 @@ class InstallmentController extends Controller
   public function payInstallment($id, $amount = null, Request $request)
   {
     if ($amount == null) {
+      //Valor de la cuota
       $amount = $request->amount;
     }
     $installment = Installment::findOrFail($id);
@@ -162,46 +163,51 @@ class InstallmentController extends Controller
 
     $credit_paid = new CreditController;
 
-    $amountToPay = 0;
+    $amount_capital = 0;
     $interest = 0;
     $balance = 0;
 
+    //Cuando el cliente paga antes de la fecha programada
     if ($payment_date >= $now) {
+      //Cuando el cliente paga 25 días antes de la fecha programada
       if (($now < $payment_date_add_days)) {
-        $amountToPay = $installment->capital_value;
+
+        $amount_capital = $installment->capital_value;
 
         if ($amount >= $installment->capital_value) {
-          $balance =  $amount - $amountToPay;
+          $balance =  $amount - $amount_capital;
         } else {
-          $amountToPay = $amount;
+          $amount_capital = $amount;
         }
-      } else {
+      }
+      //Cuando el cliente paga a tiempo
+      else {
         if ($amount >= $installment->value) {
-          $amountToPay = $installment->value;
+          $amount_capital = $installment->value;
         } else {
-          $amountToPay = $amount;
+          $amount_capital = $amount;
         }
       }
     }
 
+    //Cuando el cliente paga después de la fecha programada
     if ($payment_date < $now) {
-      $amountToPay = $installment->value;
-      $interest = $amountToPay - $installment->capital_value;
+      $amount_capital = $installment->capital_value;
+      $interest = $amount - $installment->capital_value;
 
       if ($amount >= $installment->value) {
-        // $installment->paid_balance = $amountToPay;
-        $balance = $amount - $amountToPay;
+        $balance = $amount - $amount_capital;
       } else {
-        $amountToPay = $amount;
+        // $amount = $amount;
       }
     }
 
-    $installment->paid_balance = $amountToPay;
+    $installment->paid_balance = $amount;
     $installment->status  = 1;
     $installment->payment_register = date('Y-m-d');
     $installment->save();
 
-    $credit_paid = $credit_paid->updateValuesCredit($credit_id, $amount, $amountToPay, $interest);
+    $credit_paid = $credit_paid->updateValuesCredit($credit_id, $amount, $amount_capital, $interest);
     $no_installment = $installment->installment_number;
 
     return ['balance' => $balance, 'no_installment' => $no_installment];
