@@ -19,6 +19,7 @@ class Company extends Model
         'mobile',
         'logo',
         'condition_order',
-        'condition_quotation'
+        'condition_quotation',
+        'whatsapp_msg'
     ];
 }

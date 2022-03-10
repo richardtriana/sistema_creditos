@@ -317,18 +317,19 @@ class CreditController extends Controller
 
 	function collectCredit(Credit $credit)
 	{
+		//Valor del credito - valor capital pagado
+		$pending_value = $credit->credit_value - $credit->capital_value;
 
 		$client = $credit->client()->first();
 
 		$credit->status = 4;
 		$credit->finish_date = date('Y-m-d');
-		$credit->paid_value = $credit->credit_value;
-		$credit->capital_value = $credit->credit_value;
-		$credit->interest_value = 0;
+		$credit->paid_value += $pending_value;
+		$credit->capital_value += $pending_value;
 		$credit->save();
 
 		$update_main_box = new MainBoxController();
-		$update_main_box->addAmountMainBox($credit->credit_value);
+		$update_main_box->addAmountMainBox($pending_value);
 
 		$entry =  new Entry();
 		$entry->headquarter_id = $credit->headquarter_id;
@@ -336,8 +337,8 @@ class CreditController extends Controller
 		$entry->credit_id = $credit->id;
 		$entry->description = "Cliente: {$client->name} {$client->last_name}";
 		$entry->date = date('Y-m-d');
-		$entry->type_entry = 'Recoger crédito';
-		$entry->price = $credit->credit_value;
+		$entry->type_entry = 'Recoger capital de crédito';
+		$entry->price = $pending_value;
 		$entry->save();
 	}
 }

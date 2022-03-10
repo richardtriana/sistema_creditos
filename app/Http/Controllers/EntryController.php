@@ -48,12 +48,9 @@ class EntryController extends Controller
 	public function showEntry(Entry $entry)
 	{
 		$company = Company::first();
-		// Orden
-		$headquarter = Headquarter::findOrFail($entry->headquarter_id)->first();
-		if (!$headquarter->pos_printer || $headquarter->pos_printer == '') {
-			return false;
-		}
-		$credit = Credit::findOrFail($entry->credit_id)->first();
+
+		$headquarter = $entry->headquarter()->first();
+		$credit = $entry->credit()->first();
 		$client = $credit->client()->first();
 
 		$details = [

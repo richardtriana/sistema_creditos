@@ -22,7 +22,7 @@
     <p>NIT:{{$headquarter->nit}} </p>
     <p>Dirección: {{$headquarter->address}}</p>
     <br>
-    <h2><strong>Pago de cuota</strong></h2>
+    <h2><strong>{{ $entry->type_entry}}</strong></h2>
   </header>
   <section>
     <table class="table">
@@ -32,7 +32,7 @@
       </tr>
       <tr>
         <td>Nro. Documento </td>
-        <td>{{$client->document}}</td>
+        <td>{{$client->type_document}} {{$client->document}}</td>
       </tr>
       <tr>
         <td>Nro. Crédito: </td>

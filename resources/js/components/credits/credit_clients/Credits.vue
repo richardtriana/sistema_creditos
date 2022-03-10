@@ -308,7 +308,7 @@ export default {
 					const pdf = response.data.pdf;
 					var a = document.createElement("a");
 					a.href = "data:application/pdf;base64," + pdf;
-					a.download = `credit_${credit_id}-${client}.pdf`;
+					a.download = `credit_${credit_id}-${client}-${Date.now()}.pdf`;
 					a.click();
 				});
 		},
