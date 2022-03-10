@@ -170,7 +170,7 @@ export default {
 			let me = this;
 			me.assignErrors(false);
 			axios
-				.post("api/headquarters", this.formHeadquarter)
+				.post("api/headquarters", this.formHeadquarter, me.$root.config)
 				.then(function () {
 					$("#formHeadquarterModal").modal("hide");
 					me.resetData();
@@ -191,7 +191,8 @@ export default {
 			axios
 				.put(
 					`api/headquarters/${this.formHeadquarter.id}`,
-					this.formHeadquarter
+					this.formHeadquarter,
+					me.$root.config
 				)
 				.then(function () {
 					$("#formHeadquarterModal").modal("hide");
