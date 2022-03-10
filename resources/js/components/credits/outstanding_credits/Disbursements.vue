@@ -38,7 +38,9 @@
               <th>Valor Abonado</th>
               <th>Nro Cuotas</th>
               <th>Estado</th>
-              <th v-if="$root.validatePermission('credit-index')">Información crédito</th>
+              <th v-if="$root.validatePermission('credit-index')">
+                Información crédito
+              </th>
 
               <th v-if="$root.validatePermission('credit-status')">Opciones</th>
             </tr>
@@ -55,7 +57,10 @@
               <td>
                 {{ creditStatus[credit.status] }}
               </td>
-              <td class="text-center" v-if="$root.validatePermission('credit-index')">
+              <td
+                class="text-center"
+                v-if="$root.validatePermission('credit-index')"
+              >
                 <button
                   type="button"
                   class="btn btn-outline-primary"
@@ -64,52 +69,10 @@
                   @click="showInformation(credit)"
                 >
                   <i class="bi bi-eye"></i>
-				  Información general
-
-							<td class="text-left">
-								<button
-									class="btn btn-outline-success"
-									@click="changeStatus(credit.id, 1)"
-								>
-									<i class="bi bi-check2-circle"></i> Aprobar
-								</button>
-								<button
-									class="btn btn-outline-danger"
-									@click="changeStatus(credit.id, 2)"
-								>
-									<i class="bi bi-x-circle"></i> Rechazar
-								</button>
-							</td>
-						</tr>
-					</tbody>
-					<tbody v-else>
-						<tr>
-							<td colspan="11">
-								<div
-									class="alert alert-danger text-center"
-									style="margin: 2px auto; width: 30%"
-								>
-									<p>No se encontraron clientes con creditos.</p>
-								</div>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-				<pagination
-					:align="'center'"
-					:data="creditList"
-					:limit="2"
-					@pagination-change-page="listCredits"
-				>
-					<span slot="prev-nav"><i class="bi bi-chevron-double-left"></i></span>
-					<span slot="next-nav"
-						><i class="bi bi-chevron-double-right"></i
-					></span>
-				</pagination>
-			</section>
-		</div>
-
-              <td class="text-left" v-if="$root.validatePermission('credit-status')">
+                  Información general
+                </button>
+              </td>
+              <td class="text-left">
                 <button
                   class="btn btn-outline-success"
                   @click="changeStatus(credit.id, 1)"
@@ -164,7 +127,7 @@ import CreateEditCredit from "../credit_clients/CreateEditCredit.vue";
 
 import CreditInformation from "./CreditInformation.vue";
 export default {
- name: "disbursements", 
+  name: "disbursements",
   components: {
     CreditInformation,
     CreateEditCredit,
@@ -185,7 +148,7 @@ export default {
         1: "Aprobado",
         2: "Rechazado",
         3: "Pendiente pago a proveedor",
-		4: 'Completado'
+        4: "Completado",
       },
     };
   },
@@ -197,42 +160,43 @@ export default {
       let me = this;
       axios
         .get(
-          `api/credits?page=${page}&credit=${this.search_client}&status=${this.status}`, me.$root.config
+          `api/credits?page=${page}&credit=${this.search_client}&status=${this.status}`,
+          me.$root.config
         )
         .then(function (response) {
           me.creditList = response.data;
         });
     },
 
-		changeStatus: function (id, status) {
-			let me = this;
-			var data = {
-				status: status,
-			};
-			Swal.fire({
-				title: "¿Quieres cambiar el status del credito?",
-				showDenyButton: true,
-				denyButtonText: `Cancelar`,
-				confirmButtonText: `Guardar`,
-			}).then((result) => {
-				if (result.isConfirmed) {
-					axios
-						.post(`api/credits/${id}/change-status`, data, me.$root.config)
-						.then(function () {
-							me.listCredits(1);
-						});
-					Swal.fire("Cambios realizados!", "", "success");
-				} else if (result.isDenied) {
-					Swal.fire("Operación no realizada", "", "info");
-				}
-			});
-		},
-		showData: function (credit) {
-			this.$refs.CreateEditCredit.showEditCredit(credit);
-		},
-		showInformation(credit) {
-			this.$refs.CreditInformation.showInformation(credit, 0);
-		},
-	},
+    changeStatus: function (id, status) {
+      let me = this;
+      var data = {
+        status: status,
+      };
+      Swal.fire({
+        title: "¿Quieres cambiar el status del credito?",
+        showDenyButton: true,
+        denyButtonText: `Cancelar`,
+        confirmButtonText: `Guardar`,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          axios
+            .post(`api/credits/${id}/change-status`, data, me.$root.config)
+            .then(function () {
+              me.listCredits(1);
+            });
+          Swal.fire("Cambios realizados!", "", "success");
+        } else if (result.isDenied) {
+          Swal.fire("Operación no realizada", "", "info");
+        }
+      });
+    },
+    showData: function (credit) {
+      this.$refs.CreateEditCredit.showEditCredit(credit);
+    },
+    showInformation(credit) {
+      this.$refs.CreditInformation.showInformation(credit, 0);
+    },
+  },
 };
 </script>
