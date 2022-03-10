@@ -7,6 +7,7 @@
         class="btn btn-primary"
         data-toggle="modal"
         data-target="#expenseModal"
+        v-if="$root.validatePermission('expense-store')"
       >
         Crear Egreso
       </button>
@@ -21,8 +22,8 @@
               <th>Fecha</th>
               <th>Tipo de Salida</th>
               <th>Valor</th>
-              <th>Estado</th>
-              <th>Opciones</th>
+              <th v-if="$root.validatePermission('expense-status')">Estado</th>
+              <th v-if="$root.validatePermission('expense-update')">Opciones</th>
             </tr>
           </thead>
           <tbody v-if="expenseList.data && expenseList.data.length > 0">
@@ -32,7 +33,7 @@
               <td>{{ e.date }}</td>
               <td>{{ e.type_output }}</td>
               <td class="text-right">{{ e.price | currency }}</td>
-              <td>
+              <td v-if="$root.validatePermission('expense-status')">
                 <button
                   v-if="e.status == 0"
                   class="btn btn-outline-danger"
@@ -48,7 +49,7 @@
                   <i class="bi bi-check2-circle"></i>
                 </button>
               </td>
-              <td>
+              <td v-if="$root.validatePermission('expense-update')">
                 <button
                   v-if="e.status == 1"
                   class="btn btn-outline-primary"
@@ -97,7 +98,7 @@ export default {
     listExpenses(page = 1) {
       let me = this;
       axios
-        .get(`api/expenses?page=${page}&expense=${this.search_expense}`)
+        .get(`api/expenses?page=${page}&expense=${this.search_expense}`, me.$root.config)
         .then(function (response) {
           me.expenseList = response.data;
         });

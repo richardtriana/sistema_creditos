@@ -102,7 +102,7 @@
 						/>
 					</div>
 				</div>
-				<div class="w-100 text-center">
+				<div class="w-100 text-center" v-if="$root.validatePermission('box-update')">
 					<button
 						class="btn btn-primary"
 						type="button"
@@ -131,7 +131,7 @@ export default {
 	},
 	methods: {
 		getMainBox() {
-			axios.get("api/main-box").then((reponse) => {
+			axios.get("api/main-box", this.$root.config).then((reponse) => {
 				this.formMainBox = reponse.data.main_box;
 				this.lastEditor = reponse.data.last_editor;
 			});
@@ -143,7 +143,7 @@ export default {
 				axios
 					.put(`api/main-box/${this.formMainBox.id}`, {
 						amount: this.add_amount,
-					})
+					}, me.$root.config)
 					.then(function () {
 						me.getMainBox();
 					});

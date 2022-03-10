@@ -119,7 +119,7 @@ export default {
   methods: {
     createExpense() {
       let me = this;
-      axios.post("api/expenses", this.formExpense).then(function () {
+      axios.post("api/expenses", this.formExpense, me.$root.config).then(function () {
         $("#expenseModal").modal("hide");
         me.resetData();
         me.$emit("list-expenses");
@@ -134,7 +134,7 @@ export default {
     editExpense() {
       let me = this;
       axios
-        .put(`api/expenses/${this.formExpense.id}`, this.formExpense)
+        .put(`api/expenses/${this.formExpense.id}`, this.formExpense, me.$root.config)
         .then(function () {
           $("#expenseModal").modal("hide");
           me.resetData();
@@ -151,7 +151,7 @@ export default {
     },
     listTypeExpenses() {
       let me = this;
-      axios.get(`api/type-expenses`).then(function (response) {
+      axios.get(`api/type-expenses`, me.$root.config).then(function (response) {
         me.expenseTypeList = response.data;
       });
     },
