@@ -1,6 +1,6 @@
 <template>
  <div>
-    <disbursements />
+    <disbursements  v-if="$root.validateAuth" />
     <div class="page">
     <div class="page-header text-center">
       <h2>Simulador de Crédito</h2>

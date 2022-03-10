@@ -24,5 +24,7 @@ class UserSeeder extends Seeder
       'document' => 000001,
       'headquarter_id' => 1
     ]);
+
+    User::find(1)->assignRole('admin');
   }
 }

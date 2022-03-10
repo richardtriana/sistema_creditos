@@ -68,7 +68,7 @@ export default {
   methods: {
     createSimulator() {
       let me = this;
-      axios.post("api/installments", this.installments).then(function () {
+      axios.post("api/installments", this.installments, me.$root.config).then(function () {
         $("#formSimulatorModal").modal("hide");
         me.resetData();
         this.$emit("list-credits");
@@ -82,7 +82,7 @@ export default {
     },
     editSimulator() {
       let me = this;
-      axios.put("api/credits/" + 4, this.installments).then(function () {
+      axios.put("api/credits/" + 4, this.installments, me.$root.config).then(function () {
         $("#formSimulatorModal").modal("hide");
         me.resetData();
       });

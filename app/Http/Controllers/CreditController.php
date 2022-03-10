@@ -9,14 +9,24 @@ use App\Models\CreditProvider;
 use App\Models\Entry;
 use App\Models\Headquarter;
 use App\Models\Installment;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use PDF;
 
 class CreditController extends Controller
 {
+
+	public function __construct()
+	{
+		$this->middleware('auth:api')->except('index');
+		$this->middleware('permission:credit.index')->only('installments', 'payMultipleInstallments', 'generalInformation', 'show');
+		$this->middleware('permission:credit.store')->only('store');
+		$this->middleware('permission:credit.update')->only('update', 'updateValuesCredit');
+		$this->middleware('permission:credit.delete')->only('delete');
+		$this->middleware('permission:credit.status')->only('changeStatus');
+	}
 	/**
 	 * Display a listing of the resource.
 	 *

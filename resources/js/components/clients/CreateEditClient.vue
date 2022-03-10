@@ -244,7 +244,7 @@ export default {
   methods: {
     createClient() {
       let me = this;
-      axios.post("api/clients", this.formClient).then(function () {
+      axios.post("api/clients", this.formClient, me.$root.config).then(function () {
         $("#formClientModal").modal("hide");
         me.resetData();
         me.$emit("list-clients");
@@ -259,7 +259,7 @@ export default {
     editClient() {
       let me = this;
       axios
-        .put(`api/clients/${this.formClient.id}`, this.formClient)
+        .put(`api/clients/${this.formClient.id}`, this.formClient, me.$root.config)
         .then(function () {
           $("#formClientModal").modal("hide");
           me.resetData();
