@@ -281,7 +281,7 @@ export default {
         this.listRoles = response.data.roles;
       });
     },
-    crearUser() {
+    createUser() {
       let me = this;
       me.assignErrors(false);
 
