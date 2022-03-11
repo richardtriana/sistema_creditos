@@ -104,7 +104,7 @@
         </pagination>
       </section>
     </div>
-    <create-edit-user ref="CreateEditUser" @listar-users="listUsers(1)" />
+    <create-edit-user ref="CreateEditUser" @list-users="listUsers(1)" />
   </div>
 </template>
 
