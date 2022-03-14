@@ -14,14 +14,16 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use PDF;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class CreditController extends Controller
 {
 
 	public function __construct()
-	{	 
+	{
 		$this->middleware('auth:api')->except('index');
-		$this->middleware('permission:credit.index')->only('installments','payMultipleInstallments', 'generalInformation', 'show');
+		$this->middleware('permission:credit.index')->only('installments', 'payMultipleInstallments', 'generalInformation', 'show');
 		$this->middleware('permission:credit.store')->only('store');
 		$this->middleware('permission:credit.update')->only('update', 'updateValuesCredit');
 		$this->middleware('permission:credit.delete')->only('delete');
@@ -74,6 +76,44 @@ class CreditController extends Controller
 	public function store(Request $request)
 	{
 
+		$validate = Validator::make($request->all(), [
+			'client_id' => 'required|integer|exists:clients,id',
+			'provider' => 'nullable|boolean',
+			'debtor' => 'nullable|boolean',
+			'provider_id' => [
+				'nullable',
+				Rule::requiredIf($request->provider == 1),
+				'exists:providers,id'
+			],
+			'debtor_id' => [
+				'nullable',
+				Rule::requiredIf($request->debtor == 1),
+				'exists:clients,id'
+			],
+			'headquarter_id' => 'required|integer|exists:headquarters,id',
+			'number_installments' => 'required|integer',
+			'number_paid_installments' => 'nullable|integer',
+			'day_limit' => 'nullable|integer',
+			'start_date' => 'required|date',
+			'interest' => 'required|numeric',
+			'annual_interest_percentage' => 'nullable|numeric',
+			'credit_value' =>  'required|numeric',
+			'paid_value' => 'nullable|numeric',
+			'capital_value' => 'nullable|numeric',
+			'interest_value' => 'nullable|numeric',
+			'description' => 'nullable|string',
+			'disbursement_date' => 'nullable|date',
+		]);
+
+		if ($validate->fails()) {
+			return response()->json([
+				'status' => 'error',
+				'code' =>  500,
+				'message' => 'Validación de datos incorrecta',
+				'errors' =>  $validate->errors()
+			], 500);
+		}
+
 		$listInstallments = new InstallmentController();
 		$listInstallments = $listInstallments->calculateInstallments($request);
 
@@ -83,7 +123,7 @@ class CreditController extends Controller
 		$credit->client_id = $request['client_id'];
 		$credit->provider_id = $request['provider_id'];
 		$credit->debtor_id = $request['debtor_id'];
-		$credit->user_id = 1;
+		$credit->user_id = $request->user()->id;
 		$credit->debtor = $request['debtor'];
 		$credit->provider = $request['provider'];
 		if ($request['provider'] != null && $request['provider'] != 0) {
@@ -126,6 +166,13 @@ class CreditController extends Controller
 				$credit_provider->store($request, $credit->id);
 			}
 		}
+
+		return response()->json([
+			'status' => 'success',
+			'code' =>  200,
+			'message' => 'Registro exitoso',
+			'credit' => $credit
+		], 200);
 	}
 
 	/**
@@ -137,6 +184,45 @@ class CreditController extends Controller
 	 */
 	public function update(Request $request, Credit $credit)
 	{
+		$validate = Validator::make($request->all(), [
+			'client_id' => 'required|integer|exists:clients,id',
+			'provider' => 'nullable|boolean',
+			'debtor' => 'nullable|boolean',
+			'provider_id' => [
+				'nullable',
+				Rule::requiredIf($request->provider == 1),
+				'exists:providers,id'
+			],
+			'debtor_id' => [
+				'nullable',
+				Rule::requiredIf($request->debtor == 1),
+				'exists:clients,id'
+			],
+			'headquarter_id' => 'required|integer|exists:headquarters,id',
+			'number_installments' => 'required|integer',
+			'number_paid_installments' => 'nullable|integer',
+			'day_limit' => 'nullable|integer',
+			'start_date' => 'required|date',
+			'interest' => 'required|numeric',
+			'annual_interest_percentage' => 'nullable|numeric',
+			'credit_value' =>  'required|numeric',
+			'paid_value' => 'nullable|numeric',
+			'capital_value' => 'nullable|numeric',
+			'interest_value' => 'nullable|numeric',
+			'description' => 'nullable|string',
+			'disbursement_date' => 'nullable|date',
+			'installment_value' => 'required|numeric'
+		]);
+
+		if ($validate->fails()) {
+			return response()->json([
+				'status' => 'error',
+				'code' =>  500,
+				'message' => 'Validación de datos incorrecta',
+				'errors' =>  $validate->errors()
+			], 500);
+		}
+
 		$credit = Credit::find($request->id);
 		$credit->client_id = $request['client_id'];
 		$credit->provider_id = $request['provider_id'];
@@ -150,11 +236,18 @@ class CreditController extends Controller
 		$credit->start_date = $request['start_date'];
 		$credit->interest = $request['interest'];
 		$credit->annual_interest_percentage = $request['annual_interest_percentage'];
-		$credit->user_id = $request['user_id'];
+		//$credit->user_id = $request->user()->id;
 		$credit->installment_value = $request['installment_value'];
 		$credit->description = $request['description'];
 		$credit->disbursement_date = date('Y-m-d');
 		$credit->save();
+
+		return response()->json([
+			'status' => 'success',
+			'code' =>  200,
+			'message' => 'Registro exitoso',
+			'credit' => $credit
+		], 200);
 	}
 
 	/**

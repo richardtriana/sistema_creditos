@@ -265,7 +265,22 @@ const app = new Vue({
 			this.config.headers.Authorization = "";
 			localStorage.clear();
 			this.$router.push('/');
-		  },
+		},
+		assignErrors(response, formErrors) {
+			if (response) {
+			  let errors = response.response.data.errors;
+	  
+			  Object.keys(formErrors).forEach(function (key, index) {
+				if (errors[key] != undefined) {
+				  formErrors[key] = errors[key][0];
+				}
+			  });
+			} else {
+			  Object.keys(formErrors).forEach(function (key, index) {
+				formErrors[key] = "";
+			  });
+			}
+		},
 	},
 	created(){
 		this.authUser();
