@@ -66,7 +66,6 @@
               </th>
               <th>Paz y salvo</th>
               <th>Recoger crédito</th>
-
               <th
                 v-if="
                   $root.validatePermission('credit-update') ||
@@ -124,7 +123,6 @@
                   <i class="bi bi-file-pdf"></i>
                 </button>
               </td>
-
               <td>
                 <div v-if="credit.status == 4">
                   <button
@@ -284,7 +282,6 @@ export default {
   methods: {
     listCredits(page = 1) {
       this.$root.getCurrentBalanceMainBox();
-
       let me = this;
       axios
         .get(
@@ -356,7 +353,7 @@ export default {
     },
     downloadReceiptPDF(credit_id, client) {
       axios
-        .get(`api/credits/download-Receipt-PDF/${credit_id}`)
+        .get(`api/credits/download-Receipt-PDF/${credit_id}`, this.$root.config)
         .then((response) => {
           const pdf = response.data.pdf;
           var a = document.createElement("a");

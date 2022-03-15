@@ -3855,7 +3855,8 @@ __webpack_require__.r(__webpack_exports__);
         mobile: "",
         logo: "",
         condition_order: "",
-        condition_quotation: ""
+        condition_quotation: "",
+        whatsapp_msg: ""
       },
       formErrors: {
         name: "",
@@ -3867,7 +3868,8 @@ __webpack_require__.r(__webpack_exports__);
         mobile: "",
         file0: "",
         condition_order: "",
-        condition_quotation: ""
+        condition_quotation: "",
+        whatsapp_msg: ""
       },
       editor: (_ckeditor_ckeditor5_build_classic__WEBPACK_IMPORTED_MODULE_0___default()),
       editorConfig: {
@@ -3880,14 +3882,13 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   created: function created() {
-    // this.$root.validateToken();
     this.getConfiguration();
   },
   methods: {
     getConfiguration: function getConfiguration() {
       var _this = this;
 
-      axios.get("api/configurations").then(function (response) {
+      axios.get("api/configurations", this.$root.config).then(function (response) {
         if (response.data.company) {
           var _this$formConfigurati;
 
@@ -4611,8 +4612,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
 
 
 
@@ -4696,7 +4695,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     downloadReceiptPDF: function downloadReceiptPDF(credit_id, client) {
-      axios.get("api/credits/download-Receipt-PDF/".concat(credit_id)).then(function (response) {
+      axios.get("api/credits/download-Receipt-PDF/".concat(credit_id), this.$root.config).then(function (response) {
         var pdf = response.data.pdf;
         var a = document.createElement("a");
         a.href = "data:application/pdf;base64," + pdf;
@@ -4836,7 +4835,7 @@ __webpack_require__.r(__webpack_exports__);
             data: quote,
             value: response.data.balance
           };
-          axios.post("api/entries", entry);
+          axios.post("api/entries", entry, me.$root.config);
         });
       } else {
         Swal.fire({
@@ -5962,12 +5961,12 @@ __webpack_require__.r(__webpack_exports__);
     listEntries: function listEntries() {
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
       var me = this;
-      axios.get("api/entries?page=".concat(page, "&entry=").concat(this.search_entry)).then(function (response) {
+      axios.get("api/entries?page=".concat(page, "&entry=").concat(this.search_entry), me.$root.config).then(function (response) {
         me.entryList = response.data;
       });
     },
     printEntryPdf: function printEntryPdf(entry_id, client) {
-      axios.get("api/entries/show-entry/".concat(entry_id)).then(function (response) {
+      axios.get("api/entries/show-entry/".concat(entry_id), this.$root.config).then(function (response) {
         var pdf = response.data.pdf;
         var a = document.createElement("a");
         a.href = "data:application/pdf;base64," + pdf;
@@ -7368,7 +7367,7 @@ __webpack_require__.r(__webpack_exports__);
         1: "Aprobado",
         2: "Rechazado",
         3: "Pendiente pago a proveedor",
-        4: 'Completado'
+        4: "Completado"
       }
     };
   },
@@ -7377,7 +7376,7 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-      axios.get("api/reports/general-credits?page=".concat(page)).then(function (response) {
+      axios.get("api/reports/general-credits?page=".concat(page), this.$root.config).then(function (response) {
         _this.ReportGeneralCreditsList = response.data.credits;
         _this.ReportTotalValues = response.data.total_credits;
       });
@@ -7487,14 +7486,14 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-      axios.get("api/reports/portfolio?page=".concat(page)).then(function (response) {
+      axios.get("api/reports/portfolio?page=".concat(page), this.$root.config).then(function (response) {
         _this.ReportPortfolioList = response.data;
       });
     },
     getCompanyInformation: function getCompanyInformation() {
       var _this2 = this;
 
-      axios.get("api/configurations").then(function (response) {
+      axios.get("api/configurations", this.$root.config).then(function (response) {
         if (response.data.company) {
           _this2.infoCompany = response.data.company;
         }
@@ -8119,7 +8118,7 @@ __webpack_require__.r(__webpack_exports__);
         _this.listRoles = response.data.roles;
       });
     },
-    crearUser: function crearUser() {
+    createUser: function createUser() {
       var me = this;
       me.assignErrors(false);
       axios.post("api/users", me.formUser, me.$root.config).then(function () {
@@ -62519,7 +62518,7 @@ var render = function () {
                   attrs: { type: "button" },
                   on: {
                     click: function ($event) {
-                      _vm.editar ? _vm.editUser() : _vm.createUser()
+                      _vm.formUser.id ? _vm.editUser() : _vm.createUser()
                     },
                   },
                 },
@@ -62796,7 +62795,7 @@ var render = function () {
       _c("create-edit-user", {
         ref: "CreateEditUser",
         on: {
-          "listar-users": function ($event) {
+          "list-users": function ($event) {
             return _vm.listUsers(1)
           },
         },

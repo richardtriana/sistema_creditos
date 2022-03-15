@@ -53,8 +53,6 @@ Route::get('/credits/{credit}/installments', [CreditController::class, 'installm
 Route::get('/entries/show-entry/{entry}', [EntryController::class, 'showEntry']);
 Route::resource('/entries',  EntryController::class);
 
-Route::resource('/expenses',  ExpenseController::class);
-Route::post('/expenses/{expense}/change-status',  [ExpenseController::class, 'changeStatus']);
 Route::get('/installments/calculate-installments', [InstallmentController::class, 'calculateInstallments']);
 
 Route::group(['middleware' => ['auth:api']], function () {
@@ -87,12 +85,12 @@ Route::group(['middleware' => ['auth:api']], function () {
 	//Entries
 	Route::resource('/entries',  EntryController::class);
 
-	
+
 	//Expenses
 	Route::resource('/expenses',  ExpenseController::class);
 	Route::post('/expenses/{expense}/change-status',  [ExpenseController::class, 'changeStatus']);
 	Route::resource('/type-expenses',  TypeExpenseController::class)->middleware('permission:expense.index');
-	
+
 	//Reports
 	Route::get('/reports/credits', [ReportController::class, 'ReportCredits'])->middleware('permission:report');
 	Route::get('/reports/portfolio', [ReportController::class, 'ReportPortfolio']);
@@ -124,7 +122,10 @@ Route::group(['middleware' => ['auth:api']], function () {
 
 	//Print ticket
 	Route::get('/print-installment', [PrintTicketController::class, 'printInstallment']);
-	Route::get('/print-entry/{entry}', [PrintTicketController::class, 'printEntry']);
+
+	//Por revisar
+		Route::get('/print-installment', [PrintTicketController::class, 'printInstallment']);
+		Route::get('/print-entry/{entry}', [PrintTicketController::class, 'printEntry']);
 
 	//Configuration
 	Route::resource('/configurations', CompanyController::class)->middleware('permission:configuration');

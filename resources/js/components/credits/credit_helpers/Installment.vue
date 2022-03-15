@@ -108,7 +108,7 @@ export default {
               value: response.data.balance,
             };
 
-            axios.post(`api/entries`, entry);
+            axios.post(`api/entries`, entry, me.$root.config);
           });
       } else {
         Swal.fire({
