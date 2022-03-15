@@ -40,14 +40,14 @@ Route::get('/company-logo', function () {
 });
 
 //Credit  except index
-Route::resource('/credits', CreditController::class);
+Route::get('/credits/amortization-table', [InstallmentController::class, 'printTable']);
 Route::post('/credits/collect-credit/{credit}', [CreditController::class, 'collectCredit']);
 Route::get('/credits/general-information/{credit}', [CreditController::class, 'generalInformation']);
 Route::get('/credits/download-Receipt-PDF/{credit}', [CreditController::class, 'downloadReceiptPDF']);
-Route::get('/credits/amortization-table', [InstallmentController::class, 'printTable']);
 Route::post('/credits/pay-credit-installments/{id}', [CreditController::class, 'payMultipleInstallments']);
 Route::post('/credits/{credit}/change-status',  [CreditController::class, 'changeStatus']);
 Route::get('/credits/{credit}/installments', [CreditController::class, 'installments']);
+Route::resource('/credits', CreditController::class);
 
 
 Route::get('/entries/show-entry/{entry}', [EntryController::class, 'showEntry']);
