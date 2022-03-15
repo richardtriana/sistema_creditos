@@ -206,72 +206,73 @@ import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import "@ckeditor/ckeditor5-build-classic/build/translations/es";
 
 export default {
-	data() {
-		return {
-			formConfiguration: {
-				name: "",
-				legal_representative: "",
-				nit: "",
-				address: "",
-				email: "",
-				telephone: "",
-				mobile: "",
-				logo: "",
-				condition_order: "",
-				condition_quotation: "",
-			},
-			formErrors: {
-				name: "",
-				legal_representative: "",
-				nit: "",
-				address: "",
-				email: "",
-				telephone: "",
-				mobile: "",
-				file0: "",
-				condition_order: "",
-				condition_quotation: "",
-			},
-			editor: ClassicEditor,
-			editorConfig: {
-				toolbar: {
-					removeItems: [
-						"uploadImage",
-						"mediaEmbed",
-						"blockQuote",
-						"insertTable",
-						"outdent",
-						"indent",
-						"link",
-					],
-					shouldNotGroupWhenFull: true,
-				},
-				language: "es",
-			},
-		};
-	},
-	created() {
-		// this.$root.validateToken();
-		this.getConfiguration();
-	},
-	methods: {
-		getConfiguration() {
-			axios.get("api/configurations").then((response) => {
-				if (response.data.company) {
-					this.formConfiguration = response.data.company;
-					this.formConfiguration.condition_quotation =
-						this.formConfiguration.condition_quotation ?? "";
-				}
-			});
-		},
-		saveConfiguration() {
-			this.assignErrors(false);
-			var form = new FormData($("#form_configuration")[0]);
-			form.append("id", this.formConfiguration.id);
-			form.set(
-				"condition_quotation",
-				this.formConfiguration.condition_quotation
-			);
+  data() {
+    return {
+      formConfiguration: {
+        name: "",
+        legal_representative: "",
+        nit: "",
+        address: "",
+        email: "",
+        telephone: "",
+        mobile: "",
+        logo: "",
+        condition_order: "",
+        condition_quotation: "",
+        whatsapp_msg: "",
+      },
+      formErrors: {
+        name: "",
+        legal_representative: "",
+        nit: "",
+        address: "",
+        email: "",
+        telephone: "",
+        mobile: "",
+        file0: "",
+        condition_order: "",
+        condition_quotation: "",
+        whatsapp_msg: "",
+      },
+      editor: ClassicEditor,
+      editorConfig: {
+        toolbar: {
+          removeItems: [
+            "uploadImage",
+            "mediaEmbed",
+            "blockQuote",
+            "insertTable",
+            "outdent",
+            "indent",
+            "link",
+          ],
+          shouldNotGroupWhenFull: true,
+        },
+        language: "es",
+      },
+    };
+  },
+  created() {
+    this.getConfiguration();
+  },
+  methods: {
+    getConfiguration() {
+      axios.get("api/configurations", this.$root.config).then((response) => {
+        if (response.data.company) {
+          this.formConfiguration = response.data.company;
+          this.formConfiguration.condition_quotation =
+            this.formConfiguration.condition_quotation ?? "";
+        }
+      });
+    },
+    saveConfiguration() {
+      this.assignErrors(false);
+      var form = new FormData($("#form_configuration")[0]);
+      form.append("id", this.formConfiguration.id);
+      form.set(
+        "condition_quotation",
+        this.formConfiguration.condition_quotation
+      );
 
       axios
         .post("api/configurations", form)
