@@ -4260,6 +4260,36 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -4272,7 +4302,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     AddProvider: _providers_AddProvider_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   data: function data() {
-    var _formCredit;
+    var _formCredit, _formErrors;
 
     return {
       edit: false,
@@ -4289,7 +4319,16 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       client_name: "Agregar con el botón",
       debtor_name: "Agregar con el botón",
       provider_name: "Agregar con el botón",
-      root_data: this.$root.$data
+      root_data: this.$root.$data,
+      formErrors: (_formErrors = {
+        client_id: "",
+        debtor_id: "",
+        headquarter_id: "",
+        user_id: "",
+        provider_id: "",
+        number_installments: "",
+        number_paid_installments: ""
+      }, _defineProperty(_formErrors, "number_paid_installments", ""), _defineProperty(_formErrors, "day_limit", ""), _defineProperty(_formErrors, "debtor", ""), _defineProperty(_formErrors, "provider", ""), _defineProperty(_formErrors, "status", ""), _defineProperty(_formErrors, "start_date", ""), _defineProperty(_formErrors, "interest", ""), _defineProperty(_formErrors, "annual_interest_percentage", ""), _defineProperty(_formErrors, "installment_value", ""), _defineProperty(_formErrors, "credit_value", ""), _defineProperty(_formErrors, "paid_value", ""), _defineProperty(_formErrors, "capital_value", ""), _defineProperty(_formErrors, "interest_value", ""), _defineProperty(_formErrors, "description", ""), _defineProperty(_formErrors, "disbursement_date", ""), _formErrors)
     };
   },
   created: function created() {
@@ -4304,10 +4343,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     },
     createCredit: function createCredit() {
       var me = this;
+      me.$root.assignErrors(false, me.formErrors);
       axios.post("api/credits", this.formCredit, me.$root.config).then(function () {
         $("#formCreditModal").modal("hide");
         me.resetData();
         me.$emit("list-credits");
+      })["catch"](function (response) {
+        me.$root.assignErrors(response, me.formErrors);
       });
     },
     showEditCredit: function showEditCredit(credit) {
@@ -4318,9 +4360,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     },
     editCredit: function editCredit() {
       var me = this;
+      me.$root.assignErrors(false, me.formErrors);
       axios.put("api/credits/" + this.formCredit.id, this.formCredit, me.$root.config).then(function () {
         $("#formCreditModal").modal("hide");
         me.resetData();
+      })["catch"](function (response) {
+        me.$root.assignErrors(response, me.formErrors);
       });
       this.$emit("list-credits");
       this.edit = false;
@@ -4342,6 +4387,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       Object.keys(this.formCredit).forEach(function (key, index) {
         me.formCredit[key] = "";
       });
+      me.$root.assignErrors(response, me.formErrors);
     }
   }
 });
@@ -6100,6 +6146,17 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
@@ -6110,7 +6167,13 @@ __webpack_require__.r(__webpack_exports__);
       editar: false,
       show_type_output: false,
       formExpense: {},
-      expenseTypeList: []
+      expenseTypeList: [],
+      formErrors: {
+        description: "",
+        date: "",
+        type_output: "",
+        price: ""
+      }
     };
   },
   methods: {
@@ -8681,6 +8744,20 @@ var app = new vue__WEBPACK_IMPORTED_MODULE_7__["default"]({
       this.config.headers.Authorization = "";
       localStorage.clear();
       this.$router.push('/');
+    },
+    assignErrors: function assignErrors(response, formErrors) {
+      if (response) {
+        var errors = response.response.data.errors;
+        Object.keys(formErrors).forEach(function (key, index) {
+          if (errors[key] != undefined) {
+            formErrors[key] = errors[key][0];
+          }
+        });
+      } else {
+        Object.keys(formErrors).forEach(function (key, index) {
+          formErrors[key] = "";
+        });
+      }
     }
   },
   created: function created() {
@@ -56165,6 +56242,15 @@ var render = function () {
                               },
                             },
                           }),
+                          _vm._v(" "),
+                          _c(
+                            "small",
+                            {
+                              staticClass: "form-text text-danger",
+                              attrs: { id: "client_id_help" },
+                            },
+                            [_vm._v(_vm._s(_vm.formErrors.client_id))]
+                          ),
                         ]),
                         _vm._v(" "),
                         _c(
@@ -56301,6 +56387,15 @@ var render = function () {
                                 },
                               },
                             }),
+                            _vm._v(" "),
+                            _c(
+                              "small",
+                              {
+                                staticClass: "form-text text-danger",
+                                attrs: { id: "debtor_id_help" },
+                              },
+                              [_vm._v(_vm._s(_vm.formErrors.debtor_id))]
+                            ),
                           ]
                         ),
                         _vm._v(" "),
@@ -56438,6 +56533,15 @@ var render = function () {
                                 },
                               },
                             }),
+                            _vm._v(" "),
+                            _c(
+                              "small",
+                              {
+                                staticClass: "form-text text-danger",
+                                attrs: { id: "provider_id_help" },
+                              },
+                              [_vm._v(_vm._s(_vm.formErrors.provider_id))]
+                            ),
                           ]
                         ),
                         _vm._v(" "),
@@ -56471,6 +56575,15 @@ var render = function () {
                               },
                             },
                           }),
+                          _vm._v(" "),
+                          _c(
+                            "small",
+                            {
+                              staticClass: "form-text text-danger",
+                              attrs: { id: "description_help" },
+                            },
+                            [_vm._v(_vm._s(_vm.formErrors.description))]
+                          ),
                         ]),
                         _vm._v(" "),
                         _c(
@@ -56502,6 +56615,15 @@ var render = function () {
                                 expression: "formCredit.headquarter_id",
                               },
                             }),
+                            _vm._v(" "),
+                            _c(
+                              "small",
+                              {
+                                staticClass: "form-text text-danger",
+                                attrs: { id: "headquarter_id_help" },
+                              },
+                              [_vm._v(_vm._s(_vm.formErrors.headquarter_id))]
+                            ),
                           ],
                           1
                         ),
@@ -56589,6 +56711,15 @@ var render = function () {
                               ),
                             ]
                           ),
+                          _vm._v(" "),
+                          _c(
+                            "small",
+                            {
+                              staticClass: "form-text text-danger",
+                              attrs: { id: "credit_value_help" },
+                            },
+                            [_vm._v(_vm._s(_vm.formErrors.credit_value))]
+                          ),
                         ]),
                         _vm._v(" "),
                         _c("div", { staticClass: "form-group col-md-4" }, [
@@ -56626,6 +56757,15 @@ var render = function () {
                               },
                             },
                           }),
+                          _vm._v(" "),
+                          _c(
+                            "small",
+                            {
+                              staticClass: "form-text text-danger",
+                              attrs: { id: "interest_help" },
+                            },
+                            [_vm._v(_vm._s(_vm.formErrors.interest))]
+                          ),
                         ]),
                         _vm._v(" "),
                         _c("div", { staticClass: "form-group col-md-4" }, [
@@ -56666,6 +56806,15 @@ var render = function () {
                               },
                             },
                           }),
+                          _vm._v(" "),
+                          _c(
+                            "small",
+                            {
+                              staticClass: "form-text text-danger",
+                              attrs: { id: "number_installments_help" },
+                            },
+                            [_vm._v(_vm._s(_vm.formErrors.number_installments))]
+                          ),
                         ]),
                         _vm._v(" "),
                         _c("div", { staticClass: "form-group col-md-4" }, [
@@ -56702,6 +56851,15 @@ var render = function () {
                               },
                             },
                           }),
+                          _vm._v(" "),
+                          _c(
+                            "small",
+                            {
+                              staticClass: "form-text text-danger",
+                              attrs: { id: "start_date_help" },
+                            },
+                            [_vm._v(_vm._s(_vm.formErrors.start_date))]
+                          ),
                         ]),
                       ]),
                       _vm._v(" "),
@@ -59134,6 +59292,15 @@ var render = function () {
               },
             },
           }),
+          _vm._v(" "),
+          _c(
+            "small",
+            {
+              staticClass: "form-text text-danger",
+              attrs: { id: "description_help" },
+            },
+            [_vm._v(_vm._s(_vm.formErrors.description))]
+          ),
         ]),
         _vm._v(" "),
         _c("div", { staticClass: "form-group col-12" }, [
@@ -59160,6 +59327,15 @@ var render = function () {
               },
             },
           }),
+          _vm._v(" "),
+          _c(
+            "small",
+            {
+              staticClass: "form-text text-danger",
+              attrs: { id: "date_help" },
+            },
+            [_vm._v(_vm._s(_vm.formErrors.date))]
+          ),
         ]),
         _vm._v(" "),
         _c("div", { staticClass: "form-row col-12" }, [
@@ -59188,6 +59364,15 @@ var render = function () {
                   expression: "formExpense.type_output",
                 },
               }),
+              _vm._v(" "),
+              _c(
+                "small",
+                {
+                  staticClass: "form-text text-danger",
+                  attrs: { id: "type_output_help" },
+                },
+                [_vm._v(_vm._s(_vm.formErrors.type_output))]
+              ),
             ],
             1
           ),
@@ -59276,6 +59461,15 @@ var render = function () {
               },
             },
           }),
+          _vm._v(" "),
+          _c(
+            "small",
+            {
+              staticClass: "form-text text-danger",
+              attrs: { id: "price_help" },
+            },
+            [_vm._v(_vm._s(_vm.formErrors.price))]
+          ),
         ]),
       ]),
       _vm._v(" "),
