@@ -39,13 +39,13 @@
               <td class="text-right">{{ report.value | currency }}</td>
               <td class="text-center">{{ report.payment_date }}</td>
               <td class="text-center">
-                <span class="text-success" v-if="report.payment_date > now"
+                <span class="badge badge-md font-weight-bold badge-pill badge-success " v-if="report.payment_date > now"
                   >Próximo a vencer</span
                 >
-                <span class="text-warning" v-if="report.payment_date == now"
+                <span class="badge badge-md font-weight-bold badge-pill badge-warning" v-if="report.payment_date == now"
                   >Vence hoy</span
                 >
-                <span class="text-danger" v-if="report.payment_date < now"
+                <span class="badge badge-md font-weight-bold badge-pill badge-danger" v-if="report.payment_date < now"
                   >En mora</span
                 >
               </td>

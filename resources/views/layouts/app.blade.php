@@ -30,7 +30,7 @@
         @component('components.navigation-menu')
         @endcomponent
 
-        <main class="p-4 bg-light container">
+        <main class="p-4 mt-3 bg-light container">
             @yield('content')
         </main>
     </div>

@@ -44,27 +44,27 @@ window.Swal = Swal;
 import utils from './services/utils.js';
 
 const routes = [
-	
-	{ 
-		path: "", 
+
+	{
+		path: "",
 		component: require("./components/Front/Home.vue").default,
-		name : "Home"
+		name: "Home"
 	},
-	{ 
-		path: "/login", 
+	{
+		path: "/login",
 		component: require("./components/auth/Login.vue").default,
-		name: "Login"	
+		name: "Login"
 	},
 	{
 		path: "/clients",
 		component: require("./components/clients/Clients.vue").default,
 		alias: "client-index"
 	},
-	{ 
-		path: '/roles', 
-		name: 'Roles', 
-		component: require("./components/roles/Roles.vue").default, 
-		alias: "rol-index" 
+	{
+		path: '/roles',
+		name: 'Roles',
+		component: require("./components/roles/Roles.vue").default,
+		alias: "rol-index"
 	},
 	{
 		path: "/users",
@@ -74,13 +74,13 @@ const routes = [
 	{
 		path: "/providers",
 		component: require("./components/providers/Providers.vue").default,
-		alias:"provider-index"
+		alias: "provider-index"
 	},
 	{
 		path: "/credits",
 		component: require("./components/credits/AllCredits.vue").default,
 		name: "credits",
-		alias:"credit-index",
+		alias: "credit-index",
 		children: [
 			{
 				path: "credit-clients",
@@ -148,23 +148,35 @@ const routes = [
 				name: "report-portfolio",
 			},
 			{
-				path: "credit",
+				path: "general-credits",
 				component: require("./components/reports/ReportCreditsGeneral.vue")
 					.default,
 				name: "report-general-credits",
 			},
+			{
+				path: "headquarters",
+				component: require("./components/reports/ReportHeadquarters.vue")
+					.default,
+				name: "report-headquarters",
+			},
+			{
+				path: "general-client",
+				component: require("./components/reports/ReportGeneralClient.vue")
+					.default,
+				name: "report-general-client",
+			},
 		],
 	},
 	{
-		path:"**",
-		component: require("./components/utils/NoFound.vue").default,
-		name:"NoFound"
+		path: "**",
+		component: require("./components/utils/NotFound.vue").default,
+		name: "NotFound"
 	}
 ];
 
 const router = new VueRouter({
 	routes, // short for `routes: routes`
-	linkActiveClass: "active",
+	// linkActiveClass: "active",
 	//mode: 'history'
 });
 export default router;
@@ -176,31 +188,31 @@ router.beforeEach(async (to, from, next) => {
 	const authRequired = !publicRoutes.includes(to.name);
 	let isAuthenticated = false;
 	try {
-	  isAuthenticated =
-		localStorage.getItem("token") &&
-		  localStorage.getItem("user") &&
-		  JSON.parse(localStorage.getItem("user"))
-		  ? true
-		  : false;
+		isAuthenticated =
+			localStorage.getItem("token") &&
+				localStorage.getItem("user") &&
+				JSON.parse(localStorage.getItem("user"))
+				? true
+				: false;
 	} catch (e) {
-	  isAuthenticated
+		isAuthenticated
 	}
 	if (authRequired && !isAuthenticated) {
-	  return next({ name: "Login", query: { redirect: to.fullPath } });
+		return next({ name: "Login", query: { redirect: to.fullPath } });
 	}
-  
+
 	if (isAuthenticated) {
-  
-	  let alias = to.matched[0].alias[0];
-	  if (alias) {
-		if (!utils.validatePermission(undefined, alias)) {
-		  return next({ name: "NoFound" });
+
+		let alias = to.matched[0].alias[0];
+		if (alias) {
+			if (!utils.validatePermission(undefined, alias)) {
+				return next({ name: "NotFound" });
+			}
 		}
-	  }
 	}
 	next();
-  
-  });
+
+});
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -224,18 +236,18 @@ const app = new Vue({
 		token: "",
 		config: Object({
 			headers: {
-			  Authorization: "",
+				Authorization: "",
 			},
-		  }),
+		}),
 
 	},
 	watch: {
 		$route(to, from) {
 			this.authUser();
-		  },
+		},
 	},
-	computed:{
-		validateAuth(){
+	computed: {
+		validateAuth() {
 			return !$.isEmptyObject(this.user) && this.token
 		}
 	},
@@ -248,11 +260,11 @@ const app = new Vue({
 		authUser() {
 			this.user = JSON.parse(localStorage.getItem("user"));
 			this.token = localStorage.getItem("token");
-	  
+
 			if (this.user) {
-			  this.permissions = this.user.permissions;
+				this.permissions = this.user.permissions;
 			}
-	  
+
 			this.config.headers.Authorization = "Bearer " + this.token;
 		},
 		validatePermission(permission) {
@@ -265,9 +277,24 @@ const app = new Vue({
 			this.config.headers.Authorization = "";
 			localStorage.clear();
 			this.$router.push('/');
-		  },
+		},
+		assignErrors(response, formErrors) {
+			if (response.response) {
+				let errors = response.response.data.errors;
+
+				Object.keys(formErrors).forEach(function (key, index) {
+					if (errors[key] != undefined) {
+						formErrors[key] = errors[key][0];
+					}
+				});
+			} else {
+				Object.keys(formErrors).forEach(function (key, index) {
+					formErrors[key] = "";
+				});
+			}
+		},
 	},
-	created(){
+	created() {
 		this.authUser();
 	},
 	mounted() {

@@ -34,7 +34,7 @@
               <td>{{ rol.name }}</td>
               <td v-if="$root.validatePermission('rol-update')">
                 <button
-                  class="btn btn-outline-primary"
+                  class="btn btn-primary"
                   @click="ShowData(rol)"
                 >
                   <i class="bi bi-pen"></i>

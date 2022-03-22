@@ -30,7 +30,7 @@
                       >Cliente</label
                     >
                     <button
-                      class="btn btn-outline-primary mb-2"
+                      class="btn btn-primary mb-2"
                       type="button"
                       data-toggle="modal"
                       data-target="#addClientModal"
@@ -45,6 +45,9 @@
                     readonly
                     v-model="client_name"
                   />
+                  <small id="client_id_help" class="form-text text-danger">{{
+                    formErrors.client_id
+                  }}</small>
                 </div>
 
                 <div
@@ -78,7 +81,7 @@
                       >Codeudor</label
                     >
                     <button
-                      class="btn btn-outline-primary mb-2"
+                      class="btn btn-primary mb-2"
                       type="button"
                       data-toggle="modal"
                       data-target="#addDebtorModal"
@@ -94,6 +97,9 @@
                     readonly
                     v-model="debtor_name"
                   />
+                  <small id="debtor_id_help" class="form-text text-danger">{{
+                    formErrors.debtor_id
+                  }}</small>
                 </div>
                 <div class="col-md-4"></div>
 
@@ -127,7 +133,7 @@
                       >Proveedor</label
                     >
                     <button
-                      class="btn btn-outline-primary mb-2"
+                      class="btn btn-primary mb-2"
                       type="button"
                       data-toggle="modal"
                       data-target="#addProviderModal"
@@ -143,6 +149,9 @@
                     readonly
                     v-model="provider_name"
                   />
+                  <small id="provider_id_help" class="form-text text-danger">{{
+                    formErrors.provider_id
+                  }}</small>
                 </div>
 
                 <div class="form-group col-md-4">
@@ -153,6 +162,9 @@
                     id="description"
                     v-model="formCredit.description"
                   />
+                  <small id="description_help" class="form-text text-danger">{{
+                    formErrors.description
+                  }}</small>
                 </div>
 
                 <div class="form-group col-md-4">
@@ -165,6 +177,11 @@
                     v-model="formCredit.headquarter_id"
                   >
                   </v-select>
+                  <small
+                    id="headquarter_id_help"
+                    class="form-text text-danger"
+                    >{{ formErrors.headquarter_id }}</small
+                  >
                 </div>
                 <div class="form-group col-md-4">
                   <label for="credit_value">Valor Credito</label>
@@ -197,6 +214,9 @@
                     Monto máximo
                     {{ root_data.current_balance_main_box | currency }}
                   </small>
+                  <small id="credit_value_help" class="form-text text-danger">{{
+                    formErrors.credit_value
+                  }}</small>
                 </div>
                 <div class="form-group col-md-4">
                   <label for="interest">Interés (%)</label>
@@ -208,6 +228,9 @@
                     step="any"
                     :disabled="edit"
                   />
+                  <small id="interest_help" class="form-text text-danger">{{
+                    formErrors.interest
+                  }}</small>
                 </div>
 
                 <div class="form-group col-md-4">
@@ -219,6 +242,11 @@
                     v-model="formCredit.number_installments"
                     :disabled="edit"
                   />
+                  <small
+                    id="number_installments_help"
+                    class="form-text text-danger"
+                    >{{ formErrors.number_installments }}</small
+                  >
                 </div>
 
                 <div class="form-group col-md-4">
@@ -230,6 +258,9 @@
                     v-model="formCredit.start_date"
                     :disabled="edit"
                   />
+                  <small id="start_date_help" class="form-text text-danger">{{
+                    formErrors.start_date
+                  }}</small>
                 </div>
               </div>
               <simulator
@@ -240,7 +271,8 @@
                 ref="Simulator"
                 v-if="!edit"
               ></simulator>
-              <button
+              <div  class="modal-footer">
+                <button
                 type="button"
                 class="btn btn-secondary"
                 data-dismiss="modal"
@@ -250,11 +282,12 @@
               </button>
               <button
                 type="button"
-                class="btn btn-primary rounded"
+                class="btn btn-success"
                 @click="edit ? editCredit() : createCredit()"
               >
                 Guardar
               </button>
+              </div>
             </form>
           </div>
           <div class="modal-footer"></div>
@@ -264,18 +297,17 @@
     <add-client @add-client="receiveClient($event)" />
     <add-debtor @add-debtor="receiveDebtor($event)" />
     <add-provider @add-provider="receiveProvider($event)" />
-  
   </div>
 </template>
 
 <script>
-import AddClient from '../../clients/AddClient.vue';
-import AddDebtor from '../../clients/AddDebtor.vue';
-import AddProvider from '../../providers/AddProvider.vue';
+import AddClient from "../../clients/AddClient.vue";
+import AddDebtor from "../../clients/AddDebtor.vue";
+import AddProvider from "../../providers/AddProvider.vue";
 
-import Simulator from '../credit_helpers/Simulator.vue';
+import Simulator from "../credit_helpers/Simulator.vue";
 export default {
-  components: { Simulator, AddClient, AddDebtor,  AddProvider },
+  components: { Simulator, AddClient, AddDebtor, AddProvider },
   data() {
     return {
       edit: false,
@@ -308,6 +340,30 @@ export default {
       debtor_name: "Agregar con el botón",
       provider_name: "Agregar con el botón",
       root_data: this.$root.$data,
+      formErrors: {
+        client_id: "",
+        debtor_id: "",
+        headquarter_id: "",
+        user_id: "",
+        provider_id: "",
+        number_installments: "",
+        number_paid_installments: "",
+        number_paid_installments: "",
+        day_limit: "",
+        debtor: "",
+        provider: "",
+        status: "",
+        start_date: "",
+        interest: "",
+        annual_interest_percentage: "",
+        installment_value: "",
+        credit_value: "",
+        paid_value: "",
+        capital_value: "",
+        interest_value: "",
+        description: "",
+        disbursement_date: "",
+      },
     };
   },
   created() {
@@ -324,11 +380,17 @@ export default {
     },
     createCredit() {
       let me = this;
-      axios.post("api/credits", this.formCredit, me.$root.config).then(function () {
-        $("#formCreditModal").modal("hide");
-        me.resetData();
-        me.$emit("list-credits");
-      });
+      me.$root.assignErrors(false, me.formErrors);
+      axios
+        .post("api/credits", this.formCredit, me.$root.config)
+        .then(function () {
+          $("#formCreditModal").modal("hide");
+          me.resetData();
+          me.$emit("list-credits");
+        })
+        .catch(response =>{
+          me.$root.assignErrors(response, me.formErrors);
+        });
     },
     showEditCredit(credit) {
       this.edit = true;
@@ -338,12 +400,20 @@ export default {
     },
     editCredit() {
       let me = this;
+      me.$root.assignErrors(false, me.formErrors);
       axios
-        .put("api/credits/" + this.formCredit.id, this.formCredit, me.$root.config)
+        .put(
+          "api/credits/" + this.formCredit.id,
+          this.formCredit,
+          me.$root.config
+        )
         .then(function () {
           $("#formCreditModal").modal("hide");
           me.resetData();
+        }).catch(response =>{
+          me.$root.assignErrors(response, me.formErrors);
         });
+
       this.$emit("list-credits");
       this.edit = false;
     },
@@ -364,6 +434,7 @@ export default {
       Object.keys(this.formCredit).forEach(function (key, index) {
         me.formCredit[key] = "";
       });
+      me.$root.assignErrors(response, me.formErrors);
     },
   },
 };

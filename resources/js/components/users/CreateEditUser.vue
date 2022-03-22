@@ -216,7 +216,7 @@
             </button>
             <button
               type="button"
-              class="btn btn-primary rounded"
+              class="btn btn-primary"
               @click="formUser.id ? editUser() : createUser()"
             >
               Guardar
