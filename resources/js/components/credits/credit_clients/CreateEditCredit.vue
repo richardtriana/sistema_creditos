@@ -30,7 +30,7 @@
                       >Cliente</label
                     >
                     <button
-                      class="btn btn-outline-primary mb-2"
+                      class="btn btn-primary mb-2"
                       type="button"
                       data-toggle="modal"
                       data-target="#addClientModal"
@@ -81,7 +81,7 @@
                       >Codeudor</label
                     >
                     <button
-                      class="btn btn-outline-primary mb-2"
+                      class="btn btn-primary mb-2"
                       type="button"
                       data-toggle="modal"
                       data-target="#addDebtorModal"
@@ -133,7 +133,7 @@
                       >Proveedor</label
                     >
                     <button
-                      class="btn btn-outline-primary mb-2"
+                      class="btn btn-primary mb-2"
                       type="button"
                       data-toggle="modal"
                       data-target="#addProviderModal"
@@ -271,7 +271,8 @@
                 ref="Simulator"
                 v-if="!edit"
               ></simulator>
-              <button
+              <div  class="modal-footer">
+                <button
                 type="button"
                 class="btn btn-secondary"
                 data-dismiss="modal"
@@ -281,11 +282,12 @@
               </button>
               <button
                 type="button"
-                class="btn btn-primary rounded"
+                class="btn btn-success"
                 @click="edit ? editCredit() : createCredit()"
               >
                 Guardar
               </button>
+              </div>
             </form>
           </div>
           <div class="modal-footer"></div>
@@ -378,11 +380,17 @@ export default {
     },
     createCredit() {
       let me = this;
-      axios.post("api/credits", this.formCredit, me.$root.config).then(function () {
-        $("#formCreditModal").modal("hide");
-        me.resetData();
-        me.$emit("list-credits");
-      });
+      me.$root.assignErrors(false, me.formErrors);
+      axios
+        .post("api/credits", this.formCredit, me.$root.config)
+        .then(function () {
+          $("#formCreditModal").modal("hide");
+          me.resetData();
+          me.$emit("list-credits");
+        })
+        .catch(response =>{
+          me.$root.assignErrors(response, me.formErrors);
+        });
     },
     showEditCredit(credit) {
       this.edit = true;

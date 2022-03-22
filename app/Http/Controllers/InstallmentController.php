@@ -101,7 +101,11 @@ class InstallmentController extends Controller
     $capital = $request->credit_value;
     $interest = $request->interest;
     $number_installments = $request->number_installments;
-    $start_date = $request->start_date;
+    $start_date = date('Y-m-d');
+
+    if ($request->start_date && $request->start_date != 'undefined') {
+      $start_date = $request->start_date;
+    }
 
     $value = $capital;
     $valor_pago_interes = $interest;

@@ -47,7 +47,7 @@
 								<button
 									class="btn"
 									:class="
-										p.status == 1 ? 'btn-outline-success' : 'btn-outline-danger'
+										p.status == 1 ? 'btn-success' : 'btn-danger'
 									"
 									@click="changeStatus(p.id)"
 								>
@@ -56,7 +56,7 @@
 								</button>
 							</td>
 							<td class="text-right" v-if="$root.validatePermission('provider-update')">
-								<button class="btn btn-outline-primary" @click="showData(p)">
+								<button class="btn btn-primary" @click="showData(p)">
 									<i class="bi bi-pen"></i>
 								</button>
 							</td>

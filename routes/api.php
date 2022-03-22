@@ -55,6 +55,9 @@ Route::resource('/entries',  EntryController::class);
 
 Route::get('/installments/calculate-installments', [InstallmentController::class, 'calculateInstallments']);
 
+Route::get('/reports/headquarters', [ReportController::class, 'ReportHeadquarters']);
+Route::get('/reports/general-client', [ReportController::class, 'ReportGeneralClient']);
+
 Route::group(['middleware' => ['auth:api']], function () {
 
 	Route::get('/user', function (Request $request) {
@@ -123,8 +126,8 @@ Route::group(['middleware' => ['auth:api']], function () {
 	Route::get('/print-installment', [PrintTicketController::class, 'printInstallment']);
 
 	//Por revisar
-		Route::get('/print-installment', [PrintTicketController::class, 'printInstallment']);
-		Route::get('/print-entry/{entry}', [PrintTicketController::class, 'printEntry']);
+	Route::get('/print-installment', [PrintTicketController::class, 'printInstallment']);
+	Route::get('/print-entry/{entry}', [PrintTicketController::class, 'printEntry']);
 
 	//Configuration
 	Route::resource('/configurations', CompanyController::class)->middleware('permission:configuration');

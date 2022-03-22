@@ -28,10 +28,10 @@
                   {{ box.last_editor.name }} {{ box.last_editor.last_name }}
                 </span>
               </td>
-              <td v-if="$root.validatePermission('box-update')">
+              <td v-if="$root.validatePermission('box-update')" class="text-right">
                 <button
                   type="button"
-                  class="btn btn-outline-primary"
+                  class="btn btn-primary"
                   data-toggle="modal"
                   data-target="#boxModal"
                   @click="showEditBox(box)"

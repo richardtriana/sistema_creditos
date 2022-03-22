@@ -32,7 +32,7 @@
             />
             <div class="input-group-append" id="button-addon4">
               <button
-                class="btn btn-outline-secondary"
+                class="btn btn-secondary"
                 type="button"
                 @click="searchProvider()"
               >
@@ -71,7 +71,7 @@
 
                 <td>
                   <button
-                    class="btn btn-outline-secondary"
+                    class="btn btn-success"
                     @click="$emit('add-provider', provider)"
                     data-dismiss="modal"
                   >

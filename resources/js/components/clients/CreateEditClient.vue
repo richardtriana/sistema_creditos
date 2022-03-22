@@ -29,7 +29,7 @@
             <input
               type="text"
               class="form-control"
-              id="Apellidos"
+              id="last_name"
               v-model="formClient.last_name"
             />
           </div>
@@ -198,20 +198,21 @@
       </form>
     </div>
     <div class="modal-footer">
+     
       <button
+        type="button"
+        class="btn btn-success"
+        @click="formClient.id ? editClient() : createClient()"
+      >
+        Guardar
+      </button>
+       <button
         type="button"
         class="btn btn-secondary"
         data-dismiss="modal"
         @click="(editar = false), resetData()"
       >
         Cerrar
-      </button>
-      <button
-        type="button"
-        class="btn btn-primary rounded"
-        @click="formClient.id ? editClient() : createClient()"
-      >
-        Guardar
       </button>
     </div>
   </div>
