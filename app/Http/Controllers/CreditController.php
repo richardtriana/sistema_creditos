@@ -36,6 +36,7 @@ class CreditController extends Controller
 	 */
 	public function index(Request $request)
 	{
+		
 		$credits = Credit::select();
 		$status = $request->status != null ? $request->status : 1;
 		$status = $status == 0 ? [0, 3] : [$request->status];
@@ -75,7 +76,6 @@ class CreditController extends Controller
 	 */
 	public function store(Request $request)
 	{
-
 		$validate = Validator::make($request->all(), [
 			'client_id' => 'required|integer|exists:clients,id',
 			'provider' => 'nullable|boolean',
@@ -117,21 +117,20 @@ class CreditController extends Controller
 		$listInstallments = new InstallmentController();
 		$listInstallments = $listInstallments->calculateInstallments($request);
 
-		$user_id = Auth::user();
 
 		$credit = new Credit();
 		$credit->client_id = $request['client_id'];
 		$credit->provider_id = $request['provider_id'];
 		$credit->debtor_id = $request['debtor_id'];
 		$credit->user_id = $request->user()->id;
-		$credit->debtor = $request['debtor'];
-		$credit->provider = $request['provider'];
+		$credit->debtor = $request['debtor'] ?  $request['debtor'] : false;
+		$credit->provider = $request['provider']?  $request['provider'] : false;
 		if ($request['provider'] != null && $request['provider'] != 0) {
 			$credit->status = 3;
 		} else {
 			$credit->status = 0;
 		}
-		$credit->headquarter_id = $request['headquarter_id'];
+		$credit->headquarter_id = $request->user()->headquarter_id;
 		$credit->number_installments = $request['number_installments'];
 		$credit->number_paid_installments = $request['number_paid_installments'];
 		$credit->day_limit = $request['day_limit'];
