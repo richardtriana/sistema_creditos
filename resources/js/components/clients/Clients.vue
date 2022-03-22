@@ -52,11 +52,11 @@
               </td>
               <td>{{ c.email }}</td>
               <td>{{ c.address }}</td>
-              <td v-if="$root.validatePermission('client-status')">
+              <td v-if="$root.validatePermission('client-status')" class="text-right">
                 <button
                   class="btn"
                   :class="
-                    c.status == 1 ? 'btn-outline-success' : 'btn-outline-danger'
+                    c.status == 1 ? 'btn-success' : 'btn-danger'
                   "
                   @click="changeStatus(c.id)"
                 >
@@ -64,9 +64,13 @@
                   <i class="bi bi-x-circle" v-if="c.status == 0"></i>
                 </button>
               </td>
-              <td v-if="c.status == 1 && $root.validatePermission('client-update')" class="text-center">
-                <button class="btn btn-outline-primary" @click="showData(c)">
-                  <i class="bi bi-pen"></i>
+              <td class="text-right" v-if="$root.validatePermission('client-update')">
+                <button 
+                  class="btn btn-primary" 
+                  @click="showData(c)" 
+                  v-if="c.status == 1"
+                >
+                    <i class="bi bi-pen"></i>
                 </button>
               </td>
             </tr>

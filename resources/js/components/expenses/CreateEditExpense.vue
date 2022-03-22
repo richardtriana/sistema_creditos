@@ -56,7 +56,7 @@
           <div class="form-group col-1">
             <button
               type="button"
-              class="btn btn-light text-success rounded border-success mt-4"
+              class="btn btn-success border-success mt-4"
               v-if="!show_type_output"
               @click="show_type_output = true"
             >
@@ -64,7 +64,7 @@
             </button>
             <button
               type="button"
-              class="btn btn-light text-danger rounded border-danger mt-4"
+              class="btn btn-danger border-danger mt-4"
               v-if="show_type_output"
               @click="show_type_output = false"
             >
@@ -105,7 +105,7 @@
         </button>
         <button
           type="button"
-          class="btn btn-primary rounded"
+          class="btn btn-primary"
           @click="editar ? editExpense() : createExpense()"
         >
           Guardar

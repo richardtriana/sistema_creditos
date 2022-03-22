@@ -55,14 +55,14 @@
               <td class="text-right" v-if="$root.validatePermission('headquarter-status')">
                 <button
                   v-if="headquarter.status == 1"
-                  class="btn btn-outline-danger"
+                  class="btn btn-danger"
                   @click="changeStatus(headquarter.id)"
                 >
                   <i class="bi bi-trash"></i>
                 </button>
                 <button
                   v-if="headquarter.status == 0"
-                  class="btn btn-outline-success"
+                  class="btn btn-success"
                   @click="changeStatus(headquarter.id)"
                 >
                   <i class="bi bi-check2-circle"></i>
@@ -71,7 +71,7 @@
               <td class="text-right" v-if="$root.validatePermission('headquarter-update')">
                 <button
                   v-if="headquarter.status == 1"
-                  class="btn btn-outline-primary"
+                  class="btn btn-primary"
                   @click="showData(headquarter)"
                 >
                   <i class="bi bi-pen"></i>

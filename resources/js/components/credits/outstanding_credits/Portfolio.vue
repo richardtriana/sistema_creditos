@@ -57,7 +57,7 @@
               <td class="text-center">
                 <button
                   type="button"
-                  class="btn btn-outline-primary"
+                  class="btn btn-primary"
                   data-toggle="modal"
                   data-target="#creditInformationModal"
                   @click="showInformation(credit)"
@@ -70,13 +70,13 @@
 
               <td class="text-left">
                 <button
-                  class="btn btn-outline-success"
+                  class="btn btn-success"
                   @click="changeStatus(credit.id, 1)"
                 >
                   <i class="bi bi-check2-circle"></i> Aprobar
                 </button>
                 <button
-                  class="btn btn-outline-danger"
+                  class="btn btn-danger"
                   @click="changeStatus(credit.id, 2)"
                 >
                   <i class="bi bi-x-circle"></i> Rechazar

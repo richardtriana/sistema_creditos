@@ -66,7 +66,7 @@
               <td class="text-right" v-if="$root.validatePermission('user-status') || $root.validatePermission('user-update')">
                 <button
                   v-if="user.status == 1 && $root.validatePermission('user-update')"
-                  class="btn btn-outline-primary"
+                  class="btn btn-primary"
                   @click="showData(user)"
                 >
                   <i class="bi bi-pen"></i>
@@ -74,14 +74,14 @@
                 <div class="d-inline">
                   <button
                     v-if="user.status == 1"
-                    class="btn btn-outline-danger"
+                    class="btn btn-danger"
                     @click="changeStatus(user.id)"
                   >
                     <i class="bi bi-trash"></i>
                   </button>
                   <button
                     v-if="user.status == 0"
-                    class="btn btn-outline-success"
+                    class="btn btn-success"
                     @click="changeStatus(user.id)"
                   >
                     <i class="bi bi-check2-circle"></i>

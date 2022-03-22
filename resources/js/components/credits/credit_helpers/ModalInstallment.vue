@@ -40,7 +40,7 @@
               </div>
               <div class="form-group col-3">
                 <button
-                  class="btn btn-outline-primary my-auto"
+                  class="btn btn-primary my-auto"
                   @click="payCredit()"
                   v-if="amount_value > 0"
                 >
@@ -48,14 +48,14 @@
                 </button>
                 <button
                   v-else
-                  class="btn btn-outline-secondary my-auto"
+                  class="btn btn-secondary my-auto"
                   disabled
                 >
                   <i class="bi bi-currency-dollar"></i> Abonar a crédito
                 </button>
               </div> -->
-              <div class="form-group col-3">
-                <button class="btn btn-outline-primary" @click="printTable()">
+              <div class="form-group col-5 offset-7">
+                <button class="btn btn-danger w-100 font-weight-bold" @click="printTable()">
                   <i class="bi bi-file-pdf"></i> Tabla de amortización
                 </button>
               </div>

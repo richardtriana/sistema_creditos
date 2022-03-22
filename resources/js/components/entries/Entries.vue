@@ -24,16 +24,16 @@
               <td class="text-right">{{ e.price | currency }}</td>
               <td>{{ e.type_entry }}</td>
               <td>{{ e.description }}</td>
-              <td>
+              <td class="text-right">
                 <button
-                  class="btn btn-outline-success"
+                  class="btn btn-success"
                   @click="printEntryTicket(e.id)"
                   type="button"
                 >
                   <i class="bi bi-receipt-cutoff"></i>
                 </button>
               </td>
-              <td>
+              <td class="text-right">
                 <button
                   class="btn btn-success"
                   type="button"
