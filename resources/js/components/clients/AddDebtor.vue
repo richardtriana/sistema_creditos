@@ -32,7 +32,7 @@
 						/>
 						<div class="input-group-append" id="button-addon4">
 							<button
-								class="btn btn-outline-secondary"
+								class="btn btn-secondary"
 								type="button"
 								@click="searchClient()"
 							>
@@ -66,7 +66,7 @@
 
 								<td>
 									<button
-										class="btn btn-outline-secondary"
+										class="btn btn-secondary"
 										@click="$emit('add-debtor', debtor)"
 										data-dismiss="modal"
 									>
@@ -78,7 +78,7 @@
 					</table>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">
+					<button type="button" class="btn btn-danger" data-dismiss="modal">
 						Cerrar
 					</button>
 				</div>

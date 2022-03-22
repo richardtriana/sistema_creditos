@@ -125,7 +125,7 @@
 						</button>
 						<button
 							type="button"
-							class="btn btn-primary rounded"
+							class="btn btn-primary"
 							@click="editar ? editHeadquarter() : createHeadquarter()"
 						>
 							Guardar

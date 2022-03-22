@@ -36,14 +36,14 @@
               <td v-if="$root.validatePermission('expense-status')">
                 <button
                   v-if="e.status == 0"
-                  class="btn btn-outline-danger"
+                  class="btn btn-danger"
                   @click="changeStatus(e.id)"
                 >
                   <i class="bi bi-x-circle"></i>
                 </button>
                 <button
                   v-if="e.status == 1"
-                  class="btn btn-outline-success"
+                  class="btn btn-success"
                   @click="changeStatus(e.id)"
                 >
                   <i class="bi bi-check2-circle"></i>
@@ -52,12 +52,12 @@
               <td v-if="$root.validatePermission('expense-update')">
                 <button
                   v-if="e.status == 1"
-                  class="btn btn-outline-primary"
+                  class="btn btn-primary"
                   @click="showData(e)"
                 >
                   <i class="bi bi-pen"></i>
                 </button>
-                <button v-else class="btn btn-outline-secondary" disabled>
+                <button v-else class="btn btn-secondary" disabled>
                   <i class="bi bi-pen"></i>
                 </button>
               </td>

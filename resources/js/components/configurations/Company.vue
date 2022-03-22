@@ -195,7 +195,9 @@
               formErrors.file0
             }}</small>
           </div>
-          <button type="submit" class="btn btn-primary">Guardar</button>
+         <div class="form-group text-right">
+            <button type="submit" class="btn btn-primary btn-lg w-25">Guardar</button>
+         </div>
         </form>
       </div>
     </div>

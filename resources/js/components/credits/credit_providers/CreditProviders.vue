@@ -34,7 +34,7 @@
               </td>
               <td class="text-right">
                 <button
-                  class="btn btn-outline-primary"
+                  class="btn btn-primary"
                   data-toggle="modal"
                   data-target="#historyCreditProviderModal"
                   @click="showHistoryCredit(c.history)"
@@ -44,7 +44,7 @@
               </td>
               <td class="text-right" v-if="$root.validatePermission('provider-update')">
                 <button
-                  class="btn btn-outline-success"
+                  class="btn btn-success"
                   data-toggle="modal"
                   data-target="#payCreditProviderModal"
                   @click="payCreditProvider(c)"

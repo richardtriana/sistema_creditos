@@ -96,7 +96,7 @@
                   data-toggle="modal"
                   data-target="#cuotasModal"
                   v-if="credit.status == 1"
-                  class="btn btn-outline-primary"
+                  class="btn btn-info"
                   @click="showInstallment(credit.id)"
                 >
                   <i class="bi bi-eye"></i>
@@ -104,7 +104,7 @@
 
                 <button
                   v-else
-                  class="btn disabled btn-outline-secondary"
+                  class="btn disabled btn-secondary"
                   disabled
                 >
                   <i class="bi bi-eye-slash"></i>
@@ -115,7 +115,7 @@
                 v-if="$root.validatePermission('credit-index')"
               >
                 <button
-                  class="btn btn-outline-primary"
+                  class="btn btn-danger"
                   @click="
                     printTable(credit.id, credit.name + '_' + credit.last_name)
                   "
@@ -127,7 +127,7 @@
                 <div v-if="credit.status == 4">
                   <button
                     type="button"
-                    class="btn btn-outline-success"
+                    class="btn btn-danger"
                     @click="
                       downloadReceiptPDF(
                         credit.id,
@@ -144,7 +144,7 @@
               <td>
                 <button
                   v-if="credit.status == 1"
-                  class="btn btn-outline-primary"
+                  class="btn btn-success"
                   @click="collectCredit(credit.id)"
                 >
                   <i class="bi bi-box-arrow-in-down"></i>
@@ -165,12 +165,12 @@
                 >
                   <button
                     v-if="credit.status == 1"
-                    class="btn btn-outline-primary"
+                    class="btn btn-primary"
                     @click="showData(credit)"
                   >
                     <i class="bi bi-pen"></i>
                   </button>
-                  <button v-else class="btn btn-outline-secondary" disabled>
+                  <button v-else class="btn btn-secondary" disabled>
                     <i class="bi bi-pen"></i>
                   </button>
                 </div>
@@ -180,14 +180,14 @@
                 >
                   <button
                     v-if="credit.status == 0 || credit.status == 3"
-                    class="btn btn-outline-danger"
+                    class="btn btn-danger"
                     @click="changeStatus(credit.id, 2)"
                   >
                     <i class="bi bi-x-circle"></i>
                   </button>
                   <button
                     v-if="credit.status == 0 || credit.status == 3"
-                    class="btn btn-outline-success"
+                    class="btn btn-success"
                     @click="changeStatus(credit.id, 1)"
                   >
                     <i class="bi bi-check2-circle"></i>

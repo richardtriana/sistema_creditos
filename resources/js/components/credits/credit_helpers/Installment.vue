@@ -9,8 +9,8 @@
           <th>Abono Capital</th>
           <th>Abono Interés</th>
           <th>Saldo capital</th>
-          <th v-if="allow_payment">Mora</th>
-          <th v-if="allow_payment">Dias de mora</th>
+          <!-- <th v-if="allow_payment">Mora</th> -->
+          <!-- <th v-if="allow_payment">Dias de mora</th> -->
           <th v-if="allow_payment">Valor abonado</th>
           <th v-if="allow_payment">Estado</th>
           <th v-if="allow_payment"></th>
@@ -30,18 +30,18 @@
           <td class="text-right">
             {{ quote.capital_balance | currency }}
           </td>
-          <td v-if="allow_payment" class="text-right">
+          <!-- <td v-if="allow_payment" class="text-right">
             {{ quote.late_interests_value | currency }}
-          </td>
-          <td v-if="allow_payment">{{ quote.days_past_due }}</td>
+          </td> -->
+          <!-- <td v-if="allow_payment">{{ quote.days_past_due }}</td> -->
           <td v-if="allow_payment" class="text-right">
             {{ quote.paid_balance | currency }}
           </td>
           <td v-if="allow_payment">
-            <span v-if="quote.status == 0" class="badge badge-secondary"
+            <span v-if="quote.status == 0" class="badge badge-pill badge-warning"
               >Pendiente</span
             >
-            <span v-if="quote.status == 1" class="badge badge-success"
+            <span v-if="quote.status == 1" class="badge badge-pill badge-success"
               >Pagado</span
             >
           </td>

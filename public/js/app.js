@@ -3238,6 +3238,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
@@ -3297,6 +3301,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+//
 //
 //
 //
@@ -3840,6 +3845,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -3990,6 +3997,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _credit_helpers_Simulator_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../credit_helpers/Simulator.vue */ "./resources/js/components/credits/credit_helpers/Simulator.vue");
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+//
+//
 //
 //
 //
@@ -7690,6 +7699,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "CreateEditRol",
@@ -8607,9 +8617,9 @@ var routes = [{
   name: "NoFound"
 }];
 var router = new vue_router__WEBPACK_IMPORTED_MODULE_8__["default"]({
-  routes: routes,
-  // short for `routes: routes`
-  linkActiveClass: "active" //mode: 'history'
+  routes: routes // short for `routes: routes`
+  // linkActiveClass: "active",
+  //mode: 'history'
 
 });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (router);
@@ -53593,11 +53603,11 @@ var render = function () {
                       ]),
                       _vm._v(" "),
                       _vm.$root.validatePermission("box-update")
-                        ? _c("td", [
+                        ? _c("td", { staticClass: "text-right" }, [
                             _c(
                               "button",
                               {
-                                staticClass: "btn btn-outline-primary",
+                                staticClass: "btn btn-primary",
                                 attrs: {
                                   type: "button",
                                   "data-toggle": "modal",
@@ -53759,17 +53769,17 @@ var render = function () {
                 _c("div", { staticClass: "card text-primary mb-3" }, [
                   _c("div", { staticClass: "card-header" }, [
                     _vm._v(
-                      "\n                Saldo máximo permitido:\n                "
+                      "\n\t\t\t\t\t\t\t\tSaldo máximo permitido:\n\t\t\t\t\t\t\t\t"
                     ),
                     _c("b", [
                       _vm._v(
-                        "\n                  " +
+                        "\n\t\t\t\t\t\t\t\t\t" +
                           _vm._s(
                             _vm._f("currency")(
                               _vm.root_data.current_balance_main_box
                             )
                           ) +
-                          "\n                "
+                          "\n\t\t\t\t\t\t\t\t"
                       ),
                     ]),
                   ]),
@@ -53931,9 +53941,9 @@ var render = function () {
                         },
                         [
                           _vm._v(
-                            "\n                  " +
+                            "\n\t\t\t\t\t\t\t\t\t" +
                               _vm._s(headquarter.headquarter) +
-                              "\n                "
+                              "\n\t\t\t\t\t\t\t\t"
                           ),
                         ]
                       )
@@ -53988,13 +53998,13 @@ var render = function () {
                     },
                     [
                       _vm._v(
-                        "\n                Monto máximo\n                " +
+                        "\n\t\t\t\t\t\t\t\tMonto máximo\n\t\t\t\t\t\t\t\t" +
                           _vm._s(
                             _vm._f("currency")(
                               _vm.root_data.current_balance_main_box
                             )
                           ) +
-                          "\n              "
+                          "\n\t\t\t\t\t\t\t"
                       ),
                     ]
                   ),
@@ -54005,7 +54015,7 @@ var render = function () {
                 _c(
                   "button",
                   {
-                    staticClass: "btn btn-primary",
+                    staticClass: "btn btn-success",
                     attrs: { type: "button" },
                     on: {
                       click: function ($event) {
@@ -54015,7 +54025,7 @@ var render = function () {
                   },
                   [
                     _vm._v(
-                      "\n              Realizar Arqueo de caja\n            "
+                      "\n\t\t\t\t\t\t\tRealizar Arqueo de caja\n\t\t\t\t\t\t"
                     ),
                   ]
                 ),
@@ -54023,7 +54033,7 @@ var render = function () {
                 _c(
                   "button",
                   {
-                    staticClass: "btn btn-primary",
+                    staticClass: "btn btn-success",
                     attrs: { type: "button" },
                     on: {
                       click: function ($event) {
@@ -54031,7 +54041,7 @@ var render = function () {
                       },
                     },
                   },
-                  [_vm._v("\n              Guardar\n            ")]
+                  [_vm._v("\n\t\t\t\t\t\t\tGuardar\n\t\t\t\t\t\t")]
                 ),
                 _vm._v(" "),
                 _c(
@@ -54040,7 +54050,7 @@ var render = function () {
                     staticClass: "btn btn-secondary",
                     attrs: { type: "button", "data-dismiss": "modal" },
                   },
-                  [_vm._v("\n              Cerrar\n            ")]
+                  [_vm._v("\n\t\t\t\t\t\t\tCerrar\n\t\t\t\t\t\t")]
                 ),
               ]),
             ]),
@@ -54415,7 +54425,7 @@ var render = function () {
                   _c(
                     "button",
                     {
-                      staticClass: "btn btn-outline-secondary",
+                      staticClass: "btn btn-secondary",
                       attrs: { type: "button" },
                       on: {
                         click: function ($event) {
@@ -54467,7 +54477,7 @@ var render = function () {
                         _c(
                           "button",
                           {
-                            staticClass: "btn btn-outline-secondary",
+                            staticClass: "btn btn-secondary",
                             attrs: { "data-dismiss": "modal" },
                             on: {
                               click: function ($event) {
@@ -54636,7 +54646,7 @@ var render = function () {
                   _c(
                     "button",
                     {
-                      staticClass: "btn btn-outline-secondary",
+                      staticClass: "btn btn-secondary",
                       attrs: { type: "button" },
                       on: {
                         click: function ($event) {
@@ -54688,7 +54698,7 @@ var render = function () {
                         _c(
                           "button",
                           {
-                            staticClass: "btn btn-outline-secondary",
+                            staticClass: "btn btn-secondary",
                             attrs: { "data-dismiss": "modal" },
                             on: {
                               click: function ($event) {
@@ -54769,7 +54779,7 @@ var staticRenderFns = [
       _c(
         "button",
         {
-          staticClass: "btn btn-secondary",
+          staticClass: "btn btn-danger",
           attrs: { type: "button", "data-dismiss": "modal" },
         },
         [_vm._v("\n\t\t\t\t\tCerrar\n\t\t\t\t")]
@@ -54931,15 +54941,13 @@ var render = function () {
                     _c("td", [_vm._v(_vm._s(c.address))]),
                     _vm._v(" "),
                     _vm.$root.validatePermission("client-status")
-                      ? _c("td", [
+                      ? _c("td", { staticClass: "text-right" }, [
                           _c(
                             "button",
                             {
                               staticClass: "btn",
                               class:
-                                c.status == 1
-                                  ? "btn-outline-success"
-                                  : "btn-outline-danger",
+                                c.status == 1 ? "btn-success" : "btn-danger",
                               on: {
                                 click: function ($event) {
                                   return _vm.changeStatus(c.id)
@@ -54961,21 +54969,22 @@ var render = function () {
                         ])
                       : _vm._e(),
                     _vm._v(" "),
-                    c.status == 1 &&
                     _vm.$root.validatePermission("client-update")
-                      ? _c("td", { staticClass: "text-center" }, [
-                          _c(
-                            "button",
-                            {
-                              staticClass: "btn btn-outline-primary",
-                              on: {
-                                click: function ($event) {
-                                  return _vm.showData(c)
+                      ? _c("td", { staticClass: "text-right" }, [
+                          c.status == 1
+                            ? _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-primary",
+                                  on: {
+                                    click: function ($event) {
+                                      return _vm.showData(c)
+                                    },
+                                  },
                                 },
-                              },
-                            },
-                            [_c("i", { staticClass: "bi bi-pen" })]
-                          ),
+                                [_c("i", { staticClass: "bi bi-pen" })]
+                              )
+                            : _vm._e(),
                         ])
                       : _vm._e(),
                   ])
@@ -55109,7 +55118,7 @@ var render = function () {
                 },
               ],
               staticClass: "form-control",
-              attrs: { type: "text", id: "Apellidos" },
+              attrs: { type: "text", id: "last_name" },
               domProps: { value: _vm.formClient.last_name },
               on: {
                 input: function ($event) {
@@ -55619,6 +55628,20 @@ var render = function () {
       _c(
         "button",
         {
+          staticClass: "btn btn-success",
+          attrs: { type: "button" },
+          on: {
+            click: function ($event) {
+              _vm.formClient.id ? _vm.editClient() : _vm.createClient()
+            },
+          },
+        },
+        [_vm._v("\n      Guardar\n    ")]
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
           staticClass: "btn btn-secondary",
           attrs: { type: "button", "data-dismiss": "modal" },
           on: {
@@ -55628,20 +55651,6 @@ var render = function () {
           },
         },
         [_vm._v("\n      Cerrar\n    ")]
-      ),
-      _vm._v(" "),
-      _c(
-        "button",
-        {
-          staticClass: "btn btn-primary rounded",
-          attrs: { type: "button" },
-          on: {
-            click: function ($event) {
-              _vm.formClient.id ? _vm.editClient() : _vm.createClient()
-            },
-          },
-        },
-        [_vm._v("\n      Guardar\n    ")]
       ),
     ]),
   ])
@@ -56082,11 +56091,7 @@ var render = function () {
                 ),
               ]),
               _vm._v(" "),
-              _c(
-                "button",
-                { staticClass: "btn btn-primary", attrs: { type: "submit" } },
-                [_vm._v("Guardar")]
-              ),
+              _vm._m(0),
             ]
           ),
         ]),
@@ -56094,7 +56099,23 @@ var render = function () {
     ),
   ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function () {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group text-right" }, [
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-primary btn-lg w-25",
+          attrs: { type: "submit" },
+        },
+        [_vm._v("Guardar")]
+      ),
+    ])
+  },
+]
 render._withStripped = true
 
 
@@ -56343,7 +56364,7 @@ var render = function () {
                               _c(
                                 "button",
                                 {
-                                  staticClass: "btn btn-outline-primary mb-2",
+                                  staticClass: "btn btn-primary mb-2",
                                   attrs: {
                                     type: "button",
                                     "data-toggle": "modal",
@@ -56489,7 +56510,7 @@ var render = function () {
                               _c(
                                 "button",
                                 {
-                                  staticClass: "btn btn-outline-primary mb-2",
+                                  staticClass: "btn btn-primary mb-2",
                                   attrs: {
                                     type: "button",
                                     "data-toggle": "modal",
@@ -56876,33 +56897,35 @@ var render = function () {
                           })
                         : _vm._e(),
                       _vm._v(" "),
-                      _c(
-                        "button",
-                        {
-                          staticClass: "btn btn-secondary",
-                          attrs: { type: "button", "data-dismiss": "modal" },
-                          on: {
-                            click: function ($event) {
-                              _vm.edit = false
+                      _c("div", { staticClass: "modal-footer" }, [
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-secondary",
+                            attrs: { type: "button", "data-dismiss": "modal" },
+                            on: {
+                              click: function ($event) {
+                                _vm.edit = false
+                              },
                             },
                           },
-                        },
-                        [_vm._v("\n              Cerrar\n            ")]
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "button",
-                        {
-                          staticClass: "btn btn-primary rounded",
-                          attrs: { type: "button" },
-                          on: {
-                            click: function ($event) {
-                              _vm.edit ? _vm.editCredit() : _vm.createCredit()
+                          [_vm._v("\n              Cerrar\n            ")]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-success",
+                            attrs: { type: "button" },
+                            on: {
+                              click: function ($event) {
+                                _vm.edit ? _vm.editCredit() : _vm.createCredit()
+                              },
                             },
                           },
-                        },
-                        [_vm._v("\n              Guardar\n            ")]
-                      ),
+                          [_vm._v("\n              Guardar\n            ")]
+                        ),
+                      ]),
                     ],
                     1
                   ),
@@ -56957,7 +56980,7 @@ var staticRenderFns = [
       _c(
         "button",
         {
-          staticClass: "btn btn-outline-primary mb-2",
+          staticClass: "btn btn-primary mb-2",
           attrs: {
             type: "button",
             "data-toggle": "modal",
@@ -57216,7 +57239,7 @@ var render = function () {
                                   ? _c(
                                       "button",
                                       {
-                                        staticClass: "btn btn-outline-primary",
+                                        staticClass: "btn btn-info",
                                         attrs: {
                                           "data-toggle": "modal",
                                           "data-target": "#cuotasModal",
@@ -57235,7 +57258,7 @@ var render = function () {
                                       "button",
                                       {
                                         staticClass:
-                                          "btn disabled btn-outline-secondary",
+                                          "btn disabled btn-secondary",
                                         attrs: { disabled: "" },
                                       },
                                       [
@@ -57252,7 +57275,7 @@ var render = function () {
                                 _c(
                                   "button",
                                   {
-                                    staticClass: "btn btn-outline-primary",
+                                    staticClass: "btn btn-danger",
                                     on: {
                                       click: function ($event) {
                                         return _vm.printTable(
@@ -57273,7 +57296,7 @@ var render = function () {
                                   _c(
                                     "button",
                                     {
-                                      staticClass: "btn btn-outline-success",
+                                      staticClass: "btn btn-danger",
                                       attrs: { type: "button" },
                                       on: {
                                         click: function ($event) {
@@ -57304,7 +57327,7 @@ var render = function () {
                               ? _c(
                                   "button",
                                   {
-                                    staticClass: "btn btn-outline-primary",
+                                    staticClass: "btn btn-success",
                                     on: {
                                       click: function ($event) {
                                         return _vm.collectCredit(credit.id)
@@ -57332,8 +57355,7 @@ var render = function () {
                                         ? _c(
                                             "button",
                                             {
-                                              staticClass:
-                                                "btn btn-outline-primary",
+                                              staticClass: "btn btn-primary",
                                               on: {
                                                 click: function ($event) {
                                                   return _vm.showData(credit)
@@ -57349,8 +57371,7 @@ var render = function () {
                                         : _c(
                                             "button",
                                             {
-                                              staticClass:
-                                                "btn btn-outline-secondary",
+                                              staticClass: "btn btn-secondary",
                                               attrs: { disabled: "" },
                                             },
                                             [
@@ -57368,8 +57389,7 @@ var render = function () {
                                         ? _c(
                                             "button",
                                             {
-                                              staticClass:
-                                                "btn btn-outline-danger",
+                                              staticClass: "btn btn-danger",
                                               on: {
                                                 click: function ($event) {
                                                   return _vm.changeStatus(
@@ -57391,8 +57411,7 @@ var render = function () {
                                         ? _c(
                                             "button",
                                             {
-                                              staticClass:
-                                                "btn btn-outline-success",
+                                              staticClass: "btn btn-success",
                                               on: {
                                                 click: function ($event) {
                                                   return _vm.changeStatus(
@@ -57556,10 +57575,6 @@ var render = function () {
           _vm._v(" "),
           _c("th", [_vm._v("Saldo capital")]),
           _vm._v(" "),
-          _vm.allow_payment ? _c("th", [_vm._v("Mora")]) : _vm._e(),
-          _vm._v(" "),
-          _vm.allow_payment ? _c("th", [_vm._v("Dias de mora")]) : _vm._e(),
-          _vm._v(" "),
           _vm.allow_payment ? _c("th", [_vm._v("Valor abonado")]) : _vm._e(),
           _vm._v(" "),
           _vm.allow_payment ? _c("th", [_vm._v("Estado")]) : _vm._e(),
@@ -57608,20 +57623,6 @@ var render = function () {
               ? _c("td", { staticClass: "text-right" }, [
                   _vm._v(
                     "\n          " +
-                      _vm._s(_vm._f("currency")(quote.late_interests_value)) +
-                      "\n        "
-                  ),
-                ])
-              : _vm._e(),
-            _vm._v(" "),
-            _vm.allow_payment
-              ? _c("td", [_vm._v(_vm._s(quote.days_past_due))])
-              : _vm._e(),
-            _vm._v(" "),
-            _vm.allow_payment
-              ? _c("td", { staticClass: "text-right" }, [
-                  _vm._v(
-                    "\n          " +
                       _vm._s(_vm._f("currency")(quote.paid_balance)) +
                       "\n        "
                   ),
@@ -57631,15 +57632,19 @@ var render = function () {
             _vm.allow_payment
               ? _c("td", [
                   quote.status == 0
-                    ? _c("span", { staticClass: "badge badge-secondary" }, [
-                        _vm._v("Pendiente"),
-                      ])
+                    ? _c(
+                        "span",
+                        { staticClass: "badge badge-pill badge-warning" },
+                        [_vm._v("Pendiente")]
+                      )
                     : _vm._e(),
                   _vm._v(" "),
                   quote.status == 1
-                    ? _c("span", { staticClass: "badge badge-success" }, [
-                        _vm._v("Pagado"),
-                      ])
+                    ? _c(
+                        "span",
+                        { staticClass: "badge badge-pill badge-success" },
+                        [_vm._v("Pagado")]
+                      )
                     : _vm._e(),
                 ])
               : _vm._e(),
@@ -57735,11 +57740,12 @@ var render = function () {
                   },
                   [
                     _c("div", { staticClass: "form-row w-100" }, [
-                      _c("div", { staticClass: "form-group col-3" }, [
+                      _c("div", { staticClass: "form-group col-5 offset-7" }, [
                         _c(
                           "button",
                           {
-                            staticClass: "btn btn-outline-primary",
+                            staticClass:
+                              "btn btn-danger w-100 font-weight-bold",
                             on: {
                               click: function ($event) {
                                 return _vm.printTable()
@@ -58036,7 +58042,7 @@ var render = function () {
                         _c(
                           "button",
                           {
-                            staticClass: "btn btn-outline-primary",
+                            staticClass: "btn btn-primary",
                             attrs: {
                               "data-toggle": "modal",
                               "data-target": "#historyCreditProviderModal",
@@ -58056,7 +58062,7 @@ var render = function () {
                             _c(
                               "button",
                               {
-                                staticClass: "btn btn-outline-success",
+                                staticClass: "btn btn-success",
                                 attrs: {
                                   "data-toggle": "modal",
                                   "data-target": "#payCreditProviderModal",
@@ -58306,7 +58312,7 @@ var render = function () {
             _c(
               "button",
               {
-                staticClass: "btn btn-primary",
+                staticClass: "btn btn-success",
                 attrs: { type: "button" },
                 on: {
                   click: function ($event) {
@@ -58953,7 +58959,7 @@ var render = function () {
                                 _c(
                                   "button",
                                   {
-                                    staticClass: "btn btn-outline-primary",
+                                    staticClass: "btn btn-info",
                                     attrs: {
                                       type: "button",
                                       "data-toggle": "modal",
@@ -58979,7 +58985,7 @@ var render = function () {
                             _c(
                               "button",
                               {
-                                staticClass: "btn btn-outline-success",
+                                staticClass: "btn btn-success",
                                 on: {
                                   click: function ($event) {
                                     return _vm.changeStatus(credit.id, 1)
@@ -58995,7 +59001,7 @@ var render = function () {
                             _c(
                               "button",
                               {
-                                staticClass: "btn btn-outline-danger",
+                                staticClass: "btn btn-danger",
                                 on: {
                                   click: function ($event) {
                                     return _vm.changeStatus(credit.id, 2)
@@ -59135,11 +59141,11 @@ var render = function () {
                       _vm._v(" "),
                       _c("td", [_vm._v(_vm._s(e.description))]),
                       _vm._v(" "),
-                      _c("td", [
+                      _c("td", { staticClass: "text-right" }, [
                         _c(
                           "button",
                           {
-                            staticClass: "btn btn-outline-success",
+                            staticClass: "btn btn-success",
                             attrs: { type: "button" },
                             on: {
                               click: function ($event) {
@@ -59151,7 +59157,7 @@ var render = function () {
                         ),
                       ]),
                       _vm._v(" "),
-                      _c("td", [
+                      _c("td", { staticClass: "text-right" }, [
                         _c(
                           "button",
                           {
@@ -59382,8 +59388,7 @@ var render = function () {
               ? _c(
                   "button",
                   {
-                    staticClass:
-                      "btn btn-light text-success rounded border-success mt-4",
+                    staticClass: "btn btn-success border-success mt-4",
                     attrs: { type: "button" },
                     on: {
                       click: function ($event) {
@@ -59399,8 +59404,7 @@ var render = function () {
               ? _c(
                   "button",
                   {
-                    staticClass:
-                      "btn btn-light text-danger rounded border-danger mt-4",
+                    staticClass: "btn btn-danger border-danger mt-4",
                     attrs: { type: "button" },
                     on: {
                       click: function ($event) {
@@ -59491,7 +59495,7 @@ var render = function () {
         _c(
           "button",
           {
-            staticClass: "btn btn-primary rounded",
+            staticClass: "btn btn-primary",
             attrs: { type: "button" },
             on: {
               click: function ($event) {
@@ -59636,7 +59640,7 @@ var render = function () {
                                 ? _c(
                                     "button",
                                     {
-                                      staticClass: "btn btn-outline-danger",
+                                      staticClass: "btn btn-danger",
                                       on: {
                                         click: function ($event) {
                                           return _vm.changeStatus(e.id)
@@ -59651,7 +59655,7 @@ var render = function () {
                                 ? _c(
                                     "button",
                                     {
-                                      staticClass: "btn btn-outline-success",
+                                      staticClass: "btn btn-success",
                                       on: {
                                         click: function ($event) {
                                           return _vm.changeStatus(e.id)
@@ -59674,7 +59678,7 @@ var render = function () {
                                 ? _c(
                                     "button",
                                     {
-                                      staticClass: "btn btn-outline-primary",
+                                      staticClass: "btn btn-primary",
                                       on: {
                                         click: function ($event) {
                                           return _vm.showData(e)
@@ -59686,7 +59690,7 @@ var render = function () {
                                 : _c(
                                     "button",
                                     {
-                                      staticClass: "btn btn-outline-secondary",
+                                      staticClass: "btn btn-secondary",
                                       attrs: { disabled: "" },
                                     },
                                     [_c("i", { staticClass: "bi bi-pen" })]
@@ -59845,7 +59849,7 @@ var render = function () {
     _c(
       "button",
       {
-        staticClass: "btn btn-primary rounded",
+        staticClass: "btn btn-primary",
         attrs: { type: "button" },
         on: {
           click: function ($event) {
@@ -60248,7 +60252,7 @@ var render = function () {
               _c(
                 "button",
                 {
-                  staticClass: "btn btn-primary rounded",
+                  staticClass: "btn btn-primary",
                   attrs: { type: "button" },
                   on: {
                     click: function ($event) {
@@ -60414,7 +60418,7 @@ var render = function () {
                             ? _c(
                                 "button",
                                 {
-                                  staticClass: "btn btn-outline-danger",
+                                  staticClass: "btn btn-danger",
                                   on: {
                                     click: function ($event) {
                                       return _vm.changeStatus(headquarter.id)
@@ -60429,7 +60433,7 @@ var render = function () {
                             ? _c(
                                 "button",
                                 {
-                                  staticClass: "btn btn-outline-success",
+                                  staticClass: "btn btn-success",
                                   on: {
                                     click: function ($event) {
                                       return _vm.changeStatus(headquarter.id)
@@ -60452,7 +60456,7 @@ var render = function () {
                             ? _c(
                                 "button",
                                 {
-                                  staticClass: "btn btn-outline-primary",
+                                  staticClass: "btn btn-primary",
                                   on: {
                                     click: function ($event) {
                                       return _vm.showData(headquarter)
@@ -60584,7 +60588,7 @@ var render = function () {
                   _c(
                     "button",
                     {
-                      staticClass: "btn btn-outline-secondary",
+                      staticClass: "btn btn-secondary",
                       attrs: { type: "button" },
                       on: {
                         click: function ($event) {
@@ -60636,7 +60640,7 @@ var render = function () {
                         _c(
                           "button",
                           {
-                            staticClass: "btn btn-outline-secondary",
+                            staticClass: "btn btn-success",
                             attrs: { "data-dismiss": "modal" },
                             on: {
                               click: function ($event) {
@@ -61058,6 +61062,20 @@ var render = function () {
               _c(
                 "button",
                 {
+                  staticClass: "btn btn-primary",
+                  attrs: { type: "button" },
+                  on: {
+                    click: function ($event) {
+                      _vm.editar ? _vm.editProvider() : _vm.createProvider()
+                    },
+                  },
+                },
+                [_vm._v("\n            Guardar\n          ")]
+              ),
+              _vm._v(" "),
+              _c(
+                "button",
+                {
                   staticClass: "btn btn-secondary",
                   attrs: { type: "button", "data-dismiss": "modal" },
                   on: {
@@ -61067,20 +61085,6 @@ var render = function () {
                   },
                 },
                 [_vm._v("\n            Cerrar\n          ")]
-              ),
-              _vm._v(" "),
-              _c(
-                "button",
-                {
-                  staticClass: "btn btn-primary rounded",
-                  attrs: { type: "button" },
-                  on: {
-                    click: function ($event) {
-                      _vm.editar ? _vm.editProvider() : _vm.createProvider()
-                    },
-                  },
-                },
-                [_vm._v("\n            Guardar\n          ")]
               ),
             ]),
           ]),
@@ -61215,9 +61219,7 @@ var render = function () {
                             {
                               staticClass: "btn",
                               class:
-                                p.status == 1
-                                  ? "btn-outline-success"
-                                  : "btn-outline-danger",
+                                p.status == 1 ? "btn-success" : "btn-danger",
                               on: {
                                 click: function ($event) {
                                   return _vm.changeStatus(p.id)
@@ -61244,7 +61246,7 @@ var render = function () {
                           _c(
                             "button",
                             {
-                              staticClass: "btn btn-outline-primary",
+                              staticClass: "btn btn-primary",
                               on: {
                                 click: function ($event) {
                                   return _vm.showData(p)
@@ -61585,21 +61587,36 @@ var render = function () {
                       _vm._v(" "),
                       _c("td", { staticClass: "text-center" }, [
                         report.payment_date > _vm.now
-                          ? _c("span", { staticClass: "text-success" }, [
-                              _vm._v("Próximo a vencer"),
-                            ])
+                          ? _c(
+                              "span",
+                              {
+                                staticClass:
+                                  "badge badge-md font-weight-bold badge-pill badge-success ",
+                              },
+                              [_vm._v("Próximo a vencer")]
+                            )
                           : _vm._e(),
                         _vm._v(" "),
                         report.payment_date == _vm.now
-                          ? _c("span", { staticClass: "text-warning" }, [
-                              _vm._v("Vence hoy"),
-                            ])
+                          ? _c(
+                              "span",
+                              {
+                                staticClass:
+                                  "badge badge-md font-weight-bold badge-pill badge-warning",
+                              },
+                              [_vm._v("Vence hoy")]
+                            )
                           : _vm._e(),
                         _vm._v(" "),
                         report.payment_date < _vm.now
-                          ? _c("span", { staticClass: "text-danger" }, [
-                              _vm._v("En mora"),
-                            ])
+                          ? _c(
+                              "span",
+                              {
+                                staticClass:
+                                  "badge badge-md font-weight-bold badge-pill badge-danger",
+                              },
+                              [_vm._v("En mora")]
+                            )
                           : _vm._e(),
                       ]),
                       _vm._v(" "),
@@ -61886,20 +61903,6 @@ var render = function () {
             _c(
               "button",
               {
-                staticClass: "btn btn-secondary",
-                attrs: { type: "button" },
-                on: {
-                  click: function ($event) {
-                    return _vm.closeModal()
-                  },
-                },
-              },
-              [_vm._v("\n          Close\n        ")]
-            ),
-            _vm._v(" "),
-            _c(
-              "button",
-              {
                 staticClass: "btn btn-primary",
                 attrs: { type: "button" },
                 on: {
@@ -61909,6 +61912,20 @@ var render = function () {
                 },
               },
               [_vm._v("\n          Guardar\n        ")]
+            ),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-secondary",
+                attrs: { type: "button" },
+                on: {
+                  click: function ($event) {
+                    return _vm.closeModal()
+                  },
+                },
+              },
+              [_vm._v("\n          Cerrar\n        ")]
             ),
           ]),
         ]),
@@ -62012,7 +62029,7 @@ var render = function () {
                             _c(
                               "button",
                               {
-                                staticClass: "btn btn-outline-primary",
+                                staticClass: "btn btn-primary",
                                 on: {
                                   click: function ($event) {
                                     return _vm.ShowData(rol)
@@ -62708,7 +62725,7 @@ var render = function () {
               _c(
                 "button",
                 {
-                  staticClass: "btn btn-primary rounded",
+                  staticClass: "btn btn-primary",
                   attrs: { type: "button" },
                   on: {
                     click: function ($event) {
@@ -62910,7 +62927,7 @@ var render = function () {
                               ? _c(
                                   "button",
                                   {
-                                    staticClass: "btn btn-outline-primary",
+                                    staticClass: "btn btn-primary",
                                     on: {
                                       click: function ($event) {
                                         return _vm.showData(user)
@@ -62926,7 +62943,7 @@ var render = function () {
                                 ? _c(
                                     "button",
                                     {
-                                      staticClass: "btn btn-outline-danger",
+                                      staticClass: "btn btn-danger",
                                       on: {
                                         click: function ($event) {
                                           return _vm.changeStatus(user.id)
@@ -62941,7 +62958,7 @@ var render = function () {
                                 ? _c(
                                     "button",
                                     {
-                                      staticClass: "btn btn-outline-success",
+                                      staticClass: "btn btn-success",
                                       on: {
                                         click: function ($event) {
                                           return _vm.changeStatus(user.id)
@@ -78389,7 +78406,7 @@ Vue.compile = compileToFunctions;
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"axios","version":"0.21.4","description":"Promise based HTTP client for the browser and node.js","main":"index.js","scripts":{"test":"grunt test","start":"node ./sandbox/server.js","build":"NODE_ENV=production grunt build","preversion":"npm test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json","postversion":"git push && git push --tags","examples":"node ./examples/server.js","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","fix":"eslint --fix lib/**/*.js"},"repository":{"type":"git","url":"https://github.com/axios/axios.git"},"keywords":["xhr","http","ajax","promise","node"],"author":"Matt Zabriskie","license":"MIT","bugs":{"url":"https://github.com/axios/axios/issues"},"homepage":"https://axios-http.com","devDependencies":{"coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.3.0","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^23.0.0","grunt-karma":"^4.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^4.0.2","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^6.3.2","karma-chrome-launcher":"^3.1.0","karma-firefox-launcher":"^2.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^4.3.6","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.8","karma-webpack":"^4.0.2","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^8.2.1","sinon":"^4.5.0","terser-webpack-plugin":"^4.2.3","typescript":"^4.0.5","url-search-params":"^0.10.0","webpack":"^4.44.2","webpack-dev-server":"^3.11.0"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"jsdelivr":"dist/axios.min.js","unpkg":"dist/axios.min.js","typings":"./index.d.ts","dependencies":{"follow-redirects":"^1.14.0"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}]}');
+module.exports = JSON.parse('{"_args":[["axios@0.21.4","C:\\\\xampp\\\\htdocs\\\\creditos"]],"_development":true,"_from":"axios@0.21.4","_id":"axios@0.21.4","_inBundle":false,"_integrity":"sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==","_location":"/axios","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"axios@0.21.4","name":"axios","escapedName":"axios","rawSpec":"0.21.4","saveSpec":null,"fetchSpec":"0.21.4"},"_requiredBy":["#DEV:/"],"_resolved":"https://registry.npmjs.org/axios/-/axios-0.21.4.tgz","_spec":"0.21.4","_where":"C:\\\\xampp\\\\htdocs\\\\creditos","author":{"name":"Matt Zabriskie"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"bugs":{"url":"https://github.com/axios/axios/issues"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}],"dependencies":{"follow-redirects":"^1.14.0"},"description":"Promise based HTTP client for the browser and node.js","devDependencies":{"coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.3.0","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^23.0.0","grunt-karma":"^4.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^4.0.2","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^6.3.2","karma-chrome-launcher":"^3.1.0","karma-firefox-launcher":"^2.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^4.3.6","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.8","karma-webpack":"^4.0.2","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^8.2.1","sinon":"^4.5.0","terser-webpack-plugin":"^4.2.3","typescript":"^4.0.5","url-search-params":"^0.10.0","webpack":"^4.44.2","webpack-dev-server":"^3.11.0"},"homepage":"https://axios-http.com","jsdelivr":"dist/axios.min.js","keywords":["xhr","http","ajax","promise","node"],"license":"MIT","main":"index.js","name":"axios","repository":{"type":"git","url":"git+https://github.com/axios/axios.git"},"scripts":{"build":"NODE_ENV=production grunt build","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","examples":"node ./examples/server.js","fix":"eslint --fix lib/**/*.js","postversion":"git push && git push --tags","preversion":"npm test","start":"node ./sandbox/server.js","test":"grunt test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json"},"typings":"./index.d.ts","unpkg":"dist/axios.min.js","version":"0.21.4"}');
 
 /***/ })
 
