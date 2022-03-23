@@ -19,9 +19,12 @@
             type="text"
             class="form-control truncate"
             id="description"
-            placeholder="Example input placeholder"
+            placeholder="Descripción del gasto a realizar"
             v-model="formExpense.description"
           />
+          <small id="description_help" class="form-text text-danger">{{
+            formErrors.description
+          }}</small>
         </div>
         <div class="form-group col-12">
           <label for="date">Fecha</label>
@@ -31,6 +34,9 @@
             id="date"
             v-model="formExpense.date"
           />
+          <small id="date_help" class="form-text text-danger">{{
+            formErrors.date
+          }}</small>
         </div>
         <div class="form-row col-12">
           <div class="form-group col-11">
@@ -43,17 +49,22 @@
               v-model="formExpense.type_output"
             >
             </v-select>
+            <small id="type_output_help" class="form-text text-danger">{{
+              formErrors.type_output
+            }}</small>
           </div>
           <div class="form-group col-1">
             <button
-              class="btn btn-light text-success rounded border-success mt-4"
+              type="button"
+              class="btn btn-success border-success mt-4"
               v-if="!show_type_output"
               @click="show_type_output = true"
             >
               <i class="bi bi-plus-circle"></i>
             </button>
             <button
-              class="btn btn-light text-danger rounded border-danger mt-4"
+              type="button"
+              class="btn btn-danger border-danger mt-4"
               v-if="show_type_output"
               @click="show_type_output = false"
             >
@@ -78,6 +89,9 @@
             placeholder="$"
             v-model="formExpense.price"
           />
+          <small id="price_help" class="form-text text-danger">{{
+            formErrors.price
+          }}</small>
         </div>
       </div>
       <div class="modal-footer">
@@ -91,7 +105,7 @@
         </button>
         <button
           type="button"
-          class="btn btn-primary rounded"
+          class="btn btn-primary"
           @click="editar ? editExpense() : createExpense()"
         >
           Guardar
@@ -111,16 +125,24 @@ export default {
       show_type_output: false,
       formExpense: {},
       expenseTypeList: [],
+      formErrors: {
+        description: "",
+        date: "",
+        type_output: "",
+        price: ""
+      },
     };
   },
   methods: {
     createExpense() {
       let me = this;
-      axios.post("api/expenses", this.formExpense).then(function () {
-        $("#expenseModal").modal("hide");
-        me.resetData();
-        me.$emit("list-expenses");
-      });
+      axios
+        .post("api/expenses", this.formExpense, me.$root.config)
+        .then(function () {
+          $("#expenseModal").modal("hide");
+          me.resetData();
+          me.$emit("list-expenses");
+        });
     },
     showEditExpense(expense) {
       this.editar = true;
@@ -131,7 +153,11 @@ export default {
     editExpense() {
       let me = this;
       axios
-        .put(`api/expenses/${this.formExpense.id}`, this.formExpense)
+        .put(
+          `api/expenses/${this.formExpense.id}`,
+          this.formExpense,
+          me.$root.config
+        )
         .then(function () {
           $("#expenseModal").modal("hide");
           me.resetData();
@@ -148,7 +174,7 @@ export default {
     },
     listTypeExpenses() {
       let me = this;
-      axios.get(`api/type-expenses`).then(function (response) {
+      axios.get(`api/type-expenses`, me.$root.config).then(function (response) {
         me.expenseTypeList = response.data;
       });
     },

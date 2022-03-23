@@ -2,11 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Box;
 use App\Models\MainBox;
 use Illuminate\Http\Request;
 
 class MainBoxController extends Controller
 {
+	public function __construct()
+	{
+		$this->middleware('permission:box.index', ['only' => ['index','currentBalance']]);
+		$this->middleware('permission:box.update', ['only' => ['update','addAmountMainBox', 'subAmountMainBox']]);
+	}
+	
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -79,10 +86,14 @@ class MainBoxController extends Controller
 	{
 		$amount =  $request->amount;
 
-		if ($mainBox->initial_balance == 0) {
+		if ($mainBox->initial_balance <= 0) {
 			$mainBox->initial_balance =  $amount;
 		}
 		$mainBox->current_balance = $mainBox->current_balance + $amount;
+		if ($mainBox->current_balance <= 0) {
+			$mainBox->input = 0;
+			$mainBox->output = 0;
+		}
 		$mainBox->save();
 	}
 
@@ -95,5 +106,41 @@ class MainBoxController extends Controller
 	public function destroy(MainBox $mainBox)
 	{
 		//
+	}
+
+	public function currentBalance()
+	{
+		$main_box = MainBox::first();
+		$current_balance = $main_box->current_balance;
+		return $current_balance;
+	}
+
+	public function addAmountMainBox($amount)
+	{
+		$main_box = MainBox::first();
+		if ($main_box->initial_balance == 0) {
+			$main_box->initial_balance =  $amount;
+		}
+		$main_box->input = $main_box->input + $amount;
+		$main_box->current_balance = $main_box->current_balance + $amount;
+		$main_box->save();
+	}
+
+	public function subAmountMainBox($amount)
+	{
+		$main_box = MainBox::first();
+		$main_box->current_balance = $main_box->current_balance - $amount;
+		$main_box->output = $main_box->output + $amount;
+		$main_box->save();
+	}
+
+	public function cashRegister(Box $box, Request $request)
+	{
+		$this->addAmountMainBox($request->add_amount);
+		$box->current_balance = $box->current_balance - $request->add_amount;
+		$box->initial_balance = 0;
+		$box->input = 0;
+		$box->output = 0;
+		$box->save();
 	}
 }

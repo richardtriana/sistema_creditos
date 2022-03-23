@@ -7,13 +7,14 @@
         class="btn btn-primary"
         data-toggle="modal"
         data-target="#expenseModal"
+        v-if="$root.validatePermission('expense-store')"
       >
         Crear Egreso
       </button>
     </div>
     <div class="page-content">
-      <section>
-        <table class="table table-bordered table-sm table-responsive">
+      <section class="table-responsive">
+        <table class="table table-bordered table-sm">
           <thead>
             <tr>
               <th>Motivo</th>
@@ -21,8 +22,8 @@
               <th>Fecha</th>
               <th>Tipo de Salida</th>
               <th>Valor</th>
-              <th>Estado</th>
-              <th>Opciones</th>
+              <th v-if="$root.validatePermission('expense-status')">Estado</th>
+              <th v-if="$root.validatePermission('expense-update')">Opciones</th>
             </tr>
           </thead>
           <tbody v-if="expenseList.data && expenseList.data.length > 0">
@@ -31,32 +32,32 @@
               <td>{{ e.user_id }}</td>
               <td>{{ e.date }}</td>
               <td>{{ e.type_output }}</td>
-              <td class="text-right">{{ e.price | dollar }}</td>
-              <td>
+              <td class="text-right">{{ e.price | currency }}</td>
+              <td v-if="$root.validatePermission('expense-status')">
                 <button
                   v-if="e.status == 0"
-                  class="btn btn-outline-danger"
+                  class="btn btn-danger"
                   @click="changeStatus(e.id)"
                 >
                   <i class="bi bi-x-circle"></i>
                 </button>
                 <button
                   v-if="e.status == 1"
-                  class="btn btn-outline-success"
+                  class="btn btn-success"
                   @click="changeStatus(e.id)"
                 >
                   <i class="bi bi-check2-circle"></i>
                 </button>
               </td>
-              <td>
+              <td v-if="$root.validatePermission('expense-update')">
                 <button
                   v-if="e.status == 1"
-                  class="btn btn-outline-primary"
+                  class="btn btn-primary"
                   @click="showData(e)"
                 >
                   <i class="bi bi-pen"></i>
                 </button>
-                <button v-else class="btn btn-outline-secondary" disabled>
+                <button v-else class="btn btn-secondary" disabled>
                   <i class="bi bi-pen"></i>
                 </button>
               </td>
@@ -97,7 +98,7 @@ export default {
     listExpenses(page = 1) {
       let me = this;
       axios
-        .get(`api/expenses?page=${page}&expense=${this.search_expense}`)
+        .get(`api/expenses?page=${page}&expense=${this.search_expense}`, me.$root.config)
         .then(function (response) {
           me.expenseList = response.data;
         });

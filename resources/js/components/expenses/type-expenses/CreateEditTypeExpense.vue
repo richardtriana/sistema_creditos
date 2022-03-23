@@ -12,7 +12,7 @@
     </div>
     <button
       type="button"
-      class="btn btn-primary rounded"
+      class="btn btn-primary"
       @click="editar ? editExpense() : createExpense()"
     >
       Guardar
@@ -31,7 +31,7 @@ export default {
   methods: {
     createExpense() {
       let me = this;
-      axios.post("api/type-expenses", this.formTypeExpense).then(function () {
+      axios.post("api/type-expenses", this.formTypeExpense, me.$root.config).then(function () {
         me.resetData();
         me.$emit("list-type-expenses");
       });

@@ -14,8 +14,8 @@ class ExpenseFactory extends Factory
     public function definition()
     {
         return [
-            'headquarter_id' => $this->faker->numberBetween(1, 3),
-            'user_id' => $this->faker->numberBetween(1, 3),
+            'headquarter_id' => 1,
+            'user_id' => 1,
             'description' => $this->faker->text(100),
             'date' => $this->faker->date('Y-m-d'),
             'type_output' => $this->faker->text(50),

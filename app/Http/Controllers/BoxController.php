@@ -3,10 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Box;
+use App\Models\MainBox;
 use Illuminate\Http\Request;
 
 class BoxController extends Controller
 {
+	public function __construct()
+	{
+		$this->middleware('permission:box.index', ['only' => ['index','show']]);
+		$this->middleware('permission:box.update', ['only' => ['update', 'addAmountBox','subAmountBox']]);
+	}
+
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -81,6 +88,9 @@ class BoxController extends Controller
 		}
 		$box->current_balance = $box->current_balance + $amount;
 		$box->save();
+
+		$update_main_box = new MainBoxController();
+		$update_main_box->subAmountMainBox($amount);
 	}
 
 	/**
@@ -92,5 +102,23 @@ class BoxController extends Controller
 	public function destroy(Box $box)
 	{
 		//
+	}
+
+	public function addAmountBox($id, $amount)
+	{
+		$box_id = $id;
+		$box = Box::findOrFail($box_id);
+		$box->current_balance = $box->current_balance + $amount;
+		$box->input = $box->input + $amount;
+		$box->save();
+	}
+
+	public function subAmountBox($id, $amount)
+	{
+		$box_id = $id;
+		$box = Box::findOrFail($box_id);
+		$box->current_balance = $box->current_balance - $amount;
+		$box->output = $box->output + $amount;
+		$box->save();
 	}
 }

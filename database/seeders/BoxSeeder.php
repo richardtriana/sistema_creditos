@@ -15,7 +15,7 @@ class BoxSeeder extends Seeder
     public function run()
     {
         Box::factory()
-			->count(10)
+			->count(1)
 			->create();
     }
 }

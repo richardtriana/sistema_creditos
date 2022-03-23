@@ -22,6 +22,14 @@
 					</div>
 					<form>
 						<div class="modal-body">
+							<div class="card text-primary mb-3">
+								<div class="card-header">
+									Saldo máximo permitido:
+									<b>
+										{{ root_data.current_balance_main_box | currency }}
+									</b>
+								</div>
+							</div>
 							<div class="form-group">
 								<label for="current_balance">Saldo disponible</label>
 								<input
@@ -29,8 +37,34 @@
 									step="any"
 									class="form-control"
 									id="current_balance"
-									aria-describedby="emailHelp"
+									aria-describedby="current_balanceHelp"
 									v-model="formBox.current_balance"
+									disabled
+									readonly
+								/>
+							</div>
+							<div class="form-group">
+								<label for="input">Entradas</label>
+								<input
+									type="number"
+									step="any"
+									class="form-control"
+									id="input"
+									aria-describedby="inputlHelp"
+									v-model="formBox.input"
+									disabled
+									readonly
+								/>
+							</div>
+							<div class="form-group">
+								<label for="output">Salidas</label>
+								<input
+									type="number"
+									step="any"
+									class="form-control"
+									id="output"
+									aria-describedby="outputlHelp"
+									v-model="formBox.output"
 									disabled
 									readonly
 								/>
@@ -60,23 +94,40 @@
 									class="form-control"
 									id="add_amount"
 									v-model="add_amount"
+									:max="root_data.current_balance_main_box"
+									@keyup="
+										add_amount > root_data.current_balance_main_box
+											? (add_amount = root_data.current_balance_main_box)
+											: (add_amount = add_amount)
+									"
 								/>
+								<small id="addAmountHelpBlock" class="form-text text-muted">
+									Monto máximo
+									{{ root_data.current_balance_main_box | currency }}
+								</small>
 							</div>
 						</div>
 						<div class="modal-footer">
+							<button
+								type="button"
+								class="btn btn-success"
+								@click="cashRegister(formBox)"
+							>
+								Realizar Arqueo de caja
+							</button>
+							<button
+								type="button"
+								class="btn btn-success"
+								@click="updateBox()"
+							>
+								Guardar
+							</button>
 							<button
 								type="button"
 								class="btn btn-secondary"
 								data-dismiss="modal"
 							>
 								Cerrar
-							</button>
-							<button
-								type="button"
-								class="btn btn-primary"
-								@click="updateBox()"
-							>
-								Guardar
 							</button>
 						</div>
 					</form>
@@ -94,9 +145,10 @@ export default {
 			formBox: {},
 			add_amount: 0,
 			headquarterList: {},
+			root_data: this.$root.$data,
 		};
 	},
-	created() {
+	mounted() {
 		this.listHeadquarters(1);
 	},
 	methods: {
@@ -110,16 +162,22 @@ export default {
 		},
 		listHeadquarters() {
 			let me = this;
-			axios.get(`api/headquarters/list-headquarter`).then(function (response) {
-				me.headquarterList = response.data;
-			});
+			axios
+				.get(`api/headquarters/list-all-headquarters`, me.$root.config)
+				.then(function (response) {
+					me.headquarterList = response.data;
+				});
 		},
 
 		updateBox() {
 			let me = this;
 			if (this.box_id != 0) {
 				axios
-					.put(`api/boxes/${this.box_id}`, { amount: this.add_amount })
+					.put(
+						`api/boxes/${this.box_id}`,
+						{ amount: this.add_amount },
+						me.$root.config
+					)
 					.then(function () {
 						$("#boxModal").modal("hide");
 						me.$emit("list-boxes");
@@ -131,6 +189,14 @@ export default {
 			Object.keys(this.formBox).forEach(function (key, index) {
 				me.formBox[key] = "";
 			});
+		},
+
+		cashRegister(box) {
+			box.add_amount = this.add_amount;
+			axios
+				.post(`api/main-box/cash-register/${box.id}`, box, this.$root.config)
+				.then(() => this.$emit("list-boxes"))
+				.finally($("#boxModal").modal("hide"));
 		},
 	},
 };

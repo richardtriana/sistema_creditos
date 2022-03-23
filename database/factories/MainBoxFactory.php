@@ -14,13 +14,13 @@ class MainBoxFactory extends Factory
   public function definition()
   {
     return [
-      'initial_balance' => $this->faker->randomNumber(),
-      'current_balance' => $this->faker->randomNumber(),
-      'input' => $this->faker->randomNumber(),
-      'output' => $this->faker->randomNumber(),
+      'initial_balance' => 0,
+      'current_balance' => 0,
+      'input' => 0,
+      'output' => 0,
       'history' => $this->faker->text(200),
       'last_update' => $this->faker->date('Y-m-d'),
-      'last_editor'  => $this->faker->numberBetween(1, 10)
+      'last_editor'  => 1
     ];
   }
 }

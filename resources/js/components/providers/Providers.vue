@@ -6,48 +6,48 @@
 				type="button"
 				class="btn btn-primary"
 				data-toggle="modal"
-				data-target="#formProveedorModal"
+				data-target="#formProviderModal"
+				v-if="$root.validatePermission('provider-store')"
 			>
 				Crear proveedor
 			</button>
 		</div>
 		<div class="page-content mt-4">
-			<section class="">
-				<table class="table table-sm table-bordered table-responsive">
+			<section class="table-responsive">
+				<table class="table table-sm table-bordered">
 					<thead>
-						<tr>
-							<th>id</th>
-							<th>Nombres</th>
-							<th>Apellidos</th>
+						<tr class="text-center">
+							<th>ID</th>
+							<th>Razón social</th>
 							<th>Tipo Documento</th>
-							<th>Num Documento</th>
+							<th>Documento</th>
 							<th>Celular1</th>
 							<th>Celular2</th>
-							<th>Correo Electronico</th>
+							<th>Correo Electrónico</th>
 							<th>Dirección</th>
-							<th>Estado</th>
-							<th>Opciones</th>
+							<th v-if="$root.validatePermission('provider-status')">Estado</th>
+							<th v-if="$root.validatePermission('provider-update')">Opciones</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr v-for="p in providerList.data" :key="p.id">
 							<td>{{ p.id }}</td>
-							<td>{{ p.name }}</td>
-							<td>{{ p.last_name }}</td>
+							<td>{{ p.business_name }}</td>
 							<td>
-								<span v-if="p.type_document == '1'">Cèdula de ciudadania</span>
-								<span v-if="p.type_document == '2'">Passaporte</span>
+								<span v-if="p.type_document == 'CC'">Cédula de ciudadania</span>
+								<span v-if="p.type_document == 'PP'">Pasaporte</span>
+								<span v-if="p.type_document == 'NIT'">NIT</span>
 							</td>
 							<td>{{ p.document }}</td>
 							<td>{{ p.phone_1 }}</td>
 							<td>{{ p.phone_2 }}</td>
 							<td>{{ p.email }}</td>
 							<td>{{ p.address }}</td>
-							<td>
+							<td class="text-right" v-if="$root.validatePermission('provider-status')">
 								<button
 									class="btn"
 									:class="
-										p.status == 1 ? 'btn-outline-success' : 'btn-outline-danger'
+										p.status == 1 ? 'btn-success' : 'btn-danger'
 									"
 									@click="changeStatus(p.id)"
 								>
@@ -55,8 +55,8 @@
 									<i class="bi bi-x-circle" v-if="p.status == 0"></i>
 								</button>
 							</td>
-							<td class="text-center">
-								<button class="btn btn-outline-primary" @click="showData(p)">
+							<td class="text-right" v-if="$root.validatePermission('provider-update')">
+								<button class="btn btn-primary" @click="showData(p)">
 									<i class="bi bi-pen"></i>
 								</button>
 							</td>
@@ -76,7 +76,7 @@
 		</div>
 		<create-edit-provider
 			ref="CreateEditProvider"
-			@listar-proveedores="listProviders(1)"
+			@list-providers="listProviders(1)"
 		/>
 	</div>
 </template>
@@ -95,12 +95,12 @@ export default {
 	methods: {
 		listProviders(page = 1) {
 			let me = this;
-			axios.get("api/proveedores?page=" + page).then(function (response) {
+			axios.get("api/providers?page=" + page, me.$root.config).then(function (response) {
 				me.providerList = response.data;
 			});
 		},
-		showData: function (proveedor) {
-			this.$refs.CreateEditProvider.abirEditarProveedor(proveedor);
+		showData: function (provider) {
+			this.$refs.CreateEditProvider.showEditProvider(provider);
 		},
 		changeStatus: function (id) {
 			let me = this;
@@ -113,7 +113,7 @@ export default {
 			}).then((result) => {
 				if (result.isConfirmed) {
 					axios
-						.post(`api/proveedores/${id}/change-status`, null, me.$root.config)
+						.post(`api/providers/${id}/change-status`, null, me.$root.config)
 						.then(function () {
 							me.listProviders(1);
 						});

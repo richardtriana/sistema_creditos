@@ -16,7 +16,7 @@
 							class="form-control"
 							id="saldo_inicial"
 							placeholder="$"
-							v-model="formMainBox.initial_balance"
+							:value="formMainBox.initial_balance | currency"
 						/>
 					</div>
 				</div>
@@ -32,7 +32,7 @@
 							class="form-control"
 							id="saldo_inicial"
 							placeholder="$"
-							v-model="formMainBox.current_balance"
+							:value="formMainBox.current_balance | currency"
 						/>
 					</div>
 				</div>
@@ -46,7 +46,7 @@
 							class="form-control"
 							id="input"
 							placeholder="$"
-							v-model="formMainBox.input"
+							:value="formMainBox.input | currency"
 						/>
 					</div>
 				</div>
@@ -59,7 +59,7 @@
 							class="form-control"
 							id="output"
 							placeholder="$"
-							v-model="formMainBox.output"
+							:value="formMainBox.output | currency"
 						/>
 					</div>
 				</div>
@@ -75,11 +75,12 @@
 							disabled
 							id="last_update"
 							v-model="formMainBox.last_update"
+							v-if="formMainBox.last_editor"
 						/>
 					</div>
 				</div>
 
-				<div class="form-group row col-md-6">
+				<div class="form-group row col-md-6" v-if="formMainBox.last_editor">
 					<label for="last_update" class="col-sm-4 col-form-label"
 						>Último editor</label
 					>
@@ -101,8 +102,13 @@
 						/>
 					</div>
 				</div>
-				<div class="w-100 text-center">
-					<button class="btn btn-primary" type="button" style="min-width: 30%" @click="updateBox()">
+				<div class="w-100 text-center" v-if="$root.validatePermission('box-update')">
+					<button
+						class="btn btn-primary"
+						type="button"
+						style="min-width: 30%"
+						@click="updateBox()"
+					>
 						Guardar
 					</button>
 				</div>
@@ -125,10 +131,11 @@ export default {
 	},
 	methods: {
 		getMainBox() {
-			axios.get("api/main-box").then((reponse) => {
+			axios.get("api/main-box", this.$root.config).then((reponse) => {
 				this.formMainBox = reponse.data.main_box;
 				this.lastEditor = reponse.data.last_editor;
 			});
+			this.$root.getCurrentBalanceMainBox();
 		},
 		updateBox() {
 			let me = this;
@@ -136,7 +143,7 @@ export default {
 				axios
 					.put(`api/main-box/${this.formMainBox.id}`, {
 						amount: this.add_amount,
-					})
+					}, me.$root.config)
 					.then(function () {
 						me.getMainBox();
 					});

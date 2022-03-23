@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Proveedor;
+use App\Models\Provider;
 use Illuminate\Database\Seeder;
 
-class ProveedorSeeder extends Seeder
+class ProviderSeeder extends Seeder
 {
   /**
    * Run the database seeds.
@@ -15,8 +15,8 @@ class ProveedorSeeder extends Seeder
   public function run()
   {
     //
-    Proveedor::factory()
-    ->count(10)
-    ->create();
+    Provider::factory()
+      ->count(1)
+      ->create();
   }
 }

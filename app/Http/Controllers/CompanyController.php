@@ -50,7 +50,8 @@ class CompanyController extends Controller
       'mobile' => 'string|min:5|max:13',
       'file0' => 'nullable|image|mimes:jpg,png,jpeg,gif,svg',
       'condition_order' => 'nullable|string',
-      'condition_quotation' => 'nullable|string'
+      'condition_quotation' => 'nullable|string',
+      'whatsapp_msg' => 'nullable|string',
     ]);
 
     if (!$validate->fails()) {

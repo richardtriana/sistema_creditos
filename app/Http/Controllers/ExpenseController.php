@@ -2,11 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Box;
 use App\Models\Expense;
 use Illuminate\Http\Request;
 
 class ExpenseController extends Controller
 {
+	public function __construct()
+	{
+		$this->middleware('permission:expense.index', ['only' => ['index','show']]);
+		$this->middleware('permission:expense.store', ['only' => ['store']]);
+		$this->middleware('permission:expense.update', ['only' => ['update']]);
+		$this->middleware('permission:expense.delete', ['only' => ['destroy']]);
+		$this->middleware('permission:expense.status', ['only' => ['changeStatus']]);
+	}
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -44,6 +53,10 @@ class ExpenseController extends Controller
 		$expense->type_output = $request['type_output'];
 		$expense->price = $request['price'];
 		$expense->save();
+
+		$box = Box::where('headquarter_id', $expense->headquarter_id)->firstOrFail();
+		$sub_amount_box = new BoxController();
+		$sub_amount_box->subAmountBox($box->id, $request['price']);
 	}
 
 	/**
@@ -58,7 +71,6 @@ class ExpenseController extends Controller
 		$expense->description = $request['description'];
 		$expense->date = $request['date'];
 		$expense->type_output = $request['type_output'];
-		$expense->price = $request['price'];
 		$expense->save();
 	}
 }

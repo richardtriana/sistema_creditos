@@ -24,6 +24,7 @@ class CreateCompaniesTable extends Migration
             $table->string('mobile', 15)->nullable();
             $table->string('condition_order', 300)->nullable();
             $table->string('condition_quotation', 300)->nullable();
+            $table->string('whatsapp_msg', 300)->nullable();
             $table->text('logo')->nullable();
             $table->timestamps();
         });

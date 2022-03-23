@@ -32,7 +32,7 @@
 						/>
 						<div class="input-group-append" id="button-addon4">
 							<button
-								class="btn btn-outline-secondary"
+								class="btn btn-secondary"
 								type="button"
 								@click="searchClient()"
 							>
@@ -47,7 +47,6 @@
 								<th scope="col">Nombres</th>
 								<th>Documento</th>
 								<th scope="col">Direccion</th>
-								<th>Telefono</th>
 								<th>Correo</th>
 								<th>Contacto</th>
 								<th>Opciones</th>
@@ -59,15 +58,15 @@
 								<td>{{ debtor.name }}</td>
 								<td>{{ debtor.document }}</td>
 								<td>{{ debtor.address }}</td>
-								<td>{{ debtor.mobile }}</td>
 								<td>{{ debtor.email }}</td>
 								<td>
-									{{ debtor.contact }}
+									{{ debtor.phone_1 }} <br>
+									{{ debtor.phone_2 }}
 								</td>
 
 								<td>
 									<button
-										class="btn btn-outline-secondary"
+										class="btn btn-secondary"
 										@click="$emit('add-debtor', debtor)"
 										data-dismiss="modal"
 									>
@@ -79,7 +78,7 @@
 					</table>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">
+					<button type="button" class="btn btn-danger" data-dismiss="modal">
 						Cerrar
 					</button>
 				</div>
@@ -106,7 +105,7 @@ export default {
 		listClients() {
 			let me = this;
 			axios
-				.post("api/clients/filter-client-list", null)
+				.post("api/clients/filter-client-list", null, me.$root.config)
 				.then(function (response) {
 					me.ClientList = response;
 				});
@@ -119,7 +118,7 @@ export default {
 			var url = `api/clients/filter-client-list?client=${me.filters.client}`;
 			if (me.filters.client.length >= 3) {
 				axios
-					.post(url, null)
+					.post(url, null, me.$root.config)
 					.then(function (response) {
 						me.ClientList = response;
 					})

@@ -4,9 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ClientController extends Controller
 {
+	public function __construct()
+	{
+		$this->middleware('permission:client.index', ['only' => ['index','show','filterClientList', 'credits']]);
+		$this->middleware('permission:client.store', ['only' => ['store']]);
+		$this->middleware('permission:client.update', ['only' => ['update']]);
+		$this->middleware('permission:client.delete', ['only' => ['create']]);
+		$this->middleware('permission:client.status', ['only' => ['changeStatus']]);
+	}
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -48,6 +57,29 @@ class ClientController extends Controller
 	public function store(Request $request)
 	{
 
+		$validate = Validator::make($request->all(),[
+			'name' => 'required|string|max:255',
+			'last_name' => 'required|string|max:255',
+			'type_document' => 'required|in:CC,'
+		]);
+
+		//name
+		// last_name
+		// type_document
+		// document
+		// phone_1
+		// phone_2
+		// address
+		// email
+		// birth_date
+		// gender
+		// status
+		// civil_status
+		// workplace
+		// occupation
+		// independent
+		// photo
+
 		$client = new Client();
 		$client->name = $request['name'];
 		$client->last_name = $request['last_name'];
@@ -65,9 +97,10 @@ class ClientController extends Controller
 		$client->independent = $request['independent'];
 		$client->photo = 'undefined';
 		$client->save();
+	
 	}
-
-	/**
+	
+		/**
 	 * Display the specified resource.
 	 *
 	 * @param  \App\Models\Client  $client

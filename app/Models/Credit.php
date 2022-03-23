@@ -16,6 +16,7 @@ class Credit extends Model
         'debtor_id',
         'headquarter_id',
         'user_id',
+        'provider_id',
         'number_installments',
         'number_paid_installments',
         'day_limit',
@@ -31,7 +32,9 @@ class Credit extends Model
         'capital_value',
         'interest_value',
         'disbursement_date',
-        'description'
+        'finish_date',
+        'description',
+        'provider'
     ];
 
     protected $with = [
@@ -60,5 +63,10 @@ class Credit extends Model
     public function installments()
     {
         return $this->hasMany(Installment::class);
+    }
+
+    public function provider()
+    {
+        return $this->belongsTo(Provider::class, 'provider_id');
     }
 }

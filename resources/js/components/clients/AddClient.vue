@@ -32,7 +32,7 @@
             />
             <div class="input-group-append" id="button-addon4">
               <button
-                class="btn btn-outline-secondary"
+                class="btn btn-secondary"
                 type="button"
                 @click="searchClient()"
               >
@@ -43,11 +43,10 @@
           <table class="table table-bordered table-sm table-responsive">
             <thead>
               <tr>
-                <th scope="col">#</th>
-                <th scope="col">Nombres</th>
+                <th>#</th>
+                <th>Nombres</th>
                 <th>Documento</th>
-                <th scope="col">Direccion</th>
-                <th>Telefono</th>
+                <th>Direccion</th>
                 <th>Correo</th>
                 <th>Contacto</th>
                 <th>Opciones</th>
@@ -59,15 +58,14 @@
                 <td>{{ client.name }}</td>
                 <td>{{ client.document }}</td>
                 <td>{{ client.address }}</td>
-                <td>{{ client.mobile }}</td>
                 <td>{{ client.email }}</td>
                 <td>
-                  {{ client.contact }}
+                  {{ client.phone_1 }} <br />
+                  {{ client.phone_2 }}
                 </td>
-
                 <td>
                   <button
-                    class="btn btn-outline-secondary"
+                    class="btn btn-secondary"
                     @click="$emit('add-client', client)"
                     data-dismiss="modal"
                   >
@@ -106,7 +104,7 @@ export default {
     listClients() {
       let me = this;
       axios
-        .post("api/clients/filter-client-list", null)
+        .post("api/clients/filter-client-list", null, me.$root.config)
         .then(function (response) {
           me.ClientList = response;
         });
@@ -119,7 +117,7 @@ export default {
       var url = `api/clients/filter-client-list?client=${me.filters.client}`;
       if (me.filters.client.length >= 3) {
         axios
-          .post(url, null)
+          .post(url, null, me.$root.config)
           .then(function (response) {
             me.ClientList = response;
           })
