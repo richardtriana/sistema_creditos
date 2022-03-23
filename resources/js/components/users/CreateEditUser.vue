@@ -208,18 +208,19 @@
           <div class="modal-footer">
             <button
               type="button"
+              class="btn btn-primary"
+              @click="formUser.id ? editUser() : createUser()"
+            >
+              Guardar
+            </button>
+
+            <button
+              type="button"
               class="btn btn-secondary"
               data-dismiss="modal"
               @click="editar = false"
             >
               Cerrar
-            </button>
-            <button
-              type="button"
-              class="btn btn-primary"
-              @click="formUser.id ? editUser() : createUser()"
-            >
-              Guardar
             </button>
           </div>
         </div>
@@ -236,7 +237,7 @@ export default {
       headquarterList: [],
       formUser: {
         name: "",
-        last_name:"",
+        last_name: "",
         email: "",
         username: "",
         password: "",
@@ -252,9 +253,9 @@ export default {
       },
       formErrors: {
         name: "",
-        last_name:"",
+        last_name: "",
         email: "",
-        username:"",
+        username: "",
         password: "",
         nombre: "",
         phone: "",
@@ -285,17 +286,18 @@ export default {
       let me = this;
       me.assignErrors(false);
 
-      axios.post("api/users", me.formUser, me.$root.config).then(function () {
-        $("#formUserModal").modal("hide");
-        me.resetData();
-        me.$emit("list-users");
-      })
-      .catch((response)=>{
-        me.assignErrors(response);
-      });
+      axios
+        .post("api/users", me.formUser, me.$root.config)
+        .then(function () {
+          $("#formUserModal").modal("hide");
+          me.resetData();
+          me.$emit("list-users");
+        })
+        .catch((response) => {
+          me.assignErrors(response);
+        });
     },
     showEditarUser(user) {
-  
       this.editar = true;
       let me = this;
       $("#formUserModal").modal("show");
@@ -307,7 +309,7 @@ export default {
     },
     editUser() {
       let me = this;
-      
+
       me.assignErrors(false);
       axios
         .put("api/users/" + this.formUser.id, this.formUser, me.$root.config)
@@ -316,7 +318,7 @@ export default {
           me.resetData();
           me.$emit("list-users");
         })
-        .catch(response => {
+        .catch((response) => {
           me.assignErrors(response);
         });
       this.editar = false;
@@ -338,7 +340,6 @@ export default {
         });
     },
     assignErrors(response) {
-      
       let me = this;
 
       if (response) {

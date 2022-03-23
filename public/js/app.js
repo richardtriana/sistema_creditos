@@ -2422,6 +2422,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
@@ -6057,7 +6065,7 @@ __webpack_require__.r(__webpack_exports__);
         var pdf = response.data.pdf;
         var a = document.createElement("a");
         a.href = "data:application/pdf;base64," + pdf;
-        a.download = "credit_".concat(entry_id, "-").concat(client, "-").concat(Date.now(), ".pdf");
+        a.download = "entrada_".concat(entry_id, "-").concat(client, "-").concat(Date.now(), ".pdf");
         a.click();
       });
     },
@@ -6356,6 +6364,18 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
@@ -6397,6 +6417,15 @@ __webpack_require__.r(__webpack_exports__);
         } else if (result.isDenied) {
           Swal.fire("Operación no realizada", "", "info");
         }
+      });
+    },
+    printExpendePdf: function printExpendePdf(expense_id) {
+      axios.get("api/expenses/show-expense/".concat(expense_id), this.$root.config).then(function (response) {
+        var pdf = response.data.pdf;
+        var a = document.createElement("a");
+        a.href = "data:application/pdf;base64," + pdf;
+        a.download = "egreso_".concat(expense_id, "-").concat(Date.now(), ".pdf");
+        a.click();
       });
     }
   }
@@ -8146,6 +8175,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+//
 //
 //
 //
@@ -13540,7 +13570,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.content-found {\r\n\theight: 80vh;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.content-found {\n\theight: 80vh;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -54042,11 +54072,11 @@ var render = function () {
                         box.last_editor
                           ? _c("span", [
                               _vm._v(
-                                "\n                " +
+                                "\n                  " +
                                   _vm._s(box.last_editor.name) +
                                   " " +
                                   _vm._s(box.last_editor.last_name) +
-                                  "\n              "
+                                  "\n                "
                               ),
                             ])
                           : _vm._e(),
@@ -54073,6 +54103,12 @@ var render = function () {
                             ),
                           ])
                         : _vm._e(),
+                      _vm._v(
+                        "\n              <<<<<<< HEAD =======\n              "
+                      ),
+                      _vm._v(
+                        "\n              >>>>>>> 658520e... Authentication validation in views, api and\n              permissions\n            "
+                      ),
                     ])
                   }),
                   0
@@ -59611,7 +59647,7 @@ var render = function () {
                         _c(
                           "button",
                           {
-                            staticClass: "btn btn-success",
+                            staticClass: "btn btn-info",
                             attrs: { type: "button" },
                             on: {
                               click: function ($event) {
@@ -60059,8 +60095,12 @@ var render = function () {
                     ? _c("th", [_vm._v("Estado")])
                     : _vm._e(),
                   _vm._v(" "),
+                  _c("th", [_vm._v("Ver factura")]),
+                  _vm._v(" "),
                   _vm.$root.validatePermission("expense-update")
-                    ? _c("th", [_vm._v("Opciones")])
+                    ? _c("th", [
+                        _vm._v("\n              Opciones\n            "),
+                      ])
                     : _vm._e(),
                 ]),
               ]),
@@ -60074,7 +60114,11 @@ var render = function () {
                           _vm._v(_vm._s(e.description)),
                         ]),
                         _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(e.user_id))]),
+                        _c("td", [
+                          _vm._v(
+                            _vm._s(e.user.name) + " " + _vm._s(e.user.last_name)
+                          ),
+                        ]),
                         _vm._v(" "),
                         _c("td", [_vm._v(_vm._s(e.date))]),
                         _vm._v(" "),
@@ -60121,6 +60165,22 @@ var render = function () {
                                 : _vm._e(),
                             ])
                           : _vm._e(),
+                        _vm._v(" "),
+                        _c("td", { staticClass: "text-right" }, [
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-info",
+                              attrs: { type: "button" },
+                              on: {
+                                click: function ($event) {
+                                  return _vm.printExpendePdf(e.id)
+                                },
+                              },
+                            },
+                            [_c("i", { staticClass: "bi bi-eye" })]
+                          ),
+                        ]),
                         _vm._v(" "),
                         _vm.$root.validatePermission("expense-update")
                           ? _c("td", { staticClass: "text-right" }, [
@@ -63513,20 +63573,6 @@ var render = function () {
               _c(
                 "button",
                 {
-                  staticClass: "btn btn-secondary",
-                  attrs: { type: "button", "data-dismiss": "modal" },
-                  on: {
-                    click: function ($event) {
-                      _vm.editar = false
-                    },
-                  },
-                },
-                [_vm._v("\n            Cerrar\n          ")]
-              ),
-              _vm._v(" "),
-              _c(
-                "button",
-                {
                   staticClass: "btn btn-primary",
                   attrs: { type: "button" },
                   on: {
@@ -63536,6 +63582,20 @@ var render = function () {
                   },
                 },
                 [_vm._v("\n            Guardar\n          ")]
+              ),
+              _vm._v(" "),
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-secondary",
+                  attrs: { type: "button", "data-dismiss": "modal" },
+                  on: {
+                    click: function ($event) {
+                      _vm.editar = false
+                    },
+                  },
+                },
+                [_vm._v("\n            Cerrar\n          ")]
               ),
             ]),
           ]),

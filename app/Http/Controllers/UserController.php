@@ -120,7 +120,7 @@ class UserController extends Controller
                 ->orWhere('name', 'LIKE', "%$request->user%")
                 ->orWhere('email', 'LIKE', "%$request->user%");
         }
-        $users = $users->paginate(10);
+        $users = $users->with('headquarter')->paginate(10);
 
         return $users;
     }
@@ -152,8 +152,8 @@ class UserController extends Controller
             'password' => 'required|confirmed|min:8',
             'phone' => 'nullable|numeric|between:9999,999999999999',
             'address' => 'nullable|string|min:1|max:255',
-            'type_document' => 'nullable|in:CC,CE,NIT,PP,TI',
-            'document' => 'nullable|numeric|between:9999,999999999999',
+            'type_document' => 'required|in:CC,CE,NIT,PP,TI',
+            'document' => 'required|numeric|between:9999,999999999999',
             'rol' => 'required|integer|exists:roles,id'
         ]);
 
@@ -232,8 +232,8 @@ class UserController extends Controller
             'password' => 'nullable|confirmed|min:8',
             'phone' => 'nullable|numeric|between:9999,999999999999',
             'address' => 'nullable|string|min:1|max:255',
-            'type_document' => 'nullable|in:CC,CE,NIT,PP,TI',
-            'document' => 'nullable|numeric|between:9999,999999999999',
+            'type_document' => 'required|in:CC,CE,NIT,PP,TI',
+            'document' => 'required|numeric|between:9999,999999999999',
             'rol' => 'required|integer|exists:roles,id'
         ]);
 

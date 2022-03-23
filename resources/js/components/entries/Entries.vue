@@ -35,7 +35,7 @@
               </td>
               <td class="text-right">
                 <button
-                  class="btn btn-success"
+                  class="btn btn-info"
                   type="button"
                   @click="
                     printEntryPdf(e.id, e.user.name + '_' + e.user.last_name)
@@ -93,7 +93,7 @@ export default {
           const pdf = response.data.pdf;
           var a = document.createElement("a");
           a.href = "data:application/pdf;base64," + pdf;
-          a.download = `credit_${entry_id}-${client}-${Date.now()}.pdf`;
+          a.download = `entrada_${entry_id}-${client}-${Date.now()}.pdf`;
           a.click();
         });
     },

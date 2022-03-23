@@ -7,9 +7,7 @@ use App\Models\Company;
 use App\Models\Credit;
 use App\Models\CreditProvider;
 use App\Models\Entry;
-use App\Models\Headquarter;
 use App\Models\Installment;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
@@ -21,9 +19,9 @@ class CreditController extends Controller
 {
 
 	public function __construct()
-	{	 
+	{
 		$this->middleware('auth:api')->except('index');
-		$this->middleware('permission:credit.index')->only('installments','payMultipleInstallments', 'generalInformation', 'show');
+		$this->middleware('permission:credit.index')->only('installments', 'payMultipleInstallments', 'generalInformation', 'show');
 		$this->middleware('permission:credit.store')->only('store');
 		$this->middleware('permission:credit.update')->only('update', 'updateValuesCredit');
 		$this->middleware('permission:credit.delete')->only('delete');
@@ -36,7 +34,7 @@ class CreditController extends Controller
 	 */
 	public function index(Request $request)
 	{
-		
+
 		$credits = Credit::select();
 		$status = $request->status != null ? $request->status : 1;
 		$status = $status == 0 ? [0, 3] : [$request->status];
@@ -106,13 +104,13 @@ class CreditController extends Controller
 		]);
 
 		if ($validate->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'code' =>  500,
-                'message' => 'Validación de datos incorrecta',
-                'errors' =>  $validate->errors()
-            ], 500);
-        }
+			return response()->json([
+				'status' => 'error',
+				'code' =>  500,
+				'message' => 'Validación de datos incorrecta',
+				'errors' =>  $validate->errors()
+			], 500);
+		}
 
 		$validate = Validator::make($request->all(), [
 			'client_id' => 'required|integer|exists:clients,id',
@@ -162,7 +160,7 @@ class CreditController extends Controller
 		$credit->debtor_id = $request['debtor_id'];
 		$credit->user_id = $request->user()->id;
 		$credit->debtor = $request['debtor'] ?  $request['debtor'] : false;
-		$credit->provider = $request['provider']?  $request['provider'] : false;
+		$credit->provider = $request['provider'] ?  $request['provider'] : false;
 		if ($request['provider'] != null && $request['provider'] != 0) {
 			$credit->status = 3;
 		} else {
@@ -205,11 +203,11 @@ class CreditController extends Controller
 		}
 
 		return response()->json([
-            'status' => 'success',
-            'code' =>  200,
-            'message' => 'Registro exitoso',
-            'credit' => $credit
-        ], 200);
+			'status' => 'success',
+			'code' =>  200,
+			'message' => 'Registro exitoso',
+			'credit' => $credit
+		], 200);
 	}
 
 	/**
@@ -252,13 +250,13 @@ class CreditController extends Controller
 		]);
 
 		if ($validate->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'code' =>  500,
-                'message' => 'Validación de datos incorrecta',
-                'errors' =>  $validate->errors()
-            ], 500);
-        }
+			return response()->json([
+				'status' => 'error',
+				'code' =>  500,
+				'message' => 'Validación de datos incorrecta',
+				'errors' =>  $validate->errors()
+			], 500);
+		}
 
 		$credit = Credit::find($request->id);
 		$credit->client_id = $request['client_id'];
@@ -280,11 +278,11 @@ class CreditController extends Controller
 		$credit->save();
 
 		return response()->json([
-            'status' => 'success',
-            'code' =>  200,
-            'message' => 'Registro exitoso',
-            'credit' => $credit
-        ], 200);
+			'status' => 'success',
+			'code' =>  200,
+			'message' => 'Registro exitoso',
+			'credit' => $credit
+		], 200);
 	}
 
 	/**
@@ -370,7 +368,7 @@ class CreditController extends Controller
 
 		$entry =  new Entry();
 		$entry->headquarter_id = $credit->headquarter_id;
-		$entry->user_id = 1;
+		$entry->user_id = $request->user()->id;
 		$entry->credit_id = $credit->id;
 		$entry->description = "Cliente: {$client->name} {$client->last_name}";
 		$entry->date = date('Y-m-d');
@@ -455,7 +453,7 @@ class CreditController extends Controller
 		return $credits;
 	}
 
-	function collectCredit(Credit $credit)
+	function collectCredit(Credit $credit, Request $request)
 	{
 		//Valor del credito - valor capital pagado
 		$pending_value = $credit->credit_value - $credit->capital_value;
@@ -473,7 +471,7 @@ class CreditController extends Controller
 
 		$entry =  new Entry();
 		$entry->headquarter_id = $credit->headquarter_id;
-		$entry->user_id = 1;
+		$entry->user_id = $request->user()->id;
 		$entry->credit_id = $credit->id;
 		$entry->description = "Cliente: {$client->name} {$client->last_name}";
 		$entry->date = date('Y-m-d');

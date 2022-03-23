@@ -18,4 +18,14 @@ class Expense extends Model
         'price',
         'status'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function headquarter()
+    {
+        return $this->belongsTo(Headquarter::class, 'headquarter_id');
+    }
 }

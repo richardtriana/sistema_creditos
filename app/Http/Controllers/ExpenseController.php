@@ -3,14 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\Box;
+use App\Models\Company;
 use App\Models\Expense;
 use Illuminate\Http\Request;
+use PDF;
+use Illuminate\Support\Facades\URL;
+
 
 class ExpenseController extends Controller
 {
 	public function __construct()
 	{
-		$this->middleware('permission:expense.index', ['only' => ['index','show']]);
+		$this->middleware('permission:expense.index', ['only' => ['index', 'show']]);
 		$this->middleware('permission:expense.store', ['only' => ['store']]);
 		$this->middleware('permission:expense.update', ['only' => ['update']]);
 		$this->middleware('permission:expense.delete', ['only' => ['destroy']]);
@@ -24,7 +28,7 @@ class ExpenseController extends Controller
 
 	public function index(Request $request)
 	{
-		$expenses = Expense::select()->paginate(20);
+		$expenses = Expense::with('user')->paginate(20);
 		return $expenses;
 	}
 
@@ -45,8 +49,8 @@ class ExpenseController extends Controller
 	public function store(Request $request)
 	{
 		$expense =  new Expense();
-		$expense->headquarter_id = 1;
-		$expense->user_id = 1;
+		$expense->headquarter_id = $request->user()->headquarter_id;
+		$expense->user_id = $request->user()->id;
 		$expense->status = 1;
 		$expense->description = $request['description'];
 		$expense->date = $request['date'];
@@ -72,5 +76,31 @@ class ExpenseController extends Controller
 		$expense->date = $request['date'];
 		$expense->type_output = $request['type_output'];
 		$expense->save();
+	}
+
+	public function showExpense(Expense $expense)
+	{
+		$company = Company::first();
+		$headquarter = $expense->headquarter()->first();
+		$user = $expense->user()->first();
+
+		$details = [
+			'company' => $company,
+			'expense' => $expense,
+			'headquarter' => $headquarter,
+			'user' => $user,
+			'url' => URL::to('/')
+		];
+
+		$pdf = PDF::loadView('templates.expense_information', $details);
+		$pdf = $pdf->download('expense_information.pdf');
+
+		$data = [
+			'status' => 200,
+			'pdf' => base64_encode($pdf),
+			'message' => 'Tabla generada en pdf'
+		];
+
+		return response()->json($data);
 	}
 }
