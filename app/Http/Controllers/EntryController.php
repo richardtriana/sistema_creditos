@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Credit;
 use App\Models\Entry;
 use App\Models\Company;
-use App\Models\Headquarter;
 use PDF;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Http\Request;
@@ -36,7 +35,7 @@ class EntryController extends Controller
 
 		$entry =  new Entry();
 		$entry->headquarter_id = $credit->headquarter_id;
-		$entry->user_id = 1;
+		$entry->user_id = $request->user()->id;
 		$entry->credit_id = $credit->id;
 		$entry->description = "Cliente: {$client->name} {$client->last_name}";
 		$entry->date = date('Y-m-d');

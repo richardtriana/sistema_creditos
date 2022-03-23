@@ -51,7 +51,8 @@ Route::resource('/credits', CreditController::class);
 
 
 Route::get('/entries/show-entry/{entry}', [EntryController::class, 'showEntry']);
-Route::resource('/entries',  EntryController::class);
+
+Route::get('/expenses/show-expense/{expense}', [ExpenseController::class, 'showExpense']);
 
 Route::get('/installments/calculate-installments', [InstallmentController::class, 'calculateInstallments']);
 
@@ -87,7 +88,6 @@ Route::group(['middleware' => ['auth:api']], function () {
 
 	//Entries
 	Route::resource('/entries',  EntryController::class);
-
 
 	//Expenses
 	Route::resource('/expenses',  ExpenseController::class);

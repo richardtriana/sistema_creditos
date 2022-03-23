@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
       'last_name' => 'Peña',
       'email' => 'richardpen90@gmail.com',
       'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
-      'type_document' => 1,
+      'type_document' => 'CC',
       'document' => 000001,
       'headquarter_id' => 1
     ]);

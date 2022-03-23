@@ -206,7 +206,7 @@ class InstallmentController extends Controller
       }
     }
 
-    $installment->paid_balance = $amount;
+    $installment->paid_balance = $amount_capital + $interest;
     $installment->status  = 1;
     $installment->payment_register = date('Y-m-d');
     $installment->save();

@@ -1,0 +1,91 @@
+.form-control.form-control-solid {
+	background-color: $light;
+	border-color: $light;
+	color: #3f4254;
+	-webkit-transition: color 0.15s ease, background-color 0.15s ease,
+		border-color 0.15s ease, -webkit-box-shadow 0.15s ease;
+	transition: color 0.15s ease, background-color 0.15s ease,
+		border-color 0.15s ease, -webkit-box-shadow 0.15s ease;
+	transition: color 0.15s ease, background-color 0.15s ease,
+		border-color 0.15s ease, box-shadow 0.15s ease;
+	transition: color 0.15s ease, background-color 0.15s ease,
+		border-color 0.15s ease, box-shadow 0.15s ease,
+		-webkit-box-shadow 0.15s ease;
+}
+
+.login {
+	min-height: calc(90vh - 60px);
+}
+.login .login-aside .aside-img {
+	min-height: 100%;
+	background-position: center;
+}
+.login .login-signin,
+.login .login-signup,
+.login .login-forgot {
+	display: none;
+}
+.login.login-signin-on .login-signup {
+	display: none;
+}
+.login.login-signin-on .login-signin {
+	display: block;
+}
+.login.login-signin-on .login-forgot {
+	display: none;
+}
+.login.login-signup-on .login-signup {
+	display: block;
+}
+.login.login-signup-on .login-signin {
+	display: none;
+}
+.login.login-signup-on .login-forgot {
+	display: none;
+}
+.login.login-forgot-on .login-signup {
+	display: none;
+}
+.login.login-forgot-on .login-signin {
+	display: none;
+}
+.login.login-forgot-on .login-forgot {
+	display: block;
+}
+
+@media (min-width: 992px) {
+	.login .login-aside {
+		width: 100%;
+		max-width: 600px;
+	}
+	.login .login-content {
+		width: 100%;
+		max-width: 500px;
+	}
+	.login .login-content .login-form {
+		width: 100%;
+		max-width: 450px;
+	}
+}
+@media (min-width: 992px) and (max-width: 1399.98px) {
+	.login .login-aside {
+		width: 100%;
+		max-width: 450px;
+	}
+}
+@media (max-width: 991.98px) {
+	.login .login-content .login-form {
+		width: 100%;
+		max-width: 400px;
+	}
+}
+@media (max-width: 575.98px) {
+	.login .aside-img {
+		min-height: 300px !important;
+		background-size: 400px;
+	}
+	.login .login-content .login-form {
+		width: 100%;
+		max-width: 100%;
+	}
+}

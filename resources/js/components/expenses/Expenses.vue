@@ -16,24 +16,27 @@
       <section class="table-responsive">
         <table class="table table-bordered table-sm">
           <thead>
-            <tr>
+            <tr class="text-center">
               <th>Motivo</th>
               <th>Responsable</th>
               <th>Fecha</th>
               <th>Tipo de Salida</th>
               <th>Valor</th>
               <th v-if="$root.validatePermission('expense-status')">Estado</th>
-              <th v-if="$root.validatePermission('expense-update')">Opciones</th>
+              <th>Ver factura</th>
+              <th v-if="$root.validatePermission('expense-update')">
+                Opciones
+              </th>
             </tr>
           </thead>
           <tbody v-if="expenseList.data && expenseList.data.length > 0">
             <tr v-for="e in expenseList.data" :key="e.id">
               <td class="wrap">{{ e.description }}</td>
-              <td>{{ e.user_id }}</td>
+              <td>{{ e.user.name }} {{ e.user.last_name }}</td>
               <td>{{ e.date }}</td>
               <td>{{ e.type_output }}</td>
               <td class="text-right">{{ e.price | currency }}</td>
-              <td v-if="$root.validatePermission('expense-status')">
+              <td class="text-right" v-if="$root.validatePermission('expense-status')">
                 <button
                   v-if="e.status == 0"
                   class="btn btn-danger"
@@ -49,10 +52,22 @@
                   <i class="bi bi-check2-circle"></i>
                 </button>
               </td>
-              <td v-if="$root.validatePermission('expense-update')">
+              <td class="text-right">
+                <button
+                  class="btn btn-info"
+                  type="button"
+                  @click="printExpendePdf(e.id)"
+                >
+                  <i class="bi bi-eye"></i>
+                </button>
+              </td>
+              <td
+                class="text-right"
+                v-if="$root.validatePermission('expense-update')"
+              >
                 <button
                   v-if="e.status == 1"
-                  class="btn btn-primary"
+                  class="btn btn-success"
                   @click="showData(e)"
                 >
                   <i class="bi bi-pen"></i>
@@ -98,7 +113,10 @@ export default {
     listExpenses(page = 1) {
       let me = this;
       axios
-        .get(`api/expenses?page=${page}&expense=${this.search_expense}`, me.$root.config)
+        .get(
+          `api/expenses?page=${page}&expense=${this.search_expense}`,
+          me.$root.config
+        )
         .then(function (response) {
           me.expenseList = response.data;
         });
@@ -126,6 +144,18 @@ export default {
           Swal.fire("Operación no realizada", "", "info");
         }
       });
+    },
+
+    printExpendePdf(expense_id) {
+      axios
+        .get(`api/expenses/show-expense/${expense_id}`, this.$root.config)
+        .then((response) => {
+          const pdf = response.data.pdf;
+          var a = document.createElement("a");
+          a.href = "data:application/pdf;base64," + pdf;
+          a.download = `egreso_${expense_id}-${Date.now()}.pdf`;
+          a.click();
+        });
     },
   },
 };

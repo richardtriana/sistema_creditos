@@ -39,6 +39,14 @@
                   <i class="bi bi-pencil"></i>
                 </button>
               </td>
+              <<<<<<< HEAD =======
+              <!-- <td>
+							<button class="btn btn-outline-danger">
+								<i class="bi bi-trash2"></i>
+							</button>
+						</td> -->
+              >>>>>>> 658520e... Authentication validation in views, api and
+              permissions
             </tr>
           </tbody>
         </table>
