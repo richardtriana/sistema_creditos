@@ -1,57 +1,88 @@
 <template>
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-12 col-md-8 col-lg-6">
-        <h2 class="text-center py-2">¡INICIAR SESIÓN!</h2>
-        <div class="row">
-          <div class="d-none d-md-block col-6 text-center">
-            <img class="img-fluid" src="https://picsum.photos/200/300" alt="" />
-          </div>
-          <div class="col-6">
-            <form id="form_login" autocomplete="off" @submit.prevent="login">
-              <div class="form-group">
-                <label for="exampleInputUsername1">Usuario o email</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="username"
-                  aria-describedby="usernameHelp"
-                  name="username"
-                  placeholder="Ingresar username"
-                  required
-                  v-model="formValues.username"
-                />
-                <small id="usernameHelp" class="form-text text-danger">{{
-                  formErrors.username
-                }}</small>
-              </div>
-              <div class="form-group">
-                <label for="exampleInputPassword1">Contraseña</label>
-                <input
-                  type="password"
-                  class="form-control"
-                  id="password"
-                  aria-describedby="passwordHelp"
-                  name="password"
-                  placeholder="Ingresar contraseña"
-                  required
-                  v-model="formValues.password"
-                />
-                <small id="passwordHelp" class="form-text text-danger">{{
-                  formErrors.password
-                }}</small>
-              </div>
-              <button type="submit" class="btn btn-primary">Acceder</button>
-            </form>
-          </div>
+  <div
+    class="
+      row
+      justify-content-center
+      login login-signin-on
+      d-flex
+      flex-column flex-lg-row flex-column-fluid
+      bg-white
+    "
+  >
+    <div class="login-aside d-none d-md-flex flex-column flex-row-auto justify-content-center position-relative">
+      <div
+        class="aside-img  d-md-flex flex-column flex-row-auto justify-content-center p-3"
+        style="background-image: url('https://picsum.photos/600')"
+      >
+        <img class="img-fluid" src="logo.jpeg" alt="./logo.jpeg" />
+      </div>
+    </div>
+    <div
+      class="
+        login-content
+        flex-row-fluid
+        d-flex
+        flex-column
+        justify-content-center
+        position-relative
+        overflow-hidden
+        p-7
+        mx-auto
+      "
+    >
+      <div class="login-form login-signin">
+        <div class="pb-5">
+          <h2 class="py-2 font-weight-bold">Bienvenido a Tecnoplus</h2>
+          <span class="text-muted">Ingresa tus datos de usuario</span>
         </div>
+        <form id="form_login" autocomplete="off" @submit.prevent="login">
+          <div class="form-group">
+            <label class="font-weight-bold" for="username"
+              >Usuario o email</label
+            >
+            <input
+              type="text"
+              class="form-control p-2 form-control-solid"
+              id="username"
+              aria-describedby="usernameHelp"
+              name="username"
+              required
+              v-model="formValues.username"
+            />
+            <small id="usernameHelp" class="form-text text-danger">{{
+              formErrors.username
+            }}</small>
+          </div>
+          <div class="form-group">
+            <label class="font-weight-bold" for="password">Contraseña</label>
+            <input
+              type="password"
+              class="form-control p-2 form-control-solid"
+              id="password"
+              aria-describedby="passwordHelp"
+              name="password"
+              required
+              v-model="formValues.password"
+            />
+            <small id="passwordHelp" class="form-text text-danger">{{
+              formErrors.password
+            }}</small>
+          </div>
+          <div class="form-group text-right">
+            <button
+              type="submit"
+              class="btn btn-primary w-25 p-2 font-weight-bold"
+            >
+              Acceder
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-
 export default {
   name: "Login",
   data() {

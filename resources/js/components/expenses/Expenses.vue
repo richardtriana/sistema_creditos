@@ -16,7 +16,7 @@
       <section class="table-responsive">
         <table class="table table-bordered table-sm">
           <thead>
-            <tr>
+            <tr class="text-center">
               <th>Motivo</th>
               <th>Responsable</th>
               <th>Fecha</th>
@@ -33,7 +33,7 @@
               <td>{{ e.date }}</td>
               <td>{{ e.type_output }}</td>
               <td class="text-right">{{ e.price | currency }}</td>
-              <td v-if="$root.validatePermission('expense-status')">
+              <td class="text-right" v-if="$root.validatePermission('expense-status')">
                 <button
                   v-if="e.status == 0"
                   class="btn btn-danger"
@@ -49,10 +49,10 @@
                   <i class="bi bi-check2-circle"></i>
                 </button>
               </td>
-              <td v-if="$root.validatePermission('expense-update')">
+              <td class="text-right" v-if="$root.validatePermission('expense-update')">
                 <button
                   v-if="e.status == 1"
-                  class="btn btn-primary"
+                  class="btn btn-success"
                   @click="showData(e)"
                 >
                   <i class="bi bi-pen"></i>

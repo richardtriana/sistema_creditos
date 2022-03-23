@@ -6,7 +6,7 @@
         type="text"
         class="form-control truncate"
         id="description"
-        placeholder="Example input placeholder"
+        placeholder="Descripción del egreso"
         v-model="formTypeExpense.description"
       />
     </div>

@@ -2267,6 +2267,38 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "Login",
   data: function data() {
@@ -53374,17 +53406,25 @@ var render = function () {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "container" }, [
-    _c("div", { staticClass: "row justify-content-center" }, [
-      _c("div", { staticClass: "col-12 col-md-8 col-lg-6" }, [
-        _c("h2", { staticClass: "text-center py-2" }, [
-          _vm._v("¡INICIAR SESIÓN!"),
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "row" }, [
-          _vm._m(0),
-          _vm._v(" "),
-          _c("div", { staticClass: "col-6" }, [
+  return _c(
+    "div",
+    {
+      staticClass:
+        "\n    row\n    justify-content-center\n    login login-signin-on\n    d-flex\n    flex-column flex-lg-row flex-column-fluid\n    bg-white\n  ",
+    },
+    [
+      _vm._m(0),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass:
+            "\n      login-content\n      flex-row-fluid\n      d-flex\n      flex-column\n      justify-content-center\n      position-relative\n      overflow-hidden\n      p-7\n      mx-auto\n    ",
+        },
+        [
+          _c("div", { staticClass: "login-form login-signin" }, [
+            _vm._m(1),
+            _vm._v(" "),
             _c(
               "form",
               {
@@ -53398,9 +53438,14 @@ var render = function () {
               },
               [
                 _c("div", { staticClass: "form-group" }, [
-                  _c("label", { attrs: { for: "exampleInputUsername1" } }, [
-                    _vm._v("Usuario o email"),
-                  ]),
+                  _c(
+                    "label",
+                    {
+                      staticClass: "font-weight-bold",
+                      attrs: { for: "username" },
+                    },
+                    [_vm._v("Usuario o email")]
+                  ),
                   _vm._v(" "),
                   _c("input", {
                     directives: [
@@ -53411,13 +53456,12 @@ var render = function () {
                         expression: "formValues.username",
                       },
                     ],
-                    staticClass: "form-control",
+                    staticClass: "form-control p-2 form-control-solid",
                     attrs: {
                       type: "text",
                       id: "username",
                       "aria-describedby": "usernameHelp",
                       name: "username",
-                      placeholder: "Ingresar username",
                       required: "",
                     },
                     domProps: { value: _vm.formValues.username },
@@ -53446,9 +53490,14 @@ var render = function () {
                 ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "form-group" }, [
-                  _c("label", { attrs: { for: "exampleInputPassword1" } }, [
-                    _vm._v("Contraseña"),
-                  ]),
+                  _c(
+                    "label",
+                    {
+                      staticClass: "font-weight-bold",
+                      attrs: { for: "password" },
+                    },
+                    [_vm._v("Contraseña")]
+                  ),
                   _vm._v(" "),
                   _c("input", {
                     directives: [
@@ -53459,13 +53508,12 @@ var render = function () {
                         expression: "formValues.password",
                       },
                     ],
-                    staticClass: "form-control",
+                    staticClass: "form-control p-2 form-control-solid",
                     attrs: {
                       type: "password",
                       id: "password",
                       "aria-describedby": "passwordHelp",
                       name: "password",
-                      placeholder: "Ingresar contraseña",
                       required: "",
                     },
                     domProps: { value: _vm.formValues.password },
@@ -53493,29 +53541,73 @@ var render = function () {
                   ),
                 ]),
                 _vm._v(" "),
-                _c(
-                  "button",
-                  { staticClass: "btn btn-primary", attrs: { type: "submit" } },
-                  [_vm._v("Acceder")]
-                ),
+                _vm._m(2),
               ]
             ),
           ]),
-        ]),
-      ]),
-    ]),
-  ])
+        ]
+      ),
+    ]
+  )
 }
 var staticRenderFns = [
   function () {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "d-none d-md-block col-6 text-center" }, [
-      _c("img", {
-        staticClass: "img-fluid",
-        attrs: { src: "https://picsum.photos/200/300", alt: "" },
-      }),
+    return _c(
+      "div",
+      {
+        staticClass:
+          "login-aside d-none d-md-flex flex-column flex-row-auto justify-content-center position-relative",
+      },
+      [
+        _c(
+          "div",
+          {
+            staticClass:
+              "aside-img  d-md-flex flex-column flex-row-auto justify-content-center p-3",
+            staticStyle: {
+              "background-image": "url('https://picsum.photos/600')",
+            },
+          },
+          [
+            _c("img", {
+              staticClass: "img-fluid",
+              attrs: { src: "logo.jpeg", alt: "./logo.jpeg" },
+            }),
+          ]
+        ),
+      ]
+    )
+  },
+  function () {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "pb-5" }, [
+      _c("h2", { staticClass: "py-2 font-weight-bold" }, [
+        _vm._v("Bienvenido a Tecnoplus"),
+      ]),
+      _vm._v(" "),
+      _c("span", { staticClass: "text-muted" }, [
+        _vm._v("Ingresa tus datos de usuario"),
+      ]),
+    ])
+  },
+  function () {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group text-right" }, [
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-primary w-25 p-2 font-weight-bold",
+          attrs: { type: "submit" },
+        },
+        [_vm._v("\n            Acceder\n          ")]
+      ),
     ])
   },
 ]
@@ -59481,20 +59573,6 @@ var render = function () {
         _c(
           "button",
           {
-            staticClass: "btn btn-secondary",
-            attrs: { type: "button", "data-dismiss": "modal" },
-            on: {
-              click: function ($event) {
-                _vm.editar = false
-              },
-            },
-          },
-          [_vm._v("\n        Cerrar\n      ")]
-        ),
-        _vm._v(" "),
-        _c(
-          "button",
-          {
             staticClass: "btn btn-primary",
             attrs: { type: "button" },
             on: {
@@ -59504,6 +59582,20 @@ var render = function () {
             },
           },
           [_vm._v("\n        Guardar\n      ")]
+        ),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-secondary",
+            attrs: { type: "button", "data-dismiss": "modal" },
+            on: {
+              click: function ($event) {
+                _vm.editar = false
+              },
+            },
+          },
+          [_vm._v("\n        Cerrar\n      ")]
         ),
       ]),
     ]),
@@ -59594,7 +59686,7 @@ var render = function () {
           [
             _c("table", { staticClass: "table table-bordered table-sm" }, [
               _c("thead", [
-                _c("tr", [
+                _c("tr", { staticClass: "text-center" }, [
                   _c("th", [_vm._v("Motivo")]),
                   _vm._v(" "),
                   _c("th", [_vm._v("Responsable")]),
@@ -59635,7 +59727,7 @@ var render = function () {
                         ]),
                         _vm._v(" "),
                         _vm.$root.validatePermission("expense-status")
-                          ? _c("td", [
+                          ? _c("td", { staticClass: "text-right" }, [
                               e.status == 0
                                 ? _c(
                                     "button",
@@ -59673,12 +59765,12 @@ var render = function () {
                           : _vm._e(),
                         _vm._v(" "),
                         _vm.$root.validatePermission("expense-update")
-                          ? _c("td", [
+                          ? _c("td", { staticClass: "text-right" }, [
                               e.status == 1
                                 ? _c(
                                     "button",
                                     {
-                                      staticClass: "btn btn-primary",
+                                      staticClass: "btn btn-success",
                                       on: {
                                         click: function ($event) {
                                           return _vm.showData(e)
@@ -59832,7 +59924,7 @@ var render = function () {
         attrs: {
           type: "text",
           id: "description",
-          placeholder: "Example input placeholder",
+          placeholder: "Descripción del egreso",
         },
         domProps: { value: _vm.formTypeExpense.description },
         on: {
@@ -63047,9 +63139,11 @@ var render = function () {
       },
       [
         _c("div", { staticClass: "text-center" }, [
-          _c("h1", { staticClass: "display-1" }, [_vm._v(_vm._s(_vm.message))]),
+          _c("h1", { staticClass: "display-1 " }, [
+            _vm._v(_vm._s(_vm.message)),
+          ]),
           _vm._v(" "),
-          _c("h6", { staticClass: "display-4 text-secondary" }, [
+          _c("h6", { staticClass: "display-4 text-danger" }, [
             _vm._v(" " + _vm._s("(" + _vm.code + ")") + " "),
           ]),
         ]),
@@ -78406,7 +78500,7 @@ Vue.compile = compileToFunctions;
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"_args":[["axios@0.21.4","C:\\\\xampp\\\\htdocs\\\\creditos"]],"_development":true,"_from":"axios@0.21.4","_id":"axios@0.21.4","_inBundle":false,"_integrity":"sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==","_location":"/axios","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"axios@0.21.4","name":"axios","escapedName":"axios","rawSpec":"0.21.4","saveSpec":null,"fetchSpec":"0.21.4"},"_requiredBy":["#DEV:/"],"_resolved":"https://registry.npmjs.org/axios/-/axios-0.21.4.tgz","_spec":"0.21.4","_where":"C:\\\\xampp\\\\htdocs\\\\creditos","author":{"name":"Matt Zabriskie"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"bugs":{"url":"https://github.com/axios/axios/issues"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}],"dependencies":{"follow-redirects":"^1.14.0"},"description":"Promise based HTTP client for the browser and node.js","devDependencies":{"coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.3.0","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^23.0.0","grunt-karma":"^4.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^4.0.2","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^6.3.2","karma-chrome-launcher":"^3.1.0","karma-firefox-launcher":"^2.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^4.3.6","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.8","karma-webpack":"^4.0.2","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^8.2.1","sinon":"^4.5.0","terser-webpack-plugin":"^4.2.3","typescript":"^4.0.5","url-search-params":"^0.10.0","webpack":"^4.44.2","webpack-dev-server":"^3.11.0"},"homepage":"https://axios-http.com","jsdelivr":"dist/axios.min.js","keywords":["xhr","http","ajax","promise","node"],"license":"MIT","main":"index.js","name":"axios","repository":{"type":"git","url":"git+https://github.com/axios/axios.git"},"scripts":{"build":"NODE_ENV=production grunt build","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","examples":"node ./examples/server.js","fix":"eslint --fix lib/**/*.js","postversion":"git push && git push --tags","preversion":"npm test","start":"node ./sandbox/server.js","test":"grunt test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json"},"typings":"./index.d.ts","unpkg":"dist/axios.min.js","version":"0.21.4"}');
+module.exports = JSON.parse('{"name":"axios","version":"0.21.4","description":"Promise based HTTP client for the browser and node.js","main":"index.js","scripts":{"test":"grunt test","start":"node ./sandbox/server.js","build":"NODE_ENV=production grunt build","preversion":"npm test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json","postversion":"git push && git push --tags","examples":"node ./examples/server.js","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","fix":"eslint --fix lib/**/*.js"},"repository":{"type":"git","url":"https://github.com/axios/axios.git"},"keywords":["xhr","http","ajax","promise","node"],"author":"Matt Zabriskie","license":"MIT","bugs":{"url":"https://github.com/axios/axios/issues"},"homepage":"https://axios-http.com","devDependencies":{"coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.3.0","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^23.0.0","grunt-karma":"^4.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^4.0.2","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^6.3.2","karma-chrome-launcher":"^3.1.0","karma-firefox-launcher":"^2.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^4.3.6","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.8","karma-webpack":"^4.0.2","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^8.2.1","sinon":"^4.5.0","terser-webpack-plugin":"^4.2.3","typescript":"^4.0.5","url-search-params":"^0.10.0","webpack":"^4.44.2","webpack-dev-server":"^3.11.0"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"jsdelivr":"dist/axios.min.js","unpkg":"dist/axios.min.js","typings":"./index.d.ts","dependencies":{"follow-redirects":"^1.14.0"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}]}');
 
 /***/ })
 
