@@ -36,10 +36,7 @@
               <td>{{ e.date }}</td>
               <td>{{ e.type_output }}</td>
               <td class="text-right">{{ e.price | currency }}</td>
-              <td
-                class="text-right"
-                v-if="$root.validatePermission('expense-status')"
-              >
+              <td class="text-right" v-if="$root.validatePermission('expense-status')">
                 <button
                   v-if="e.status == 0"
                   class="btn btn-danger"
