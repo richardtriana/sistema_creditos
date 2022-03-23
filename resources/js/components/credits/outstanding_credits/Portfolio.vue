@@ -57,7 +57,7 @@
               <td class="text-center">
                 <button
                   type="button"
-                  class="btn btn-primary"
+                  class="btn btn-info"
                   data-toggle="modal"
                   data-target="#creditInformationModal"
                   @click="showInformation(credit)"

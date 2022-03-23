@@ -46,7 +46,6 @@ class User extends Authenticatable implements Authorizable
     ];
 
     protected $with = [
-        'headquarter',
         'roles'
     ];
 
