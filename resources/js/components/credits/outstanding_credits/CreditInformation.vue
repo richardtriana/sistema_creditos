@@ -29,7 +29,7 @@
                 CreditInformation != null && CreditInformation.client != null
               "
             >
-              <tr>
+              <tr class="text-center">
                 <td>
                   <strong>Cliente:</strong> <br />
                   {{ CreditInformation.name }}
@@ -46,7 +46,7 @@
                   {{ CreditInformation.client.phone_2 }}
                 </td>
               </tr>
-              <tr>
+              <tr class="text-center">
                 <td>
                   <strong># Crédito: </strong>
                   {{ CreditInformation.id }}
@@ -60,7 +60,7 @@
                   {{ CreditInformation.number_installments }}
                 </td>
               </tr>
-              <tr>
+              <tr class="text-center">
                 <td colspan="3">
                   <strong>Descripción: </strong>
 

@@ -31,7 +31,7 @@
       <section class="table-responsive">
         <table class="table table-sm table-bordered table-hover table-striped">
           <thead>
-            <tr>
+            <tr class="text-center">
               <th>id</th>
               <th>Nombre</th>
               <th>Apellidos</th>

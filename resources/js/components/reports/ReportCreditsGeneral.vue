@@ -49,19 +49,19 @@
       <section class="table-responsive">
         <h5>Totalizado:</h5>
         <table class="table table-sm table-bordered">
-          <tr>
+          <tr class="text-center">
             <th>Total Valor créditos</th>
             <td>{{ ReportTotalValues.credit_value | currency }}</td>
           </tr>
-          <tr>
+          <tr class="text-center">
             <th>Total abonado</th>
             <td>{{ ReportTotalValues.paid_value | currency }}</td>
           </tr>
-          <tr>
+          <tr class="text-center">
             <th>Total abono a capital</th>
             <td>{{ ReportTotalValues.capital_value | currency }}</td>
           </tr>
-          <tr>
+          <tr class="text-center">
             <th>Total abonado a intereses</th>
             <td>{{ ReportTotalValues.interest_value | currency }}</td>
           </tr>

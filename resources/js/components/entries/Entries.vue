@@ -13,7 +13,6 @@
               <th>Valor</th>
               <th>Tipo de Salida</th>
               <th>Descripción</th>
-              <th>Reimprimir Ticket</th>
               <th>Ver Factura</th>
             </tr>
           </thead>
@@ -23,16 +22,10 @@
               <td>{{ e.date }}</td>
               <td class="text-right">{{ e.price | currency }}</td>
               <td>{{ e.type_entry }}</td>
-              <td>{{ e.description }}</td>
-              <td class="text-right">
-                <button
-                  class="btn btn-success"
-                  @click="printEntryTicket(e.id)"
-                  type="button"
-                >
-                  <i class="bi bi-receipt-cutoff"></i>
-                </button>
+              <td>
+                <pre class="h6 font-weight-normal"> <p>{{ e.description }}</p></pre>
               </td>
+
               <td class="text-right">
                 <button
                   class="btn btn-info"

@@ -1,7 +1,7 @@
 <template>
 	<div class="page">
 		<div class="page-header">
-			<h3>Reporte de cajas de Sedes</h3>
+			<h3>Reporte de Cliente</h3>
 		</div>
 		<div
 			class="page-search form-inline justify-content-center row p-4 border my-2"
@@ -60,7 +60,7 @@
 						</tr>
 					</tbody>
 					<tbody v-else>
-						<tr>
+						<tr class="text-center">
 							<td colspan="12" class="alert alert-warning text-center">
 								Buscar cliente
 							</td>

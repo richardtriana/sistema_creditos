@@ -23,7 +23,7 @@ class HeadquarterFactory extends Factory
     {
         return [
             'headquarter' => $this->faker->name(),
-            'status' => $this->faker->boolean(),
+            'status' => 1,
             'address' => $this->faker->address(),
             'nit' => $this->faker->ean13(),
             'email' => $this->faker->email(),
