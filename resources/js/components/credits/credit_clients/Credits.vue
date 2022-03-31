@@ -95,19 +95,10 @@
                 <button
                   data-toggle="modal"
                   data-target="#cuotasModal"
-                  v-if="credit.status == 1"
                   class="btn btn-info"
-                  @click="showInstallment(credit.id)"
+                  @click="showInstallment(credit)"
                 >
                   <i class="bi bi-eye"></i>
-                </button>
-
-                <button
-                  v-else
-                  class="btn disabled btn-secondary"
-                  disabled
-                >
-                  <i class="bi bi-eye-slash"></i>
                 </button>
               </td>
               <td
@@ -197,7 +188,7 @@
             </tr>
           </tbody>
           <tbody v-else>
-            <tr>
+            <tr class="text-center">
               <td colspan="11">
                 <div
                   class="alert alert-danger text-center"
@@ -308,7 +299,12 @@ export default {
     },
 
     showInstallment: function (credit) {
-      this.$refs.ModalInstallment.listCreditInstallments(credit, 1);
+      let credit_id = credit.id;
+      let allow_payment = credit.status == 1 ? 1 : 0;
+      this.$refs.ModalInstallment.listCreditInstallments(
+        credit_id,
+        allow_payment
+      );
     },
     showDataClient: function (client) {
       this.$refs.ModalCreateEditClient.showEditClient(client);

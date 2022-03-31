@@ -37,15 +37,49 @@
                 >
               </td>
               <td class="text-right">{{ report.value | currency }}</td>
-              <td class="text-center">{{ report.payment_date }}</td>
+              <td class="text-center font-weight-bold">
+                <span
+                  class="badge badge-md badge-pill badge-success"
+                  v-if="report.payment_date > now"
+                  >{{ report.payment_date }}</span
+                >
+                <span
+                  class="badge badge-md badge-pill badge-warning"
+                  v-if="report.payment_date == now"
+                  >{{ report.payment_date }}</span
+                >
+                <span
+                  class="badge badge-md badge-pill badge-danger"
+                  v-if="report.payment_date < now"
+                  >{{ report.payment_date }}</span
+                >
+              </td>
               <td class="text-center">
-                <span class="badge badge-md font-weight-bold badge-pill badge-success " v-if="report.payment_date > now"
+                <span
+                  class="
+                    badge badge-md
+                    font-weight-bold
+                    badge-pill badge-success
+                  "
+                  v-if="report.payment_date > now"
                   >Próximo a vencer</span
                 >
-                <span class="badge badge-md font-weight-bold badge-pill badge-warning" v-if="report.payment_date == now"
+                <span
+                  class="
+                    badge badge-md
+                    font-weight-bold
+                    badge-pill badge-warning
+                  "
+                  v-if="report.payment_date == now"
                   >Vence hoy</span
                 >
-                <span class="badge badge-md font-weight-bold badge-pill badge-danger" v-if="report.payment_date < now"
+                <span
+                  class="
+                    badge badge-md
+                    font-weight-bold
+                    badge-pill badge-danger
+                  "
+                  v-if="report.payment_date < now"
                   >En mora</span
                 >
               </td>

@@ -40,41 +40,43 @@
               </button>
             </div>
           </div>
-          <table class="table table-bordered table-sm table-responsive">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Nombres</th>
-                <th>Documento</th>
-                <th>Direccion</th>
-                <th>Correo</th>
-                <th>Contacto</th>
-                <th>Opciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="client in ClientList.data" v-bind:key="client.id">
-                <th scope="row">{{ client.code }}</th>
-                <td>{{ client.name }}</td>
-                <td>{{ client.document }}</td>
-                <td>{{ client.address }}</td>
-                <td>{{ client.email }}</td>
-                <td>
-                  {{ client.phone_1 }} <br />
-                  {{ client.phone_2 }}
-                </td>
-                <td>
-                  <button
-                    class="btn btn-secondary"
-                    @click="$emit('add-client', client)"
-                    data-dismiss="modal"
-                  >
-                    <i class="bi bi-plus-circle"></i>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <section class="table-responsive">
+            <table class="table table-bordered table-sm">
+              <thead>
+                <tr class="text-center">
+                  <th>#</th>
+                  <th>Nombres</th>
+                  <th>Documento</th>
+                  <th>Direccion</th>
+                  <th>Correo</th>
+                  <th>Contacto</th>
+                  <th>Añadir</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="client in ClientList.data" v-bind:key="client.id">
+                  <th scope="row">{{ client.id }}</th>
+                  <td>{{ client.name }}</td>
+                  <td>{{ client.document }}</td>
+                  <td>{{ client.address }}</td>
+                  <td>{{ client.email }}</td>
+                  <td>
+                    {{ client.phone_1 }} <br />
+                    {{ client.phone_2 }}
+                  </td>
+                  <td class="text-right">
+                    <button
+                      class="btn btn-primary"
+                      @click="$emit('add-client', client)"
+                      data-dismiss="modal"
+                    >
+                      <i class="bi bi-plus-circle"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">

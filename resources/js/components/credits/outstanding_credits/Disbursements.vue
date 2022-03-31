@@ -89,7 +89,7 @@
             </tr>
           </tbody>
           <tbody v-else>
-            <tr>
+            <tr class="text-center">
               <td colspan="11">
                 <div
                   class="alert alert-danger text-center"

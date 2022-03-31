@@ -44,7 +44,6 @@ Route::get('/credits/amortization-table', [InstallmentController::class, 'printT
 Route::post('/credits/collect-credit/{credit}', [CreditController::class, 'collectCredit']);
 Route::get('/credits/general-information/{credit}', [CreditController::class, 'generalInformation']);
 Route::get('/credits/download-Receipt-PDF/{credit}', [CreditController::class, 'downloadReceiptPDF']);
-Route::post('/credits/pay-credit-installments/{id}', [CreditController::class, 'payMultipleInstallments']);
 Route::post('/credits/{credit}/change-status',  [CreditController::class, 'changeStatus']);
 Route::get('/credits/{credit}/installments', [CreditController::class, 'installments']);
 Route::resource('/credits', CreditController::class);
@@ -121,7 +120,7 @@ Route::group(['middleware' => ['auth:api']], function () {
 
 	//Installments
 	Route::resource('/installments', InstallmentController::class);
-	Route::post('/installment/{id}/pay-installment', [InstallmentController::class, 'payInstallment']);
+	Route::post('/installment/{credit}/pay-installment', [InstallmentController::class, 'payInstallment']);
 
 	//Print ticket
 	Route::get('/print-installment', [PrintTicketController::class, 'printInstallment']);
