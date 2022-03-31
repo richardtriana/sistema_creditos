@@ -25,7 +25,7 @@
             class="page-header d-flex justify-content-between p-4 border my-2"
           >
             <div class="form-row w-100">
-              <!-- <div class="form-group col-2">
+              <div class="form-group col-2">
                 <label for="amount">Monto a pagar</label>
               </div>
               <div class="form-group col-4">
@@ -46,16 +46,15 @@
                 >
                   <i class="bi bi-currency-dollar"></i> Abonar a crédito
                 </button>
-                <button
-                  v-else
-                  class="btn btn-secondary my-auto"
-                  disabled
-                >
+                <button v-else class="btn btn-secondary my-auto" disabled>
                   <i class="bi bi-currency-dollar"></i> Abonar a crédito
                 </button>
-              </div> -->
-              <div class="form-group col-5 offset-7">
-                <button class="btn btn-danger w-100 font-weight-bold" @click="printTable()">
+              </div>
+              <div class="form-group col-12 text-center">
+                <button
+                  class="btn btn-danger w-50 font-weight-bold"
+                  @click="printTable()"
+                >
                   <i class="bi bi-file-pdf"></i> Tabla de amortización
                 </button>
               </div>
@@ -100,7 +99,7 @@ export default {
       if (this.amount_value > 0) {
         axios
           .post(
-            `api/credits/pay-credit-installments/${this.id_credit}`,
+            `api/installment/${this.id_credit}/pay-installment`,
             data,
             this.$root.config
           )

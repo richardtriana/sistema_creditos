@@ -42,7 +42,7 @@
           </div>
           <table class="table table-bordered table-sm table-responsive">
             <thead>
-              <tr>
+              <tr class="text-center">
                 <th>#</th>
                 <th>Razón social</th>
                 <th>Documento</th>

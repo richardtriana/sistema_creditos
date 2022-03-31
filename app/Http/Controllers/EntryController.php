@@ -18,7 +18,7 @@ class EntryController extends Controller
 	 */
 	public function index(Request $request)
 	{
-		$entries = Entry::select()->paginate(20);
+		$entries = Entry::select()->orderBy('id', 'desc')->paginate(20);
 		return $entries;
 	}
 	/**
@@ -41,7 +41,7 @@ class EntryController extends Controller
 		$entry->date = date('Y-m-d');
 		$entry->type_entry = 'Pago de cuota';
 		$entry->price = $request->data['value'] - $request['value'];
-		$entry->save();
+		//$entry->save();
 	}
 
 	public function showEntry(Entry $entry)

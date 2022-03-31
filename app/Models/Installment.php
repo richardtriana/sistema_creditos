@@ -20,6 +20,7 @@ class Installment extends Model
     'interest_value',
     'capital_value',
     'paid_balance',
+    'paid_capital',
     'payment_register',
     'status',
     'capital_balance'

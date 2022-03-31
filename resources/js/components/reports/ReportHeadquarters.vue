@@ -1,7 +1,7 @@
 <template>
 	<div class="page">
 		<div class="page-header">
-			<h3>Reporte de cajas de Sedes</h3>
+			<h3>Reporte de Sedes</h3>
 		</div>
 		<div class="page-content">
 			<section class="table-responsive">
