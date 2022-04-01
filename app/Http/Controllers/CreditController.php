@@ -53,7 +53,9 @@ class CreditController extends Controller
 				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document')
 				->whereIn('credits.status', $status);
 		}
-		$credits = $credits->paginate(10);
+		$credits = $credits
+			->orderBy('id', 'desc')
+			->paginate(10);
 		return $credits;
 	}
 
@@ -340,7 +342,6 @@ class CreditController extends Controller
 
 	public function installments(Request $request, $id)
 	{
-
 		$credit = Credit::findOrFail($id);
 		$installments =  $credit->installments()->get();
 		foreach ($installments as $installment) {
@@ -353,7 +354,11 @@ class CreditController extends Controller
 				$late_interests_value =  $days_past_due > 30 ?  $day_value_default * 30 : $day_value_default * $days_past_due;
 				$installment->days_past_due  = $days_past_due > 30 ? 30 : $days_past_due;
 				$installment->late_interests_value  = $late_interests_value;
-				$installment->value  += $late_interests_value;
+				if ($installment->paid_capital > 0 && $installment->paid_capital < $installment->capital_value) {
+					$installment->value = $installment->capital_value - $installment->paid_capital;
+				} else {
+					$installment->value  += $late_interests_value;
+				}
 			}
 		}
 

@@ -303,7 +303,8 @@ export default {
       let allow_payment = credit.status == 1 ? 1 : 0;
       this.$refs.ModalInstallment.listCreditInstallments(
         credit_id,
-        allow_payment
+        allow_payment,
+        credit
       );
     },
     showDataClient: function (client) {

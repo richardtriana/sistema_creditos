@@ -11,7 +11,7 @@
               <th>Responsable</th>
               <th>Fecha</th>
               <th>Valor</th>
-              <th>Tipo de Salida</th>
+              <th>Tipo de entrada</th>
               <th>Descripción</th>
               <th>Ver Factura</th>
             </tr>
@@ -23,7 +23,9 @@
               <td class="text-right">{{ e.price | currency }}</td>
               <td>{{ e.type_entry }}</td>
               <td>
-                <pre class="h6 font-weight-normal"> <p>{{ e.description }}</p></pre>
+                <pre
+                  class="h6 font-weight-normal"
+                > <p>{{ e.description }}</p></pre>
               </td>
 
               <td class="text-right">
@@ -31,7 +33,7 @@
                   class="btn btn-info"
                   type="button"
                   @click="
-                    printEntryPdf(e.id, e.user.name + '_' + e.user.last_name)
+                    printEntryPdf(e.id)
                   "
                 >
                   <i class="bi bi-eye"></i>
@@ -79,14 +81,14 @@ export default {
           me.entryList = response.data;
         });
     },
-    printEntryPdf(entry_id, client) {
+    printEntryPdf(entry_id) {
       axios
         .get(`api/entries/show-entry/${entry_id}`, this.$root.config)
         .then((response) => {
           const pdf = response.data.pdf;
           var a = document.createElement("a");
           a.href = "data:application/pdf;base64," + pdf;
-          a.download = `entrada_${entry_id}-${client}-${Date.now()}.pdf`;
+          a.download = `entrada_${entry_id}-${Date.now()}.pdf`;
           a.click();
         });
     },
