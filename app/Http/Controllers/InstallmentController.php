@@ -161,9 +161,13 @@ class InstallmentController extends Controller
    * Esto se usa en caso de que se pague una sola cuota
    * o multiples cuotas desde CreditController para abono a capital
    */
+
   public function payInstallment(Credit $credit, $amount = null, Request $request)
   {
+
+    $quote = $request->quote_id != null || $request->quote_id != 0 ? true : false;
     $user_id = $request->user()->id;
+
     if ($amount == null) {
       //Valor de la cuota o abono
       $amount = $request->amount;
@@ -172,15 +176,21 @@ class InstallmentController extends Controller
     $now = now();
     $status = 0;
 
-    $installment = $credit->installments()->whereDate('payment_date', '<', $now)
-      ->where(function ($query) {
-        $query->where('paid_balance', '<=', 0)
-          ->orWhereNull('paid_balance');
-      })
+    $installment = $credit->installments();
+    if (!$quote) {
+      $installment = $installment->whereDate('payment_date', '<=', $now);
+    }
+    $installment = $installment->where(function ($query) {
+      $query->where('paid_balance', '<=', 0)
+        ->orWhereNull('paid_balance')
+        ->orWhereColumn('paid_capital', '<', 'capital_value');
+    })
       ->first();
 
-    if (($installment) == null) {
-      $installment = $credit->installments()->where('payment_date', '>=', $now)->first();
+    if (($installment) == null && !$quote) {
+      $installment = $credit->installments()
+        ->where('payment_date', '>=', $now)
+        ->first();
     }
 
     $amount_capital = 0;
@@ -190,10 +200,13 @@ class InstallmentController extends Controller
     $no_installment = $installment->installment_number;
 
     //Se verifica el saldo restante del crédito
-    $balance_credit = ($credit->credit_value - $credit->capital_value) + $installment->interest_value;
-    if ($balance_credit <= $amount) {
-      $amount = $balance_credit;
-      $balance = $amount_receipt - $amount;
+    if (!$quote) {
+      $balance_credit = ($credit->credit_value - $credit->capital_value);
+      $balance_credit  = $installment->paid_capital > 0 ? $balance_credit : $balance_credit + $installment->interest_value;
+      if ($balance_credit <= $amount) {
+        $amount = $balance_credit;
+        $balance = $amount_receipt - $amount;
+      }
     }
 
     $payment_date = Carbon::createFromFormat('Y-m-d', $installment->payment_date);
@@ -206,23 +219,23 @@ class InstallmentController extends Controller
         if ($installment->paid_balance == null || $installment->paid_balance == 0) {
           $amount_capital = $amount -  $installment->interest_value; //ok
           $interest = $installment->interest_value;
-
-          if ($amount < $installment->value) {
-            $amount_capital = $amount;
+          if ($amount_capital + 1 < $installment->capital_value) {
             $status = 0;
           }
         }
-        //cuando se ha realizado abono
-        if ($installment->paid_balance > 0) {
-          $amount_capital = $amount;
-          $interest = 0;
+        if (!$quote) {
+          //cuando se ha realizado abono
+          if ($installment->paid_balance > 0) {
+            $amount_capital = $amount;
+            $interest = 0;
+          }
         }
       }
 
       //Cuando el cliente paga después de la fecha programada
       if ($payment_date < $now) {
-        $status = 1;
         $days_past_due = $now->diffInDays($payment_date);
+
         $day_value_default = $installment->interest_value / 30;
         $late_interests_value =  $days_past_due > 30 ?  $day_value_default * 30 : $day_value_default * $days_past_due;
         $installment->days_past_due  = $days_past_due > 30 ? 30 : $days_past_due;
@@ -230,10 +243,13 @@ class InstallmentController extends Controller
         $interest = $installment->interest_value + $late_interests_value;
 
         $amount_capital = $amount -  $interest; //ok
-        $balance -= $late_interests_value;
-        if ($balance < 0) {
-          $balance = 0;
+        if ($quote  && ($amount + 1 < $installment->value + $late_interests_value)) {
+          $status = 0;
+        } else {
+          $status = 1;
         }
+        $balance -= $late_interests_value;
+        $balance = $balance < 0 ?? (int) 0;
       }
       $installment->paid_balance +=  ($amount_capital + $interest);
       $installment->paid_capital += $amount_capital;
@@ -241,20 +257,29 @@ class InstallmentController extends Controller
       $installment->payment_register = date('Y-m-d');
 
       if ($installment->save()) {
+
         $credit_paid = new CreditController;
         $credit_paid->updateValuesCredit($credit->id, $amount, $amount_capital, $interest);
-        $this->saveEntryInstallment($credit, $amount_receipt, $amount_capital + $interest, $no_installment, $balance, $user_id);
+
+        $entry_id =  $this->saveEntryInstallment($credit, $amount_receipt, $amount_capital + $interest, $no_installment, $balance, $user_id, $quote);
+      } else {
+        return false;
       }
     }
-    $this->updateInstallments($credit);
+    if (!$quote) {
+      $this->updateInstallments($credit);
+    }
 
-    return ['balance' => $balance, 'no_installment' => $no_installment];
+    return ['balance' => $balance, 'no_installment' => $no_installment, 'entry_id' => $entry_id];
   }
 
   public function updateInstallments(Credit $credit)
   {
     $capital = $credit->credit_value - $credit->capital_value;
-    $installments = $credit->installments()->where('status', 0)->get();
+    $installments = $credit->installments()
+      ->where('status', 0)
+      ->get();
+
     $interest = $credit->interest;
     $number_installments = count($installments);
     $start_date = date('Y-m-d');
@@ -318,9 +343,13 @@ class InstallmentController extends Controller
     }
   }
 
-  public function saveEntryInstallment(Credit $credit, $amount_receipt, $amount_paid, $no_installment, $balance,  $user_id)
+  public function saveEntryInstallment(Credit $credit, $amount_receipt, $amount_paid, $no_installment, $balance,  $user_id, $quote)
   {
     $amount = $amount_paid;
+    $amount_receipt = '$' . number_format($amount_receipt, 0, ',', '.');
+    $amount_paid = '$' . number_format($amount_paid, 0, ',', '.');
+    $balance = '$' . number_format($balance, 0, ',', '.');
+    $type_entry = $quote ? 'Pago de cuota' : 'Abono a crédito';
 
     $client = $credit->client()->first();
     if ($amount > 0) {
@@ -329,15 +358,21 @@ class InstallmentController extends Controller
       $entry->user_id = $user_id;
       $entry->credit_id = $credit->id;
       $entry->description =
-        "Cliente: {$client->name} {$client->last_name}\n # crédito: {$credit->id} \n # cuota: {$no_installment}\n Efectivo: $ {$amount_receipt}\n Valor pagado: $ {$amount_paid}\n Regreso: {$balance}\n";
+        "Cliente: {$client->name} {$client->last_name}\n"
+        . "# crédito: {$credit->id} \n"
+        . "# cuota: {$no_installment}\n"
+        . "Efectivo: {$amount_receipt}\n"
+        . "Valor pagado: {$amount_paid}\n"
+        . "Regreso: {$balance}";
       $entry->date = date('Y-m-d');
-      $entry->type_entry = 'Abono a crédito';
+      $entry->type_entry = $type_entry;
       $entry->price = $amount;
-      if ($credit->credit_value > $credit->capital_value) {
-        $entry->save();
-      }
+      $entry->save();
+
+      return  $entry->id;
     }
   }
+
 
   public function printTable(Request $request)
   {

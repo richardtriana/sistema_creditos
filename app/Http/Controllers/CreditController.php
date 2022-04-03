@@ -53,7 +53,9 @@ class CreditController extends Controller
 				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document')
 				->whereIn('credits.status', $status);
 		}
-		$credits = $credits->paginate(10);
+		$credits = $credits
+			->orderBy('id', 'desc')
+			->paginate(10);
 		return $credits;
 	}
 
@@ -179,7 +181,6 @@ class CreditController extends Controller
 		$credit->capital_value = $request['capital_value'];
 		$credit->interest_value = $request['interest_value'];
 		$credit->description = $request['description'];
-		$credit->disbursement_date = date('Y-m-d');
 		$credit->installment_value = $listInstallments['installment'];
 
 		if ($credit->save()) {
@@ -275,7 +276,7 @@ class CreditController extends Controller
 		//$credit->user_id = $request->user()->id;
 		$credit->installment_value = $request['installment_value'];
 		$credit->description = $request['description'];
-		$credit->disbursement_date = date('Y-m-d');
+
 		$credit->save();
 
 		return response()->json([
@@ -311,6 +312,7 @@ class CreditController extends Controller
 					if ($request->status  == 1) {
 						$update_main_box = new MainBoxController();
 						$update_main_box->subAmountMainBox($credit->credit_value);
+						$credit->disbursement_date = date('Y-m-d');
 					}
 
 					if ($request->status  == 2 && $credit->status == 1) {
@@ -340,7 +342,6 @@ class CreditController extends Controller
 
 	public function installments(Request $request, $id)
 	{
-
 		$credit = Credit::findOrFail($id);
 		$installments =  $credit->installments()->get();
 		foreach ($installments as $installment) {
@@ -353,7 +354,11 @@ class CreditController extends Controller
 				$late_interests_value =  $days_past_due > 30 ?  $day_value_default * 30 : $day_value_default * $days_past_due;
 				$installment->days_past_due  = $days_past_due > 30 ? 30 : $days_past_due;
 				$installment->late_interests_value  = $late_interests_value;
-				$installment->value  += $late_interests_value;
+				if ($installment->paid_capital > 0 && $installment->paid_capital < $installment->capital_value) {
+					$installment->value = $installment->capital_value - $installment->paid_capital;
+				} else {
+					$installment->value  += $late_interests_value;
+				}
 			}
 		}
 
@@ -437,14 +442,61 @@ class CreditController extends Controller
 		return $data;
 	}
 
-	public function getTotalValueCredits()
+	public function getTotalValueCredits(Request $request)
 	{
+		$from = $request->from;
+		$to = $request->to;
+		$this_month = Carbon::now()->month;
+		$status = $request->status;
+
+		switch ($status) {
+			case 'all':
+				$query_date = 'created_at';
+				break;
+			case '0':
+				$query_date = 'created_at';
+				break;
+			case '1':
+				$query_date = 'disbursement_date';
+				break;
+			case '2':
+				$query_date = 'updated_at';
+				break;
+			case '3':
+				$query_date = 'created_at';
+				break;
+			case '4':
+				$query_date = 'finish_date';
+				break;
+		}
+
 		$credits = Credit::select(
 			DB::raw('SUM(credit_value) as credit_value '),
 			DB::raw('SUM(paid_value) as paid_value'),
 			DB::raw('SUM(interest_value) as interest_value'),
 			DB::raw('SUM(capital_value) as capital_value')
-		)->first();
+		);
+		if ($status == null) {
+			$credits = $credits->whereMonth('created_at', $this_month);
+		} else {
+			$credits = $credits
+				->where(function ($query) use ($status) {
+					if ($status == 'all') {
+						$query->where('status', '<>', '-1');
+					} else {
+						$query->where('status', $status);
+					}
+				})
+				->where(function ($query) use ($from, $to, $query_date) {
+					if ($from != '' && $from != 'undefined' && $from != null) {
+						$query->whereDate("$query_date", '>=', $from);
+					}
+					if ($to != '' && $to != 'undefined' && $to != null) {
+						$query->whereDate("$query_date", '<=', $to);
+					}
+				});
+		}
+		$credits = $credits->first();
 		return $credits;
 	}
 

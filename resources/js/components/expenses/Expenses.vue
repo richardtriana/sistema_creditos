@@ -12,15 +12,82 @@
         Crear Egreso
       </button>
     </div>
+    <div class="page-search p-4 border my-2">
+      <h6 class="text-primary text-uppercase">Filtrar:</h6>
+      <form>
+        <div class="form-row">
+          <div class="form-group col-md-4 mr-md-auto">
+            <label for="search_type_output">Tipo de salida:</label>
+            <input
+              type="text"
+              id="search_type_output"
+              name="search_type_output"
+              class="form-control"
+              placeholder="Escribir el tipo de salida"
+              v-model="search_type_output"
+            />
+          </div>
+          <div class="form-group col-md-4 ml-md-auto">
+            <label for="search_description">Descripción:</label>
+            <input
+              type="text"
+              id="search_description"
+              name="search_description"
+              class="form-control"
+              placeholder="Escribir el motivo o descripción"
+              v-model="search_description"
+            />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-4 ml-auto">
+            <label for="">Desde:</label>
+            <input
+              type="date"
+              id="search_from"
+              name="search_from"
+              class="form-control"
+              placeholder="Desde"
+              v-model="search_from"
+              :max="now"
+            />
+          </div>
+          <div class="form-group col-md-4 mr-auto">
+            <label for="">Hasta:</label>
+            <input
+              type="date"
+              id="search_to"
+              name="search_to"
+              class="form-control"
+              placeholder="Desde"
+              v-model="search_to"
+              :max="now"
+            />
+          </div>
+        </div>
+        <div class="form-row text-right m-auto">
+          <div class="form-group m-md-auto col-md-4">
+            <button
+              class="btn btn-success w-100"
+              type="button"
+              @click="listExpenses(1)"
+            >
+              <i class="bi bi-search"></i> Buscar
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
     <div class="page-content">
       <section class="table-responsive">
         <table class="table table-bordered table-sm">
           <thead>
             <tr class="text-center">
-              <th>Motivo</th>
+              <th>Sede</th>
               <th>Responsable</th>
               <th>Fecha</th>
               <th>Tipo de Salida</th>
+              <th>Descripción</th>
               <th>Valor</th>
               <th v-if="$root.validatePermission('expense-status')">Estado</th>
               <th>Ver factura</th>
@@ -31,12 +98,16 @@
           </thead>
           <tbody v-if="expenseList.data && expenseList.data.length > 0">
             <tr v-for="e in expenseList.data" :key="e.id">
-              <td class="wrap">{{ e.description }}</td>
+              <td>{{ e.headquarter.headquarter }}</td>
               <td>{{ e.user.name }} {{ e.user.last_name }}</td>
               <td>{{ e.date }}</td>
               <td>{{ e.type_output }}</td>
+              <td class="wrap">{{ e.description }}</td>
               <td class="text-right">{{ e.price | currency }}</td>
-              <td class="text-right" v-if="$root.validatePermission('expense-status')">
+              <td
+                class="text-right"
+                v-if="$root.validatePermission('expense-status')"
+              >
                 <button
                   v-if="e.status == 0"
                   class="btn btn-danger"
@@ -102,8 +173,12 @@ export default {
   components: { ModalExpense },
   data() {
     return {
-      search_expense: "",
       expenseList: {},
+      search_from: "",
+      search_to: "",
+      search_description: "",
+      search_type_output: "",
+      now: new Date().toISOString().slice(0, 10),
     };
   },
   mounted() {
@@ -114,7 +189,7 @@ export default {
       let me = this;
       axios
         .get(
-          `api/expenses?page=${page}&expense=${this.search_expense}`,
+          `api/expenses?page=${page}&from=${this.search_from}&to=${this.search_to}&type_output=${this.search_type_output}&description=${this.search_description}`,
           me.$root.config
         )
         .then(function (response) {

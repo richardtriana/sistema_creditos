@@ -21,7 +21,9 @@
         <tr v-for="quote in listInstallments" :key="quote.id">
           <th>{{ quote.payment_date }}</th>
           <td>{{ quote.installment_number }}</td>
-          <td class="text-right">{{ quote.value | currency }}</td>
+          <th class="text-right font-weight-bold">
+            {{ quote.value | currency }}
+          </th>
           <td class="text-right">
             {{ quote.capital_value | currency }}
           </td>
@@ -104,6 +106,7 @@ export default {
       let me = this;
       var data = {
         amount: quote.value,
+        quote_id: quote.id,
       };
 
       console.log(quote.value);
@@ -117,6 +120,7 @@ export default {
           )
           .then(function (response) {
             me.listCreditInstallments(me.id_credit, 1);
+            me.printEntryPdf(response.data.entry_id);
           });
       } else {
         Swal.fire({
@@ -126,12 +130,19 @@ export default {
         });
       }
     },
-    calculateLate(quote) {
-      var payment_date = new Date(quote.payment_date).getTime();
-      if (payment_date < this.now) {
-        var time = this.now - payment_date;
-        return Math.round(time / (1000 * 60 * 60 * 24));
-      }
+    printEntryPdf(entry_id) {
+      axios
+        .get(`api/entries/show-entry/${entry_id}`, this.$root.config)
+        .then((response) => {
+          const pdf = response.data.pdf;
+          var a = document.createElement("a");
+          a.href = "data:application/pdf;base64," + pdf;
+          a.download = `entrada_${entry_id}-${Date.now()}.pdf`;
+          a.target = "_blank"
+          a.click();
+          console.log(a);
+
+        });
     },
   },
 };
