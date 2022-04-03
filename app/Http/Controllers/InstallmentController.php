@@ -220,7 +220,6 @@ class InstallmentController extends Controller
           $amount_capital = $amount -  $installment->interest_value; //ok
           $interest = $installment->interest_value;
           if ($amount_capital + 1 < $installment->capital_value) {
-            var_dump('holi, esto es un error');
             $status = 0;
           }
         }

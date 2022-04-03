@@ -88,7 +88,6 @@ export default {
       now: new Date().getTime(),
     };
   },
-
   computed: {},
   methods: {
     listCreditInstallments(credit_id, allow_payment) {
@@ -109,6 +108,8 @@ export default {
         amount: quote.value,
         quote_id: quote.id,
       };
+
+      console.log(quote.value);
 
       if (quote.value > 0) {
         axios
