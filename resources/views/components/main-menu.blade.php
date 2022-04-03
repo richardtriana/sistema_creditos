@@ -1,5 +1,5 @@
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary justify-content-between">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary ">
     <a class="navbar-brand" href="#">
         <img src="{{ asset('logo.jpeg') }}" alt="" srcset="" width="100">
     </a>
@@ -7,7 +7,7 @@
         aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <ul class="nav justify-content-end">
+    <ul class="nav justify-content-end w-100">
 
         @if (Route::has('login'))
         <li class="nav-item">
