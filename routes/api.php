@@ -97,6 +97,7 @@ Route::group(['middleware' => ['auth:api']], function () {
 	Route::get('/reports/credits', [ReportController::class, 'ReportCredits'])->middleware('permission:report');
 	Route::get('/reports/portfolio', [ReportController::class, 'ReportPortfolio']);
 	Route::get('/reports/general-credits', [ReportController::class, 'ReportGeneralCredits']);
+	Route::get('/reports/headquarters-expenses', [ReportController::class, 'ReportHeadquartersExpenses']);
 
 	//Providers
 	Route::resource('/providers',  ProviderController::class);

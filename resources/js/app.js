@@ -165,6 +165,12 @@ const routes = [
 					.default,
 				name: "report-general-client",
 			},
+			{
+				path: "headquarters-expenses",
+				component: require("./components/reports/ReportHeadquartersExpenses.vue")
+					.default,
+				name: "report-headquarters-expenses",
+			},
 		],
 	},
 	{

@@ -6383,6 +6383,77 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
@@ -6390,8 +6461,12 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      search_expense: "",
-      expenseList: {}
+      expenseList: {},
+      search_from: "",
+      search_to: "",
+      search_description: "",
+      search_type_output: "",
+      now: new Date().toISOString().slice(0, 10)
     };
   },
   mounted: function mounted() {
@@ -6401,7 +6476,7 @@ __webpack_require__.r(__webpack_exports__);
     listExpenses: function listExpenses() {
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
       var me = this;
-      axios.get("api/expenses?page=".concat(page, "&expense=").concat(this.search_expense), me.$root.config).then(function (response) {
+      axios.get("api/expenses?page=".concat(page, "&from=").concat(this.search_from, "&to=").concat(this.search_to, "&type_output=").concat(this.search_type_output, "&description=").concat(this.search_description), me.$root.config).then(function (response) {
         me.expenseList = response.data;
       });
     },
@@ -7497,6 +7572,66 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -7508,7 +7643,11 @@ __webpack_require__.r(__webpack_exports__);
         2: "Rechazado",
         3: "Pendiente pago a proveedor",
         4: "Completado"
-      }
+      },
+      now: new Date().toISOString().slice(0, 10),
+      search_from: "",
+      search_to: "",
+      search_status: "all"
     };
   },
   methods: {
@@ -7516,7 +7655,7 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-      axios.get("api/reports/general-credits?page=".concat(page), this.$root.config).then(function (response) {
+      axios.get("api/reports/general-credits?page=".concat(page, "&from=").concat(this.search_from, "&to=").concat(this.search_to, "&status=").concat(this.search_status), this.$root.config).then(function (response) {
         _this.ReportGeneralCreditsList = response.data.credits;
         _this.ReportTotalValues = response.data.total_credits;
       });
@@ -7729,6 +7868,125 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/reports/ReportHeadquartersExpenses.vue?vue&type=script&lang=js&":
+/*!*****************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/reports/ReportHeadquartersExpenses.vue?vue&type=script&lang=js& ***!
+  \*****************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  data: function data() {
+    return {
+      headquartersExpenseList: {},
+      search_from: "",
+      search_to: ""
+    };
+  },
+  mounted: function mounted() {
+    this.listHeadquartersExpenses(1);
+  },
+  methods: {
+    listHeadquartersExpenses: function listHeadquartersExpenses() {
+      var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+      var me = this;
+      axios.get("api/reports/headquarters-expenses?page=".concat(page, "&from=").concat(this.search_from, "&to=").concat(this.search_to), this.$root.config).then(function (response) {
+        me.headquartersExpenseList = response.data;
+      });
+    }
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/reports/ReportPortfolio.vue?vue&type=script&lang=js&":
 /*!******************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/reports/ReportPortfolio.vue?vue&type=script&lang=js& ***!
@@ -7847,12 +8105,52 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
       ReportPortfolioList: {},
       now: new Date().toISOString().slice(0, 10),
-      infoCompany: {}
+      infoCompany: {},
+      search_from: "",
+      search_to: ""
     };
   },
   methods: {
@@ -7860,7 +8158,7 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-      axios.get("api/reports/portfolio?page=".concat(page), this.$root.config).then(function (response) {
+      axios.get("api/reports/portfolio?page=".concat(page, "&from=").concat(this.search_from, "&to=").concat(this.search_to), this.$root.config).then(function (response) {
         _this.ReportPortfolioList = response.data;
       });
     },
@@ -8927,6 +9225,10 @@ var routes = [{
     path: "general-client",
     component: __webpack_require__(/*! ./components/reports/ReportGeneralClient.vue */ "./resources/js/components/reports/ReportGeneralClient.vue")["default"],
     name: "report-general-client"
+  }, {
+    path: "headquarters-expenses",
+    component: __webpack_require__(/*! ./components/reports/ReportHeadquartersExpenses.vue */ "./resources/js/components/reports/ReportHeadquartersExpenses.vue")["default"],
+    name: "report-headquarters-expenses"
   }]
 }, {
   path: "**",
@@ -73391,6 +73693,45 @@ component.options.__file = "resources/js/components/reports/ReportHeadquarters.v
 
 /***/ }),
 
+/***/ "./resources/js/components/reports/ReportHeadquartersExpenses.vue":
+/*!************************************************************************!*\
+  !*** ./resources/js/components/reports/ReportHeadquartersExpenses.vue ***!
+  \************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _ReportHeadquartersExpenses_vue_vue_type_template_id_3a19689e___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ReportHeadquartersExpenses.vue?vue&type=template&id=3a19689e& */ "./resources/js/components/reports/ReportHeadquartersExpenses.vue?vue&type=template&id=3a19689e&");
+/* harmony import */ var _ReportHeadquartersExpenses_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ReportHeadquartersExpenses.vue?vue&type=script&lang=js& */ "./resources/js/components/reports/ReportHeadquartersExpenses.vue?vue&type=script&lang=js&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _ReportHeadquartersExpenses_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _ReportHeadquartersExpenses_vue_vue_type_template_id_3a19689e___WEBPACK_IMPORTED_MODULE_0__.render,
+  _ReportHeadquartersExpenses_vue_vue_type_template_id_3a19689e___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/reports/ReportHeadquartersExpenses.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
 /***/ "./resources/js/components/reports/ReportPortfolio.vue":
 /*!*************************************************************!*\
   !*** ./resources/js/components/reports/ReportPortfolio.vue ***!
@@ -74242,6 +74583,22 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/reports/ReportHeadquartersExpenses.vue?vue&type=script&lang=js&":
+/*!*************************************************************************************************!*\
+  !*** ./resources/js/components/reports/ReportHeadquartersExpenses.vue?vue&type=script&lang=js& ***!
+  \*************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ReportHeadquartersExpenses_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ReportHeadquartersExpenses.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/reports/ReportHeadquartersExpenses.vue?vue&type=script&lang=js&");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ReportHeadquartersExpenses_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
 /***/ "./resources/js/components/reports/ReportPortfolio.vue?vue&type=script&lang=js&":
 /*!**************************************************************************************!*\
   !*** ./resources/js/components/reports/ReportPortfolio.vue?vue&type=script&lang=js& ***!
@@ -74975,6 +75332,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ReportHeadquarters_vue_vue_type_template_id_47d4f7f6___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
 /* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ReportHeadquarters_vue_vue_type_template_id_47d4f7f6___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ReportHeadquarters.vue?vue&type=template&id=47d4f7f6& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/reports/ReportHeadquarters.vue?vue&type=template&id=47d4f7f6&");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/reports/ReportHeadquartersExpenses.vue?vue&type=template&id=3a19689e&":
+/*!*******************************************************************************************************!*\
+  !*** ./resources/js/components/reports/ReportHeadquartersExpenses.vue?vue&type=template&id=3a19689e& ***!
+  \*******************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ReportHeadquartersExpenses_vue_vue_type_template_id_3a19689e___WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ReportHeadquartersExpenses_vue_vue_type_template_id_3a19689e___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ReportHeadquartersExpenses_vue_vue_type_template_id_3a19689e___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ReportHeadquartersExpenses.vue?vue&type=template&id=3a19689e& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/reports/ReportHeadquartersExpenses.vue?vue&type=template&id=3a19689e&");
 
 
 /***/ }),
@@ -81624,6 +81998,169 @@ var render = function () {
         ]
       ),
       _vm._v(" "),
+      _c("div", { staticClass: "page-search p-4 border my-2" }, [
+        _c("h6", { staticClass: "text-primary text-uppercase" }, [
+          _vm._v("Filtrar:"),
+        ]),
+        _vm._v(" "),
+        _c("form", [
+          _c("div", { staticClass: "form-row" }, [
+            _c("div", { staticClass: "form-group col-md-4 mr-md-auto" }, [
+              _c("label", { attrs: { for: "search_type_output" } }, [
+                _vm._v("Tipo de salida:"),
+              ]),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.search_type_output,
+                    expression: "search_type_output",
+                  },
+                ],
+                staticClass: "form-control",
+                attrs: {
+                  type: "text",
+                  id: "search_type_output",
+                  name: "search_type_output",
+                  placeholder: "Escribir el tipo de salida",
+                },
+                domProps: { value: _vm.search_type_output },
+                on: {
+                  input: function ($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.search_type_output = $event.target.value
+                  },
+                },
+              }),
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "form-group col-md-4 ml-md-auto" }, [
+              _c("label", { attrs: { for: "search_description" } }, [
+                _vm._v("Descripción:"),
+              ]),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.search_description,
+                    expression: "search_description",
+                  },
+                ],
+                staticClass: "form-control",
+                attrs: {
+                  type: "text",
+                  id: "search_description",
+                  name: "search_description",
+                  placeholder: "Escribir el motivo o descripción",
+                },
+                domProps: { value: _vm.search_description },
+                on: {
+                  input: function ($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.search_description = $event.target.value
+                  },
+                },
+              }),
+            ]),
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "form-row" }, [
+            _c("div", { staticClass: "form-group col-md-4 ml-auto" }, [
+              _c("label", { attrs: { for: "" } }, [_vm._v("Desde:")]),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.search_from,
+                    expression: "search_from",
+                  },
+                ],
+                staticClass: "form-control",
+                attrs: {
+                  type: "date",
+                  id: "search_from",
+                  name: "search_from",
+                  placeholder: "Desde",
+                  max: _vm.now,
+                },
+                domProps: { value: _vm.search_from },
+                on: {
+                  input: function ($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.search_from = $event.target.value
+                  },
+                },
+              }),
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "form-group col-md-4 mr-auto" }, [
+              _c("label", { attrs: { for: "" } }, [_vm._v("Hasta:")]),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.search_to,
+                    expression: "search_to",
+                  },
+                ],
+                staticClass: "form-control",
+                attrs: {
+                  type: "date",
+                  id: "search_to",
+                  name: "search_to",
+                  placeholder: "Desde",
+                  max: _vm.now,
+                },
+                domProps: { value: _vm.search_to },
+                on: {
+                  input: function ($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.search_to = $event.target.value
+                  },
+                },
+              }),
+            ]),
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "form-row text-right m-auto" }, [
+            _c("div", { staticClass: "form-group m-md-auto col-md-4" }, [
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-success w-100",
+                  attrs: { type: "button" },
+                  on: {
+                    click: function ($event) {
+                      return _vm.listExpenses(1)
+                    },
+                  },
+                },
+                [
+                  _c("i", { staticClass: "bi bi-search" }),
+                  _vm._v(" Buscar\n          "),
+                ]
+              ),
+            ]),
+          ]),
+        ]),
+      ]),
+      _vm._v(" "),
       _c("div", { staticClass: "page-content" }, [
         _c(
           "section",
@@ -81632,13 +82169,15 @@ var render = function () {
             _c("table", { staticClass: "table table-bordered table-sm" }, [
               _c("thead", [
                 _c("tr", { staticClass: "text-center" }, [
-                  _c("th", [_vm._v("Motivo")]),
+                  _c("th", [_vm._v("Sede")]),
                   _vm._v(" "),
                   _c("th", [_vm._v("Responsable")]),
                   _vm._v(" "),
                   _c("th", [_vm._v("Fecha")]),
                   _vm._v(" "),
                   _c("th", [_vm._v("Tipo de Salida")]),
+                  _vm._v(" "),
+                  _c("th", [_vm._v("Descripción")]),
                   _vm._v(" "),
                   _c("th", [_vm._v("Valor")]),
                   _vm._v(" "),
@@ -81661,9 +82200,7 @@ var render = function () {
                     "tbody",
                     _vm._l(_vm.expenseList.data, function (e) {
                       return _c("tr", { key: e.id }, [
-                        _c("td", { staticClass: "wrap" }, [
-                          _vm._v(_vm._s(e.description)),
-                        ]),
+                        _c("td", [_vm._v(_vm._s(e.headquarter.headquarter))]),
                         _vm._v(" "),
                         _c("td", [
                           _vm._v(
@@ -81674,6 +82211,10 @@ var render = function () {
                         _c("td", [_vm._v(_vm._s(e.date))]),
                         _vm._v(" "),
                         _c("td", [_vm._v(_vm._s(e.type_output))]),
+                        _vm._v(" "),
+                        _c("td", { staticClass: "wrap" }, [
+                          _vm._v(_vm._s(e.description)),
+                        ]),
                         _vm._v(" "),
                         _c("td", { staticClass: "text-right" }, [
                           _vm._v(_vm._s(_vm._f("currency")(e.price))),
@@ -83383,6 +83924,154 @@ var render = function () {
   return _c("div", { staticClass: "page" }, [
     _vm._m(0),
     _vm._v(" "),
+    _c("div", { staticClass: "page-search p-4 border my-2" }, [
+      _c("h6", { staticClass: "text-primary text-uppercase" }, [
+        _vm._v("Filtrar:"),
+      ]),
+      _vm._v(" "),
+      _c("form", [
+        _c("div", { staticClass: "form-row" }, [
+          _c("div", { staticClass: "form-group col-4 ml-auto" }, [
+            _c("label", { attrs: { for: "search_status" } }, [
+              _vm._v("Estado:"),
+            ]),
+            _vm._v(" "),
+            _c(
+              "select",
+              {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.search_status,
+                    expression: "search_status",
+                  },
+                ],
+                staticClass: "custom-select",
+                attrs: { name: "search_status", id: "search_status" },
+                on: {
+                  change: function ($event) {
+                    var $$selectedVal = Array.prototype.filter
+                      .call($event.target.options, function (o) {
+                        return o.selected
+                      })
+                      .map(function (o) {
+                        var val = "_value" in o ? o._value : o.value
+                        return val
+                      })
+                    _vm.search_status = $event.target.multiple
+                      ? $$selectedVal
+                      : $$selectedVal[0]
+                  },
+                },
+              },
+              [
+                _c("option", { attrs: { value: "all" } }, [_vm._v("Todos")]),
+                _vm._v(" "),
+                _vm._l(_vm.creditStatus, function (status, key) {
+                  return _c(
+                    "option",
+                    { key: status, domProps: { value: key } },
+                    [
+                      _vm._v(
+                        "\n              " + _vm._s(status) + "\n            "
+                      ),
+                    ]
+                  )
+                }),
+              ],
+              2
+            ),
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "form-group col-4" }, [
+            _c("label", { attrs: { for: "" } }, [_vm._v("Desde:")]),
+            _vm._v(" "),
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.search_from,
+                  expression: "search_from",
+                },
+              ],
+              staticClass: "form-control",
+              attrs: {
+                type: "date",
+                id: "search_from",
+                name: "search_from",
+                placeholder: "Desde",
+                max: _vm.now,
+              },
+              domProps: { value: _vm.search_from },
+              on: {
+                input: function ($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.search_from = $event.target.value
+                },
+              },
+            }),
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "form-group col-4 mr-auto" }, [
+            _c("label", { attrs: { for: "" } }, [_vm._v("Hasta:")]),
+            _vm._v(" "),
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.search_to,
+                  expression: "search_to",
+                },
+              ],
+              staticClass: "form-control",
+              attrs: {
+                type: "date",
+                id: "search_to",
+                name: "search_to",
+                placeholder: "Desde",
+                max: _vm.now,
+              },
+              domProps: { value: _vm.search_to },
+              on: {
+                input: function ($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.search_to = $event.target.value
+                },
+              },
+            }),
+          ]),
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-row text-right m-auto" }, [
+          _c("div", { staticClass: "form-group ml-md-auto col-md-4" }, [
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-success w-100",
+                attrs: { type: "button" },
+                on: {
+                  click: function ($event) {
+                    return _vm.listReportGeneralCredits(1)
+                  },
+                },
+              },
+              [
+                _c("i", { staticClass: "bi bi-search" }),
+                _vm._v(" Buscar\n          "),
+              ]
+            ),
+          ]),
+        ]),
+      ]),
+    ]),
+    _vm._v(" "),
     _c("div", { staticClass: "page-content" }, [
       _c(
         "section",
@@ -83470,7 +84159,7 @@ var render = function () {
         _c("h5", [_vm._v("Totalizado:")]),
         _vm._v(" "),
         _c("table", { staticClass: "table table-sm table-bordered" }, [
-          _c("tr", { staticClass: "text-center" }, [
+          _c("tr", { staticClass: "text-right" }, [
             _c("th", [_vm._v("Total Valor créditos")]),
             _vm._v(" "),
             _c("td", [
@@ -83480,7 +84169,7 @@ var render = function () {
             ]),
           ]),
           _vm._v(" "),
-          _c("tr", { staticClass: "text-center" }, [
+          _c("tr", { staticClass: "text-right" }, [
             _c("th", [_vm._v("Total abonado")]),
             _vm._v(" "),
             _c("td", [
@@ -83490,7 +84179,7 @@ var render = function () {
             ]),
           ]),
           _vm._v(" "),
-          _c("tr", { staticClass: "text-center" }, [
+          _c("tr", { staticClass: "text-right" }, [
             _c("th", [_vm._v("Total abono a capital")]),
             _vm._v(" "),
             _c("td", [
@@ -83500,7 +84189,7 @@ var render = function () {
             ]),
           ]),
           _vm._v(" "),
-          _c("tr", { staticClass: "text-center" }, [
+          _c("tr", { staticClass: "text-right" }, [
             _c("th", [_vm._v("Total abonado a intereses")]),
             _vm._v(" "),
             _c("td", [
@@ -83888,6 +84577,205 @@ render._withStripped = true
 
 /***/ }),
 
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/reports/ReportHeadquartersExpenses.vue?vue&type=template&id=3a19689e&":
+/*!**********************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/reports/ReportHeadquartersExpenses.vue?vue&type=template&id=3a19689e& ***!
+  \**********************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* binding */ render),
+/* harmony export */   "staticRenderFns": () => (/* binding */ staticRenderFns)
+/* harmony export */ });
+var render = function () {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _vm._m(0),
+    _vm._v(" "),
+    _c("div", { staticClass: "page-search p-4 border my-2" }, [
+      _c("h6", { staticClass: "text-primary text-uppercase" }, [
+        _vm._v("Filtrar:"),
+      ]),
+      _vm._v(" "),
+      _c("form", [
+        _c("div", { staticClass: "form-row" }, [
+          _c("div", { staticClass: "form-group col-4 ml-auto" }, [
+            _c("label", { attrs: { for: "" } }, [_vm._v("Desde:")]),
+            _vm._v(" "),
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.search_from,
+                  expression: "search_from",
+                },
+              ],
+              staticClass: "form-control",
+              attrs: {
+                type: "date",
+                id: "search_from",
+                name: "search_from",
+                placeholder: "Desde",
+                max: _vm.now,
+              },
+              domProps: { value: _vm.search_from },
+              on: {
+                input: function ($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.search_from = $event.target.value
+                },
+              },
+            }),
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "form-group col-4 mr-auto" }, [
+            _c("label", { attrs: { for: "" } }, [_vm._v("Hasta:")]),
+            _vm._v(" "),
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.search_to,
+                  expression: "search_to",
+                },
+              ],
+              staticClass: "form-control",
+              attrs: {
+                type: "date",
+                id: "search_to",
+                name: "search_to",
+                placeholder: "Desde",
+                max: _vm.now,
+              },
+              domProps: { value: _vm.search_to },
+              on: {
+                input: function ($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.search_to = $event.target.value
+                },
+              },
+            }),
+          ]),
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-row text-right m-auto" }, [
+          _c("div", { staticClass: "form-group m-md-auto col-md-4" }, [
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-success w-100",
+                attrs: { type: "button" },
+                on: {
+                  click: function ($event) {
+                    return _vm.listHeadquartersExpenses(1)
+                  },
+                },
+              },
+              [
+                _c("i", { staticClass: "bi bi-search" }),
+                _vm._v(" Buscar\n          "),
+              ]
+            ),
+          ]),
+        ]),
+      ]),
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "page-content" }, [
+      _c(
+        "section",
+        { staticClass: "table-responsive" },
+        [
+          _c("table", { staticClass: "table table-bordered table-sm" }, [
+            _vm._m(1),
+            _vm._v(" "),
+            _vm.headquartersExpenseList.data &&
+            _vm.headquartersExpenseList.data.length > 0
+              ? _c(
+                  "tbody",
+                  _vm._l(_vm.headquartersExpenseList.data, function (r) {
+                    return _c("tr", { key: r.id }, [
+                      _c("td", [_vm._v(_vm._s(r.headquarter))]),
+                      _vm._v(" "),
+                      _c("td", { staticClass: "text-right" }, [
+                        _vm._v(_vm._s(_vm._f("currency")(r.price))),
+                      ]),
+                    ])
+                  }),
+                  0
+                )
+              : _vm._e(),
+          ]),
+          _vm._v(" "),
+          _c(
+            "pagination",
+            {
+              attrs: {
+                align: "center",
+                data: _vm.headquartersExpenseList,
+                limit: 2,
+              },
+              on: { "pagination-change-page": _vm.listHeadquartersExpenses },
+            },
+            [
+              _c("span", { attrs: { slot: "prev-nav" }, slot: "prev-nav" }, [
+                _c("i", { staticClass: "bi bi-chevron-double-left" }),
+              ]),
+              _vm._v(" "),
+              _c("span", { attrs: { slot: "next-nav" }, slot: "next-nav" }, [
+                _c("i", { staticClass: "bi bi-chevron-double-right" }),
+              ]),
+            ]
+          ),
+        ],
+        1
+      ),
+    ]),
+  ])
+}
+var staticRenderFns = [
+  function () {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "div",
+      {
+        staticClass:
+          "page-header d-flex justify-content-between p-4 border my-2",
+      },
+      [_c("h3", [_vm._v("Reporte de egresos por sede")])]
+    )
+  },
+  function () {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", { staticClass: "text-center" }, [
+        _c("th", [_vm._v("Sede")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Valor")]),
+      ]),
+    ])
+  },
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/reports/ReportPortfolio.vue?vue&type=template&id=7c323789&":
 /*!***********************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/reports/ReportPortfolio.vue?vue&type=template&id=7c323789& ***!
@@ -83906,6 +84794,101 @@ var render = function () {
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "page" }, [
     _vm._m(0),
+    _vm._v(" "),
+    _c("div", { staticClass: "page-search p-4 border my-2" }, [
+      _c("h6", { staticClass: "text-primary text-uppercase" }, [
+        _vm._v("Filtrar:"),
+      ]),
+      _vm._v(" "),
+      _c("form", [
+        _c("div", { staticClass: "form-row" }, [
+          _c("div", { staticClass: "form-group col-4 ml-auto" }, [
+            _c("label", { attrs: { for: "" } }, [_vm._v("Desde:")]),
+            _vm._v(" "),
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.search_from,
+                  expression: "search_from",
+                },
+              ],
+              staticClass: "form-control",
+              attrs: {
+                type: "date",
+                id: "search_from",
+                name: "search_from",
+                placeholder: "Desde",
+                max: _vm.now,
+              },
+              domProps: { value: _vm.search_from },
+              on: {
+                input: function ($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.search_from = $event.target.value
+                },
+              },
+            }),
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "form-group col-4 mr-auto" }, [
+            _c("label", { attrs: { for: "" } }, [_vm._v("Hasta:")]),
+            _vm._v(" "),
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.search_to,
+                  expression: "search_to",
+                },
+              ],
+              staticClass: "form-control",
+              attrs: {
+                type: "date",
+                id: "search_to",
+                name: "search_to",
+                placeholder: "Desde",
+                max: _vm.now,
+              },
+              domProps: { value: _vm.search_to },
+              on: {
+                input: function ($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.search_to = $event.target.value
+                },
+              },
+            }),
+          ]),
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-row text-right m-auto" }, [
+          _c("div", { staticClass: "form-group m-md-auto col-md-4" }, [
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-success w-100",
+                attrs: { type: "button" },
+                on: {
+                  click: function ($event) {
+                    return _vm.listReportPortfolio(1)
+                  },
+                },
+              },
+              [
+                _c("i", { staticClass: "bi bi-search" }),
+                _vm._v(" Buscar\n          "),
+              ]
+            ),
+          ]),
+        ]),
+      ]),
+    ]),
     _vm._v(" "),
     _c("div", { staticClass: "page-content" }, [
       _c(
