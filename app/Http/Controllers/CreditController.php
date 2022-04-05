@@ -42,7 +42,7 @@ class CreditController extends Controller
 
 		if ($request->credit && ($request->credit != '')) {
 			$credits  =   $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
-				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document')
+				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document', 'c.phone_1', 'c.phone_2')
 				->where('document', 'LIKE', "%$request->credit%")
 				->orWhere('name', 'LIKE', "%$request->credit%")
 				->orWhere('email', 'LIKE', "%$request->credit%")
@@ -50,7 +50,7 @@ class CreditController extends Controller
 				->whereIn('credits.status', $status);
 		} else {
 			$credits  =     $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
-				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document')
+				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document', 'c.phone_1', 'c.phone_2')
 				->whereIn('credits.status', $status);
 		}
 		$credits = $credits->paginate(10);
@@ -335,6 +335,10 @@ class CreditController extends Controller
 			}
 			$credit->status = $request->status;
 		}
+
+		if ($request->status  == 2 && $request->description != null) {
+			$credit->description  = "$credit->description \nRechazado por: $request->description";
+		}
 		$credit->save();
 	}
 
@@ -462,6 +466,9 @@ class CreditController extends Controller
 				break;
 			case '4':
 				$query_date = 'finish_date';
+				break;
+			case '5':
+				$query_date = 'updated_at';
 				break;
 		}
 

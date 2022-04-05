@@ -1,4 +1,4 @@
-<template>
+<template id="main">
   <div class="page">
     <div class="page-header d-flex justify-content-between p-4 border my-2">
       <h3>Creditos</h3>
@@ -53,6 +53,7 @@
               <th>ID</th>
               <th>Cliente</th>
               <th>Nro. Documento</th>
+              <th>Descripción</th>
               <th>Valor crédito</th>
               <th>Valor Abonado</th>
               <th>Nro Cuotas</th>
@@ -66,6 +67,7 @@
               </th>
               <th>Paz y salvo</th>
               <th>Recoger crédito</th>
+              <th>Cobro jurídico</th>
               <th
                 v-if="
                   $root.validatePermission('credit-update') ||
@@ -82,6 +84,17 @@
               <td>{{ credit.id }}</td>
               <td>{{ credit.name }} {{ credit.last_name }}</td>
               <td>{{ credit.type_document }} {{ credit.document }}</td>
+              <td>
+                <textarea
+                  name="description"
+                  id="description"
+                  cols="10"
+                  rows="4"
+                  class="form-control-plaintext"
+                  readonly
+                  v-model="credit.description"
+                ></textarea>
+              </td>
               <td class="text-right">{{ credit.credit_value | currency }}</td>
               <td class="text-right">{{ credit.paid_value | currency }}</td>
               <td>{{ credit.number_installments }}</td>
@@ -140,6 +153,22 @@
                 >
                   <i class="bi bi-box-arrow-in-down"></i>
                   Recoger
+                </button>
+              </td>
+              <td>
+                <button
+                  v-if="credit.status == 1"
+                  class="btn btn-danger"
+                  @click="changeStatus(credit.id, 5)"
+                >
+                  <i class="bi bi-x-circle"></i> Pasar a cobro jurídico
+                </button>
+                <button
+                  v-if="credit.status == 5"
+                  class="btn btn-success"
+                  @click="changeStatus(credit.id, 1)"
+                >
+                  <i class="bi bi-check"></i> Deshacer cobro jurídico
                 </button>
               </td>
 
@@ -241,7 +270,6 @@
 </template>
 <script>
 import CreateEditCredit from "./CreateEditCredit.vue";
-
 import ModalCreateEditClient from "../../clients/ModalCreateEditClient.vue";
 import ModalInstallment from "../credit_helpers/ModalInstallment.vue";
 
@@ -264,7 +292,9 @@ export default {
         2: "Rechazado",
         3: "Pendiente pago a proveedor",
         4: "Completado",
+        5: "Cobro jurídico",
       },
+      msg_rejected: "",
     };
   },
   created() {
@@ -310,28 +340,71 @@ export default {
       this.$refs.ModalCreateEditClient.showEditClient(client);
     },
     changeStatus: function (id, status) {
-      let me = this;
-      var data = {
-        status: status,
-      };
-
       Swal.fire({
-        title: "¿Quieres cambiar el status del credito?",
-        showDenyButton: true,
-        denyButtonText: `Cancelar`,
-        confirmButtonText: `Guardar`,
+        title: "¿Quieres cambiar el estado del credito?",
+        showCancelButton: true,
+        cancelButtonText: "Cancelar",
+        confirmButtonText: `Aceptar`,
       }).then((result) => {
         if (result.isConfirmed) {
-          axios
-            .post(`api/credits/${id}/change-status`, data, me.$root.config)
-            .then(function () {
-              me.listCredits(1);
-            });
-          Swal.fire("Cambios realizados!", "", "success");
-        } else if (result.isDenied) {
+          if (status != 2) {
+            this.sendData(id, data);
+            Swal.fire("Cambios realizados!", "", "success");
+          } else {
+            this.msgRejectd(id);
+          }
+        } else {
           Swal.fire("Operación no realizada", "", "info");
         }
       });
+    },
+    msgRejectd: async function (id) {
+      const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+          title: "text-primary",
+          cancelButton: "btn btn-secondary",
+          confirmButton: "btn btn-danger",
+        },
+        buttonsStyling: false,
+      });
+
+      await swalWithBootstrapButtons
+        .fire({
+          title: "Motivo de rechazo",
+          reverseButtons: true,
+          input: "text",
+          inputLabel: "Realice una descripción del motivo",
+          inputPlaceholder: "",
+          showCancelButton: true,
+          cancelButtonText: "Cancelar",
+          confirmButtonText: "Rechazar",
+          inputValidator: (value) => {
+            if (!value) {
+              return "Debes completar este campo!";
+            }
+          },
+        })
+        .then((response) => {
+          console.log(response.isConfirmed);
+          if (response.isConfirmed) {
+            var data = {
+              status: 2,
+              description: response.value,
+            };
+            this.sendData(id, data);
+            Swal.fire("Cambios realizados!", "", "success");
+          } else {
+            Swal.fire("Operación no realizada", "", "info");
+          }
+        });
+    },
+    sendData(id, data) {
+      let me = this;
+      axios
+        .post(`api/credits/${id}/change-status`, data, this.$root.config)
+        .then(function () {
+          me.listCredits(1);
+        });
     },
     printTable(credit_id, client) {
       axios

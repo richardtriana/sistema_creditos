@@ -70,7 +70,9 @@
           </form>
         </div>
         <div class="modal-footer">
-          
+           <button type="button" class="btn btn-secondary" @click="closeModal()">
+            Cerrar
+          </button>
           <button
             type="button"
             class="btn btn-primary"
@@ -78,9 +80,7 @@
           >
             Guardar
           </button>
-          <button type="button" class="btn btn-secondary" @click="closeModal()">
-            Cerrar
-          </button>
+         
         </div>
       </div>
     </div>

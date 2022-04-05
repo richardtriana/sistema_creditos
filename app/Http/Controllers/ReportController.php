@@ -75,6 +75,9 @@ class ReportController extends Controller
 			case '4':
 				$query_date = 'finish_date';
 				break;
+			case '5':
+				$query_date = 'updated_at';
+				break;
 		}
 		$credits = Credit::select();
 
