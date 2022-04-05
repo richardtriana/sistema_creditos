@@ -107,18 +107,18 @@
           <div class="modal-footer">
             <button
               type="button"
-              class="btn btn-primary"
-              @click="editar ? editProvider() : createProvider()"
-            >
-              Guardar
-            </button>
-            <button
-              type="button"
               class="btn btn-secondary"
               data-dismiss="modal"
               @click="editar = false"
             >
               Cerrar
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="editar ? editProvider() : createProvider()"
+            >
+              Guardar
             </button>
           </div>
         </div>
@@ -147,11 +147,13 @@ export default {
   methods: {
     createProvider() {
       let me = this;
-      axios.post("api/providers", this.formProvider, me.$root.config).then(function () {
-        $("#formProviderModal").modal("hide");
-        me.formProvider = {};
-        this.$emit("list-providers");
-      });
+      axios
+        .post("api/providers", this.formProvider, me.$root.config)
+        .then(function () {
+          $("#formProviderModal").modal("hide");
+          me.formProvider = {};
+          this.$emit("list-providers");
+        });
     },
     showEditProvider(provider) {
       this.editar = true;
@@ -162,7 +164,11 @@ export default {
     editProvider() {
       let me = this;
       axios
-        .put("api/providers/" + this.formProvider.id, this.formProvider, me.$root.config)
+        .put(
+          "api/providers/" + this.formProvider.id,
+          this.formProvider,
+          me.$root.config
+        )
         .then(function () {
           $("#formProviderModal").modal("hide");
           me.formProvider = {};

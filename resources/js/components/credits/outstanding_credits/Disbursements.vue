@@ -20,9 +20,11 @@
           name="search_client"
           class="form-control"
           placeholder="Buscar cliente | Documento"
-          @keyup="listCredits()"
           v-model="search_client"
         />
+      </div>
+      <div class="form-group col-8 m-auto">
+        <button class="btn btn-primary" @click="listCredits(1)">Buscar</button>
       </div>
     </div>
 
@@ -73,18 +75,20 @@
                 </button>
               </td>
               <td class="text-left">
-                <button
-                  class="btn btn-success"
-                  @click="changeStatus(credit.id, 1)"
-                >
-                  <i class="bi bi-check2-circle"></i> Aprobar
-                </button>
-                <button
-                  class="btn btn-danger"
-                  @click="changeStatus(credit.id, 2)"
-                >
-                  <i class="bi bi-x-circle"></i> Rechazar
-                </button>
+                <div v-if="credit.status == 0 || credit.status == 4">
+                  <button
+                    class="btn btn-success"
+                    @click="changeStatus(credit.id, 1)"
+                  >
+                    <i class="bi bi-check2-circle"></i> Aprobar
+                  </button>
+                  <button
+                    class="btn btn-danger"
+                    @click="changeStatus(credit.id, 2)"
+                  >
+                    <i class="bi bi-x-circle"></i> Rechazar
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -149,6 +153,7 @@ export default {
         2: "Rechazado",
         3: "Pendiente pago a proveedor",
         4: "Completado",
+        5: "Cobro jurídico",
       },
     };
   },
@@ -169,27 +174,71 @@ export default {
     },
 
     changeStatus: function (id, status) {
-      let me = this;
-      var data = {
-        status: status,
-      };
       Swal.fire({
-        title: "¿Quieres cambiar el status del credito?",
-        showDenyButton: true,
-        denyButtonText: `Cancelar`,
-        confirmButtonText: `Guardar`,
+        title: "¿Quieres cambiar el estado del credito?",
+        showCancelButton: true,
+        cancelButtonText: "Cancelar",
+        confirmButtonText: `Aceptar`,
       }).then((result) => {
         if (result.isConfirmed) {
-          axios
-            .post(`api/credits/${id}/change-status`, data, me.$root.config)
-            .then(function () {
-              me.listCredits(1);
-            });
-          Swal.fire("Cambios realizados!", "", "success");
-        } else if (result.isDenied) {
+          if (status != 2) {
+            this.sendData(id, data);
+            Swal.fire("Cambios realizados!", "", "success");
+          } else {
+            this.msgRejectd(id);
+          }
+        } else {
           Swal.fire("Operación no realizada", "", "info");
         }
       });
+    },
+    msgRejectd: async function (id) {
+      const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+          title: "text-primary",
+          cancelButton: "btn btn-secondary",
+          confirmButton: "btn btn-danger",
+        },
+        buttonsStyling: false,
+      });
+
+      await swalWithBootstrapButtons
+        .fire({
+          title: "Motivo de rechazo",
+          reverseButtons: true,
+          input: "text",
+          inputLabel: "Realice una descripción del motivo",
+          inputPlaceholder: "",
+          showCancelButton: true,
+          cancelButtonText: "Cancelar",
+          confirmButtonText: "Rechazar",
+          inputValidator: (value) => {
+            if (!value) {
+              return "Debes completar este campo!";
+            }
+          },
+        })
+        .then((response) => {
+          console.log(response.isConfirmed);
+          if (response.isConfirmed) {
+            var data = {
+              status: 2,
+              description: response.value,
+            };
+            this.sendData(id, data);
+            Swal.fire("Cambios realizados!", "", "success");
+          } else {
+            Swal.fire("Operación no realizada", "", "info");
+          }
+        });
+    },
+    sendData(id, data) {
+      let me = this;
+      axios
+        .post(`api/credits/${id}/change-status`, data, this.$root.config)
+        .then(function () {
+          me.listCredits(1);
+        });
     },
     showData: function (credit) {
       this.$refs.CreateEditCredit.showEditCredit(credit);

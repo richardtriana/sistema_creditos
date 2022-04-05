@@ -26,7 +26,7 @@
             <table
               class="table table-bordered table-condensed"
               v-if="
-                CreditInformation != null && CreditInformation.client != null
+                CreditInformation != null && CreditInformation.client_id != null
               "
             >
               <tr class="text-center">
@@ -37,13 +37,13 @@
                 </td>
                 <td>
                   <strong> Identificacion: </strong> <br />
-                  {{ CreditInformation.client.type_document }}
-                  {{ CreditInformation.client.document }}
+                  {{ CreditInformation.type_document }}
+                  {{ CreditInformation.document }}
                 </td>
                 <td>
                   <strong>Contacto:</strong> <br />
-                  {{ CreditInformation.client.phone_1 }} -
-                  {{ CreditInformation.client.phone_2 }}
+                  {{ CreditInformation.phone_1 }} -
+                  {{ CreditInformation.phone_2 }}
                 </td>
               </tr>
               <tr class="text-center">
@@ -175,29 +175,71 @@ export default {
         });
     },
     changeStatus: function (id, status) {
-      let me = this;
-      var data = {
-        status: status,
-      };
       Swal.fire({
         title: "¿Quieres cambiar el status del credito?",
-        showDenyButton: true,
-        denyButtonText: `Cancelar`,
-        confirmButtonText: `Guardar`,
-      })
-        .then((result) => {
-          if (result.isConfirmed) {
-            axios
-              .post(`api/credits/${id}/change-status`, data, me.$root.config)
-              .then(function () {
-                me.$emit("list-credits");
-              });
+        showCancelButton: true,
+        cancelButtonText: "Cancelar",
+        confirmButtonText: `Aceptar`,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          if (status != 2) {
+            this.sendData(id, data);
             Swal.fire("Cambios realizados!", "", "success");
-          } else if (result.isDenied) {
+          } else {
+            this.msgRejectd(id);
+          }
+        } else {
+          Swal.fire("Operación no realizada", "", "info");
+        }
+      });
+    },
+    msgRejectd: async function (id) {
+      const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+          title: "text-primary",
+          cancelButton: "btn btn-secondary",
+          confirmButton: "btn btn-danger",
+        },
+        buttonsStyling: false,
+      });
+
+      await swalWithBootstrapButtons
+        .fire({
+          title: "Motivo de rechazo",
+          reverseButtons: true,
+          input: "text",
+          inputLabel: "Realice una descripción del motivo",
+          inputPlaceholder: "",
+          showCancelButton: true,
+          cancelButtonText: "Cancelar",
+          confirmButtonText: "Rechazar",
+          inputValidator: (value) => {
+            if (!value) {
+              return "Debes completar este campo!";
+            }
+          },
+        })
+        .then((response) => {
+          console.log(response.isConfirmed);
+          if (response.isConfirmed) {
+            var data = {
+              status: 2,
+              description: response.value,
+            };
+            this.sendData(id, data);
+            Swal.fire("Cambios realizados!", "", "success");
+          } else {
             Swal.fire("Operación no realizada", "", "info");
           }
-        })
-        .finally($("#creditInformationModal").modal("hide"));
+        });
+    },
+    sendData(id, data) {
+      let me = this;
+      axios
+        .post(`api/credits/${id}/change-status`, data, this.$root.config)
+        .then(function () {
+          me.listCredits(1);
+        });
     },
   },
 };

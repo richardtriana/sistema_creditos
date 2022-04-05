@@ -156,12 +156,12 @@
 
                 <div class="form-group col-md-4">
                   <label for="description">Descripción</label>
-                  <input
+                  <textarea
                     type="text"
                     class="form-control"
                     id="description"
                     v-model="formCredit.description"
-                  />
+                  ></textarea>
                   <small id="description_help" class="form-text text-danger">{{
                     formErrors.description
                   }}</small>
@@ -271,22 +271,15 @@
                 ref="Simulator"
                 v-if="!edit"
               ></simulator>
-              <div  class="modal-footer">
+              <div class="modal-footer">
                 <button
-                type="button"
-                class="btn btn-secondary"
-                data-dismiss="modal"
-                @click="edit = false"
-              >
-                Cerrar
-              </button>
-              <button
-                type="button"
-                class="btn btn-success"
-                @click="edit ? editCredit() : createCredit()"
-              >
-                Guardar
-              </button>
+                  type="button"
+                  class="btn btn-secondary"
+                  data-dismiss="modal"
+                  @click="edit = false"
+                >
+                  Cerrar
+                </button>
               </div>
             </form>
           </div>
@@ -388,7 +381,7 @@ export default {
           me.resetData();
           me.$emit("list-credits");
         })
-        .catch(response =>{
+        .catch((response) => {
           me.$root.assignErrors(response, me.formErrors);
         });
     },
@@ -410,7 +403,8 @@ export default {
         .then(function () {
           $("#formCreditModal").modal("hide");
           me.resetData();
-        }).catch(response =>{
+        })
+        .catch((response) => {
           me.$root.assignErrors(response, me.formErrors);
         });
 

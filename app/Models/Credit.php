@@ -37,9 +37,7 @@ class Credit extends Model
         'provider'
     ];
 
-    protected $with = [
-        'client'
-    ];
+    protected $with = [];
 
     public function client()
     {
