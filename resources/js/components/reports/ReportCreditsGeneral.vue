@@ -143,6 +143,7 @@ export default {
         2: "Rechazado",
         3: "Pendiente pago a proveedor",
         4: "Completado",
+        5: "Cobro jurídico",
       },
       now: new Date().toISOString().slice(0, 10),
       search_from: "",

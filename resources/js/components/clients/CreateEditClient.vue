@@ -198,21 +198,20 @@
       </form>
     </div>
     <div class="modal-footer">
-     
       <button
-        type="button"
-        class="btn btn-success"
-        @click="formClient.id ? editClient() : createClient()"
-      >
-        Guardar
-      </button>
-       <button
         type="button"
         class="btn btn-secondary"
         data-dismiss="modal"
         @click="(editar = false), resetData()"
       >
         Cerrar
+      </button>
+      <button
+        type="button"
+        class="btn btn-success"
+        @click="formClient.id ? editClient() : createClient()"
+      >
+        Guardar
       </button>
     </div>
   </div>
@@ -226,7 +225,7 @@ export default {
       formClient: {
         name: "",
         last_name: "",
-        type_document: 'CC',
+        type_document: "CC",
         document: 0,
         birth_date: "",
         email: "",
@@ -245,11 +244,13 @@ export default {
   methods: {
     createClient() {
       let me = this;
-      axios.post("api/clients", this.formClient, me.$root.config).then(function () {
-        $("#formClientModal").modal("hide");
-        me.resetData();
-        me.$emit("list-clients");
-      });
+      axios
+        .post("api/clients", this.formClient, me.$root.config)
+        .then(function () {
+          $("#formClientModal").modal("hide");
+          me.resetData();
+          me.$emit("list-clients");
+        });
     },
     showEditClient(client) {
       this.editar = true;
@@ -260,7 +261,11 @@ export default {
     editClient() {
       let me = this;
       axios
-        .put(`api/clients/${this.formClient.id}`, this.formClient, me.$root.config)
+        .put(
+          `api/clients/${this.formClient.id}`,
+          this.formClient,
+          me.$root.config
+        )
         .then(function () {
           $("#formClientModal").modal("hide");
           me.resetData();

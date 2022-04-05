@@ -16,7 +16,7 @@
       <h6 class="text-primary text-uppercase">Filtrar:</h6>
       <form>
         <div class="form-row">
-          <div class="form-group col-md-4 mr-md-auto">
+          <div class="form-group col-md-4 ml-md-auto">
             <label for="search_type_output">Tipo de salida:</label>
             <input
               type="text"
@@ -27,7 +27,7 @@
               v-model="search_type_output"
             />
           </div>
-          <div class="form-group col-md-4 ml-md-auto">
+          <div class="form-group col-md-4 mr-md-auto">
             <label for="search_description">Descripción:</label>
             <input
               type="text"

@@ -359,6 +359,7 @@ class InstallmentController extends Controller
       $entry->credit_id = $credit->id;
       $entry->description =
         "Cliente: {$client->name} {$client->last_name}\n"
+        . " Documento: {$client->type_document} {$client->document}"
         . "# crédito: {$credit->id} \n"
         . "# cuota: {$no_installment}\n"
         . "Efectivo: {$amount_receipt}\n"
