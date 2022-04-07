@@ -11,7 +11,7 @@ class HeadquarterController extends Controller
 {
 	public function __construct()
 	{
-		$this->middleware('permission:headquarter.index', ['only' => ['index','show', 'listHeadquarter', 'listAllHeadquarters']]);
+		$this->middleware('permission:headquarter.index', ['only' => ['index', 'show', 'listHeadquarter', 'listAllHeadquarters']]);
 		$this->middleware('permission:headquarter.store', ['only' => ['store']]);
 		$this->middleware('permission:headquarter.update', ['only' => ['update', 'create']]);
 		$this->middleware('permission:headquarter.status', ['only' => ['changeStatus']]);
@@ -62,11 +62,11 @@ class HeadquarterController extends Controller
 			'email' => 'required|email:rfc,dns|unique:users|max:255',
 			'legal_representative' => 'required|string'
 		]);
-		
+
 		if (!$validate->fails()) {
 			$headquarter = new Headquarter();
 			$headquarter->headquarter = $request['headquarter'];
-			$headquarter->status = $request['status'];
+			$headquarter->status = 1;
 			$headquarter->address = $request['address'];
 			$headquarter->nit = $request['nit'];
 			$headquarter->email = $request['email'];
@@ -128,16 +128,40 @@ class HeadquarterController extends Controller
 	 */
 	public function update(Request $request, Headquarter $headquarter)
 	{
-		$headquarter = Headquarter::find($request->id);
-		$headquarter->headquarter = $request['headquarter'];
-		$headquarter->status = $request['status'];
-		$headquarter->address = $request['address'];
-		$headquarter->nit = $request['nit'];
-		$headquarter->email = $request['email'];
-		$headquarter->legal_representative = $request['legal_representative'];
-		$headquarter->pos_printer = $request['pos_printer'];
-		$headquarter->phone = $request['phone'];
-		$headquarter->save();
+
+		$validate = Validator::make($request->all(), [
+			'headquarter' => 'required|string|min:3|max:50',
+			'status' => 'required|boolean',
+			'address' => 'nullable|string',
+			'nit' => 'nullable|string',
+			'email' => 'required|email:rfc,dns|unique:users|max:255',
+			'legal_representative' => 'required|string'
+		]);
+		if (!$request->fails()) {
+			$headquarter->headquarter = $request['headquarter'];
+			$headquarter->address = $request['address'];
+			$headquarter->nit = $request['nit'];
+			$headquarter->email = $request['email'];
+			$headquarter->legal_representative = $request['legal_representative'];
+			$headquarter->pos_printer = $request['pos_printer'];
+			$headquarter->phone = $request['phone'];
+			$headquarter->save();
+
+			$data = [
+				'status' => 'success',
+				'code' => 200,
+				'message' => 'Registro exitoso',
+				'headquarter' => $headquarter
+			];
+		} else {
+			$data = [
+				'status' => 'error',
+				'code' =>  400,
+				'message' => 'Validación de datos incorrecta',
+				'errors' =>  $validate->errors()
+			];
+		}
+		return response()->json($data, $data['code']);
 	}
 
 	/**

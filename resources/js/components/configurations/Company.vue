@@ -268,7 +268,7 @@ export default {
       });
     },
     saveConfiguration() {
-      this.assignErrors(false);
+      this.$root.assignErrors(false, this.formErrors);
       var form = new FormData($("#form_configuration")[0]);
       form.append("id", this.formConfiguration.id);
       form.set(
@@ -277,44 +277,15 @@ export default {
       );
 
       axios
-        .post("api/configurations", form)
+        .post("api/configurations", form, this.$root.config)
         .then((response) => {
           this.formConfiguration = response.data.configuration;
         })
         .catch((response) => {
-          this.assignErrors(response);
+          this.$root.assignErrors(response, this.formErrors);
         });
     },
-    assignErrors(response) {
-      const fillable = [
-        "name",
-        "legal_representative",
-        "nit",
-        "address",
-        "email",
-        "telephone",
-        "mobile",
-        "file0",
-        "condition_order",
-        "condition_quotation",
-        "whatsapp_msg",
-      ];
 
-      if (response) {
-        var errors = response.response.data.errors;
-        console.log(errors);
-
-        fillable.forEach((index) => {
-          if (errors[index] != undefined) {
-            this.formErrors[index] = errors[index][0];
-          }
-        });
-      } else {
-        fillable.forEach((index) => {
-          this.formErrors[index] = "";
-        });
-      }
-    },
     readImage(input) {
       var id = $(input).data("info");
       if (input.files && input.files[0]) {

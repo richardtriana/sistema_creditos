@@ -8,7 +8,7 @@ use App\Models\Expense;
 use Illuminate\Http\Request;
 use PDF;
 use Illuminate\Support\Facades\URL;
-
+use Illuminate\Support\Facades\Validator;
 
 class ExpenseController extends Controller
 {
@@ -42,12 +42,30 @@ class ExpenseController extends Controller
 
 	/**
 	 * Store a newly created resource in storage.
-	 *
+	 *	
 	 * @param  \Illuminate\Http\Request  $request
 	 * @return \Illuminate\Http\Response
 	 */
 	public function store(Request $request)
 	{
+		$validate = Validator::make($request->all(), [
+			'description' => 'required|string|max:255',
+			'date' => 'required|date',
+			'type_output' => 'required|string|exists:type_expenses,description',
+			'price' => 'required|numeric',
+		]);
+
+
+		if ($validate->fails()) {
+			return response()->json([
+				'status' => 'error',
+				'code' =>  400,
+				'message' => 'Validación de datos incorrecta',
+				'errors' =>  $validate->errors()
+			], 400);
+		}
+
+
 		$expense =  new Expense();
 		$expense->headquarter_id = $request->user()->headquarter_id;
 		$expense->user_id = $request->user()->id;
@@ -61,6 +79,14 @@ class ExpenseController extends Controller
 		$box = Box::where('headquarter_id', $expense->headquarter_id)->firstOrFail();
 		$sub_amount_box = new BoxController();
 		$sub_amount_box->subAmountBox($box->id, $request['price']);
+
+
+		return response()->json([
+			'status' => 'success',
+			'code' =>  200,
+			'message' => 'Registro exitoso',
+			'expense' =>  $expense
+		], 200);
 	}
 
 	/**
@@ -72,10 +98,34 @@ class ExpenseController extends Controller
 	 */
 	public function update(Request $request, Expense $expense)
 	{
+
+		$validate = Validator::make($request->all(), [
+			'description' => 'required|string|max:255',
+			'date' => 'required|date',
+			'type_output' => 'required|string|exists:type_expenses,description',
+		]);
+
+
+		if ($validate->fails()) {
+			return response()->json([
+				'status' => 'error',
+				'code' =>  400,
+				'message' => 'Validación de datos incorrecta',
+				'errors' =>  $validate->errors()
+			], 400);
+		}
+
 		$expense->description = $request['description'];
 		$expense->date = $request['date'];
 		$expense->type_output = $request['type_output'];
-		$expense->save();
+		$expense->update();
+
+		return response()->json([
+			'status' => 'success',
+			'code' =>  200,
+			'message' => 'Registro exitoso',
+			'expense' =>  $expense
+		], 200);
 	}
 
 	public function showExpense(Expense $expense)

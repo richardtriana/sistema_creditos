@@ -121,7 +121,7 @@ export default {
     },
     CreateRol() {
       let me = this;
-      this.assignErrors(false);
+      me.$root.assignErrors(false, me.formErrors);
       const formRol = new FormData($("#form_rol")[0]);
       axios
         .post("api/roles", formRol, this.$root.config)
@@ -130,7 +130,7 @@ export default {
           me.$emit("list-roles");
         })
         .catch((response) => {
-          this.assignErrors(response);
+          me.$root.assignErrors(response, me.formErrors);
         });
     },
     OpenEditRol(rol) {
@@ -141,7 +141,7 @@ export default {
 
     EditRol() {
       let me = this;
-      this.assignErrors(false);
+      me.$root.assignErrors(false, me.formErrors);
 
       let permissions_sync = [];
       $(".check-permissions:checked").each(function () {
@@ -157,7 +157,7 @@ export default {
           me.$emit("list-roles");
         })
         .catch((response) => {
-          this.assignErrors(response);
+          me.$root.assignErrors(response, me.formErrors);
         });
     },
     closeModal: function () {
@@ -169,7 +169,7 @@ export default {
       let me = this;
       $("#rolModal").modal("hide");
       me.formRol = {};
-      this.assignErrors(false);
+      me.$root.assignErrors(false, me.formErrors);
     },
     assignErrors(response) {
       if (response) {

@@ -30,6 +30,9 @@
 									</b>
 								</div>
 							</div>
+							<div class="text-center">
+								<p class="text-danger"> {{ errorCashRegister }}</p>
+							</div>
 							<div class="form-group">
 								<label for="current_balance">Saldo disponible</label>
 								<input
@@ -105,6 +108,9 @@
 									Monto máximo
 									{{ root_data.current_balance_main_box | currency }}
 								</small>
+								<small class="form-text text-danger">
+									{{ formErrors.amount}}
+								</small>
 							</div>
 						</div>
 						<div class="modal-footer">
@@ -146,6 +152,10 @@ export default {
 			add_amount: 0,
 			headquarterList: {},
 			root_data: this.$root.$data,
+			formErrors: {
+				amount: ""
+			},
+			errorCashRegister: ''
 		};
 	},
 	mounted() {
@@ -158,7 +168,7 @@ export default {
 			let me = this;
 			$("#boxModal").modal("show");
 			me.formBox = box;
-			console.log(box);
+			me.errorCashRegister =""
 		},
 		listHeadquarters() {
 			let me = this;
@@ -172,6 +182,7 @@ export default {
 		updateBox() {
 			let me = this;
 			if (this.box_id != 0) {
+				me.$root.assignErrors(false, me.formErrors);
 				axios
 					.put(
 						`api/boxes/${this.box_id}`,
@@ -181,6 +192,8 @@ export default {
 					.then(function () {
 						$("#boxModal").modal("hide");
 						me.$emit("list-boxes");
+					}).catch(response => {
+						me.$root.assignErrors(response, me.formErrors);
 					});
 			}
 		},
@@ -192,11 +205,17 @@ export default {
 		},
 
 		cashRegister(box) {
+			this.errorCashRegister = "";
 			box.add_amount = this.add_amount;
 			axios
 				.post(`api/main-box/cash-register/${box.id}`, box, this.$root.config)
-				.then(() => this.$emit("list-boxes"))
-				.finally($("#boxModal").modal("hide"));
+				.then(() => {
+					this.$emit("list-boxes");
+					$("#boxModal").modal("hide");
+				})
+				.catch(response => {
+					this.errorCashRegister = "Error al realizar arqueo de caja"
+				})
 		},
 	},
 };

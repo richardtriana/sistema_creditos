@@ -39,14 +39,12 @@
                   <i class="bi bi-pencil"></i>
                 </button>
               </td>
-              <<<<<<< HEAD =======
               <!-- <td>
 							<button class="btn btn-outline-danger">
 								<i class="bi bi-trash2"></i>
 							</button>
 						</td> -->
-              >>>>>>> 658520e... Authentication validation in views, api and
-              permissions
+
             </tr>
           </tbody>
         </table>
@@ -70,8 +68,8 @@ export default {
   },
   methods: {
     listBoxes() {
-      axios.get("api/boxes", this.$root.config).then((reponse) => {
-        this.boxList = reponse.data.boxes;
+      axios.get("api/boxes", this.$root.config).then((response) => {
+        this.boxList = response.data.boxes;
       });
       this.$root.getCurrentBalanceMainBox();
     },

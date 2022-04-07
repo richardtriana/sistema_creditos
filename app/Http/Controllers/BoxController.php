@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Box;
 use App\Models\MainBox;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class BoxController extends Controller
 {
@@ -81,6 +82,20 @@ class BoxController extends Controller
 	 */
 	public function update(Request $request, Box $box)
 	{
+		$validate = Validator::make($request->all(), [
+			'amount' => 'required|numeric'
+		]);
+
+		if ($validate->fails()) {
+			return response()->json([
+				'status' => 'error',
+				'code' =>  400,
+				'message' => 'Validación de datos incorrecta',
+				'errors' =>  $validate->errors()
+			], 400);
+		}
+
+		
 		$amount =  $request->amount;
 
 		if ($box->initial_balance == 0) {
@@ -91,6 +106,13 @@ class BoxController extends Controller
 
 		$update_main_box = new MainBoxController();
 		$update_main_box->subAmountMainBox($amount);
+
+		return response()->json([
+			'status' => 'success',
+			'code' =>  200,
+			'message' => 'Registro exitoso',
+			'box' =>  $box
+		], 200);
 	}
 
 	/**

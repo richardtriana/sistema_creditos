@@ -33,6 +33,7 @@
                     class="form-control"
                     id="nombre"
                     v-model="formUser.name"
+                    placeholder="Ingresar nombre"
                   />
                   <small id="name_help" class="form-text text-danger">{{
                     formErrors.name
@@ -45,6 +46,7 @@
                     class="form-control"
                     id="name"
                     v-model="formUser.last_name"
+                    placeholder="Ingresar apellidos"
                   />
                   <small id="last_name_help" class="form-text text-danger">{{
                     formErrors.last_name
@@ -57,6 +59,7 @@
                     class="form-control"
                     id="email"
                     v-model="formUser.email"
+                    placeholder="Ingresar email"
                   />
                   <small id="email_help" class="form-text text-danger">{{
                     formErrors.email
@@ -69,6 +72,7 @@
                     class="form-control"
                     id="username"
                     v-model="formUser.username"
+                    placeholder="Ingresar username"
                   />
                   <small id="username_help" class="form-text text-danger">{{
                     formErrors.username
@@ -81,6 +85,7 @@
                     class="form-control"
                     id="phone"
                     v-model="formUser.phone"
+                    placeholder="Ingresar celular"
                   />
                   <small id="phone_help" class="form-text text-danger">{{
                     formErrors.phone
@@ -94,7 +99,7 @@
                     class="custom-select"
                     v-model="formUser.type_document"
                   >
-                    <option value="0" disabled selected>--Seleccionar--</option>
+                    <option value="" disabled selected>--Seleccionar--</option>
                     <option
                       v-for="(d, key) in type_documents"
                       :key="key"
@@ -116,6 +121,7 @@
                     class="form-control"
                     id="document"
                     v-model="formUser.document"
+                    placeholder="Ingresar identificación"
                   />
                   <small id="document_help" class="form-text text-danger">{{
                     formErrors.document
@@ -129,6 +135,7 @@
                     class="form-control"
                     id="address"
                     v-model="formUser.address"
+                    placeholder="Ingresar dirección"
                   />
                   <small id="address_help" class="form-text text-danger">{{
                     formErrors.address
@@ -141,6 +148,7 @@
                     :label="'headquarter'"
                     :reduce="(headquarter) => headquarter.id"
                     v-model="formUser.headquarter_id"
+                    placeholder="--Seleccionar sede--"
                   >
                   </v-select>
                   <small
@@ -241,13 +249,11 @@ export default {
         email: "",
         username: "",
         password: "",
-        nombre: "",
         phone: "",
         address: "",
         type_document: "CC",
         document: 0,
         photo: "",
-        status: "1",
         headquarter_id: "",
         rol: "",
       },
@@ -257,13 +263,11 @@ export default {
         email: "",
         username: "",
         password: "",
-        nombre: "",
         phone: "",
         address: "",
         type_document: "",
         document: "",
         photo: "",
-        status: "",
         headquarter_id: "",
         rol: "",
       },
@@ -284,7 +288,7 @@ export default {
     },
     createUser() {
       let me = this;
-      me.assignErrors(false);
+      me.$root.assignErrors(false, me.formErrors);
 
       axios
         .post("api/users", me.formUser, me.$root.config)
@@ -294,7 +298,7 @@ export default {
           me.$emit("list-users");
         })
         .catch((response) => {
-          me.assignErrors(response);
+          me.$root.assignErrors(response, me.formErrors);
         });
     },
     showEditarUser(user) {
@@ -309,17 +313,17 @@ export default {
     },
     editUser() {
       let me = this;
-
-      me.assignErrors(false);
+      me.$root.assignErrors(false, me.formErrors);
+      //console.log(me.$root.config);
       axios
-        .put("api/users/" + this.formUser.id, this.formUser, me.$root.config)
-        .then(function () {
-          $("#formUserModal").modal("hide");
-          me.resetData();
-          me.$emit("list-users");
+        .put("api/users/" + me.formUser.id, me.formUser, me.$root.config)
+        .then(function (res) {
+          // $("#formUserModal").modal("hide");
+          // me.resetData();
+          // me.$emit("list-users");
         })
         .catch((response) => {
-          me.assignErrors(response);
+          //me.$root.assignErrors(response, me.formErrors);
         });
       this.editar = false;
     },
@@ -328,7 +332,7 @@ export default {
       Object.keys(this.formUser).forEach(function (key, index) {
         me.formUser[key] = "";
       });
-      me.assignErrors(false);
+      me.$root.assignErrors(false, me.formErrors);
     },
 
     listHeadquarters(page = 1) {
@@ -338,23 +342,6 @@ export default {
         .then(function (response) {
           me.headquarterList = response.data;
         });
-    },
-    assignErrors(response) {
-      let me = this;
-
-      if (response) {
-        let errors = response.response.data.errors;
-
-        Object.keys(me.formErrors).forEach(function (key, index) {
-          if (errors[key] != undefined) {
-            me.formErrors[key] = errors[key][0];
-          }
-        });
-      } else {
-        Object.keys(me.formErrors).forEach(function (key, index) {
-          me.formErrors[key] = "";
-        });
-      }
     },
   },
 };

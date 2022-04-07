@@ -2428,8 +2428,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
@@ -2447,8 +2445,8 @@ __webpack_require__.r(__webpack_exports__);
     listBoxes: function listBoxes() {
       var _this = this;
 
-      axios.get("api/boxes", this.$root.config).then(function (reponse) {
-        _this.boxList = reponse.data.boxes;
+      axios.get("api/boxes", this.$root.config).then(function (response) {
+        _this.boxList = response.data.boxes;
       });
       this.$root.getCurrentBalanceMainBox();
     },
@@ -2662,6 +2660,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -2670,7 +2674,11 @@ __webpack_require__.r(__webpack_exports__);
       formBox: {},
       add_amount: 0,
       headquarterList: {},
-      root_data: this.$root.$data
+      root_data: this.$root.$data,
+      formErrors: {
+        amount: ""
+      },
+      errorCashRegister: ''
     };
   },
   mounted: function mounted() {
@@ -2683,7 +2691,7 @@ __webpack_require__.r(__webpack_exports__);
       var me = this;
       $("#boxModal").modal("show");
       me.formBox = box;
-      console.log(box);
+      me.errorCashRegister = "";
     },
     listHeadquarters: function listHeadquarters() {
       var me = this;
@@ -2695,11 +2703,14 @@ __webpack_require__.r(__webpack_exports__);
       var me = this;
 
       if (this.box_id != 0) {
+        me.$root.assignErrors(false, me.formErrors);
         axios.put("api/boxes/".concat(this.box_id), {
           amount: this.add_amount
         }, me.$root.config).then(function () {
           $("#boxModal").modal("hide");
           me.$emit("list-boxes");
+        })["catch"](function (response) {
+          me.$root.assignErrors(response, me.formErrors);
         });
       }
     },
@@ -2712,10 +2723,15 @@ __webpack_require__.r(__webpack_exports__);
     cashRegister: function cashRegister(box) {
       var _this = this;
 
+      this.errorCashRegister = "";
       box.add_amount = this.add_amount;
       axios.post("api/main-box/cash-register/".concat(box.id), box, this.$root.config).then(function () {
-        return _this.$emit("list-boxes");
-      })["finally"]($("#boxModal").modal("hide"));
+        _this.$emit("list-boxes");
+
+        $("#boxModal").modal("hide");
+      })["catch"](function (response) {
+        _this.errorCashRegister = "Error al realizar arqueo de caja";
+      });
     }
   }
 });
@@ -2852,12 +2868,18 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
       formMainBox: {},
       lastEditor: {},
-      add_amount: 0
+      add_amount: 0,
+      formErrors: {
+        amount: ""
+      }
     };
   },
   created: function created() {
@@ -2867,9 +2889,9 @@ __webpack_require__.r(__webpack_exports__);
     getMainBox: function getMainBox() {
       var _this = this;
 
-      axios.get("api/main-box", this.$root.config).then(function (reponse) {
-        _this.formMainBox = reponse.data.main_box;
-        _this.lastEditor = reponse.data.last_editor;
+      axios.get("api/main-box", this.$root.config).then(function (response) {
+        _this.formMainBox = response.data.main_box;
+        _this.lastEditor = response.data.last_editor;
       });
       this.$root.getCurrentBalanceMainBox();
     },
@@ -2877,10 +2899,13 @@ __webpack_require__.r(__webpack_exports__);
       var me = this;
 
       if (this.box_id != 0) {
+        me.$root.assignErrors(false, me.formErrors);
         axios.put("api/main-box/".concat(this.formMainBox.id), {
           amount: this.add_amount
         }, me.$root.config).then(function () {
           me.getMainBox();
+        })["catch"](function (response) {
+          me.$root.assignErrors(response, me.formErrors);
         });
       }
     }
@@ -3561,6 +3586,69 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -3568,7 +3656,7 @@ __webpack_require__.r(__webpack_exports__);
       formClient: {
         name: "",
         last_name: "",
-        type_document: 'CC',
+        type_document: "CC",
         document: 0,
         birth_date: "",
         email: "",
@@ -3581,31 +3669,53 @@ __webpack_require__.r(__webpack_exports__);
         occupation: "",
         address: ""
       },
+      formErrors: {
+        name: "",
+        last_name: "",
+        type_document: "",
+        document: "",
+        birth_date: "",
+        email: "",
+        phone_1: "",
+        phone_2: "",
+        gender: "",
+        civil_status: "",
+        independent: "",
+        workplace: "",
+        occupation: "",
+        address: ""
+      },
       type_documents: this.$root.$data.type_documents
     };
   },
   methods: {
     createClient: function createClient() {
       var me = this;
+      me.$root.assignErrors(false, me.formErrors);
       axios.post("api/clients", this.formClient, me.$root.config).then(function () {
         $("#formClientModal").modal("hide");
         me.resetData();
         me.$emit("list-clients");
+      })["catch"](function (response) {
+        me.$root.assignErrors(response, me.formErrors);
       });
     },
     showEditClient: function showEditClient(client) {
       this.editar = true;
       var me = this;
       $("#formClientModal").modal("show");
-      me.formClient = client;
+      me.formClient = Object.assign({}, client);
     },
     editClient: function editClient() {
       var me = this;
+      me.$root.assignErrors(false, me.formErrors);
       axios.put("api/clients/".concat(this.formClient.id), this.formClient, me.$root.config).then(function () {
         $("#formClientModal").modal("hide");
         me.resetData();
+        me.$emit("list-clients");
+      })["catch"](function (response) {
+        me.$root.assignErrors(response, me.formErrors);
       });
-      me.$emit("list-clients");
       me.editar = false;
     },
     resetData: function resetData() {
@@ -3613,6 +3723,7 @@ __webpack_require__.r(__webpack_exports__);
       Object.keys(this.formClient).forEach(function (key, index) {
         me.formClient[key] = "";
       });
+      me.$root.assignErrors(false, me.formErrors);
     }
   }
 });
@@ -3947,34 +4058,15 @@ __webpack_require__.r(__webpack_exports__);
     saveConfiguration: function saveConfiguration() {
       var _this2 = this;
 
-      this.assignErrors(false);
+      this.$root.assignErrors(false, this.formErrors);
       var form = new FormData($("#form_configuration")[0]);
       form.append("id", this.formConfiguration.id);
       form.set("condition_quotation", this.formConfiguration.condition_quotation);
-      axios.post("api/configurations", form).then(function (response) {
+      axios.post("api/configurations", form, this.$root.config).then(function (response) {
         _this2.formConfiguration = response.data.configuration;
       })["catch"](function (response) {
-        _this2.assignErrors(response);
+        _this2.$root.assignErrors(response, _this2.formErrors);
       });
-    },
-    assignErrors: function assignErrors(response) {
-      var _this3 = this;
-
-      var fillable = ["name", "legal_representative", "nit", "address", "email", "telephone", "mobile", "file0", "condition_order", "condition_quotation", "whatsapp_msg"];
-
-      if (response) {
-        var errors = response.response.data.errors;
-        console.log(errors);
-        fillable.forEach(function (index) {
-          if (errors[index] != undefined) {
-            _this3.formErrors[index] = errors[index][0];
-          }
-        });
-      } else {
-        fillable.forEach(function (index) {
-          _this3.formErrors[index] = "";
-        });
-      }
     },
     readImage: function readImage(input) {
       var id = $(input).data("info");
@@ -4037,6 +4129,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _credit_helpers_Simulator_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../credit_helpers/Simulator.vue */ "./resources/js/components/credits/credit_helpers/Simulator.vue");
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -4405,7 +4507,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.edit = true;
       var me = this;
       $("#formCreditModal").modal("show");
-      me.formCredit = credit;
+      me.formCredit = Object.assign({}, credit);
     },
     editCredit: function editCredit() {
       var me = this;
@@ -4436,7 +4538,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       Object.keys(this.formCredit).forEach(function (key, index) {
         me.formCredit[key] = "";
       });
-      me.$root.assignErrors(response, me.formErrors);
+      me.$root.assignErrors(false, me.formErrors);
     }
   }
 });
@@ -6206,6 +6308,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
@@ -6228,10 +6331,13 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     createExpense: function createExpense() {
       var me = this;
+      me.$root.assignErrors(false, me.formErrors);
       axios.post("api/expenses", this.formExpense, me.$root.config).then(function () {
         $("#expenseModal").modal("hide");
         me.resetData();
         me.$emit("list-expenses");
+      })["catch"](function (response) {
+        me.$root.assignErrors(response, me.formErrors);
       });
     },
     showEditExpense: function showEditExpense(expense) {
@@ -6242,9 +6348,12 @@ __webpack_require__.r(__webpack_exports__);
     },
     editExpense: function editExpense() {
       var me = this;
+      me.$root.assignErrors(false, me.formErrors);
       axios.put("api/expenses/".concat(this.formExpense.id), this.formExpense, me.$root.config).then(function () {
         $("#expenseModal").modal("hide");
         me.resetData();
+      })["catch"](function (response) {
+        me.$root.assignErrors(response, me.formErrors);
       });
       this.$emit("list-expenses");
       me.editar = false;
@@ -6254,6 +6363,7 @@ __webpack_require__.r(__webpack_exports__);
       Object.keys(this.formExpense).forEach(function (key, index) {
         me.formExpense[key] = "";
       });
+      me.$root.assignErrors(false, me.formErrors);
     },
     listTypeExpenses: function listTypeExpenses() {
       var me = this;
@@ -6281,6 +6391,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _ModalExpense_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalExpense.vue */ "./resources/js/components/expenses/ModalExpense.vue");
+//
+//
+//
 //
 //
 //
@@ -6688,6 +6801,29 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -6699,8 +6835,7 @@ __webpack_require__.r(__webpack_exports__);
         phone: "",
         address: "",
         email: "",
-        nit: "",
-        status: "1"
+        nit: ""
       },
       formErrors: {
         headquarter: "",
@@ -6709,8 +6844,7 @@ __webpack_require__.r(__webpack_exports__);
         phone: "",
         address: "",
         email: "",
-        nit: "",
-        status: "1"
+        nit: ""
       }
     };
   },
@@ -6718,13 +6852,13 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     createHeadquarter: function createHeadquarter() {
       var me = this;
-      me.assignErrors(false);
+      me.$root.assignErrors(false, me.formErrors);
       axios.post("api/headquarters", this.formHeadquarter, me.$root.config).then(function () {
         $("#formHeadquarterModal").modal("hide");
         me.resetData();
         me.$emit("list-headquarters");
       })["catch"](function (response) {
-        me.assignErrors(response);
+        me.$root.assignErrors(response, me.formErrors);
       });
     },
     showEditHeadquarter: function showEditHeadquarter(headquarter) {
@@ -6735,11 +6869,12 @@ __webpack_require__.r(__webpack_exports__);
     },
     editHeadquarter: function editHeadquarter() {
       var me = this;
+      me.$root.assignErrors(false, me.formErrors);
       axios.put("api/headquarters/".concat(this.formHeadquarter.id), this.formHeadquarter, me.$root.config).then(function () {
         $("#formHeadquarterModal").modal("hide");
         me.resetData();
       })["catch"](function (response) {
-        me.assignErrors(response);
+        me.$root.assignErrors(response, me.formErrors);
       });
       me.$emit("list-headquarters");
       me.editar = false;
@@ -6750,24 +6885,6 @@ __webpack_require__.r(__webpack_exports__);
         me.formHeadquarter[key] = "";
       });
       me.$emit("list-headquarters");
-    },
-    assignErrors: function assignErrors(response) {
-      var _this = this;
-
-      var fillable = ["headquarter", "status", "address", "nit", "email", "legal_representative", "phone", "pos_printer"];
-
-      if (response) {
-        var errors = response.response.data.errors;
-        fillable.forEach(function (index) {
-          if (errors[index] != undefined) {
-            _this.formErrors[index] = errors[index][0];
-          }
-        });
-      } else {
-        fillable.forEach(function (index) {
-          _this.formErrors[index] = "";
-        });
-      }
     }
   }
 });
@@ -7221,6 +7338,33 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -7233,16 +7377,27 @@ __webpack_require__.r(__webpack_exports__);
         phone_2: "",
         email: ""
       },
+      formErrors: {
+        business_name: "",
+        type_document: "",
+        document: "",
+        phone_1: "",
+        phone_2: "",
+        email: ""
+      },
       type_documents: this.$root.$data.type_documents
     };
   },
   methods: {
     createProvider: function createProvider() {
       var me = this;
+      me.$root.assignErrors(false, me.formErrors);
       axios.post("api/providers", this.formProvider, me.$root.config).then(function () {
         $("#formProviderModal").modal("hide");
         me.formProvider = {};
-        this.$emit("list-providers");
+        me.$emit("list-providers");
+      })["catch"](function (response) {
+        me.$root.assignErrors(response, me.formErrors);
       });
     },
     showEditProvider: function showEditProvider(provider) {
@@ -7253,11 +7408,14 @@ __webpack_require__.r(__webpack_exports__);
     },
     editProvider: function editProvider() {
       var me = this;
+      me.$root.assignErrors(false, me.formErrors);
       axios.put("api/providers/" + this.formProvider.id, this.formProvider, me.$root.config).then(function () {
         $("#formProviderModal").modal("hide");
         me.formProvider = {};
+        me.$emit("list-providers");
+      })["catch"](function (response) {
+        me.$root.assignErrors(response, me.formErrors);
       });
-      this.$emit("list-providers");
       this.editar = false;
     }
   }
@@ -7999,16 +8157,14 @@ __webpack_require__.r(__webpack_exports__);
       return _services_utils__WEBPACK_IMPORTED_MODULE_0__["default"].validatePermission(this.formRol.permissions ? this.formRol.permissions : [], permission);
     },
     CreateRol: function CreateRol() {
-      var _this2 = this;
-
       var me = this;
-      this.assignErrors(false);
+      me.$root.assignErrors(false, me.formErrors);
       var formRol = new FormData($("#form_rol")[0]);
       axios.post("api/roles", formRol, this.$root.config).then(function () {
         me.ResetData();
         me.$emit("list-roles");
       })["catch"](function (response) {
-        _this2.assignErrors(response);
+        me.$root.assignErrors(response, me.formErrors);
       });
     },
     OpenEditRol: function OpenEditRol(rol) {
@@ -8017,10 +8173,8 @@ __webpack_require__.r(__webpack_exports__);
       this.formRol = rol;
     },
     EditRol: function EditRol() {
-      var _this3 = this;
-
       var me = this;
-      this.assignErrors(false);
+      me.$root.assignErrors(false, me.formErrors);
       var permissions_sync = [];
       $(".check-permissions:checked").each(function () {
         permissions_sync.push($(this).val());
@@ -8030,7 +8184,7 @@ __webpack_require__.r(__webpack_exports__);
         me.ResetData();
         me.$emit("list-roles");
       })["catch"](function (response) {
-        _this3.assignErrors(response);
+        me.$root.assignErrors(response, me.formErrors);
       });
     },
     closeModal: function closeModal() {
@@ -8042,7 +8196,7 @@ __webpack_require__.r(__webpack_exports__);
       var me = this;
       $("#rolModal").modal("hide");
       me.formRol = {};
-      this.assignErrors(false);
+      me.$root.assignErrors(false, me.formErrors);
     },
     assignErrors: function assignErrors(response) {
       if (response) {
@@ -8406,6 +8560,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -8417,13 +8579,11 @@ __webpack_require__.r(__webpack_exports__);
         email: "",
         username: "",
         password: "",
-        nombre: "",
         phone: "",
         address: "",
         type_document: "CC",
         document: 0,
         photo: "",
-        status: "1",
         headquarter_id: "",
         rol: ""
       },
@@ -8433,13 +8593,11 @@ __webpack_require__.r(__webpack_exports__);
         email: "",
         username: "",
         password: "",
-        nombre: "",
         phone: "",
         address: "",
         type_document: "",
         document: "",
         photo: "",
-        status: "",
         headquarter_id: "",
         rol: ""
       },
@@ -8462,13 +8620,13 @@ __webpack_require__.r(__webpack_exports__);
     },
     createUser: function createUser() {
       var me = this;
-      me.assignErrors(false);
+      me.$root.assignErrors(false, me.formErrors);
       axios.post("api/users", me.formUser, me.$root.config).then(function () {
         $("#formUserModal").modal("hide");
         me.resetData();
         me.$emit("list-users");
       })["catch"](function (response) {
-        me.assignErrors(response);
+        me.$root.assignErrors(response, me.formErrors);
       });
     },
     showEditarUser: function showEditarUser(user) {
@@ -8482,13 +8640,12 @@ __webpack_require__.r(__webpack_exports__);
     },
     editUser: function editUser() {
       var me = this;
-      me.assignErrors(false);
-      axios.put("api/users/" + this.formUser.id, this.formUser, me.$root.config).then(function () {
-        $("#formUserModal").modal("hide");
-        me.resetData();
-        me.$emit("list-users");
-      })["catch"](function (response) {
-        me.assignErrors(response);
+      me.$root.assignErrors(false, me.formErrors); //console.log(me.$root.config);
+
+      axios.put("api/users/" + me.formUser.id, me.formUser, me.$root.config).then(function (res) {// $("#formUserModal").modal("hide");
+        // me.resetData();
+        // me.$emit("list-users");
+      })["catch"](function (response) {//me.$root.assignErrors(response, me.formErrors);
       });
       this.editar = false;
     },
@@ -8497,7 +8654,7 @@ __webpack_require__.r(__webpack_exports__);
       Object.keys(this.formUser).forEach(function (key, index) {
         me.formUser[key] = "";
       });
-      me.assignErrors(false);
+      me.$root.assignErrors(false, me.formErrors);
     },
     listHeadquarters: function listHeadquarters() {
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
@@ -8505,22 +8662,6 @@ __webpack_require__.r(__webpack_exports__);
       axios.get("api/headquarters?page=".concat(page), me.$root.config).then(function (response) {
         me.headquarterList = response.data;
       });
-    },
-    assignErrors: function assignErrors(response) {
-      var me = this;
-
-      if (response) {
-        var errors = response.response.data.errors;
-        Object.keys(me.formErrors).forEach(function (key, index) {
-          if (errors[key] != undefined) {
-            me.formErrors[key] = errors[key][0];
-          }
-        });
-      } else {
-        Object.keys(me.formErrors).forEach(function (key, index) {
-          me.formErrors[key] = "";
-        });
-      }
     }
   }
 });
@@ -13570,7 +13711,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.content-found {\n\theight: 80vh;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.content-found {\r\n\theight: 80vh;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -54103,12 +54244,6 @@ var render = function () {
                             ),
                           ])
                         : _vm._e(),
-                      _vm._v(
-                        "\n              <<<<<<< HEAD =======\n              "
-                      ),
-                      _vm._v(
-                        "\n              >>>>>>> 658520e... Authentication validation in views, api and\n              permissions\n            "
-                      ),
                     ])
                   }),
                   0
@@ -54268,6 +54403,12 @@ var render = function () {
                           "\n\t\t\t\t\t\t\t\t"
                       ),
                     ]),
+                  ]),
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "text-center" }, [
+                  _c("p", { staticClass: "text-danger" }, [
+                    _vm._v(" " + _vm._s(_vm.errorCashRegister)),
                   ]),
                 ]),
                 _vm._v(" "),
@@ -54494,6 +54635,14 @@ var render = function () {
                       ),
                     ]
                   ),
+                  _vm._v(" "),
+                  _c("small", { staticClass: "form-text text-danger" }, [
+                    _vm._v(
+                      "\n\t\t\t\t\t\t\t\t" +
+                        _vm._s(_vm.formErrors.amount) +
+                        "\n\t\t\t\t\t\t\t"
+                    ),
+                  ]),
                 ]),
               ]),
               _vm._v(" "),
@@ -54796,11 +54945,19 @@ var render = function () {
                 },
               },
             }),
+            _vm._v(" "),
+            _c("small", { staticClass: "form-text text-danger" }, [
+              _vm._v(
+                "\n\t\t\t\t\t\t" +
+                  _vm._s(_vm.formErrors.amount) +
+                  "\n\t\t\t\t\t"
+              ),
+            ]),
           ]),
         ]),
         _vm._v(" "),
         _vm.$root.validatePermission("box-update")
-          ? _c("div", { staticClass: "w-100 text-center" }, [
+          ? _c("div", { staticClass: "w-100 text-center mt-5" }, [
               _c(
                 "button",
                 {
@@ -55578,7 +55735,12 @@ var render = function () {
                 },
               ],
               staticClass: "form-control",
-              attrs: { type: "text", id: "name" },
+              class: [_vm.formErrors.name ? "is-invalid" : ""],
+              attrs: {
+                type: "text",
+                id: "name",
+                placeholder: "Ingresar nombres",
+              },
               domProps: { value: _vm.formClient.name },
               on: {
                 input: function ($event) {
@@ -55589,6 +55751,21 @@ var render = function () {
                 },
               },
             }),
+            _vm._v(" "),
+            _c(
+              "small",
+              {
+                staticClass: "form-text text-danger",
+                attrs: { id: "name_help" },
+              },
+              [
+                _vm._v(
+                  "\n            " +
+                    _vm._s(_vm.formErrors.name) +
+                    "\n          "
+                ),
+              ]
+            ),
           ]),
           _vm._v(" "),
           _c("div", { staticClass: "form-group col-md-4" }, [
@@ -55604,7 +55781,12 @@ var render = function () {
                 },
               ],
               staticClass: "form-control",
-              attrs: { type: "text", id: "last_name" },
+              class: [_vm.formErrors.last_name ? "is-invalid" : ""],
+              attrs: {
+                type: "text",
+                id: "last_name",
+                placeholder: "Ingresar  apellidos",
+              },
               domProps: { value: _vm.formClient.last_name },
               on: {
                 input: function ($event) {
@@ -55615,6 +55797,21 @@ var render = function () {
                 },
               },
             }),
+            _vm._v(" "),
+            _c(
+              "small",
+              {
+                staticClass: "form-text text-danger",
+                attrs: { id: "last_name_help" },
+              },
+              [
+                _vm._v(
+                  "\n            " +
+                    _vm._s(_vm.formErrors.last_name) +
+                    "\n          "
+                ),
+              ]
+            ),
           ]),
           _vm._v(" "),
           _c("div", { staticClass: "form-group col-md-4" }, [
@@ -55632,6 +55829,7 @@ var render = function () {
                 },
               ],
               staticClass: "form-control",
+              class: [_vm.formErrors.birth_date ? "is-invalid" : ""],
               attrs: { type: "date", id: "birth_date" },
               domProps: { value: _vm.formClient.birth_date },
               on: {
@@ -55643,6 +55841,21 @@ var render = function () {
                 },
               },
             }),
+            _vm._v(" "),
+            _c(
+              "small",
+              {
+                staticClass: "form-text text-danger",
+                attrs: { id: "birth_date_help" },
+              },
+              [
+                _vm._v(
+                  "\n            " +
+                    _vm._s(_vm.formErrors.birth_date) +
+                    "\n          "
+                ),
+              ]
+            ),
           ]),
           _vm._v(" "),
           _c("div", { staticClass: "form-group col-md-4" }, [
@@ -55662,7 +55875,12 @@ var render = function () {
                   },
                 ],
                 staticClass: "custom-select",
-                attrs: { name: "type_document", id: "type_document" },
+                class: [_vm.formErrors.type_document ? "is-invalid" : ""],
+                attrs: {
+                  name: "type_document",
+                  id: "type_document",
+                  placeholder: "--Selecciona--",
+                },
                 on: {
                   change: function ($event) {
                     var $$selectedVal = Array.prototype.filter
@@ -55682,7 +55900,7 @@ var render = function () {
                 },
               },
               [
-                _c("option", { attrs: { value: "0", disabled: "" } }, [
+                _c("option", { attrs: { value: "", disabled: "" } }, [
                   _vm._v("--Seleccionar--"),
                 ]),
                 _vm._v(" "),
@@ -55691,6 +55909,21 @@ var render = function () {
                     _vm._v("\n              " + _vm._s(d) + "\n            "),
                   ])
                 }),
+                _vm._v(" "),
+                _c(
+                  "small",
+                  {
+                    staticClass: "form-text text-danger",
+                    attrs: { id: "type_document_help" },
+                  },
+                  [
+                    _vm._v(
+                      "\n              " +
+                        _vm._s(_vm.formErrors.type_document) +
+                        "\n            "
+                    ),
+                  ]
+                ),
               ],
               2
             ),
@@ -55711,7 +55944,12 @@ var render = function () {
                 },
               ],
               staticClass: "form-control",
-              attrs: { type: "number", id: "Documento" },
+              class: [_vm.formErrors.document ? "is-invalid" : ""],
+              attrs: {
+                type: "number",
+                id: "Documento",
+                placeholder: "Ingresar identificación",
+              },
               domProps: { value: _vm.formClient.document },
               on: {
                 input: function ($event) {
@@ -55722,6 +55960,21 @@ var render = function () {
                 },
               },
             }),
+            _vm._v(" "),
+            _c(
+              "small",
+              {
+                staticClass: "form-text text-danger",
+                attrs: { id: "document_help" },
+              },
+              [
+                _vm._v(
+                  "\n            " +
+                    _vm._s(_vm.formErrors.document) +
+                    "\n          "
+                ),
+              ]
+            ),
           ]),
           _vm._v(" "),
           _c("div", { staticClass: "form-group col-md-4" }, [
@@ -55741,6 +55994,7 @@ var render = function () {
                   },
                 ],
                 staticClass: "custom-select",
+                class: [_vm.formErrors.civil_status ? "is-invalid" : ""],
                 attrs: { name: "civil_status", id: "civil_status" },
                 on: {
                   change: function ($event) {
@@ -55761,7 +56015,7 @@ var render = function () {
                 },
               },
               [
-                _c("option", { attrs: { value: "0", disabled: "" } }, [
+                _c("option", { attrs: { value: "", disabled: "" } }, [
                   _vm._v("--Seleccionar--"),
                 ]),
                 _vm._v(" "),
@@ -55782,6 +56036,21 @@ var render = function () {
                 ]),
                 _vm._v(" "),
                 _c("option", { attrs: { value: "Viudo" } }, [_vm._v("Viudo")]),
+              ]
+            ),
+            _vm._v(" "),
+            _c(
+              "small",
+              {
+                staticClass: "form-text text-danger",
+                attrs: { id: "civil_status_help" },
+              },
+              [
+                _vm._v(
+                  "\n            " +
+                    _vm._s(_vm.formErrors.civil_status) +
+                    "\n          "
+                ),
               ]
             ),
           ]),
@@ -55886,6 +56155,21 @@ var render = function () {
                 [_vm._v("Otro")]
               ),
             ]),
+            _vm._v(" "),
+            _c(
+              "small",
+              {
+                staticClass: "form-text text-danger",
+                attrs: { id: "gender_help" },
+              },
+              [
+                _vm._v(
+                  "\n            " +
+                    _vm._s(_vm.formErrors.gender) +
+                    "\n          "
+                ),
+              ]
+            ),
           ]),
         ]),
         _vm._v(" "),
@@ -55905,7 +56189,12 @@ var render = function () {
                 },
               ],
               staticClass: "form-control",
-              attrs: { type: "email", id: "email" },
+              class: [_vm.formErrors.email ? "is-invalid" : ""],
+              attrs: {
+                type: "email",
+                id: "email",
+                placeholder: "Ingresar correo electrónico",
+              },
               domProps: { value: _vm.formClient.email },
               on: {
                 input: function ($event) {
@@ -55916,6 +56205,21 @@ var render = function () {
                 },
               },
             }),
+            _vm._v(" "),
+            _c(
+              "small",
+              {
+                staticClass: "form-text text-danger",
+                attrs: { id: "email_help" },
+              },
+              [
+                _vm._v(
+                  "\n            " +
+                    _vm._s(_vm.formErrors.email) +
+                    "\n          "
+                ),
+              ]
+            ),
           ]),
           _vm._v(" "),
           _c("div", { staticClass: "form-group col-4" }, [
@@ -55931,7 +56235,12 @@ var render = function () {
                 },
               ],
               staticClass: "form-control",
-              attrs: { type: "text", id: "address" },
+              class: [_vm.formErrors.address ? "is-invalid" : ""],
+              attrs: {
+                type: "text",
+                id: "address",
+                placeholder: "Ingresar dirección",
+              },
               domProps: { value: _vm.formClient.address },
               on: {
                 input: function ($event) {
@@ -55942,6 +56251,21 @@ var render = function () {
                 },
               },
             }),
+            _vm._v(" "),
+            _c(
+              "small",
+              {
+                staticClass: "form-text text-danger",
+                attrs: { id: "address_help" },
+              },
+              [
+                _vm._v(
+                  "\n            " +
+                    _vm._s(_vm.formErrors.address) +
+                    "\n          "
+                ),
+              ]
+            ),
           ]),
           _vm._v(" "),
           _c("div", { staticClass: "form-group col-4" }, [
@@ -55957,7 +56281,12 @@ var render = function () {
                 },
               ],
               staticClass: "form-control",
-              attrs: { type: "tel", id: "phone_1" },
+              class: [_vm.formErrors.phone_1 ? "is-invalid" : ""],
+              attrs: {
+                type: "tel",
+                id: "phone_1",
+                placeholder: "Ingresar numero de celular",
+              },
               domProps: { value: _vm.formClient.phone_1 },
               on: {
                 input: function ($event) {
@@ -55968,6 +56297,21 @@ var render = function () {
                 },
               },
             }),
+            _vm._v(" "),
+            _c(
+              "small",
+              {
+                staticClass: "form-text text-danger",
+                attrs: { id: "phone_1_help" },
+              },
+              [
+                _vm._v(
+                  "\n            " +
+                    _vm._s(_vm.formErrors.phone_1) +
+                    "\n          "
+                ),
+              ]
+            ),
           ]),
           _vm._v(" "),
           _c("div", { staticClass: "form-group col-4" }, [
@@ -55983,7 +56327,12 @@ var render = function () {
                 },
               ],
               staticClass: "form-control",
-              attrs: { type: "tel", id: "phone_2" },
+              class: [_vm.formErrors.phone_2 ? "is-invalid" : ""],
+              attrs: {
+                type: "tel",
+                id: "phone_2",
+                placeholder: "Ingresar numero de celular",
+              },
               domProps: { value: _vm.formClient.phone_2 },
               on: {
                 input: function ($event) {
@@ -55994,6 +56343,21 @@ var render = function () {
                 },
               },
             }),
+            _vm._v(" "),
+            _c(
+              "small",
+              {
+                staticClass: "form-text text-danger",
+                attrs: { id: "phone_2_help" },
+              },
+              [
+                _vm._v(
+                  "\n            " +
+                    _vm._s(_vm.formErrors.phone_2) +
+                    "\n          "
+                ),
+              ]
+            ),
           ]),
           _vm._v(" "),
           _c("div", { staticClass: "form-group col-md-4" }, [
@@ -56011,7 +56375,12 @@ var render = function () {
                 },
               ],
               staticClass: "form-control",
-              attrs: { type: "email", id: "workplace" },
+              class: [_vm.formErrors.workplace ? "is-invalid" : ""],
+              attrs: {
+                type: "email",
+                id: "workplace",
+                placeholder: "Ingresar lugar de trabajo",
+              },
               domProps: { value: _vm.formClient.workplace },
               on: {
                 input: function ($event) {
@@ -56022,6 +56391,21 @@ var render = function () {
                 },
               },
             }),
+            _vm._v(" "),
+            _c(
+              "small",
+              {
+                staticClass: "form-text text-danger",
+                attrs: { id: "workplace_help" },
+              },
+              [
+                _vm._v(
+                  "\n            " +
+                    _vm._s(_vm.formErrors.workplace) +
+                    "\n          "
+                ),
+              ]
+            ),
           ]),
           _vm._v(" "),
           _c("div", { staticClass: "form-group col-md-4" }, [
@@ -56037,7 +56421,12 @@ var render = function () {
                 },
               ],
               staticClass: "form-control",
-              attrs: { type: "text", id: "occupation" },
+              class: [_vm.formErrors.occupation ? "is-invalid" : ""],
+              attrs: {
+                type: "text",
+                id: "occupation",
+                placeholder: "Ingresar ocupación",
+              },
               domProps: { value: _vm.formClient.occupation },
               on: {
                 input: function ($event) {
@@ -56048,6 +56437,21 @@ var render = function () {
                 },
               },
             }),
+            _vm._v(" "),
+            _c(
+              "small",
+              {
+                staticClass: "form-text text-danger",
+                attrs: { id: "occupation_help" },
+              },
+              [
+                _vm._v(
+                  "\n            " +
+                    _vm._s(_vm.formErrors.occupation) +
+                    "\n          "
+                ),
+              ]
+            ),
           ]),
           _vm._v(" "),
           _c("div", { staticClass: "form-check col-md-4 ml-4" }, [
@@ -56104,6 +56508,21 @@ var render = function () {
                 attrs: { for: "independent" },
               },
               [_vm._v("\n            Independiente\n          ")]
+            ),
+            _vm._v(" "),
+            _c(
+              "small",
+              {
+                staticClass: "form-text text-danger",
+                attrs: { id: "independent_help" },
+              },
+              [
+                _vm._v(
+                  "\n            " +
+                    _vm._s(_vm.formErrors.independent) +
+                    "\n          "
+                ),
+              ]
             ),
           ]),
         ]),
@@ -56738,6 +57157,9 @@ var render = function () {
                               },
                             ],
                             staticClass: "form-control",
+                            class: [
+                              _vm.formErrors.client_id ? "is-invalid" : "",
+                            ],
                             attrs: { type: "text", disabled: "", readonly: "" },
                             domProps: { value: _vm.client_name },
                             on: {
@@ -56879,6 +57301,9 @@ var render = function () {
                                 },
                               ],
                               staticClass: "form-control",
+                              class: [
+                                _vm.formErrors.debtor_id ? "is-invalid" : "",
+                              ],
                               attrs: {
                                 type: "text",
                                 disabled: "",
@@ -57025,6 +57450,9 @@ var render = function () {
                                 },
                               ],
                               staticClass: "form-control",
+                              class: [
+                                _vm.formErrors.provider_id ? "is-invalid" : "",
+                              ],
                               attrs: {
                                 type: "text",
                                 disabled: "",
@@ -57067,6 +57495,9 @@ var render = function () {
                               },
                             ],
                             staticClass: "form-control",
+                            class: [
+                              _vm.formErrors.description ? "is-invalid" : "",
+                            ],
                             attrs: { type: "text", id: "description" },
                             domProps: { value: _vm.formCredit.description },
                             on: {
@@ -57102,6 +57533,11 @@ var render = function () {
                             ]),
                             _vm._v(" "),
                             _c("v-select", {
+                              class: [
+                                _vm.formErrors.headquarter_id
+                                  ? "is-invalid"
+                                  : "",
+                              ],
                               attrs: {
                                 options: _vm.headquarterList,
                                 label: "headquarter",
@@ -57143,6 +57579,11 @@ var render = function () {
                           _vm.edit
                             ? _c("input", {
                                 staticClass: "form-control",
+                                class: [
+                                  _vm.formErrors.credit_value
+                                    ? "is-invalid"
+                                    : "",
+                                ],
                                 attrs: {
                                   type: "text",
                                   id: "credit_value",
@@ -57168,6 +57609,11 @@ var render = function () {
                                   },
                                 ],
                                 staticClass: "form-control",
+                                class: [
+                                  _vm.formErrors.credit_value
+                                    ? "is-invalid"
+                                    : "",
+                                ],
                                 attrs: {
                                   type: "number",
                                   id: "credit_value",
@@ -57244,6 +57690,9 @@ var render = function () {
                               },
                             ],
                             staticClass: "form-control",
+                            class: [
+                              _vm.formErrors.interest ? "is-invalid" : "",
+                            ],
                             attrs: {
                               type: "number",
                               id: "interest",
@@ -57292,6 +57741,11 @@ var render = function () {
                               },
                             ],
                             staticClass: "form-control",
+                            class: [
+                              _vm.formErrors.number_installments
+                                ? "is-invalid"
+                                : "",
+                            ],
                             attrs: {
                               type: "number",
                               id: "number_installments",
@@ -57339,6 +57793,9 @@ var render = function () {
                               },
                             ],
                             staticClass: "form-control",
+                            class: [
+                              _vm.formErrors.start_date ? "is-invalid" : "",
+                            ],
                             attrs: {
                               type: "date",
                               id: "start_date",
@@ -57391,7 +57848,7 @@ var render = function () {
                             attrs: { type: "button", "data-dismiss": "modal" },
                             on: {
                               click: function ($event) {
-                                _vm.edit = false
+                                ;(_vm.edit = false), _vm.resetData()
                               },
                             },
                           },
@@ -59847,6 +60304,7 @@ var render = function () {
                   reduce: function (expenseType) {
                     return expenseType.description
                   },
+                  placeholder: "--Seleccionar--",
                 },
                 model: {
                   value: _vm.formExpense.type_output,
@@ -60461,7 +60919,12 @@ var render = function () {
                       ],
                       staticClass: "form-control",
                       class: [_vm.formErrors.headquarter ? "is-invalid" : ""],
-                      attrs: { type: "text", id: "headquarter", required: "" },
+                      attrs: {
+                        type: "text",
+                        id: "headquarter",
+                        required: "",
+                        placeholder: "Ingresar sede",
+                      },
                       domProps: { value: _vm.formHeadquarter.headquarter },
                       on: {
                         input: function ($event) {
@@ -60502,7 +60965,13 @@ var render = function () {
                         },
                       ],
                       staticClass: "form-control",
-                      attrs: { type: "text", id: "address", required: "" },
+                      class: [_vm.formErrors.address ? "is-invalid" : ""],
+                      attrs: {
+                        type: "text",
+                        id: "address",
+                        required: "",
+                        placeholder: "Ingresar dirección",
+                      },
                       domProps: { value: _vm.formHeadquarter.address },
                       on: {
                         input: function ($event) {
@@ -60526,9 +60995,9 @@ var render = function () {
                       },
                       [
                         _vm._v(
-                          "\n\t\t\t\t\t\t\t\t\t" +
+                          "\n                    " +
                             _vm._s(_vm.formErrors.address) +
-                            "\n\t\t\t\t\t\t\t\t"
+                            "\n                  "
                         ),
                       ]
                     ),
@@ -60547,7 +61016,12 @@ var render = function () {
                         },
                       ],
                       staticClass: "form-control",
-                      attrs: { type: "text", id: "nit" },
+                      class: [_vm.formErrors.nit ? "is-invalid" : ""],
+                      attrs: {
+                        type: "text",
+                        id: "nit",
+                        placeholder: "Ingresar nit",
+                      },
                       domProps: { value: _vm.formHeadquarter.nit },
                       on: {
                         input: function ($event) {
@@ -60571,9 +61045,9 @@ var render = function () {
                       },
                       [
                         _vm._v(
-                          "\n\t\t\t\t\t\t\t\t\t" +
+                          "\n                    " +
                             _vm._s(_vm.formErrors.nit) +
-                            "\n\t\t\t\t\t\t\t\t"
+                            "\n                  "
                         ),
                       ]
                     ),
@@ -60595,7 +61069,11 @@ var render = function () {
                       ],
                       staticClass: "form-control",
                       class: [_vm.formErrors.email ? "is-invalid" : ""],
-                      attrs: { type: "email", id: "email" },
+                      attrs: {
+                        type: "email",
+                        id: "email",
+                        placeholder: "Ingresar email",
+                      },
                       domProps: { value: _vm.formHeadquarter.email },
                       on: {
                         input: function ($event) {
@@ -60615,13 +61093,13 @@ var render = function () {
                       "small",
                       {
                         staticClass: "form-text text-danger",
-                        attrs: { id: "emailHelp" },
+                        attrs: { id: "email_help" },
                       },
                       [
                         _vm._v(
-                          "\n\t\t\t\t\t\t\t\t\t" +
+                          "\n                    " +
                             _vm._s(_vm.formErrors.email) +
-                            "\n\t\t\t\t\t\t\t\t"
+                            "\n                  "
                         ),
                       ]
                     ),
@@ -60642,7 +61120,12 @@ var render = function () {
                         },
                       ],
                       staticClass: "form-control",
-                      attrs: { type: "text", id: "legal_representative" },
+                      class: [_vm.formErrors.headquarter ? "is-invalid" : ""],
+                      attrs: {
+                        type: "text",
+                        id: "legal_representative",
+                        placeholder: "Ingresar representante",
+                      },
                       domProps: {
                         value: _vm.formHeadquarter.legal_representative,
                       },
@@ -60659,6 +61142,21 @@ var render = function () {
                         },
                       },
                     }),
+                    _vm._v(" "),
+                    _c(
+                      "small",
+                      {
+                        staticClass: "form-text text-danger",
+                        attrs: { id: "legal_representative_help" },
+                      },
+                      [
+                        _vm._v(
+                          "\n                    " +
+                            _vm._s(_vm.formErrors.legal_representative) +
+                            "\n                  "
+                        ),
+                      ]
+                    ),
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "form-group col-md-4" }, [
@@ -60676,7 +61174,12 @@ var render = function () {
                         },
                       ],
                       staticClass: "form-control",
-                      attrs: { type: "number", id: "phone" },
+                      class: [_vm.formErrors.phone ? "is-invalid" : ""],
+                      attrs: {
+                        type: "number",
+                        id: "phone",
+                        placeholder: "Ingresar numero de celular",
+                      },
                       domProps: { value: _vm.formHeadquarter.phone },
                       on: {
                         input: function ($event) {
@@ -60691,6 +61194,21 @@ var render = function () {
                         },
                       },
                     }),
+                    _vm._v(" "),
+                    _c(
+                      "small",
+                      {
+                        staticClass: "form-text text-danger",
+                        attrs: { id: "phone_help" },
+                      },
+                      [
+                        _vm._v(
+                          "\n                    " +
+                            _vm._s(_vm.formErrors.phone) +
+                            "\n                  "
+                        ),
+                      ]
+                    ),
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "form-group col-md-4" }, [
@@ -60709,7 +61227,11 @@ var render = function () {
                       ],
                       staticClass: "form-control",
                       class: [_vm.formErrors.pos_printer ? "is-invalid" : ""],
-                      attrs: { type: "email", id: "pos_printer" },
+                      attrs: {
+                        type: "email",
+                        id: "pos_printer",
+                        placeholder: "Ingresar impresora",
+                      },
                       domProps: { value: _vm.formHeadquarter.pos_printer },
                       on: {
                         input: function ($event) {
@@ -60733,9 +61255,9 @@ var render = function () {
                       },
                       [
                         _vm._v(
-                          "\n\t\t\t\t\t\t\t\t\t" +
+                          "\n                    " +
                             _vm._s(_vm.formErrors.pos_printer) +
-                            "\n\t\t\t\t\t\t\t\t"
+                            "\n                  "
                         ),
                       ]
                     ),
@@ -60756,7 +61278,7 @@ var render = function () {
                     },
                   },
                 },
-                [_vm._v("\n\t\t\t\t\t\tCerrar\n\t\t\t\t\t")]
+                [_vm._v("\n              Cerrar\n            ")]
               ),
               _vm._v(" "),
               _c(
@@ -60772,7 +61294,7 @@ var render = function () {
                     },
                   },
                 },
-                [_vm._v("\n\t\t\t\t\t\tGuardar\n\t\t\t\t\t")]
+                [_vm._v("\n              Guardar\n            ")]
               ),
             ]),
           ]),
@@ -60924,7 +61446,7 @@ var render = function () {
                     _vm._v(" "),
                     _vm.$root.validatePermission("headquarter-status")
                       ? _c("td", { staticClass: "text-right" }, [
-                          headquarter.status == 1
+                          !headquarter.status
                             ? _c(
                                 "button",
                                 {
@@ -60937,10 +61459,7 @@ var render = function () {
                                 },
                                 [_c("i", { staticClass: "bi bi-trash" })]
                               )
-                            : _vm._e(),
-                          _vm._v(" "),
-                          headquarter.status == 0
-                            ? _c(
+                            : _c(
                                 "button",
                                 {
                                   staticClass: "btn btn-success",
@@ -60955,14 +61474,13 @@ var render = function () {
                                     staticClass: "bi bi-check2-circle",
                                   }),
                                 ]
-                              )
-                            : _vm._e(),
+                              ),
                         ])
                       : _vm._e(),
                     _vm._v(" "),
                     _vm.$root.validatePermission("headquarter-update")
                       ? _c("td", { staticClass: "text-right" }, [
-                          headquarter.status == 1
+                          headquarter.status
                             ? _c(
                                 "button",
                                 {
@@ -61327,7 +61845,11 @@ var render = function () {
                         },
                       ],
                       staticClass: "form-control",
-                      attrs: { type: "text", id: "business_name" },
+                      attrs: {
+                        type: "text",
+                        id: "business_name",
+                        placeholder: "Ingresar razón social",
+                      },
                       domProps: { value: _vm.formProvider.business_name },
                       on: {
                         input: function ($event) {
@@ -61342,6 +61864,21 @@ var render = function () {
                         },
                       },
                     }),
+                    _vm._v(" "),
+                    _c(
+                      "small",
+                      {
+                        staticClass: "text-form text-danger",
+                        attrs: { id: "business_name_help" },
+                      },
+                      [
+                        _vm._v(
+                          "\n                  " +
+                            _vm._s(_vm.formErrors.business_name) +
+                            "\n                "
+                        ),
+                      ]
+                    ),
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "form-group col-md-4" }, [
@@ -61361,7 +61898,11 @@ var render = function () {
                           },
                         ],
                         staticClass: "custom-select",
-                        attrs: { name: "type_document", id: "type_document" },
+                        attrs: {
+                          name: "type_document",
+                          id: "c",
+                          placeholder: "Ingresar identificación",
+                        },
                         on: {
                           change: function ($event) {
                             var $$selectedVal = Array.prototype.filter
@@ -61403,6 +61944,21 @@ var render = function () {
                       ],
                       2
                     ),
+                    _vm._v(" "),
+                    _c(
+                      "small",
+                      {
+                        staticClass: "text-form text-danger",
+                        attrs: { id: "type_document_help" },
+                      },
+                      [
+                        _vm._v(
+                          "\n                  " +
+                            _vm._s(_vm.formErrors.type_document) +
+                            "\n                "
+                        ),
+                      ]
+                    ),
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "form-group col-md-4" }, [
@@ -61435,6 +61991,21 @@ var render = function () {
                         },
                       },
                     }),
+                    _vm._v(" "),
+                    _c(
+                      "small",
+                      {
+                        staticClass: "text-form text-danger",
+                        attrs: { id: "document_help" },
+                      },
+                      [
+                        _vm._v(
+                          "\n                  " +
+                            _vm._s(_vm.formErrors.document) +
+                            "\n                "
+                        ),
+                      ]
+                    ),
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "form-group col-4" }, [
@@ -61452,7 +62023,11 @@ var render = function () {
                         },
                       ],
                       staticClass: "form-control",
-                      attrs: { type: "tel", id: "phone_1" },
+                      attrs: {
+                        type: "tel",
+                        id: "phone_1",
+                        placeholder: "Ingresar celular",
+                      },
                       domProps: { value: _vm.formProvider.phone_1 },
                       on: {
                         input: function ($event) {
@@ -61467,6 +62042,21 @@ var render = function () {
                         },
                       },
                     }),
+                    _vm._v(" "),
+                    _c(
+                      "small",
+                      {
+                        staticClass: "text-form text-danger",
+                        attrs: { id: "phone_1_help" },
+                      },
+                      [
+                        _vm._v(
+                          "\n                  " +
+                            _vm._s(_vm.formErrors.phone_1) +
+                            "\n                "
+                        ),
+                      ]
+                    ),
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "form-group col-4" }, [
@@ -61484,7 +62074,11 @@ var render = function () {
                         },
                       ],
                       staticClass: "form-control",
-                      attrs: { type: "tel", id: "phone_2" },
+                      attrs: {
+                        type: "tel",
+                        id: "phone_2",
+                        placeholder: "Ingresar celular",
+                      },
                       domProps: { value: _vm.formProvider.phone_2 },
                       on: {
                         input: function ($event) {
@@ -61499,11 +62093,26 @@ var render = function () {
                         },
                       },
                     }),
+                    _vm._v(" "),
+                    _c(
+                      "small",
+                      {
+                        staticClass: "text-form text-danger",
+                        attrs: { id: "phone_2_help" },
+                      },
+                      [
+                        _vm._v(
+                          "\n                  " +
+                            _vm._s(_vm.formErrors.phone_2) +
+                            "\n                "
+                        ),
+                      ]
+                    ),
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "form-group col-4" }, [
                     _c("label", { attrs: { for: "email" } }, [
-                      _vm._v("Correo Electronico"),
+                      _vm._v("Correo Electrónico"),
                     ]),
                     _vm._v(" "),
                     _c("input", {
@@ -61516,7 +62125,11 @@ var render = function () {
                         },
                       ],
                       staticClass: "form-control",
-                      attrs: { type: "email", id: "email" },
+                      attrs: {
+                        type: "email",
+                        id: "email",
+                        placeholder: "Ingresar correo electrónico",
+                      },
                       domProps: { value: _vm.formProvider.email },
                       on: {
                         input: function ($event) {
@@ -61531,6 +62144,21 @@ var render = function () {
                         },
                       },
                     }),
+                    _vm._v(" "),
+                    _c(
+                      "small",
+                      {
+                        staticClass: "text-form text-danger",
+                        attrs: { id: "email_help" },
+                      },
+                      [
+                        _vm._v(
+                          "\n                  " +
+                            _vm._s(_vm.formErrors.email) +
+                            "\n                "
+                        ),
+                      ]
+                    ),
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "form-group col-4" }, [
@@ -61548,7 +62176,11 @@ var render = function () {
                         },
                       ],
                       staticClass: "form-control",
-                      attrs: { type: "text", id: "address" },
+                      attrs: {
+                        type: "text",
+                        id: "address",
+                        placeholder: "Ingresar dirección",
+                      },
                       domProps: { value: _vm.formProvider.address },
                       on: {
                         input: function ($event) {
@@ -61563,6 +62195,21 @@ var render = function () {
                         },
                       },
                     }),
+                    _vm._v(" "),
+                    _c(
+                      "small",
+                      {
+                        staticClass: "text-form text-danger",
+                        attrs: { id: "address_help" },
+                      },
+                      [
+                        _vm._v(
+                          "\n                  " +
+                            _vm._s(_vm.formErrors.address) +
+                            "\n                "
+                        ),
+                      ]
+                    ),
                   ]),
                 ]),
               ]),
@@ -63035,7 +63682,11 @@ var render = function () {
                         },
                       ],
                       staticClass: "form-control",
-                      attrs: { type: "text", id: "nombre" },
+                      attrs: {
+                        type: "text",
+                        id: "nombre",
+                        placeholder: "Ingresar nombre",
+                      },
                       domProps: { value: _vm.formUser.name },
                       on: {
                         input: function ($event) {
@@ -63072,7 +63723,11 @@ var render = function () {
                         },
                       ],
                       staticClass: "form-control",
-                      attrs: { type: "text", id: "name" },
+                      attrs: {
+                        type: "text",
+                        id: "name",
+                        placeholder: "Ingresar apellidos",
+                      },
                       domProps: { value: _vm.formUser.last_name },
                       on: {
                         input: function ($event) {
@@ -63111,7 +63766,11 @@ var render = function () {
                         },
                       ],
                       staticClass: "form-control",
-                      attrs: { type: "email", id: "email" },
+                      attrs: {
+                        type: "email",
+                        id: "email",
+                        placeholder: "Ingresar email",
+                      },
                       domProps: { value: _vm.formUser.email },
                       on: {
                         input: function ($event) {
@@ -63148,7 +63807,11 @@ var render = function () {
                         },
                       ],
                       staticClass: "form-control",
-                      attrs: { type: "text", id: "username" },
+                      attrs: {
+                        type: "text",
+                        id: "username",
+                        placeholder: "Ingresar username",
+                      },
                       domProps: { value: _vm.formUser.username },
                       on: {
                         input: function ($event) {
@@ -63189,7 +63852,11 @@ var render = function () {
                         },
                       ],
                       staticClass: "form-control",
-                      attrs: { type: "number", id: "phone" },
+                      attrs: {
+                        type: "number",
+                        id: "phone",
+                        placeholder: "Ingresar celular",
+                      },
                       domProps: { value: _vm.formUser.phone },
                       on: {
                         input: function ($event) {
@@ -63252,7 +63919,7 @@ var render = function () {
                       [
                         _c(
                           "option",
-                          { attrs: { value: "0", disabled: "", selected: "" } },
+                          { attrs: { value: "", disabled: "", selected: "" } },
                           [_vm._v("--Seleccionar--")]
                         ),
                         _vm._v(" "),
@@ -63298,7 +63965,11 @@ var render = function () {
                         },
                       ],
                       staticClass: "form-control",
-                      attrs: { type: "number", id: "document" },
+                      attrs: {
+                        type: "number",
+                        id: "document",
+                        placeholder: "Ingresar identificación",
+                      },
                       domProps: { value: _vm.formUser.document },
                       on: {
                         input: function ($event) {
@@ -63339,7 +64010,11 @@ var render = function () {
                         },
                       ],
                       staticClass: "form-control",
-                      attrs: { type: "text", id: "address" },
+                      attrs: {
+                        type: "text",
+                        id: "address",
+                        placeholder: "Ingresar dirección",
+                      },
                       domProps: { value: _vm.formUser.address },
                       on: {
                         input: function ($event) {
@@ -63376,6 +64051,7 @@ var render = function () {
                           reduce: function (headquarter) {
                             return headquarter.id
                           },
+                          placeholder: "--Seleccionar sede--",
                         },
                         model: {
                           value: _vm.formUser.headquarter_id,
@@ -63909,12 +64585,10 @@ var render = function () {
       },
       [
         _c("div", { staticClass: "text-center" }, [
-          _c("h1", { staticClass: "display-1 " }, [
-            _vm._v(_vm._s(_vm.message)),
-          ]),
+          _c("h1", { staticClass: "display-1" }, [_vm._v(_vm._s(_vm.message))]),
           _vm._v(" "),
-          _c("h6", { staticClass: "display-4 text-danger" }, [
-            _vm._v(" " + _vm._s("(" + _vm.code + ")") + " "),
+          _c("h6", { staticClass: "display-4 text-secondary" }, [
+            _vm._v(_vm._s("(" + _vm.code + ")")),
           ]),
         ]),
       ]

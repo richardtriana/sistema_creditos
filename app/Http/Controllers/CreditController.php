@@ -106,10 +106,10 @@ class CreditController extends Controller
 		if ($validate->fails()) {
 			return response()->json([
 				'status' => 'error',
-				'code' =>  500,
+				'code' =>  400,
 				'message' => 'Validación de datos incorrecta',
 				'errors' =>  $validate->errors()
-			], 500);
+			], 400);
 		}
 
 		$validate = Validator::make($request->all(), [
@@ -144,10 +144,10 @@ class CreditController extends Controller
 		if ($validate->fails()) {
 			return response()->json([
 				'status' => 'error',
-				'code' =>  500,
+				'code' =>  400,
 				'message' => 'Validación de datos incorrecta',
 				'errors' =>  $validate->errors()
-			], 500);
+			], 400);
 		}
 
 		$listInstallments = new InstallmentController();
@@ -252,10 +252,10 @@ class CreditController extends Controller
 		if ($validate->fails()) {
 			return response()->json([
 				'status' => 'error',
-				'code' =>  500,
+				'code' =>  400,
 				'message' => 'Validación de datos incorrecta',
 				'errors' =>  $validate->errors()
-			], 500);
+			], 400);
 		}
 
 		$credit = Credit::find($request->id);

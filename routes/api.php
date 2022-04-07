@@ -116,8 +116,8 @@ Route::group(['middleware' => ['auth:api']], function () {
 	Route::get('/permissions', [RoleController::class, 'getPermissions']);
 
 	//User
-	Route::resource('/users',  UserController::class);
 	Route::post('/users/{user}/change-status',  [UserController::class, 'changeStatus']);
+	Route::resource('/users',  UserController::class);
 
 	//Installments
 	Route::resource('/installments', InstallmentController::class);
