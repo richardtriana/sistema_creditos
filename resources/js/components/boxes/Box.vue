@@ -44,7 +44,6 @@
 								<i class="bi bi-trash2"></i>
 							</button>
 						</td> -->
-
             </tr>
           </tbody>
         </table>

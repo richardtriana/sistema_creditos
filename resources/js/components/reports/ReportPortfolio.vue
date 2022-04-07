@@ -3,6 +3,44 @@
     <div class="page-header">
       <h3>Reporte de cartera</h3>
     </div>
+    <div class="page-search p-4 border my-2">
+      <h6 class="text-primary text-uppercase">Filtrar:</h6>
+      <form>
+        <div class="form-row">
+          <div class="form-group col-4 ml-auto">
+            <label for="">Desde:</label>
+            <input
+              type="date"
+              id="search_from"
+              name="search_from"
+              class="form-control"
+              placeholder="Desde"
+              v-model="search_from"
+              :max="now"
+            />
+          </div>
+          <div class="form-group col-4 mr-auto">
+            <label for="">Hasta:</label>
+            <input
+              type="date"
+              id="search_to"
+              name="search_to"
+              class="form-control"
+              placeholder="Desde"
+              v-model="search_to"
+              :max="now"
+            />
+          </div>
+        </div>
+        <div class="form-row text-right m-auto">
+          <div class="form-group m-md-auto col-md-4">
+            <button class="btn btn-success w-100" type="button" @click="listReportPortfolio(1)">
+              <i class="bi bi-search"></i> Buscar
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
     <div class="page-content">
       <section class="table-responsive">
         <table class="table table-sm table-bordered">
@@ -37,15 +75,49 @@
                 >
               </td>
               <td class="text-right">{{ report.value | currency }}</td>
-              <td class="text-center">{{ report.payment_date }}</td>
+              <td class="text-center font-weight-bold">
+                <span
+                  class="badge badge-md badge-pill badge-success"
+                  v-if="report.payment_date > now"
+                  >{{ report.payment_date }}</span
+                >
+                <span
+                  class="badge badge-md badge-pill badge-warning"
+                  v-if="report.payment_date == now"
+                  >{{ report.payment_date }}</span
+                >
+                <span
+                  class="badge badge-md badge-pill badge-danger"
+                  v-if="report.payment_date < now"
+                  >{{ report.payment_date }}</span
+                >
+              </td>
               <td class="text-center">
-                <span class="badge badge-md font-weight-bold badge-pill badge-success " v-if="report.payment_date > now"
+                <span
+                  class="
+                    badge badge-md
+                    font-weight-bold
+                    badge-pill badge-success
+                  "
+                  v-if="report.payment_date > now"
                   >Próximo a vencer</span
                 >
-                <span class="badge badge-md font-weight-bold badge-pill badge-warning" v-if="report.payment_date == now"
+                <span
+                  class="
+                    badge badge-md
+                    font-weight-bold
+                    badge-pill badge-warning
+                  "
+                  v-if="report.payment_date == now"
                   >Vence hoy</span
                 >
-                <span class="badge badge-md font-weight-bold badge-pill badge-danger" v-if="report.payment_date < now"
+                <span
+                  class="
+                    badge badge-md
+                    font-weight-bold
+                    badge-pill badge-danger
+                  "
+                  v-if="report.payment_date < now"
                   >En mora</span
                 >
               </td>
@@ -78,12 +150,14 @@ export default {
       ReportPortfolioList: {},
       now: new Date().toISOString().slice(0, 10),
       infoCompany: {},
+      search_from: "",
+      search_to: "",
     };
   },
   methods: {
     listReportPortfolio(page = 1) {
       axios
-        .get(`api/reports/portfolio?page=${page}`, this.$root.config)
+        .get(`api/reports/portfolio?page=${page}&from=${this.search_from}&to=${this.search_to}`, this.$root.config)
         .then((response) => {
           this.ReportPortfolioList = response.data;
         });

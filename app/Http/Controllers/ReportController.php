@@ -3,14 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Credit;
+use App\Models\Expense;
 use App\Models\Installment;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PhpParser\Node\Stmt\Echo_;
 
 class ReportController extends Controller
 {
-	public function ReportPortfolio()
+	public function ReportPortfolio(Request $request)
 	{
+		//var_dump($request->to);
+		$from = $request->from;
+		$to = $request->to;
 		$now = date("Y-m-d");
 		$payment_date_add_days = date("Y-m-d", strtotime($now . "+ 5 days"));
 
@@ -24,7 +30,15 @@ class ReportController extends Controller
 			'credits.credit_value',
 			'credits.status',
 		)
-			->whereDate('payment_date', '<=', $payment_date_add_days)
+			->where(function ($query) use ($payment_date_add_days, $from, $to) {
+				$query->whereDate('payment_date', '<=', $payment_date_add_days);
+				if ($from != '' && $from != 'undefined' && $from != null) {
+					$query->whereDate('payment_date', '>=', $from);
+				}
+				if ($to != '' && $to != 'undefined' && $to != null) {
+					$query->whereDate('payment_date', '<=', $to);
+				}
+			})
 			->whereNull('payment_register')
 			->where('credits.status', 1)
 			->leftJoin('credits', 'installments.credit_id', 'credits.id')
@@ -37,9 +51,60 @@ class ReportController extends Controller
 
 	public function ReportGeneralCredits(Request $request)
 	{
-		$credits = Credit::select()->paginate(15);
+		$from = $request->from;
+		$to = $request->to;
+		$this_month = Carbon::now()->month;
+		$status = $request->status;
+
+		switch ($status) {
+			case 'all':
+				$query_date = 'created_at';
+				break;
+			case '0':
+				$query_date = 'created_at';
+				break;
+			case '1':
+				$query_date = 'disbursement_date';
+				break;
+			case '2':
+				$query_date = 'updated_at';
+				break;
+			case '3':
+				$query_date = 'created_at';
+				break;
+			case '4':
+				$query_date = 'finish_date';
+				break;
+			case '5':
+				$query_date = 'updated_at';
+				break;
+		}
+		$credits = Credit::select();
+
+		if ($status == null) {
+			$credits = $credits->whereMonth('created_at', $this_month);
+		} else {
+			$credits = $credits
+				->where(function ($query) use ($status) {
+					if ($status == 'all') {
+						$query->where('status', '<>', '-1');
+					} else {
+						$query->where('status', $status);
+					}
+				})
+				->where(function ($query) use ($from, $to, $query_date) {
+					if ($from != '' && $from != 'undefined' && $from != null) {
+						$query->whereDate("$query_date", '>=', $from);
+					}
+					if ($to != '' && $to != 'undefined' && $to != null) {
+						$query->whereDate("$query_date", '<=', $to);
+					}
+				});
+		}
+
+		$credits = $credits->paginate(15);
 		$total_credits = new CreditController;
-		$total_credits = $total_credits->getTotalValueCredits();
+		$total_credits = $total_credits->getTotalValueCredits($request);
 
 		return ['credits' => $credits, 'total_credits' => $total_credits];
 	}
@@ -66,6 +131,34 @@ class ReportController extends Controller
 			->paginate(15);
 
 		return $credits;
+	}
+
+	public function ReportHeadquartersExpenses(Request $request)
+	{
+		$from = $request->from;
+		$to = $request->to;
+		$this_month = Carbon::now()->month;
+
+		$expenses = Expense::select(
+			DB::raw('SUM(price) as price '),
+			'headquarters.headquarter as headquarter',
+		)
+			->where(function ($query) use ($this_month, $from, $to) {
+
+				$query->whereMonth('date', '<=', $this_month);
+
+				if ($from != '' && $from != 'undefined' && $from != null) {
+					$query->whereDate('date', '>=', $from);
+				}
+				if ($to != '' && $to != 'undefined' && $to != null) {
+					$query->whereDate('date', '<=', $to);
+				}
+			})
+			->groupBy('headquarter')
+			->leftJoin('headquarters', 'headquarters.id', 'expenses.headquarter_id')
+			->paginate(15);
+
+		return $expenses;
 	}
 
 	public function ReportGeneralClient(Request $request)

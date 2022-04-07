@@ -98,18 +98,18 @@
       <div class="modal-footer">
         <button
           type="button"
-          class="btn btn-primary"
-          @click="editar ? editExpense() : createExpense()"
-        >
-          Guardar
-        </button>
-        <button
-          type="button"
           class="btn btn-secondary"
           data-dismiss="modal"
           @click="editar = false"
         >
           Cerrar
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          @click="editar ? editExpense() : createExpense()"
+        >
+          Guardar
         </button>
       </div>
     </form>

@@ -25,7 +25,7 @@
             class="page-header d-flex justify-content-between p-4 border my-2"
           >
             <div class="form-row w-100">
-              <!-- <div class="form-group col-2">
+              <div class="form-group col-2">
                 <label for="amount">Monto a pagar</label>
               </div>
               <div class="form-group col-4">
@@ -36,26 +36,30 @@
                   id="amount"
                   placeholder="$"
                   v-model="amount_value"
+                  :min="min_amount"
                 />
+                <small id="addAmountHelpBlock" class="form-text text-muted">
+                  Monto mínimo
+                  {{ min_amount | currency }}
+                </small>
               </div>
               <div class="form-group col-3">
                 <button
                   class="btn btn-primary my-auto"
                   @click="payCredit()"
-                  v-if="amount_value > 0"
+                  v-if="amount_value > min_amount"
                 >
                   <i class="bi bi-currency-dollar"></i> Abonar a crédito
                 </button>
+                <button v-else class="btn btn-secondary my-auto" disabled>
+                  <i class="bi bi-currency-dollar"></i> Abonar a crédito
+                </button>
+              </div>
+              <div class="form-group col-12 text-center">
                 <button
-                  v-else
-                  class="btn btn-secondary my-auto"
-                  disabled
+                  class="btn btn-danger w-50 font-weight-bold"
+                  @click="printTable()"
                 >
-                  <i class="bi bi-currency-dollar"></i> Abonar a crédito
-                </button>
-              </div> -->
-              <div class="form-group col-5 offset-7">
-                <button class="btn btn-danger w-100 font-weight-bold" @click="printTable()">
                   <i class="bi bi-file-pdf"></i> Tabla de amortización
                 </button>
               </div>
@@ -80,17 +84,17 @@ export default {
     return {
       id_credit: 0,
       allow_payment: 0,
-      listInstallments: [],
-      listInstallmentsPaid: [],
       amount_value: 0,
       allow_payment: 1,
+      min_amount: 0,
     };
   },
   methods: {
-    listCreditInstallments: function (credit, allow_payment) {
-      this.id_credit = credit;
+    listCreditInstallments: function (credit_id, allow_payment, credit) {
+      this.id_credit = credit_id;
       this.allow_payment = allow_payment;
-      this.$refs.Installment.listCreditInstallments(credit, allow_payment);
+      this.min_amount = credit.installment_value;
+      this.$refs.Installment.listCreditInstallments(credit_id, allow_payment);
     },
 
     payCredit() {
@@ -100,11 +104,13 @@ export default {
       if (this.amount_value > 0) {
         axios
           .post(
-            `api/credits/pay-credit-installments/${this.id_credit}`,
+            `api/installment/${this.id_credit}/pay-installment`,
             data,
             this.$root.config
           )
-          .then(this.listCreditInstallments(this.id_credit, 1))
+          .then((response) => {
+            me.printEntryPdf(response.data.entry_id);
+          })
           .finally(
             this.$refs.Installment.listCreditInstallments(
               this.id_credit,
@@ -115,7 +121,7 @@ export default {
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "El valor debe ser mayor a 0 ",
+          text: `El valor debe ser mayor a ${this.min_amount}`,
         });
       }
     },
@@ -131,6 +137,19 @@ export default {
           var a = document.createElement("a");
           a.href = "data:application/pdf;base64," + pdf;
           a.download = `credit_${this.id_credit}-${Date.now()}.pdf`;
+          a.target = "_blank"
+          a.click();
+          console.log(a);
+        });
+    },
+    printEntryPdf(entry_id) {
+      axios
+        .get(`api/entries/show-entry/${entry_id}`, this.$root.config)
+        .then((response) => {
+          const pdf = response.data.pdf;
+          var a = document.createElement("a");
+          a.href = "data:application/pdf;base64," + pdf;
+          a.download = `entrada_${entry_id}-${Date.now()}.pdf`;
           a.click();
         });
     },

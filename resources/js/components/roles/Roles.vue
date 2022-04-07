@@ -17,7 +17,7 @@
       <section class="table-responsive">
         <table class="table table-sm table-bordered">
           <thead class="thead-primary">
-            <tr>
+            <tr class="text-center">
               <th scope="col">#</th>
               <th scope="col">Rol</th>
               <th v-if="$root.validatePermission('rol-update')">

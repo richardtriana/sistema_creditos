@@ -23,7 +23,19 @@ class User extends Authenticatable implements Authorizable
     protected $guard_name = "api";
 
     protected $fillable = [
-        'id', 'last_name', 'email', 'password', 'name', 'phone', 'address', 'type_document', 'document', 'photo', 'headquarter_id', 'rol_id', 'status'
+        'id',
+        'name',
+        'last_name',
+        'email',
+        'password',
+        'phone',
+        'address',
+        'type_document',
+        'document',
+        'photo',
+        'headquarter_id',
+        'rol_id',
+        'status'
     ];
 
     /**

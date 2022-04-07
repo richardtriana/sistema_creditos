@@ -14,7 +14,7 @@ class MainBoxController extends Controller
 		$this->middleware('permission:box.index', ['only' => ['index','currentBalance']]);
 		$this->middleware('permission:box.update', ['only' => ['update','addAmountMainBox', 'subAmountMainBox', 'cashRegister']]);
 	}
-	
+
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -171,9 +171,14 @@ class MainBoxController extends Controller
 				'errors' =>  $validate->errors()
 			], 400);
 		}
-
-		$this->addAmountMainBox($request->add_amount);
-		$box->current_balance = $box->current_balance - $request->add_amount;
+		
+		if ($request->add_amount <= 0) {
+			$this->addAmountMainBox($request->current_balance);
+			$box->current_balance = 0;
+		} else {
+			$this->addAmountMainBox($request->add_amount);
+			$box->current_balance = $box->current_balance - $request->add_amount;
+		}
 		$box->initial_balance = 0;
 		$box->input = 0;
 		$box->output = 0;

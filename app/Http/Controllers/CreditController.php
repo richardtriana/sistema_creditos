@@ -8,6 +8,7 @@ use App\Models\Credit;
 use App\Models\CreditProvider;
 use App\Models\Entry;
 use App\Models\Installment;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
@@ -21,7 +22,7 @@ class CreditController extends Controller
 	public function __construct()
 	{
 		$this->middleware('auth:api')->except('index');
-		$this->middleware('permission:credit.index')->only('installments', 'payMultipleInstallments', 'generalInformation', 'show');
+		$this->middleware('permission:credit.index')->only('installments', 'generalInformation', 'show');
 		$this->middleware('permission:credit.store')->only('store');
 		$this->middleware('permission:credit.update')->only('update', 'updateValuesCredit');
 		$this->middleware('permission:credit.delete')->only('delete');
@@ -41,7 +42,7 @@ class CreditController extends Controller
 
 		if ($request->credit && ($request->credit != '')) {
 			$credits  =   $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
-				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document')
+				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document', 'c.phone_1', 'c.phone_2')
 				->where('document', 'LIKE', "%$request->credit%")
 				->orWhere('name', 'LIKE', "%$request->credit%")
 				->orWhere('email', 'LIKE', "%$request->credit%")
@@ -49,10 +50,12 @@ class CreditController extends Controller
 				->whereIn('credits.status', $status);
 		} else {
 			$credits  =     $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
-				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document')
+				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document', 'c.phone_1', 'c.phone_2')
 				->whereIn('credits.status', $status);
 		}
-		$credits = $credits->paginate(10);
+		$credits = $credits
+			->orderBy('id', 'desc')
+			->paginate(10);
 		return $credits;
 	}
 
@@ -178,7 +181,6 @@ class CreditController extends Controller
 		$credit->capital_value = $request['capital_value'];
 		$credit->interest_value = $request['interest_value'];
 		$credit->description = $request['description'];
-		$credit->disbursement_date = date('Y-m-d');
 		$credit->installment_value = $listInstallments['installment'];
 
 		if ($credit->save()) {
@@ -274,7 +276,7 @@ class CreditController extends Controller
 		//$credit->user_id = $request->user()->id;
 		$credit->installment_value = $request['installment_value'];
 		$credit->description = $request['description'];
-		$credit->disbursement_date = date('Y-m-d');
+
 		$credit->save();
 
 		return response()->json([
@@ -310,6 +312,7 @@ class CreditController extends Controller
 					if ($request->status  == 1) {
 						$update_main_box = new MainBoxController();
 						$update_main_box->subAmountMainBox($credit->credit_value);
+						$credit->disbursement_date = date('Y-m-d');
 					}
 
 					if ($request->status  == 2 && $credit->status == 1) {
@@ -334,48 +337,38 @@ class CreditController extends Controller
 			}
 			$credit->status = $request->status;
 		}
+
+		if ($request->status  == 2 && $request->description != null) {
+			$credit->description  = "$credit->description \nRechazado por: $request->description";
+		}
 		$credit->save();
 	}
 
 	public function installments(Request $request, $id)
 	{
-
 		$credit = Credit::findOrFail($id);
-		return $credit->installments()->get();
-	}
+		$installments =  $credit->installments()->get();
+		foreach ($installments as $installment) {
+			$now = now();
+			$payment_date = Carbon::createFromFormat('Y-m-d', $installment->payment_date);
 
-	public function payMultipleInstallments(Request $request, $id)
-	{
-		$credit_id = $id;
-		$amount = $request['amount'];
-		$amount_paid = $request['amount'];
-
-		$credit = Credit::findOrFail($credit_id);
-		$client = $credit->client()->first();
-		$listInstallments = $credit->installments()->where('status', '0')->get();
-
-		for ($i = 0; $i < count($listInstallments) && $amount > 0; $i++) {
-			$pay_installment = new InstallmentController();
-			if ($amount > 0) {
-				$installment_paid =	$pay_installment->payInstallment($listInstallments[$i]['id'], $amount, $request);
-				$balance = $installment_paid['balance'];
+			if ($payment_date < $now) {
+				$days_past_due = $now->diffInDays($payment_date);
+				$day_value_default = $installment->interest_value / 30;
+				$late_interests_value =  $days_past_due > 30 ?  $day_value_default * 30 : $day_value_default * $days_past_due;
+				$installment->days_past_due  = $days_past_due > 30 ? 30 : $days_past_due;
+				$installment->late_interests_value  = $late_interests_value;
+				if ($installment->paid_capital > 0 && $installment->paid_capital < $installment->capital_value) {
+					$installment->value = $installment->capital_value - $installment->paid_capital;
+				} else {
+					$installment->value  += $late_interests_value;
+				}
 			}
-			$amount = $balance;
-			$no_installment_paid = $installment_paid['no_installment'];
 		}
-		$print_cuota = new PrintTicketController;
-		$print_cuota = $print_cuota->printPayment($id, $amount_paid, $no_installment_paid);
 
-		$entry =  new Entry();
-		$entry->headquarter_id = $credit->headquarter_id;
-		$entry->user_id = $request->user()->id;
-		$entry->credit_id = $credit->id;
-		$entry->description = "Cliente: {$client->name} {$client->last_name}";
-		$entry->date = date('Y-m-d');
-		$entry->type_entry = 'Abono a crédito';
-		$entry->price = $amount;
-		$entry->save();
+		return $installments;
 	}
+
 
 	public function updateValuesCredit($id, $total_amount, $capital, $interest)
 	{
@@ -396,6 +389,17 @@ class CreditController extends Controller
 			$credit->finish_date = date('Y-m-d');
 		}
 		$credit->save();
+
+		if ($credit->status == 4) {
+			Installment::where('credit_id', $credit->id)->where('status', 0)->update(
+				[
+					'status' => 1,
+					'payment_register' => date('Y-m-d'),
+					'paid_balance' => 0,
+					'paid_capital' => 0
+				]
+			);
+		}
 	}
 
 	public function downloadReceiptPDF(Credit $credit)
@@ -442,14 +446,64 @@ class CreditController extends Controller
 		return $data;
 	}
 
-	public function getTotalValueCredits()
+	public function getTotalValueCredits(Request $request)
 	{
+		$from = $request->from;
+		$to = $request->to;
+		$this_month = Carbon::now()->month;
+		$status = $request->status;
+
+		switch ($status) {
+			case 'all':
+				$query_date = 'created_at';
+				break;
+			case '0':
+				$query_date = 'created_at';
+				break;
+			case '1':
+				$query_date = 'disbursement_date';
+				break;
+			case '2':
+				$query_date = 'updated_at';
+				break;
+			case '3':
+				$query_date = 'created_at';
+				break;
+			case '4':
+				$query_date = 'finish_date';
+				break;
+			case '5':
+				$query_date = 'updated_at';
+				break;
+		}
+
 		$credits = Credit::select(
 			DB::raw('SUM(credit_value) as credit_value '),
 			DB::raw('SUM(paid_value) as paid_value'),
 			DB::raw('SUM(interest_value) as interest_value'),
 			DB::raw('SUM(capital_value) as capital_value')
-		)->first();
+		);
+		if ($status == null) {
+			$credits = $credits->whereMonth('created_at', $this_month);
+		} else {
+			$credits = $credits
+				->where(function ($query) use ($status) {
+					if ($status == 'all') {
+						$query->where('status', '<>', '-1');
+					} else {
+						$query->where('status', $status);
+					}
+				})
+				->where(function ($query) use ($from, $to, $query_date) {
+					if ($from != '' && $from != 'undefined' && $from != null) {
+						$query->whereDate("$query_date", '>=', $from);
+					}
+					if ($to != '' && $to != 'undefined' && $to != null) {
+						$query->whereDate("$query_date", '<=', $to);
+					}
+				});
+		}
+		$credits = $credits->first();
 		return $credits;
 	}
 
@@ -458,25 +512,39 @@ class CreditController extends Controller
 		//Valor del credito - valor capital pagado
 		$pending_value = $credit->credit_value - $credit->capital_value;
 
-		$client = $credit->client()->first();
+		if ($credit->status == 1) {
+			$client = $credit->client()->first();
 
-		$credit->status = 4;
-		$credit->finish_date = date('Y-m-d');
-		$credit->paid_value += $pending_value;
-		$credit->capital_value += $pending_value;
-		$credit->save();
+			$credit->status = 4;
+			$credit->finish_date = date('Y-m-d');
+			$credit->paid_value += $pending_value;
+			$credit->capital_value += $pending_value;
+			$credit->save();
 
-		$update_main_box = new MainBoxController();
-		$update_main_box->addAmountMainBox($pending_value);
+			Installment::where('credit_id', $credit->id)->where('status', 0)->update(
+				[
+					'status' => 1,
+					'payment_register' => date('Y-m-d'),
+					'paid_balance' => DB::raw('capital_value'),
+					'paid_capital' => DB::raw('capital_value')
+				]
+			);
 
-		$entry =  new Entry();
-		$entry->headquarter_id = $credit->headquarter_id;
-		$entry->user_id = $request->user()->id;
-		$entry->credit_id = $credit->id;
-		$entry->description = "Cliente: {$client->name} {$client->last_name}";
-		$entry->date = date('Y-m-d');
-		$entry->type_entry = 'Recoger capital de crédito';
-		$entry->price = $pending_value;
-		$entry->save();
+			$update_main_box = new MainBoxController();
+			$update_main_box->addAmountMainBox($pending_value);
+
+			$entry =  new Entry();
+			$entry->headquarter_id = $credit->headquarter_id;
+			$entry->user_id = $request->user()->id;
+			$entry->credit_id = $credit->id;
+			$entry->description = "
+				Cliente: {$client->name} {$client->last_name}
+				Nro. Credito: $credit->id
+				";
+			$entry->date = date('Y-m-d');
+			$entry->type_entry = 'Recoger capital de crédito';
+			$entry->price = $pending_value;
+			$entry->save();
+		}
 	}
 }

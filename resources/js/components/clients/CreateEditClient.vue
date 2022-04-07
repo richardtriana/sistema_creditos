@@ -264,18 +264,18 @@
     <div class="modal-footer">
       <button
         type="button"
-        class="btn btn-success"
-        @click="formClient.id ? editClient() : createClient()"
-      >
-        Guardar
-      </button>
-      <button
-        type="button"
         class="btn btn-secondary"
         data-dismiss="modal"
         @click="(editar = false), resetData()"
       >
         Cerrar
+      </button>
+      <button
+        type="button"
+        class="btn btn-success"
+        @click="formClient.id ? editClient() : createClient()"
+      >
+        Guardar
       </button>
     </div>
   </div>

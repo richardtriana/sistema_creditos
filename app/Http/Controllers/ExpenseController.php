@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Box;
 use App\Models\Company;
 use App\Models\Expense;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use PDF;
 use Illuminate\Support\Facades\URL;
@@ -28,7 +29,32 @@ class ExpenseController extends Controller
 
 	public function index(Request $request)
 	{
-		$expenses = Expense::with('user')->paginate(20);
+		$from = $request->from;
+		$to = $request->to;
+		$this_month = Carbon::now()->month;
+		$type_output = $request->type_output;
+		$description = $request->description;
+
+		$expenses = Expense::with('user:id,name,last_name', 'headquarter:id,headquarter')
+			->where(function ($query) use ($this_month, $from, $to) {
+
+				$query->whereMonth('date', '<=', $this_month);
+
+				if ($from != '' && $from != 'undefined' && $from != null) {
+					$query->whereDate('date', '>=', $from);
+				}
+				if ($to != '' && $to != 'undefined' && $to != null) {
+					$query->whereDate('date', '<=', $to);
+				}
+			});
+		if ($type_output != null) {
+			$expenses =	$expenses->where('type_output', 'LIKE', "%$type_output%");
+		}
+		if ($description != null) {
+			$expenses =	$expenses->where('description', 'LIKE', "%$description%");
+		}
+		$expenses =	$expenses->paginate(15);
+		
 		return $expenses;
 	}
 
