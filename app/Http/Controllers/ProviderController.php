@@ -92,7 +92,7 @@ class ProviderController extends Controller
 				'required',
 				'numeric',
 				'between:9999,999999999999',
-				Rule::unique('providers')->ignore($provider->document)
+				Rule::unique('providers')->ignore($provider->id)
 			],
 			'phone_1' => 'required|string',
 			'phone_2' => 'nullable|string',
@@ -101,7 +101,7 @@ class ProviderController extends Controller
 				'required',
 				'string',
 				'email:rfc,dns',
-				Rule::unique('providers')->ignore($provider->email)
+				Rule::unique('providers')->ignore($provider->id)
 			],
 		]);
 

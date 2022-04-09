@@ -151,7 +151,7 @@ class ClientController extends Controller
 				'required',
 				'numeric',
 				'between:9999,999999999999',
-				Rule::unique('clients')->ignore($client->document)
+				Rule::unique('clients')->ignore($client->id)
 			],
 			'phone_1' => 'nullable|string',
 			'phone_2' => 'nullable|string',
@@ -160,7 +160,7 @@ class ClientController extends Controller
 				'nullable',
 				'string',
 				'email:rfc,dns',
-				Rule::unique('clients')->ignore($client->email)
+				Rule::unique('clients')->ignore($client->id)
 			],
 			'birth_date' => 'nullable|date',
 			'gender' => 'nullable|string|in:M,F,O',

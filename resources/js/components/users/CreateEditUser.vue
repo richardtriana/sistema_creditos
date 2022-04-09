@@ -314,16 +314,14 @@ export default {
     editUser() {
       let me = this;
       me.$root.assignErrors(false, me.formErrors);
-      //console.log(me.$root.config);
-      axios
-        .put("api/users/" + me.formUser.id, me.formUser, me.$root.config)
+      axios.put("api/users/" + me.formUser.id, me.formUser, me.$root.config)
         .then(function (res) {
-          // $("#formUserModal").modal("hide");
-          // me.resetData();
-          // me.$emit("list-users");
+          $("#formUserModal").modal("hide");
+          me.resetData();
+          me.$emit("list-users");
         })
         .catch((response) => {
-          //me.$root.assignErrors(response, me.formErrors);
+          me.$root.assignErrors(response, me.formErrors);
         });
       this.editar = false;
     },

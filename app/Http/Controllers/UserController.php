@@ -12,14 +12,14 @@ use Illuminate\Validation\Rule;
 class UserController extends Controller
 {
 
-    // public function __construct()
-    // {
-    //     $this->middleware('permission:user.index', ['only' => ['index']]);
-    //     $this->middleware('permission:user.store', ['only' => ['store','register']]);
-    //     $this->middleware('permission:user.update', ['only' => ['update']]);
-    //     $this->middleware('permission:user.delete', ['only' => ['destroy']]);
-    //     $this->middleware('permission:user.status', ['only' => ['changeStatus']]);
-    // }
+    public function __construct()
+    {
+        $this->middleware('permission:user.index', ['only' => ['index']]);
+        $this->middleware('permission:user.store', ['only' => ['store']]);
+        $this->middleware('permission:user.update', ['only' => ['update']]);
+        $this->middleware('permission:user.delete', ['only' => ['destroy']]);
+        $this->middleware('permission:user.status', ['only' => ['changeStatus']]);
+    }
 
     public function login(Request $request)
     {
@@ -161,10 +161,10 @@ class UserController extends Controller
         if ($validate->fails()) {
             return response()->json([
                 'status' => 'error',
-                'code' =>  500,
+                'code' =>  400,
                 'message' => 'Validación de datos incorrecta',
                 'errors' =>  $validate->errors()
-            ], 500);
+            ], 400);
         }
 
         $user = new User();
@@ -222,22 +222,22 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        return $user;
         $validate = Validator::make($request->all(), [
             'headquarter_id' => 'required|integer|exists:headquarters,id',
             'name' => 'required|string|min:3|max:255',
             'last_name' => 'required|string|min:3|max:255',
-            'email' => ['required',
+            'email' => [
+                'required',
                 'email:rfc,dns',
                 'max:255',
-                Rule::unique('users')->ignore($user->email)
+                Rule::unique('users')->ignore($user->id)
             ],
             'username' => [
                 'required',
                 'alpha_num',
                 'min:4',
                 'max:25',
-                Rule::unique("users")->ignore($user->username)
+                Rule::unique("users")->ignore($user->id)
             ],
             'password' => 'nullable|confirmed|min:8',
             'phone' => 'nullable|numeric|between:9999,999999999999',
@@ -247,7 +247,7 @@ class UserController extends Controller
                 'required',
                 'numeric',
                 'between:9999,999999999999',
-                Rule::unique('users')->ignore($user->document)
+                Rule::unique('users')->ignore($user->id)
             ],
             'rol' => 'required|integer|exists:roles,id'
         ]);
@@ -256,10 +256,10 @@ class UserController extends Controller
         if ($validate->fails()) {
             return response()->json([
                 'status' => 'error',
-                'code' =>  500,
+                'code' =>  400,
                 'message' => 'Validación de datos incorrecta',
                 'errors' =>  $validate->errors()
-            ], 500);
+            ], 400);
         }
 
         $user->headquarter_id = $request['headquarter_id'];
