@@ -165,6 +165,7 @@
                     id="description"
                     v-model="formCredit.description"
                     :class="[formErrors.description ? 'is-invalid' : '']"
+                    placeholder="Ingresar descripción "
                   ></textarea>
                   <small id="description_help" class="form-text text-danger">{{
                     formErrors.description
@@ -180,6 +181,7 @@
                     :reduce="(headquarter) => headquarter.id"
                     v-model="formCredit.headquarter_id"
                     :class="[formErrors.headquarter_id ? 'is-invalid' : '']"
+                    placeholder="Seleccionar sede"
                   >
                   </v-select>
                   <small
@@ -199,6 +201,7 @@
                     :value="formCredit.credit_value | currency"
                     :disabled="edit"
                     :class="[formErrors.credit_value ? 'is-invalid' : '']"
+                    placeholder="Ingresar valor de crédito"
                   />
                   <input
                     v-if="!edit"
@@ -216,6 +219,7 @@
                         : (formCredit.credit_value = formCredit.credit_value)
                     "
                     :class="[formErrors.credit_value ? 'is-invalid' : '']"
+                    placeholder="Ingresar valor de crédito"
                   />
                   <small id="addAmountHelpBlock" class="form-text text-muted">
                     Monto máximo
@@ -235,6 +239,7 @@
                     step="any"
                     :disabled="edit"
                     :class="[formErrors.interest ? 'is-invalid' : '']"
+                    placeholder="Ingresar interés"
                   />
                   <small id="interest_help" class="form-text text-danger">{{
                     formErrors.interest
@@ -250,6 +255,7 @@
                     v-model="formCredit.number_installments"
                     :disabled="edit"
                     :class="[formErrors.number_installments ? 'is-invalid' : '']"
+                    placeholder="Ingresar cantidad de cuotas"
                   />
                   <small
                     id="number_installments_help"

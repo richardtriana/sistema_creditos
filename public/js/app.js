@@ -4444,6 +4444,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 
 
@@ -79749,7 +79755,11 @@ var render = function () {
                             class: [
                               _vm.formErrors.description ? "is-invalid" : "",
                             ],
-                            attrs: { type: "text", id: "description" },
+                            attrs: {
+                              type: "text",
+                              id: "description",
+                              placeholder: "Ingresar descripción ",
+                            },
                             domProps: { value: _vm.formCredit.description },
                             on: {
                               input: function ($event) {
@@ -79796,6 +79806,7 @@ var render = function () {
                                 reduce: function (headquarter) {
                                   return headquarter.id
                                 },
+                                placeholder: "Seleccionar sede",
                               },
                               model: {
                                 value: _vm.formCredit.headquarter_id,
@@ -79840,6 +79851,7 @@ var render = function () {
                                   id: "credit_value",
                                   step: "any",
                                   disabled: _vm.edit,
+                                  placeholder: "Ingresar valor de crédito",
                                 },
                                 domProps: {
                                   value: _vm._f("currency")(
@@ -79870,6 +79882,7 @@ var render = function () {
                                   id: "credit_value",
                                   step: "any",
                                   max: _vm.root_data.current_balance_main_box,
+                                  placeholder: "Ingresar valor de crédito",
                                 },
                                 domProps: {
                                   value: _vm.formCredit.credit_value,
@@ -79949,6 +79962,7 @@ var render = function () {
                               id: "interest",
                               step: "any",
                               disabled: _vm.edit,
+                              placeholder: "Ingresar interés",
                             },
                             domProps: { value: _vm.formCredit.interest },
                             on: {
@@ -80001,6 +80015,7 @@ var render = function () {
                               type: "number",
                               id: "number_installments",
                               disabled: _vm.edit,
+                              placeholder: "Ingresar cantidad de cuotas",
                             },
                             domProps: {
                               value: _vm.formCredit.number_installments,
