@@ -47,6 +47,7 @@
               aria-logname="{}"
               :reduce="(expenseType) => expenseType.description"
               v-model="formExpense.type_output"
+              placeholder="--Seleccionar--"
             >
             </v-select>
             <small id="type_output_help" class="form-text text-danger">{{
@@ -136,12 +137,16 @@ export default {
   methods: {
     createExpense() {
       let me = this;
+       me.$root.assignErrors(false, me.formErrors);
+
       axios
         .post("api/expenses", this.formExpense, me.$root.config)
         .then(function () {
           $("#expenseModal").modal("hide");
           me.resetData();
           me.$emit("list-expenses");
+        }).catch(response =>{
+              me.$root.assignErrors(response, me.formErrors);
         });
     },
     showEditExpense(expense) {
@@ -152,6 +157,8 @@ export default {
     },
     editExpense() {
       let me = this;
+       me.$root.assignErrors(false, me.formErrors);
+
       axios
         .put(
           `api/expenses/${this.formExpense.id}`,
@@ -161,6 +168,8 @@ export default {
         .then(function () {
           $("#expenseModal").modal("hide");
           me.resetData();
+        }).catch(response =>{
+              me.$root.assignErrors(response, me.formErrors);
         });
       this.$emit("list-expenses");
 
@@ -171,6 +180,7 @@ export default {
       Object.keys(this.formExpense).forEach(function (key, index) {
         me.formExpense[key] = "";
       });
+      me.$root.assignErrors(false, me.formErrors);
     },
     listTypeExpenses() {
       let me = this;

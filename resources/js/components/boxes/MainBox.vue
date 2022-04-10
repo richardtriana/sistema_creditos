@@ -100,9 +100,12 @@
 							placeholder="$"
 							v-model="add_amount"
 						/>
+						<small class="form-text text-danger">
+							{{ formErrors.amount}}
+						</small>
 					</div>
 				</div>
-				<div class="w-100 text-center" v-if="$root.validatePermission('box-update')">
+				<div class="w-100 text-center mt-5" v-if="$root.validatePermission('box-update')">
 					<button
 						class="btn btn-primary"
 						type="button"
@@ -124,6 +127,9 @@ export default {
 			formMainBox: {},
 			lastEditor: {},
 			add_amount: 0,
+			formErrors: {
+				amount: ""
+			},
 		};
 	},
 	created() {
@@ -131,22 +137,25 @@ export default {
 	},
 	methods: {
 		getMainBox() {
-			axios.get("api/main-box", this.$root.config).then((reponse) => {
-				this.formMainBox = reponse.data.main_box;
-				this.lastEditor = reponse.data.last_editor;
+			axios.get("api/main-box", this.$root.config).then((response) => {
+				this.formMainBox = response.data.main_box;
+				this.lastEditor = response.data.last_editor;
 			});
 			this.$root.getCurrentBalanceMainBox();
 		},
 		updateBox() {
 			let me = this;
 			if (this.box_id != 0) {
+				me.$root.assignErrors(false, me.formErrors);
 				axios
 					.put(`api/main-box/${this.formMainBox.id}`, {
 						amount: this.add_amount,
 					}, me.$root.config)
 					.then(function () {
 						me.getMainBox();
-					});
+					}).catch(response => {
+						me.$root.assignErrors(response, me.formErrors);
+					})
 			}
 		},
 	},

@@ -54,14 +54,14 @@
               <td>{{ headquarter.phone }}</td>
               <td class="text-right" v-if="$root.validatePermission('headquarter-status')">
                 <button
-                  v-if="headquarter.status == 1"
+                  v-if="!headquarter.status"
                   class="btn btn-danger"
                   @click="changeStatus(headquarter.id)"
                 >
                   <i class="bi bi-trash"></i>
                 </button>
                 <button
-                  v-if="headquarter.status == 0"
+                  v-else
                   class="btn btn-success"
                   @click="changeStatus(headquarter.id)"
                 >
@@ -70,7 +70,7 @@
               </td>
               <td class="text-right" v-if="$root.validatePermission('headquarter-update')">
                 <button
-                  v-if="headquarter.status == 1"
+                  v-if="headquarter.status"
                   class="btn btn-primary"
                   @click="showData(headquarter)"
                 >

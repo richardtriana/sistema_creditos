@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class ClientController extends Controller
 {
@@ -57,28 +58,32 @@ class ClientController extends Controller
 	public function store(Request $request)
 	{
 
-		$validate = Validator::make($request->all(),[
+		$validate = Validator::make($request->all(), [
 			'name' => 'required|string|max:255',
 			'last_name' => 'required|string|max:255',
-			'type_document' => 'required|in:CC,'
+			'type_document' => 'required|in:CC,CE,NIT,PP,TI',
+			'document' => 'required|numeric|min:999999|max:999999999999|unique:clients',
+			'phone_1' => 'nullable|string',
+			'phone_2' => 'nullable|string',
+			'address' => 'nullable|string',
+			'email' => 'nullable|string|email:rfc,dns|unique:clients',
+			'birth_date' => 'nullable|date',
+			'gender' => 'nullable|string|in:M,F,O',
+			'civil_status' => 'nullable|string|in:Soltero,Casado,Union libre,Divorciado,Viudo',
+			'workplace' => 'nullable|string|max:255',
+			'occupation' => 'nullable|string|max:255',
+			'independent' => 'nullable|boolean'
 		]);
 
-		//name
-		// last_name
-		// type_document
-		// document
-		// phone_1
-		// phone_2
-		// address
-		// email
-		// birth_date
-		// gender
-		// status
-		// civil_status
-		// workplace
-		// occupation
-		// independent
-		// photo
+		if ($validate->fails()) {
+			return response()->json([
+				'status' => 'error',
+				'code' =>  400,
+				'message' => 'Validación de datos incorrecta',
+				'errors' =>  $validate->errors()
+			], 400);
+		}
+
 
 		$client = new Client();
 		$client->name = $request['name'];
@@ -97,7 +102,14 @@ class ClientController extends Controller
 		$client->independent = $request['independent'];
 		$client->photo = 'undefined';
 		$client->save();
-	
+
+
+		return response()->json([
+			'status' => 'success',
+			'code' =>  200,
+			'message' => 'Registro exitoso',
+			'errors' =>  $validate->errors()
+		], 200);
 	}
 	
 		/**
@@ -131,6 +143,45 @@ class ClientController extends Controller
 	 */
 	public function update(Request $request, Client $client)
 	{
+		$validate = Validator::make($request->all(), [
+			'name' => 'required|string|max:255',
+			'last_name' => 'required|string|max:255',
+			'type_document' => 'required|in:CC,CE,NIT,PP,TI',
+			'document' => [
+				'required',
+				'numeric',
+				'between:9999,999999999999',
+				Rule::unique('clients')->ignore($client->id)
+			],
+			'phone_1' => 'nullable|string',
+			'phone_2' => 'nullable|string',
+			'address' => 'nullable|string',
+			'email' => [
+				'nullable',
+				'string',
+				'email:rfc,dns',
+				Rule::unique('clients')->ignore($client->id)
+			],
+			'birth_date' => 'nullable|date',
+			'gender' => 'nullable|string|in:M,F,O',
+			'civil_status' => 'nullable|string|max:255',
+			'workplace' => 'nullable|string|max:255',
+			'occupation' => 'nullable|string|max:255',
+			'independent' => 'nullable|boolean'
+		]);
+
+
+		if ($validate->fails()) {
+			return response()->json([
+				'status' => 'error',
+				'code' =>  400,
+				'message' => 'Validación de datos incorrecta',
+				'errors' =>  $validate->errors()
+			], 400);
+		}
+
+
+
 		$client = Client::find($request->id);
 		$client->name = $request['name'];
 		$client->last_name = $request['last_name'];
@@ -147,7 +198,14 @@ class ClientController extends Controller
 		$client->occupation = $request['occupation'];
 		$client->independent = $request['independent'];
 		$client->photo = 'undefined';
-		$client->save();
+		$client->update();
+
+		return response()->json([
+			'status' => 'success',
+			'code' =>  200,
+			'message' => 'Registro exitoso',
+			'errors' =>  $validate->errors()
+		], 200);
 	}
 
 	/**

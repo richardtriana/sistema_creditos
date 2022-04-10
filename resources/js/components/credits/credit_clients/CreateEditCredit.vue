@@ -44,6 +44,7 @@
                     disabled
                     readonly
                     v-model="client_name"
+                    :class="[formErrors.client_id ? 'is-invalid' : '']"
                   />
                   <small id="client_id_help" class="form-text text-danger">{{
                     formErrors.client_id
@@ -96,6 +97,7 @@
                     disabled
                     readonly
                     v-model="debtor_name"
+                    :class="[formErrors.debtor_id ? 'is-invalid' : '']"
                   />
                   <small id="debtor_id_help" class="form-text text-danger">{{
                     formErrors.debtor_id
@@ -148,6 +150,7 @@
                     disabled
                     readonly
                     v-model="provider_name"
+                    :class="[formErrors.provider_id ? 'is-invalid' : '']"
                   />
                   <small id="provider_id_help" class="form-text text-danger">{{
                     formErrors.provider_id
@@ -161,6 +164,8 @@
                     class="form-control"
                     id="description"
                     v-model="formCredit.description"
+                    :class="[formErrors.description ? 'is-invalid' : '']"
+                    placeholder="Ingresar descripción "
                   ></textarea>
                   <small id="description_help" class="form-text text-danger">{{
                     formErrors.description
@@ -175,6 +180,8 @@
                     aria-logname="{}"
                     :reduce="(headquarter) => headquarter.id"
                     v-model="formCredit.headquarter_id"
+                    :class="[formErrors.headquarter_id ? 'is-invalid' : '']"
+                    placeholder="Seleccionar sede"
                   >
                   </v-select>
                   <small
@@ -193,6 +200,8 @@
                     step="any"
                     :value="formCredit.credit_value | currency"
                     :disabled="edit"
+                    :class="[formErrors.credit_value ? 'is-invalid' : '']"
+                    placeholder="Ingresar valor de crédito"
                   />
                   <input
                     v-if="!edit"
@@ -209,6 +218,8 @@
                             root_data.current_balance_main_box)
                         : (formCredit.credit_value = formCredit.credit_value)
                     "
+                    :class="[formErrors.credit_value ? 'is-invalid' : '']"
+                    placeholder="Ingresar valor de crédito"
                   />
                   <small id="addAmountHelpBlock" class="form-text text-muted">
                     Monto máximo
@@ -227,6 +238,8 @@
                     v-model="formCredit.interest"
                     step="any"
                     :disabled="edit"
+                    :class="[formErrors.interest ? 'is-invalid' : '']"
+                    placeholder="Ingresar interés"
                   />
                   <small id="interest_help" class="form-text text-danger">{{
                     formErrors.interest
@@ -241,6 +254,8 @@
                     id="number_installments"
                     v-model="formCredit.number_installments"
                     :disabled="edit"
+                    :class="[formErrors.number_installments ? 'is-invalid' : '']"
+                    placeholder="Ingresar cantidad de cuotas"
                   />
                   <small
                     id="number_installments_help"
@@ -257,6 +272,7 @@
                     id="start_date"
                     v-model="formCredit.start_date"
                     :disabled="edit"
+                    :class="[formErrors.start_date ? 'is-invalid' : '']"
                   />
                   <small id="start_date_help" class="form-text text-danger">{{
                     formErrors.start_date
@@ -273,13 +289,20 @@
               ></simulator>
               <div class="modal-footer">
                 <button
-                  type="button"
-                  class="btn btn-secondary"
-                  data-dismiss="modal"
-                  @click="edit = false"
-                >
-                  Cerrar
-                </button>
+                type="button"
+                class="btn btn-secondary"
+                data-dismiss="modal"
+                @click="(edit = false), resetData()"
+              >
+                Cerrar
+              </button>
+              <button
+                type="button"
+                class="btn btn-success"
+                @click="edit ? editCredit() : createCredit()"
+              >
+                Guardar
+              </button>
               </div>
             </form>
           </div>
@@ -389,7 +412,7 @@ export default {
       this.edit = true;
       let me = this;
       $("#formCreditModal").modal("show");
-      me.formCredit = credit;
+      me.formCredit = Object.assign({}, credit);
     },
     editCredit() {
       let me = this;
@@ -428,7 +451,7 @@ export default {
       Object.keys(this.formCredit).forEach(function (key, index) {
         me.formCredit[key] = "";
       });
-      me.$root.assignErrors(response, me.formErrors);
+      me.$root.assignErrors(false, me.formErrors);
     },
   },
 };

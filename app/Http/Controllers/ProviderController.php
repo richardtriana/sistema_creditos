@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Provider;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+
 
 class ProviderController extends Controller
 {
@@ -31,7 +34,26 @@ class ProviderController extends Controller
 
 	public function store(Request $request)
 	{
+		$validate = Validator::make($request->all(), [
+			'business_name' => 'required|string|max:100',
+			'type_document' => 'required|in:CC,CE,NIT,PP,TI',
+			'document' => 'required|numeric|min:999999|max:999999999999|unique:providers',
+			'phone_1' => 'required|string',
+			'phone_2' => 'nullable|string',
+			'address' => 'nullable|string',
+			'email' => 'required|string|email:rfc,dns|unique:providers',
+		]);
 
+
+		if ($validate->fails()) {
+			return response()->json([
+				'status' => 'error',
+				'code' =>  400,
+				'message' => 'Validación de datos incorrecta',
+				'errors' =>  $validate->errors()
+			], 400);
+		}
+		
 		$provider = new Provider();
 		$provider->business_name = $request['business_name'];
 		$provider->type_document = $request['type_document'];
@@ -41,6 +63,14 @@ class ProviderController extends Controller
 		$provider->address = $request['address'];
 		$provider->email = $request['email'];
 		$provider->save();
+
+		return response()->json([
+			'status' => 'success',
+			'code' =>  200,
+			'message' => 'Registro exitoso',
+			'provider' =>  $provider
+		], 200);
+		
 	}
 
 	public function show(Provider $provider)
@@ -55,7 +85,37 @@ class ProviderController extends Controller
 
 	public function update(Request $request, Provider $provider)
 	{
-		$provider = Provider::find($request->id);
+		$validate = Validator::make($request->all(), [
+			'business_name' => 'required|string|max:100',
+			'type_document' => 'required|in:CC,CE,NIT,PP,TI',
+			'document' => [
+				'required',
+				'numeric',
+				'between:9999,999999999999',
+				Rule::unique('providers')->ignore($provider->id)
+			],
+			'phone_1' => 'required|string',
+			'phone_2' => 'nullable|string',
+			'address' => 'nullable|string',
+			'email' => [
+				'required',
+				'string',
+				'email:rfc,dns',
+				Rule::unique('providers')->ignore($provider->id)
+			],
+		]);
+
+
+		if ($validate->fails()) {
+			return response()->json([
+				'status' => 'error',
+				'code' =>  400,
+				'message' => 'Validación de datos incorrecta',
+				'errors' =>  $validate->errors()
+			], 400);
+		}
+
+		//$provider = Provider::find($request->id);
 		$provider->business_name = $request['business_name'];
 		$provider->type_document = $request['type_document'];
 		$provider->document = $request['document'];
@@ -63,7 +123,14 @@ class ProviderController extends Controller
 		$provider->phone_2 = $request['phone_2'];
 		$provider->address = $request['address'];
 		$provider->email = $request['email'];
-		$provider->save();
+		$provider->update();
+
+		return response()->json([
+			'status' => 'success',
+			'code' =>  200,
+			'message' => 'Registro exitoso',
+			'provider' =>  $provider
+		], 200);
 	}
 
 	public function changeStatus(Provider $provider)
