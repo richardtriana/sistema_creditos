@@ -3947,36 +3947,17 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     saveConfiguration: function saveConfiguration() {
-      var _this2 = this;
-
-      this.assignErrors(false);
+      var me = this;
       var form = new FormData($("#form_configuration")[0]);
-      form.append("id", this.formConfiguration.id);
-      form.set("condition_quotation", this.formConfiguration.condition_quotation);
-      axios.post("api/configurations", form).then(function (response) {
-        _this2.formConfiguration = response.data.configuration;
+      form.append("id", me.formConfiguration.id);
+      form.set("condition_quotation", me.formConfiguration.condition_quotation);
+      me.$root.assignErrors(false, me.formErrors);
+      axios.post("api/configurations", form, me.$root.config).then(function (response) {
+        me.formConfiguration = response.data.configuration;
+        me.$root.assignErrors(false, me.formErrors);
       })["catch"](function (response) {
-        _this2.assignErrors(response);
+        me.$root.assignErrors(response, me.formErrors);
       });
-    },
-    assignErrors: function assignErrors(response) {
-      var _this3 = this;
-
-      var fillable = ["name", "legal_representative", "nit", "address", "email", "telephone", "mobile", "file0", "condition_order", "condition_quotation", "whatsapp_msg"];
-
-      if (response) {
-        var errors = response.response.data.errors;
-        console.log(errors);
-        fillable.forEach(function (index) {
-          if (errors[index] != undefined) {
-            _this3.formErrors[index] = errors[index][0];
-          }
-        });
-      } else {
-        fillable.forEach(function (index) {
-          _this3.formErrors[index] = "";
-        });
-      }
     },
     readImage: function readImage(input) {
       var id = $(input).data("info");
@@ -4781,7 +4762,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     showInstallment: function showInstallment(credit) {
       var credit_id = credit.id;
       var allow_payment = credit.status == 1 ? 1 : 0;
-      this.$refs.ModalInstallment.listCreditInstallments(credit_id, allow_payment);
+      this.$refs.ModalInstallment.listCreditInstallments(credit_id, allow_payment, credit);
     },
     showDataClient: function showDataClient(client) {
       this.$refs.ModalCreateEditClient.showEditClient(client);
@@ -5005,6 +4986,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -5029,13 +5012,15 @@ __webpack_require__.r(__webpack_exports__);
     payInstallment: function payInstallment(quote) {
       var me = this;
       var data = {
-        amount: quote.value
+        amount: quote.value,
+        quote_id: quote.id
       };
       console.log(quote.value);
 
       if (quote.value > 0) {
         axios.post("api/installment/".concat(quote.credit_id, "/pay-installment"), data, me.$root.config).then(function (response) {
           me.listCreditInstallments(me.id_credit, 1);
+          me.printEntryPdf(response.data.entry_id);
         });
       } else {
         Swal.fire({
@@ -5045,13 +5030,16 @@ __webpack_require__.r(__webpack_exports__);
         });
       }
     },
-    calculateLate: function calculateLate(quote) {
-      var payment_date = new Date(quote.payment_date).getTime();
-
-      if (payment_date < this.now) {
-        var time = this.now - payment_date;
-        return Math.round(time / (1000 * 60 * 60 * 24));
-      }
+    printEntryPdf: function printEntryPdf(entry_id) {
+      axios.get("api/entries/show-entry/".concat(entry_id), this.$root.config).then(function (response) {
+        var pdf = response.data.pdf;
+        var a = document.createElement("a");
+        a.href = "data:application/pdf;base64," + pdf;
+        a.download = "entrada_".concat(entry_id, "-").concat(Date.now(), ".pdf");
+        a.target = "_blank";
+        a.click();
+        console.log(a);
+      });
     }
   }
 });
@@ -5145,25 +5133,31 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
     Installment: _Installment_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
   },
   data: function data() {
-    return _defineProperty({
+    var _ref;
+
+    return _ref = {
       id_credit: 0,
       allow_payment: 0,
-      listInstallments: [],
-      listInstallmentsPaid: [],
       amount_value: 0
-    }, "allow_payment", 1);
+    }, _defineProperty(_ref, "allow_payment", 1), _defineProperty(_ref, "min_amount", 0), _ref;
   },
   methods: {
-    listCreditInstallments: function listCreditInstallments(credit, allow_payment) {
-      this.id_credit = credit;
+    listCreditInstallments: function listCreditInstallments(credit_id, allow_payment, credit) {
+      this.id_credit = credit_id;
       this.allow_payment = allow_payment;
-      this.$refs.Installment.listCreditInstallments(credit, allow_payment);
+      this.min_amount = credit.installment_value;
+      this.$refs.Installment.listCreditInstallments(credit_id, allow_payment);
     },
     payCredit: function payCredit() {
       var data = {
@@ -5171,12 +5165,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       };
 
       if (this.amount_value > 0) {
-        axios.post("api/installment/".concat(this.id_credit, "/pay-installment"), data, this.$root.config).then(this.listCreditInstallments(this.id_credit, 1))["finally"](this.$refs.Installment.listCreditInstallments(this.id_credit, this.allow_payment));
+        axios.post("api/installment/".concat(this.id_credit, "/pay-installment"), data, this.$root.config).then(function (response) {
+          me.printEntryPdf(response.data.entry_id);
+        })["finally"](this.$refs.Installment.listCreditInstallments(this.id_credit, this.allow_payment));
       } else {
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "El valor debe ser mayor a 0 "
+          text: "El valor debe ser mayor a ".concat(this.min_amount)
         });
       }
     },
@@ -5188,6 +5184,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         var a = document.createElement("a");
         a.href = "data:application/pdf;base64," + pdf;
         a.download = "credit_".concat(_this.id_credit, "-").concat(Date.now(), ".pdf");
+        a.target = "_blank";
+        a.click();
+        console.log(a);
+      });
+    },
+    printEntryPdf: function printEntryPdf(entry_id) {
+      axios.get("api/entries/show-entry/".concat(entry_id), this.$root.config).then(function (response) {
+        var pdf = response.data.pdf;
+        var a = document.createElement("a");
+        a.href = "data:application/pdf;base64," + pdf;
+        a.download = "entrada_".concat(entry_id, "-").concat(Date.now(), ".pdf");
         a.click();
       });
     }
@@ -6405,8 +6412,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -6431,12 +6436,12 @@ __webpack_require__.r(__webpack_exports__);
         me.entryList = response.data;
       });
     },
-    printEntryPdf: function printEntryPdf(entry_id, client) {
+    printEntryPdf: function printEntryPdf(entry_id) {
       axios.get("api/entries/show-entry/".concat(entry_id), this.$root.config).then(function (response) {
         var pdf = response.data.pdf;
         var a = document.createElement("a");
         a.href = "data:application/pdf;base64," + pdf;
-        a.download = "entrada_".concat(entry_id, "-").concat(client, "-").concat(Date.now(), ".pdf");
+        a.download = "entrada_".concat(entry_id, "-").concat(Date.now(), ".pdf");
         a.click();
       });
     },
@@ -14265,7 +14270,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ":root{--vs-colors--lightest:rgba(60,60,60,0.26);--vs-colors--light:rgba(60,60,60,0.5);--vs-colors--dark:#333;--vs-colors--darkest:rgba(0,0,0,0.15);--vs-search-input-color:inherit;--vs-search-input-placeholder-color:inherit;--vs-font-size:1rem;--vs-line-height:1.4;--vs-state-disabled-bg:#f8f8f8;--vs-state-disabled-color:var(--vs-colors--light);--vs-state-disabled-controls-color:var(--vs-colors--light);--vs-state-disabled-cursor:not-allowed;--vs-border-color:var(--vs-colors--lightest);--vs-border-width:1px;--vs-border-style:solid;--vs-border-radius:4px;--vs-actions-padding:4px 6px 0 3px;--vs-controls-color:var(--vs-colors--light);--vs-controls-size:1;--vs-controls--deselect-text-shadow:0 1px 0 #fff;--vs-selected-bg:#f0f0f0;--vs-selected-color:var(--vs-colors--dark);--vs-selected-border-color:var(--vs-border-color);--vs-selected-border-style:var(--vs-border-style);--vs-selected-border-width:var(--vs-border-width);--vs-dropdown-bg:#fff;--vs-dropdown-color:inherit;--vs-dropdown-z-index:1000;--vs-dropdown-min-width:160px;--vs-dropdown-max-height:350px;--vs-dropdown-box-shadow:0px 3px 6px 0px var(--vs-colors--darkest);--vs-dropdown-option-bg:#000;--vs-dropdown-option-color:var(--vs-dropdown-color);--vs-dropdown-option-padding:3px 20px;--vs-dropdown-option--active-bg:#5897fb;--vs-dropdown-option--active-color:#fff;--vs-dropdown-option--deselect-bg:#fb5858;--vs-dropdown-option--deselect-color:#fff;--vs-transition-timing-function:cubic-bezier(1,-0.115,0.975,0.855);--vs-transition-duration:150ms}.v-select{font-family:inherit;position:relative}.v-select,.v-select *{box-sizing:border-box}:root{--vs-transition-timing-function:cubic-bezier(1,0.5,0.8,1);--vs-transition-duration:0.15s}@-webkit-keyframes vSelectSpinner{0%{transform:rotate(0deg)}to{transform:rotate(1turn)}}@keyframes vSelectSpinner{0%{transform:rotate(0deg)}to{transform:rotate(1turn)}}.vs__fade-enter-active,.vs__fade-leave-active{pointer-events:none;transition:opacity var(--vs-transition-duration) var(--vs-transition-timing-function)}.vs__fade-enter,.vs__fade-leave-to{opacity:0}:root{--vs-disabled-bg:var(--vs-state-disabled-bg);--vs-disabled-color:var(--vs-state-disabled-color);--vs-disabled-cursor:var(--vs-state-disabled-cursor)}.vs--disabled .vs__clear,.vs--disabled .vs__dropdown-toggle,.vs--disabled .vs__open-indicator,.vs--disabled .vs__search,.vs--disabled .vs__selected{background-color:var(--vs-disabled-bg);cursor:var(--vs-disabled-cursor)}.v-select[dir=rtl] .vs__actions{padding:0 3px 0 6px}.v-select[dir=rtl] .vs__clear{margin-left:6px;margin-right:0}.v-select[dir=rtl] .vs__deselect{margin-left:0;margin-right:2px}.v-select[dir=rtl] .vs__dropdown-menu{text-align:right}.vs__dropdown-toggle{-webkit-appearance:none;-moz-appearance:none;appearance:none;background:none;border:var(--vs-border-width) var(--vs-border-style) var(--vs-border-color);border-radius:var(--vs-border-radius);display:flex;padding:0 0 4px;white-space:normal}.vs__selected-options{display:flex;flex-basis:100%;flex-grow:1;flex-wrap:wrap;padding:0 2px;position:relative}.vs__actions{align-items:center;display:flex;padding:var(--vs-actions-padding)}.vs--searchable .vs__dropdown-toggle{cursor:text}.vs--unsearchable .vs__dropdown-toggle{cursor:pointer}.vs--open .vs__dropdown-toggle{border-bottom-color:transparent;border-bottom-left-radius:0;border-bottom-right-radius:0}.vs__open-indicator{fill:var(--vs-controls-color);transform:scale(var(--vs-controls-size));transition:transform var(--vs-transition-duration) var(--vs-transition-timing-function);transition-timing-function:var(--vs-transition-timing-function)}.vs--open .vs__open-indicator{transform:rotate(180deg) scale(var(--vs-controls-size))}.vs--loading .vs__open-indicator{opacity:0}.vs__clear{fill:var(--vs-controls-color);background-color:transparent;border:0;cursor:pointer;margin-right:8px;padding:0}.vs__dropdown-menu{background:var(--vs-dropdown-bg);border:var(--vs-border-width) var(--vs-border-style) var(--vs-border-color);border-radius:0 0 var(--vs-border-radius) var(--vs-border-radius);border-top-style:none;box-shadow:var(--vs-dropdown-box-shadow);box-sizing:border-box;color:var(--vs-dropdown-color);display:block;left:0;list-style:none;margin:0;max-height:var(--vs-dropdown-max-height);min-width:var(--vs-dropdown-min-width);overflow-y:auto;padding:5px 0;position:absolute;text-align:left;top:calc(100% - var(--vs-border-width));width:100%;z-index:var(--vs-dropdown-z-index)}.vs__no-options{text-align:center}.vs__dropdown-option{clear:both;color:var(--vs-dropdown-option-color);cursor:pointer;display:block;line-height:1.42857143;padding:var(--vs-dropdown-option-padding);white-space:nowrap}.vs__dropdown-option--highlight{background:var(--vs-dropdown-option--active-bg);color:var(--vs-dropdown-option--active-color)}.vs__dropdown-option--deselect{background:var(--vs-dropdown-option--deselect-bg);color:var(--vs-dropdown-option--deselect-color)}.vs__dropdown-option--disabled{background:var(--vs-state-disabled-bg);color:var(--vs-state-disabled-color);cursor:var(--vs-state-disabled-cursor)}.vs__selected{align-items:center;background-color:var(--vs-selected-bg);border:var(--vs-selected-border-width) var(--vs-selected-border-style) var(--vs-selected-border-color);border-radius:var(--vs-border-radius);color:var(--vs-selected-color);display:flex;line-height:var(--vs-line-height);margin:4px 2px 0;padding:0 .25em;z-index:0}.vs__deselect{fill:var(--vs-controls-color);-webkit-appearance:none;-moz-appearance:none;appearance:none;background:none;border:0;cursor:pointer;display:inline-flex;margin-left:4px;padding:0;text-shadow:var(--vs-controls--deselect-text-shadow)}.vs--single .vs__selected{background-color:transparent;border-color:transparent}.vs--single.vs--loading .vs__selected,.vs--single.vs--open .vs__selected{opacity:.4;position:absolute}.vs--single.vs--searching .vs__selected{display:none}.vs__search::-webkit-search-cancel-button{display:none}.vs__search::-ms-clear,.vs__search::-webkit-search-decoration,.vs__search::-webkit-search-results-button,.vs__search::-webkit-search-results-decoration{display:none}.vs__search,.vs__search:focus{-webkit-appearance:none;-moz-appearance:none;appearance:none;background:none;border:1px solid transparent;border-left:none;box-shadow:none;color:var(--vs-search-input-color);flex-grow:1;font-size:var(--vs-font-size);line-height:var(--vs-line-height);margin:4px 0 0;max-width:100%;outline:none;padding:0 7px;width:0;z-index:1}.vs__search::-moz-placeholder{color:var(--vs-search-input-placeholder-color)}.vs__search:-ms-input-placeholder{color:var(--vs-search-input-placeholder-color)}.vs__search::placeholder{color:var(--vs-search-input-placeholder-color)}.vs--unsearchable .vs__search{opacity:1}.vs--unsearchable:not(.vs--disabled) .vs__search{cursor:pointer}.vs--single.vs--searching:not(.vs--open):not(.vs--loading) .vs__search{opacity:.2}.vs__spinner{align-self:center;-webkit-animation:vSelectSpinner 1.1s linear infinite;animation:vSelectSpinner 1.1s linear infinite;border:.9em solid hsla(0,0%,39%,.1);border-left-color:rgba(60,60,60,.45);font-size:5px;opacity:0;overflow:hidden;text-indent:-9999em;transform:translateZ(0) scale(var(--vs-controls--spinner-size,var(--vs-controls-size)));transition:opacity .1s}.vs__spinner,.vs__spinner:after{border-radius:50%;height:5em;transform:scale(var(--vs-controls--spinner-size,var(--vs-controls-size)));width:5em}.vs--loading .vs__spinner{opacity:1}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ".v-select{position:relative;font-family:inherit}.v-select,.v-select *{box-sizing:border-box}@-webkit-keyframes vSelectSpinner{0%{transform:rotate(0deg)}to{transform:rotate(1turn)}}@keyframes vSelectSpinner{0%{transform:rotate(0deg)}to{transform:rotate(1turn)}}.vs__fade-enter-active,.vs__fade-leave-active{pointer-events:none;transition:opacity .15s cubic-bezier(1,.5,.8,1)}.vs__fade-enter,.vs__fade-leave-to{opacity:0}.vs--disabled .vs__clear,.vs--disabled .vs__dropdown-toggle,.vs--disabled .vs__open-indicator,.vs--disabled .vs__search,.vs--disabled .vs__selected{cursor:not-allowed;background-color:#f8f8f8}.v-select[dir=rtl] .vs__actions{padding:0 3px 0 6px}.v-select[dir=rtl] .vs__clear{margin-left:6px;margin-right:0}.v-select[dir=rtl] .vs__deselect{margin-left:0;margin-right:2px}.v-select[dir=rtl] .vs__dropdown-menu{text-align:right}.vs__dropdown-toggle{-webkit-appearance:none;-moz-appearance:none;appearance:none;display:flex;padding:0 0 4px;background:none;border:1px solid rgba(60,60,60,.26);border-radius:4px;white-space:normal}.vs__selected-options{display:flex;flex-basis:100%;flex-grow:1;flex-wrap:wrap;padding:0 2px;position:relative}.vs__actions{display:flex;align-items:center;padding:4px 6px 0 3px}.vs--searchable .vs__dropdown-toggle{cursor:text}.vs--unsearchable .vs__dropdown-toggle{cursor:pointer}.vs--open .vs__dropdown-toggle{border-bottom-color:transparent;border-bottom-left-radius:0;border-bottom-right-radius:0}.vs__open-indicator{fill:rgba(60,60,60,.5);transform:scale(1);transition:transform .15s cubic-bezier(1,-.115,.975,.855);transition-timing-function:cubic-bezier(1,-.115,.975,.855)}.vs--open .vs__open-indicator{transform:rotate(180deg) scale(1)}.vs--loading .vs__open-indicator{opacity:0}.vs__clear{fill:rgba(60,60,60,.5);padding:0;border:0;background-color:transparent;cursor:pointer;margin-right:8px}.vs__dropdown-menu{display:block;box-sizing:border-box;position:absolute;top:calc(100% - 1px);left:0;z-index:1000;padding:5px 0;margin:0;width:100%;max-height:350px;min-width:160px;overflow-y:auto;box-shadow:0 3px 6px 0 rgba(0,0,0,.15);border:1px solid rgba(60,60,60,.26);border-top-style:none;border-radius:0 0 4px 4px;text-align:left;list-style:none;background:#fff}.vs__no-options{text-align:center}.vs__dropdown-option{line-height:1.42857143;display:block;padding:3px 20px;clear:both;color:#333;white-space:nowrap;cursor:pointer}.vs__dropdown-option--highlight{background:#5897fb;color:#fff}.vs__dropdown-option--deselect{background:#fb5858;color:#fff}.vs__dropdown-option--disabled{background:inherit;color:rgba(60,60,60,.5);cursor:inherit}.vs__selected{display:flex;align-items:center;background-color:#f0f0f0;border:1px solid rgba(60,60,60,.26);border-radius:4px;color:#333;line-height:1.4;margin:4px 2px 0;padding:0 .25em;z-index:0}.vs__deselect{display:inline-flex;-webkit-appearance:none;-moz-appearance:none;appearance:none;margin-left:4px;padding:0;border:0;cursor:pointer;background:none;fill:rgba(60,60,60,.5);text-shadow:0 1px 0 #fff}.vs--single .vs__selected{background-color:transparent;border-color:transparent}.vs--single.vs--loading .vs__selected,.vs--single.vs--open .vs__selected{position:absolute;opacity:.4}.vs--single.vs--searching .vs__selected{display:none}.vs__search::-webkit-search-cancel-button{display:none}.vs__search::-ms-clear,.vs__search::-webkit-search-decoration,.vs__search::-webkit-search-results-button,.vs__search::-webkit-search-results-decoration{display:none}.vs__search,.vs__search:focus{-webkit-appearance:none;-moz-appearance:none;appearance:none;line-height:1.4;font-size:1em;border:1px solid transparent;border-left:none;outline:none;margin:4px 0 0;padding:0 7px;background:none;box-shadow:none;width:0;max-width:100%;flex-grow:1;z-index:1}.vs__search::-moz-placeholder{color:inherit}.vs__search:-ms-input-placeholder{color:inherit}.vs__search::placeholder{color:inherit}.vs--unsearchable .vs__search{opacity:1}.vs--unsearchable:not(.vs--disabled) .vs__search{cursor:pointer}.vs--single.vs--searching:not(.vs--open):not(.vs--loading) .vs__search{opacity:.2}.vs__spinner{align-self:center;opacity:0;font-size:5px;text-indent:-9999em;overflow:hidden;border:.9em solid hsla(0,0%,39.2%,.1);border-left-color:rgba(60,60,60,.45);transform:translateZ(0);-webkit-animation:vSelectSpinner 1.1s linear infinite;animation:vSelectSpinner 1.1s linear infinite;transition:opacity .1s}.vs__spinner,.vs__spinner:after{border-radius:50%;width:5em;height:5em}.vs--loading .vs__spinner{opacity:1}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -14289,7 +14294,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.content-found {\n\theight: 80vh;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.content-found {\r\n\theight: 80vh;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -14309,55 +14314,37 @@ ___CSS_LOADER_EXPORT___.push([module.id, "\n.content-found {\n\theight: 80vh;\n}
   MIT License http://www.opensource.org/licenses/mit-license.php
   Author Tobias Koppers @sokra
 */
+// css base code, injected by the css-loader
+// eslint-disable-next-line func-names
 module.exports = function (cssWithMappingToString) {
   var list = []; // return the list of modules as css string
 
   list.toString = function toString() {
     return this.map(function (item) {
-      var content = "";
-      var needLayer = typeof item[5] !== "undefined";
-
-      if (item[4]) {
-        content += "@supports (".concat(item[4], ") {");
-      }
+      var content = cssWithMappingToString(item);
 
       if (item[2]) {
-        content += "@media ".concat(item[2], " {");
-      }
-
-      if (needLayer) {
-        content += "@layer".concat(item[5].length > 0 ? " ".concat(item[5]) : "", " {");
-      }
-
-      content += cssWithMappingToString(item);
-
-      if (needLayer) {
-        content += "}";
-      }
-
-      if (item[2]) {
-        content += "}";
-      }
-
-      if (item[4]) {
-        content += "}";
+        return "@media ".concat(item[2], " {").concat(content, "}");
       }
 
       return content;
     }).join("");
   }; // import a list of modules into the list
+  // eslint-disable-next-line func-names
 
 
-  list.i = function i(modules, media, dedupe, supports, layer) {
+  list.i = function (modules, mediaQuery, dedupe) {
     if (typeof modules === "string") {
-      modules = [[null, modules, undefined]];
+      // eslint-disable-next-line no-param-reassign
+      modules = [[null, modules, ""]];
     }
 
     var alreadyImportedModules = {};
 
     if (dedupe) {
-      for (var k = 0; k < this.length; k++) {
-        var id = this[k][0];
+      for (var i = 0; i < this.length; i++) {
+        // eslint-disable-next-line prefer-destructuring
+        var id = this[i][0];
 
         if (id != null) {
           alreadyImportedModules[id] = true;
@@ -14365,37 +14352,19 @@ module.exports = function (cssWithMappingToString) {
       }
     }
 
-    for (var _k = 0; _k < modules.length; _k++) {
-      var item = [].concat(modules[_k]);
+    for (var _i = 0; _i < modules.length; _i++) {
+      var item = [].concat(modules[_i]);
 
       if (dedupe && alreadyImportedModules[item[0]]) {
+        // eslint-disable-next-line no-continue
         continue;
       }
 
-      if (typeof layer !== "undefined") {
-        if (typeof item[5] === "undefined") {
-          item[5] = layer;
-        } else {
-          item[1] = "@layer".concat(item[5].length > 0 ? " ".concat(item[5]) : "", " {").concat(item[1], "}");
-          item[5] = layer;
-        }
-      }
-
-      if (media) {
+      if (mediaQuery) {
         if (!item[2]) {
-          item[2] = media;
+          item[2] = mediaQuery;
         } else {
-          item[1] = "@media ".concat(item[2], " {").concat(item[1], "}");
-          item[2] = media;
-        }
-      }
-
-      if (supports) {
-        if (!item[4]) {
-          item[4] = "".concat(supports);
-        } else {
-          item[1] = "@supports (".concat(item[4], ") {").concat(item[1], "}");
-          item[4] = supports;
+          item[2] = "".concat(mediaQuery, " and ").concat(item[2]);
         }
       }
 
@@ -43403,10 +43372,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'يناير_فبراير_مارس_أبريل_ماي_يونيو_يوليوز_غشت_شتنبر_أكتوبر_نونبر_دجنبر'.split(
             '_'
         ),
-        monthsShort:
-            'يناير_فبراير_مارس_أبريل_ماي_يونيو_يوليوز_غشت_شتنبر_أكتوبر_نونبر_دجنبر'.split(
-                '_'
-            ),
+        monthsShort: 'يناير_فبراير_مارس_أبريل_ماي_يونيو_يوليوز_غشت_شتنبر_أكتوبر_نونبر_دجنبر'.split(
+            '_'
+        ),
         weekdays: 'الأحد_الإتنين_الثلاثاء_الأربعاء_الخميس_الجمعة_السبت'.split('_'),
         weekdaysShort: 'احد_اتنين_ثلاثاء_اربعاء_خميس_جمعة_سبت'.split('_'),
         weekdaysMin: 'ح_ن_ث_ر_خ_ج_س'.split('_'),
@@ -43463,7 +43431,7 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
-//! locale : Arabic (Libya) [ar-ly]
+//! locale : Arabic (Lybia) [ar-ly]
 //! author : Ali Hmer: https://github.com/kikoanis
 
 ;(function (global, factory) {
@@ -43668,10 +43636,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'يناير_فبراير_مارس_أبريل_ماي_يونيو_يوليوز_غشت_شتنبر_أكتوبر_نونبر_دجنبر'.split(
             '_'
         ),
-        monthsShort:
-            'يناير_فبراير_مارس_أبريل_ماي_يونيو_يوليوز_غشت_شتنبر_أكتوبر_نونبر_دجنبر'.split(
-                '_'
-            ),
+        monthsShort: 'يناير_فبراير_مارس_أبريل_ماي_يونيو_يوليوز_غشت_شتنبر_أكتوبر_نونبر_دجنبر'.split(
+            '_'
+        ),
         weekdays: 'الأحد_الإثنين_الثلاثاء_الأربعاء_الخميس_الجمعة_السبت'.split('_'),
         weekdaysShort: 'احد_اثنين_ثلاثاء_اربعاء_خميس_جمعة_سبت'.split('_'),
         weekdaysMin: 'ح_ن_ث_ر_خ_ج_س'.split('_'),
@@ -43767,10 +43734,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'يناير_فبراير_مارس_أبريل_مايو_يونيو_يوليو_أغسطس_سبتمبر_أكتوبر_نوفمبر_ديسمبر'.split(
             '_'
         ),
-        monthsShort:
-            'يناير_فبراير_مارس_أبريل_مايو_يونيو_يوليو_أغسطس_سبتمبر_أكتوبر_نوفمبر_ديسمبر'.split(
-                '_'
-            ),
+        monthsShort: 'يناير_فبراير_مارس_أبريل_مايو_يونيو_يوليو_أغسطس_سبتمبر_أكتوبر_نوفمبر_ديسمبر'.split(
+            '_'
+        ),
         weekdays: 'الأحد_الإثنين_الثلاثاء_الأربعاء_الخميس_الجمعة_السبت'.split('_'),
         weekdaysShort: 'أحد_إثنين_ثلاثاء_أربعاء_خميس_جمعة_سبت'.split('_'),
         weekdaysMin: 'ح_ن_ث_ر_خ_ج_س'.split('_'),
@@ -43866,10 +43832,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'جانفي_فيفري_مارس_أفريل_ماي_جوان_جويلية_أوت_سبتمبر_أكتوبر_نوفمبر_ديسمبر'.split(
             '_'
         ),
-        monthsShort:
-            'جانفي_فيفري_مارس_أفريل_ماي_جوان_جويلية_أوت_سبتمبر_أكتوبر_نوفمبر_ديسمبر'.split(
-                '_'
-            ),
+        monthsShort: 'جانفي_فيفري_مارس_أفريل_ماي_جوان_جويلية_أوت_سبتمبر_أكتوبر_نوفمبر_ديسمبر'.split(
+            '_'
+        ),
         weekdays: 'الأحد_الإثنين_الثلاثاء_الأربعاء_الخميس_الجمعة_السبت'.split('_'),
         weekdaysShort: 'أحد_إثنين_ثلاثاء_أربعاء_خميس_جمعة_سبت'.split('_'),
         weekdaysMin: 'ح_ن_ث_ر_خ_ج_س'.split('_'),
@@ -44170,10 +44135,9 @@ __webpack_require__.r(__webpack_exports__);
             '_'
         ),
         monthsShort: 'yan_fev_mar_apr_may_iyn_iyl_avq_sen_okt_noy_dek'.split('_'),
-        weekdays:
-            'Bazar_Bazar ertəsi_Çərşənbə axşamı_Çərşənbə_Cümə axşamı_Cümə_Şənbə'.split(
-                '_'
-            ),
+        weekdays: 'Bazar_Bazar ertəsi_Çərşənbə axşamı_Çərşənbə_Cümə axşamı_Cümə_Şənbə'.split(
+            '_'
+        ),
         weekdaysShort: 'Baz_BzE_ÇAx_Çər_CAx_Cüm_Şən'.split('_'),
         weekdaysMin: 'Bz_BE_ÇA_Çə_CA_Cü_Şə'.split('_'),
         weekdaysParseExact: true,
@@ -44298,21 +44262,20 @@ __webpack_require__.r(__webpack_exports__);
             format: 'студзеня_лютага_сакавіка_красавіка_траўня_чэрвеня_ліпеня_жніўня_верасня_кастрычніка_лістапада_снежня'.split(
                 '_'
             ),
-            standalone:
-                'студзень_люты_сакавік_красавік_травень_чэрвень_ліпень_жнівень_верасень_кастрычнік_лістапад_снежань'.split(
-                    '_'
-                ),
+            standalone: 'студзень_люты_сакавік_красавік_травень_чэрвень_ліпень_жнівень_верасень_кастрычнік_лістапад_снежань'.split(
+                '_'
+            ),
         },
-        monthsShort:
-            'студ_лют_сак_крас_трав_чэрв_ліп_жнів_вер_каст_ліст_снеж'.split('_'),
+        monthsShort: 'студ_лют_сак_крас_трав_чэрв_ліп_жнів_вер_каст_ліст_снеж'.split(
+            '_'
+        ),
         weekdays: {
             format: 'нядзелю_панядзелак_аўторак_сераду_чацвер_пятніцу_суботу'.split(
                 '_'
             ),
-            standalone:
-                'нядзеля_панядзелак_аўторак_серада_чацвер_пятніца_субота'.split(
-                    '_'
-                ),
+            standalone: 'нядзеля_панядзелак_аўторак_серада_чацвер_пятніца_субота'.split(
+                '_'
+            ),
             isFormat: /\[ ?[Ууў] ?(?:мінулую|наступную)? ?\] ?dddd/,
         },
         weekdaysShort: 'нд_пн_ат_ср_чц_пт_сб'.split('_'),
@@ -44631,10 +44594,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'জানুয়ারি_ফেব্রুয়ারি_মার্চ_এপ্রিল_মে_জুন_জুলাই_আগস্ট_সেপ্টেম্বর_অক্টোবর_নভেম্বর_ডিসেম্বর'.split(
             '_'
         ),
-        monthsShort:
-            'জানু_ফেব্রু_মার্চ_এপ্রিল_মে_জুন_জুলাই_আগস্ট_সেপ্ট_অক্টো_নভে_ডিসে'.split(
-                '_'
-            ),
+        monthsShort: 'জানু_ফেব্রু_মার্চ_এপ্রিল_মে_জুন_জুলাই_আগস্ট_সেপ্ট_অক্টো_নভে_ডিসে'.split(
+            '_'
+        ),
         weekdays: 'রবিবার_সোমবার_মঙ্গলবার_বুধবার_বৃহস্পতিবার_শুক্রবার_শনিবার'.split(
             '_'
         ),
@@ -44779,10 +44741,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'জানুয়ারি_ফেব্রুয়ারি_মার্চ_এপ্রিল_মে_জুন_জুলাই_আগস্ট_সেপ্টেম্বর_অক্টোবর_নভেম্বর_ডিসেম্বর'.split(
             '_'
         ),
-        monthsShort:
-            'জানু_ফেব্রু_মার্চ_এপ্রিল_মে_জুন_জুলাই_আগস্ট_সেপ্ট_অক্টো_নভে_ডিসে'.split(
-                '_'
-            ),
+        monthsShort: 'জানু_ফেব্রু_মার্চ_এপ্রিল_মে_জুন_জুলাই_আগস্ট_সেপ্ট_অক্টো_নভে_ডিসে'.split(
+            '_'
+        ),
         weekdays: 'রবিবার_সোমবার_মঙ্গলবার_বুধবার_বৃহস্পতিবার_শুক্রবার_শনিবার'.split(
             '_'
         ),
@@ -44917,16 +44878,14 @@ __webpack_require__.r(__webpack_exports__);
         months: 'ཟླ་བ་དང་པོ_ཟླ་བ་གཉིས་པ_ཟླ་བ་གསུམ་པ_ཟླ་བ་བཞི་པ_ཟླ་བ་ལྔ་པ_ཟླ་བ་དྲུག་པ_ཟླ་བ་བདུན་པ_ཟླ་བ་བརྒྱད་པ_ཟླ་བ་དགུ་པ_ཟླ་བ་བཅུ་པ_ཟླ་བ་བཅུ་གཅིག་པ_ཟླ་བ་བཅུ་གཉིས་པ'.split(
             '_'
         ),
-        monthsShort:
-            'ཟླ་1_ཟླ་2_ཟླ་3_ཟླ་4_ཟླ་5_ཟླ་6_ཟླ་7_ཟླ་8_ཟླ་9_ཟླ་10_ཟླ་11_ཟླ་12'.split(
-                '_'
-            ),
+        monthsShort: 'ཟླ་1_ཟླ་2_ཟླ་3_ཟླ་4_ཟླ་5_ཟླ་6_ཟླ་7_ཟླ་8_ཟླ་9_ཟླ་10_ཟླ་11_ཟླ་12'.split(
+            '_'
+        ),
         monthsShortRegex: /^(ཟླ་\d{1,2})/,
         monthsParseExact: true,
-        weekdays:
-            'གཟའ་ཉི་མ་_གཟའ་ཟླ་བ་_གཟའ་མིག་དམར་_གཟའ་ལྷག་པ་_གཟའ་ཕུར་བུ_གཟའ་པ་སངས་_གཟའ་སྤེན་པ་'.split(
-                '_'
-            ),
+        weekdays: 'གཟའ་ཉི་མ་_གཟའ་ཟླ་བ་_གཟའ་མིག་དམར་_གཟའ་ལྷག་པ་_གཟའ་ཕུར་བུ_གཟའ་པ་སངས་_གཟའ་སྤེན་པ་'.split(
+            '_'
+        ),
         weekdaysShort: 'ཉི་མ་_ཟླ་བ་_མིག་དམར་_ལྷག་པ་_ཕུར་བུ_པ་སངས་_སྤེན་པ་'.split(
             '_'
         ),
@@ -45089,12 +45048,9 @@ __webpack_require__.r(__webpack_exports__);
             /^du/i,
             /^ker/i,
         ],
-        monthsRegex =
-            /^(genver|c[ʼ\']hwevrer|meurzh|ebrel|mae|mezheven|gouere|eost|gwengolo|here|du|kerzu|gen|c[ʼ\']hwe|meu|ebr|mae|eve|gou|eos|gwe|her|du|ker)/i,
-        monthsStrictRegex =
-            /^(genver|c[ʼ\']hwevrer|meurzh|ebrel|mae|mezheven|gouere|eost|gwengolo|here|du|kerzu)/i,
-        monthsShortStrictRegex =
-            /^(gen|c[ʼ\']hwe|meu|ebr|mae|eve|gou|eos|gwe|her|du|ker)/i,
+        monthsRegex = /^(genver|c[ʼ\']hwevrer|meurzh|ebrel|mae|mezheven|gouere|eost|gwengolo|here|du|kerzu|gen|c[ʼ\']hwe|meu|ebr|mae|eve|gou|eos|gwe|her|du|ker)/i,
+        monthsStrictRegex = /^(genver|c[ʼ\']hwevrer|meurzh|ebrel|mae|mezheven|gouere|eost|gwengolo|here|du|kerzu)/i,
+        monthsShortStrictRegex = /^(gen|c[ʼ\']hwe|meu|ebr|mae|eve|gou|eos|gwe|her|du|ker)/i,
         fullWeekdaysParse = [
             /^sul/i,
             /^lun/i,
@@ -45285,10 +45241,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'januar_februar_mart_april_maj_juni_juli_august_septembar_oktobar_novembar_decembar'.split(
             '_'
         ),
-        monthsShort:
-            'jan._feb._mar._apr._maj._jun._jul._aug._sep._okt._nov._dec.'.split(
-                '_'
-            ),
+        monthsShort: 'jan._feb._mar._apr._maj._jun._jul._aug._sep._okt._nov._dec.'.split(
+            '_'
+        ),
         monthsParseExact: true,
         weekdays: 'nedjelja_ponedjeljak_utorak_srijeda_četvrtak_petak_subota'.split(
             '_'
@@ -45389,24 +45344,21 @@ __webpack_require__.r(__webpack_exports__);
 
     var ca = moment.defineLocale('ca', {
         months: {
-            standalone:
-                'gener_febrer_març_abril_maig_juny_juliol_agost_setembre_octubre_novembre_desembre'.split(
-                    '_'
-                ),
+            standalone: 'gener_febrer_març_abril_maig_juny_juliol_agost_setembre_octubre_novembre_desembre'.split(
+                '_'
+            ),
             format: "de gener_de febrer_de març_d'abril_de maig_de juny_de juliol_d'agost_de setembre_d'octubre_de novembre_de desembre".split(
                 '_'
             ),
             isFormat: /D[oD]?(\s)+MMMM/,
         },
-        monthsShort:
-            'gen._febr._març_abr._maig_juny_jul._ag._set._oct._nov._des.'.split(
-                '_'
-            ),
+        monthsShort: 'gen._febr._març_abr._maig_juny_jul._ag._set._oct._nov._des.'.split(
+            '_'
+        ),
         monthsParseExact: true,
-        weekdays:
-            'diumenge_dilluns_dimarts_dimecres_dijous_divendres_dissabte'.split(
-                '_'
-            ),
+        weekdays: 'diumenge_dilluns_dimarts_dimecres_dijous_divendres_dissabte'.split(
+            '_'
+        ),
         weekdaysShort: 'dg._dl._dt._dc._dj._dv._ds.'.split('_'),
         weekdaysMin: 'dg_dl_dt_dc_dj_dv_ds'.split('_'),
         weekdaysParseExact: true,
@@ -45506,15 +45458,9 @@ __webpack_require__.r(__webpack_exports__);
 
     //! moment.js locale configuration
 
-    var months = {
-            format: 'leden_únor_březen_duben_květen_červen_červenec_srpen_září_říjen_listopad_prosinec'.split(
-                '_'
-            ),
-            standalone:
-                'ledna_února_března_dubna_května_června_července_srpna_září_října_listopadu_prosince'.split(
-                    '_'
-                ),
-        },
+    var months = 'leden_únor_březen_duben_květen_červen_červenec_srpen_září_říjen_listopad_prosinec'.split(
+            '_'
+        ),
         monthsShort = 'led_úno_bře_dub_kvě_čvn_čvc_srp_zář_říj_lis_pro'.split('_'),
         monthsParse = [
             /^led/i,
@@ -45532,8 +45478,7 @@ __webpack_require__.r(__webpack_exports__);
         ],
         // NOTE: 'červen' is substring of 'červenec'; therefore 'červenec' must precede 'červen' in the regex to be fully matched.
         // Otherwise parser matches '1. červenec' as '1. červen' + 'ec'.
-        monthsRegex =
-            /^(leden|únor|březen|duben|květen|červenec|července|červen|června|srpen|září|říjen|listopad|prosinec|led|úno|bře|dub|kvě|čvn|čvc|srp|zář|říj|lis|pro)/i;
+        monthsRegex = /^(leden|únor|březen|duben|květen|červenec|července|červen|června|srpen|září|říjen|listopad|prosinec|led|úno|bře|dub|kvě|čvn|čvc|srp|zář|říj|lis|pro)/i;
 
     function plural(n) {
         return n > 1 && n < 5 && ~~(n / 10) !== 1;
@@ -45599,10 +45544,8 @@ __webpack_require__.r(__webpack_exports__);
         monthsShortRegex: monthsRegex,
         // NOTE: 'červen' is substring of 'červenec'; therefore 'červenec' must precede 'červen' in the regex to be fully matched.
         // Otherwise parser matches '1. červenec' as '1. červen' + 'ec'.
-        monthsStrictRegex:
-            /^(leden|ledna|února|únor|březen|března|duben|dubna|květen|května|červenec|července|červen|června|srpen|srpna|září|říjen|října|listopadu|listopad|prosinec|prosince)/i,
-        monthsShortStrictRegex:
-            /^(led|úno|bře|dub|kvě|čvn|čvc|srp|zář|říj|lis|pro)/i,
+        monthsStrictRegex: /^(leden|ledna|února|únor|březen|března|duben|dubna|květen|května|červenec|července|červen|června|srpen|srpna|září|říjen|října|listopadu|listopad|prosinec|prosince)/i,
+        monthsShortStrictRegex: /^(led|úno|bře|dub|kvě|čvn|čvc|srp|zář|říj|lis|pro)/i,
         monthsParse: monthsParse,
         longMonthsParse: monthsParse,
         shortMonthsParse: monthsParse,
@@ -45710,10 +45653,9 @@ __webpack_require__.r(__webpack_exports__);
             '_'
         ),
         monthsShort: 'кӑр_нар_пуш_ака_май_ҫӗр_утӑ_ҫур_авн_юпа_чӳк_раш'.split('_'),
-        weekdays:
-            'вырсарникун_тунтикун_ытларикун_юнкун_кӗҫнерникун_эрнекун_шӑматкун'.split(
-                '_'
-            ),
+        weekdays: 'вырсарникун_тунтикун_ытларикун_юнкун_кӗҫнерникун_эрнекун_шӑматкун'.split(
+            '_'
+        ),
         weekdaysShort: 'выр_тун_ытл_юн_кӗҫ_эрн_шӑм'.split('_'),
         weekdaysMin: 'вр_тн_ыт_юн_кҫ_эр_шм'.split('_'),
         longDateFormat: {
@@ -45795,10 +45737,9 @@ __webpack_require__.r(__webpack_exports__);
         monthsShort: 'Ion_Chwe_Maw_Ebr_Mai_Meh_Gor_Aws_Med_Hyd_Tach_Rhag'.split(
             '_'
         ),
-        weekdays:
-            'Dydd Sul_Dydd Llun_Dydd Mawrth_Dydd Mercher_Dydd Iau_Dydd Gwener_Dydd Sadwrn'.split(
-                '_'
-            ),
+        weekdays: 'Dydd Sul_Dydd Llun_Dydd Mawrth_Dydd Mercher_Dydd Iau_Dydd Gwener_Dydd Sadwrn'.split(
+            '_'
+        ),
         weekdaysShort: 'Sul_Llun_Maw_Mer_Iau_Gwe_Sad'.split('_'),
         weekdaysMin: 'Su_Ll_Ma_Me_Ia_Gw_Sa'.split('_'),
         weekdaysParseExact: true,
@@ -45998,13 +45939,13 @@ __webpack_require__.r(__webpack_exports__);
         months: 'Jänner_Februar_März_April_Mai_Juni_Juli_August_September_Oktober_November_Dezember'.split(
             '_'
         ),
-        monthsShort:
-            'Jän._Feb._März_Apr._Mai_Juni_Juli_Aug._Sep._Okt._Nov._Dez.'.split('_'),
+        monthsShort: 'Jän._Feb._März_Apr._Mai_Juni_Juli_Aug._Sep._Okt._Nov._Dez.'.split(
+            '_'
+        ),
         monthsParseExact: true,
-        weekdays:
-            'Sonntag_Montag_Dienstag_Mittwoch_Donnerstag_Freitag_Samstag'.split(
-                '_'
-            ),
+        weekdays: 'Sonntag_Montag_Dienstag_Mittwoch_Donnerstag_Freitag_Samstag'.split(
+            '_'
+        ),
         weekdaysShort: 'So._Mo._Di._Mi._Do._Fr._Sa.'.split('_'),
         weekdaysMin: 'So_Mo_Di_Mi_Do_Fr_Sa'.split('_'),
         weekdaysParseExact: true,
@@ -46093,13 +46034,13 @@ __webpack_require__.r(__webpack_exports__);
         months: 'Januar_Februar_März_April_Mai_Juni_Juli_August_September_Oktober_November_Dezember'.split(
             '_'
         ),
-        monthsShort:
-            'Jan._Feb._März_Apr._Mai_Juni_Juli_Aug._Sep._Okt._Nov._Dez.'.split('_'),
+        monthsShort: 'Jan._Feb._März_Apr._Mai_Juni_Juli_Aug._Sep._Okt._Nov._Dez.'.split(
+            '_'
+        ),
         monthsParseExact: true,
-        weekdays:
-            'Sonntag_Montag_Dienstag_Mittwoch_Donnerstag_Freitag_Samstag'.split(
-                '_'
-            ),
+        weekdays: 'Sonntag_Montag_Dienstag_Mittwoch_Donnerstag_Freitag_Samstag'.split(
+            '_'
+        ),
         weekdaysShort: 'So_Mo_Di_Mi_Do_Fr_Sa'.split('_'),
         weekdaysMin: 'So_Mo_Di_Mi_Do_Fr_Sa'.split('_'),
         weekdaysParseExact: true,
@@ -46190,13 +46131,13 @@ __webpack_require__.r(__webpack_exports__);
         months: 'Januar_Februar_März_April_Mai_Juni_Juli_August_September_Oktober_November_Dezember'.split(
             '_'
         ),
-        monthsShort:
-            'Jan._Feb._März_Apr._Mai_Juni_Juli_Aug._Sep._Okt._Nov._Dez.'.split('_'),
+        monthsShort: 'Jan._Feb._März_Apr._Mai_Juni_Juli_Aug._Sep._Okt._Nov._Dez.'.split(
+            '_'
+        ),
         monthsParseExact: true,
-        weekdays:
-            'Sonntag_Montag_Dienstag_Mittwoch_Donnerstag_Freitag_Samstag'.split(
-                '_'
-            ),
+        weekdays: 'Sonntag_Montag_Dienstag_Mittwoch_Donnerstag_Freitag_Samstag'.split(
+            '_'
+        ),
         weekdaysShort: 'So._Mo._Di._Mi._Do._Fr._Sa.'.split('_'),
         weekdaysMin: 'So_Mo_Di_Mi_Do_Fr_Sa'.split('_'),
         weekdaysParseExact: true,
@@ -46383,14 +46324,12 @@ __webpack_require__.r(__webpack_exports__);
     }
 
     var el = moment.defineLocale('el', {
-        monthsNominativeEl:
-            'Ιανουάριος_Φεβρουάριος_Μάρτιος_Απρίλιος_Μάιος_Ιούνιος_Ιούλιος_Αύγουστος_Σεπτέμβριος_Οκτώβριος_Νοέμβριος_Δεκέμβριος'.split(
-                '_'
-            ),
-        monthsGenitiveEl:
-            'Ιανουαρίου_Φεβρουαρίου_Μαρτίου_Απριλίου_Μαΐου_Ιουνίου_Ιουλίου_Αυγούστου_Σεπτεμβρίου_Οκτωβρίου_Νοεμβρίου_Δεκεμβρίου'.split(
-                '_'
-            ),
+        monthsNominativeEl: 'Ιανουάριος_Φεβρουάριος_Μάρτιος_Απρίλιος_Μάιος_Ιούνιος_Ιούλιος_Αύγουστος_Σεπτέμβριος_Οκτώβριος_Νοέμβριος_Δεκέμβριος'.split(
+            '_'
+        ),
+        monthsGenitiveEl: 'Ιανουαρίου_Φεβρουαρίου_Μαρτίου_Απριλίου_Μαΐου_Ιουνίου_Ιουλίου_Αυγούστου_Σεπτεμβρίου_Οκτωβρίου_Νοεμβρίου_Δεκεμβρίου'.split(
+            '_'
+        ),
         months: function (momentToFormat, format) {
             if (!momentToFormat) {
                 return this._monthsNominativeEl;
@@ -47274,10 +47213,9 @@ __webpack_require__.r(__webpack_exports__);
 
     //! moment.js locale configuration
 
-    var monthsShortDot =
-            'ene._feb._mar._abr._may._jun._jul._ago._sep._oct._nov._dic.'.split(
-                '_'
-            ),
+    var monthsShortDot = 'ene._feb._mar._abr._may._jun._jul._ago._sep._oct._nov._dic.'.split(
+            '_'
+        ),
         monthsShort = 'ene_feb_mar_abr_may_jun_jul_ago_sep_oct_nov_dic'.split('_'),
         monthsParse = [
             /^ene/i,
@@ -47293,8 +47231,7 @@ __webpack_require__.r(__webpack_exports__);
             /^nov/i,
             /^dic/i,
         ],
-        monthsRegex =
-            /^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|ene\.?|feb\.?|mar\.?|abr\.?|may\.?|jun\.?|jul\.?|ago\.?|sep\.?|oct\.?|nov\.?|dic\.?)/i;
+        monthsRegex = /^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|ene\.?|feb\.?|mar\.?|abr\.?|may\.?|jun\.?|jul\.?|ago\.?|sep\.?|oct\.?|nov\.?|dic\.?)/i;
 
     var esDo = moment.defineLocale('es-do', {
         months: 'enero_febrero_marzo_abril_mayo_junio_julio_agosto_septiembre_octubre_noviembre_diciembre'.split(
@@ -47311,10 +47248,8 @@ __webpack_require__.r(__webpack_exports__);
         },
         monthsRegex: monthsRegex,
         monthsShortRegex: monthsRegex,
-        monthsStrictRegex:
-            /^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)/i,
-        monthsShortStrictRegex:
-            /^(ene\.?|feb\.?|mar\.?|abr\.?|may\.?|jun\.?|jul\.?|ago\.?|sep\.?|oct\.?|nov\.?|dic\.?)/i,
+        monthsStrictRegex: /^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)/i,
+        monthsShortStrictRegex: /^(ene\.?|feb\.?|mar\.?|abr\.?|may\.?|jun\.?|jul\.?|ago\.?|sep\.?|oct\.?|nov\.?|dic\.?)/i,
         monthsParse: monthsParse,
         longMonthsParse: monthsParse,
         shortMonthsParse: monthsParse,
@@ -47402,10 +47337,9 @@ __webpack_require__.r(__webpack_exports__);
 
     //! moment.js locale configuration
 
-    var monthsShortDot =
-            'ene._feb._mar._abr._may._jun._jul._ago._sep._oct._nov._dic.'.split(
-                '_'
-            ),
+    var monthsShortDot = 'ene._feb._mar._abr._may._jun._jul._ago._sep._oct._nov._dic.'.split(
+            '_'
+        ),
         monthsShort = 'ene_feb_mar_abr_may_jun_jul_ago_sep_oct_nov_dic'.split('_'),
         monthsParse = [
             /^ene/i,
@@ -47421,8 +47355,7 @@ __webpack_require__.r(__webpack_exports__);
             /^nov/i,
             /^dic/i,
         ],
-        monthsRegex =
-            /^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|ene\.?|feb\.?|mar\.?|abr\.?|may\.?|jun\.?|jul\.?|ago\.?|sep\.?|oct\.?|nov\.?|dic\.?)/i;
+        monthsRegex = /^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|ene\.?|feb\.?|mar\.?|abr\.?|may\.?|jun\.?|jul\.?|ago\.?|sep\.?|oct\.?|nov\.?|dic\.?)/i;
 
     var esMx = moment.defineLocale('es-mx', {
         months: 'enero_febrero_marzo_abril_mayo_junio_julio_agosto_septiembre_octubre_noviembre_diciembre'.split(
@@ -47439,10 +47372,8 @@ __webpack_require__.r(__webpack_exports__);
         },
         monthsRegex: monthsRegex,
         monthsShortRegex: monthsRegex,
-        monthsStrictRegex:
-            /^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)/i,
-        monthsShortStrictRegex:
-            /^(ene\.?|feb\.?|mar\.?|abr\.?|may\.?|jun\.?|jul\.?|ago\.?|sep\.?|oct\.?|nov\.?|dic\.?)/i,
+        monthsStrictRegex: /^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)/i,
+        monthsShortStrictRegex: /^(ene\.?|feb\.?|mar\.?|abr\.?|may\.?|jun\.?|jul\.?|ago\.?|sep\.?|oct\.?|nov\.?|dic\.?)/i,
         monthsParse: monthsParse,
         longMonthsParse: monthsParse,
         shortMonthsParse: monthsParse,
@@ -47532,10 +47463,9 @@ __webpack_require__.r(__webpack_exports__);
 
     //! moment.js locale configuration
 
-    var monthsShortDot =
-            'ene._feb._mar._abr._may._jun._jul._ago._sep._oct._nov._dic.'.split(
-                '_'
-            ),
+    var monthsShortDot = 'ene._feb._mar._abr._may._jun._jul._ago._sep._oct._nov._dic.'.split(
+            '_'
+        ),
         monthsShort = 'ene_feb_mar_abr_may_jun_jul_ago_sep_oct_nov_dic'.split('_'),
         monthsParse = [
             /^ene/i,
@@ -47551,8 +47481,7 @@ __webpack_require__.r(__webpack_exports__);
             /^nov/i,
             /^dic/i,
         ],
-        monthsRegex =
-            /^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|ene\.?|feb\.?|mar\.?|abr\.?|may\.?|jun\.?|jul\.?|ago\.?|sep\.?|oct\.?|nov\.?|dic\.?)/i;
+        monthsRegex = /^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|ene\.?|feb\.?|mar\.?|abr\.?|may\.?|jun\.?|jul\.?|ago\.?|sep\.?|oct\.?|nov\.?|dic\.?)/i;
 
     var esUs = moment.defineLocale('es-us', {
         months: 'enero_febrero_marzo_abril_mayo_junio_julio_agosto_septiembre_octubre_noviembre_diciembre'.split(
@@ -47569,10 +47498,8 @@ __webpack_require__.r(__webpack_exports__);
         },
         monthsRegex: monthsRegex,
         monthsShortRegex: monthsRegex,
-        monthsStrictRegex:
-            /^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)/i,
-        monthsShortStrictRegex:
-            /^(ene\.?|feb\.?|mar\.?|abr\.?|may\.?|jun\.?|jul\.?|ago\.?|sep\.?|oct\.?|nov\.?|dic\.?)/i,
+        monthsStrictRegex: /^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)/i,
+        monthsShortStrictRegex: /^(ene\.?|feb\.?|mar\.?|abr\.?|may\.?|jun\.?|jul\.?|ago\.?|sep\.?|oct\.?|nov\.?|dic\.?)/i,
         monthsParse: monthsParse,
         longMonthsParse: monthsParse,
         shortMonthsParse: monthsParse,
@@ -47660,10 +47587,9 @@ __webpack_require__.r(__webpack_exports__);
 
     //! moment.js locale configuration
 
-    var monthsShortDot =
-            'ene._feb._mar._abr._may._jun._jul._ago._sep._oct._nov._dic.'.split(
-                '_'
-            ),
+    var monthsShortDot = 'ene._feb._mar._abr._may._jun._jul._ago._sep._oct._nov._dic.'.split(
+            '_'
+        ),
         monthsShort = 'ene_feb_mar_abr_may_jun_jul_ago_sep_oct_nov_dic'.split('_'),
         monthsParse = [
             /^ene/i,
@@ -47679,8 +47605,7 @@ __webpack_require__.r(__webpack_exports__);
             /^nov/i,
             /^dic/i,
         ],
-        monthsRegex =
-            /^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|ene\.?|feb\.?|mar\.?|abr\.?|may\.?|jun\.?|jul\.?|ago\.?|sep\.?|oct\.?|nov\.?|dic\.?)/i;
+        monthsRegex = /^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|ene\.?|feb\.?|mar\.?|abr\.?|may\.?|jun\.?|jul\.?|ago\.?|sep\.?|oct\.?|nov\.?|dic\.?)/i;
 
     var es = moment.defineLocale('es', {
         months: 'enero_febrero_marzo_abril_mayo_junio_julio_agosto_septiembre_octubre_noviembre_diciembre'.split(
@@ -47697,10 +47622,8 @@ __webpack_require__.r(__webpack_exports__);
         },
         monthsRegex: monthsRegex,
         monthsShortRegex: monthsRegex,
-        monthsStrictRegex:
-            /^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)/i,
-        monthsShortStrictRegex:
-            /^(ene\.?|feb\.?|mar\.?|abr\.?|may\.?|jun\.?|jul\.?|ago\.?|sep\.?|oct\.?|nov\.?|dic\.?)/i,
+        monthsStrictRegex: /^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)/i,
+        monthsShortStrictRegex: /^(ene\.?|feb\.?|mar\.?|abr\.?|may\.?|jun\.?|jul\.?|ago\.?|sep\.?|oct\.?|nov\.?|dic\.?)/i,
         monthsParse: monthsParse,
         longMonthsParse: monthsParse,
         shortMonthsParse: monthsParse,
@@ -47814,12 +47737,12 @@ __webpack_require__.r(__webpack_exports__);
         months: 'jaanuar_veebruar_märts_aprill_mai_juuni_juuli_august_september_oktoober_november_detsember'.split(
             '_'
         ),
-        monthsShort:
-            'jaan_veebr_märts_apr_mai_juuni_juuli_aug_sept_okt_nov_dets'.split('_'),
-        weekdays:
-            'pühapäev_esmaspäev_teisipäev_kolmapäev_neljapäev_reede_laupäev'.split(
-                '_'
-            ),
+        monthsShort: 'jaan_veebr_märts_apr_mai_juuni_juuli_aug_sept_okt_nov_dets'.split(
+            '_'
+        ),
+        weekdays: 'pühapäev_esmaspäev_teisipäev_kolmapäev_neljapäev_reede_laupäev'.split(
+            '_'
+        ),
         weekdaysShort: 'P_E_T_K_N_R_L'.split('_'),
         weekdaysMin: 'P_E_T_K_N_R_L'.split('_'),
         longDateFormat: {
@@ -47890,15 +47813,13 @@ __webpack_require__.r(__webpack_exports__);
         months: 'urtarrila_otsaila_martxoa_apirila_maiatza_ekaina_uztaila_abuztua_iraila_urria_azaroa_abendua'.split(
             '_'
         ),
-        monthsShort:
-            'urt._ots._mar._api._mai._eka._uzt._abu._ira._urr._aza._abe.'.split(
-                '_'
-            ),
+        monthsShort: 'urt._ots._mar._api._mai._eka._uzt._abu._ira._urr._aza._abe.'.split(
+            '_'
+        ),
         monthsParseExact: true,
-        weekdays:
-            'igandea_astelehena_asteartea_asteazkena_osteguna_ostirala_larunbata'.split(
-                '_'
-            ),
+        weekdays: 'igandea_astelehena_asteartea_asteazkena_osteguna_ostirala_larunbata'.split(
+            '_'
+        ),
         weekdaysShort: 'ig._al._ar._az._og._ol._lr.'.split('_'),
         weekdaysMin: 'ig_al_ar_az_og_ol_lr'.split('_'),
         weekdaysParseExact: true,
@@ -47999,18 +47920,15 @@ __webpack_require__.r(__webpack_exports__);
         months: 'ژانویه_فوریه_مارس_آوریل_مه_ژوئن_ژوئیه_اوت_سپتامبر_اکتبر_نوامبر_دسامبر'.split(
             '_'
         ),
-        monthsShort:
-            'ژانویه_فوریه_مارس_آوریل_مه_ژوئن_ژوئیه_اوت_سپتامبر_اکتبر_نوامبر_دسامبر'.split(
-                '_'
-            ),
-        weekdays:
-            'یک\u200cشنبه_دوشنبه_سه\u200cشنبه_چهارشنبه_پنج\u200cشنبه_جمعه_شنبه'.split(
-                '_'
-            ),
-        weekdaysShort:
-            'یک\u200cشنبه_دوشنبه_سه\u200cشنبه_چهارشنبه_پنج\u200cشنبه_جمعه_شنبه'.split(
-                '_'
-            ),
+        monthsShort: 'ژانویه_فوریه_مارس_آوریل_مه_ژوئن_ژوئیه_اوت_سپتامبر_اکتبر_نوامبر_دسامبر'.split(
+            '_'
+        ),
+        weekdays: 'یک\u200cشنبه_دوشنبه_سه\u200cشنبه_چهارشنبه_پنج\u200cشنبه_جمعه_شنبه'.split(
+            '_'
+        ),
+        weekdaysShort: 'یک\u200cشنبه_دوشنبه_سه\u200cشنبه_چهارشنبه_پنج\u200cشنبه_جمعه_شنبه'.split(
+            '_'
+        ),
         weekdaysMin: 'ی_د_س_چ_پ_ج_ش'.split('_'),
         weekdaysParseExact: true,
         longDateFormat: {
@@ -48102,10 +48020,9 @@ __webpack_require__.r(__webpack_exports__);
 
     //! moment.js locale configuration
 
-    var numbersPast =
-            'nolla yksi kaksi kolme neljä viisi kuusi seitsemän kahdeksan yhdeksän'.split(
-                ' '
-            ),
+    var numbersPast = 'nolla yksi kaksi kolme neljä viisi kuusi seitsemän kahdeksan yhdeksän'.split(
+            ' '
+        ),
         numbersFuture = [
             'nolla',
             'yhden',
@@ -48167,14 +48084,12 @@ __webpack_require__.r(__webpack_exports__);
         months: 'tammikuu_helmikuu_maaliskuu_huhtikuu_toukokuu_kesäkuu_heinäkuu_elokuu_syyskuu_lokakuu_marraskuu_joulukuu'.split(
             '_'
         ),
-        monthsShort:
-            'tammi_helmi_maalis_huhti_touko_kesä_heinä_elo_syys_loka_marras_joulu'.split(
-                '_'
-            ),
-        weekdays:
-            'sunnuntai_maanantai_tiistai_keskiviikko_torstai_perjantai_lauantai'.split(
-                '_'
-            ),
+        monthsShort: 'tammi_helmi_maalis_huhti_touko_kesä_heinä_elo_syys_loka_marras_joulu'.split(
+            '_'
+        ),
+        weekdays: 'sunnuntai_maanantai_tiistai_keskiviikko_torstai_perjantai_lauantai'.split(
+            '_'
+        ),
         weekdaysShort: 'su_ma_ti_ke_to_pe_la'.split('_'),
         weekdaysMin: 'su_ma_ti_ke_to_pe_la'.split('_'),
         longDateFormat: {
@@ -48328,10 +48243,9 @@ __webpack_require__.r(__webpack_exports__);
             '_'
         ),
         monthsShort: 'jan_feb_mar_apr_mai_jun_jul_aug_sep_okt_nov_des'.split('_'),
-        weekdays:
-            'sunnudagur_mánadagur_týsdagur_mikudagur_hósdagur_fríggjadagur_leygardagur'.split(
-                '_'
-            ),
+        weekdays: 'sunnudagur_mánadagur_týsdagur_mikudagur_hósdagur_fríggjadagur_leygardagur'.split(
+            '_'
+        ),
         weekdaysShort: 'sun_mán_týs_mik_hós_frí_ley'.split('_'),
         weekdaysMin: 'su_má_tý_mi_hó_fr_le'.split('_'),
         longDateFormat: {
@@ -48402,10 +48316,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'janvier_février_mars_avril_mai_juin_juillet_août_septembre_octobre_novembre_décembre'.split(
             '_'
         ),
-        monthsShort:
-            'janv._févr._mars_avr._mai_juin_juil._août_sept._oct._nov._déc.'.split(
-                '_'
-            ),
+        monthsShort: 'janv._févr._mars_avr._mai_juin_juil._août_sept._oct._nov._déc.'.split(
+            '_'
+        ),
         monthsParseExact: true,
         weekdays: 'dimanche_lundi_mardi_mercredi_jeudi_vendredi_samedi'.split('_'),
         weekdaysShort: 'dim._lun._mar._mer._jeu._ven._sam.'.split('_'),
@@ -48491,10 +48404,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'janvier_février_mars_avril_mai_juin_juillet_août_septembre_octobre_novembre_décembre'.split(
             '_'
         ),
-        monthsShort:
-            'janv._févr._mars_avr._mai_juin_juil._août_sept._oct._nov._déc.'.split(
-                '_'
-            ),
+        monthsShort: 'janv._févr._mars_avr._mai_juin_juil._août_sept._oct._nov._déc.'.split(
+            '_'
+        ),
         monthsParseExact: true,
         weekdays: 'dimanche_lundi_mardi_mercredi_jeudi_vendredi_samedi'.split('_'),
         weekdaysShort: 'dim._lun._mar._mer._jeu._ven._sam.'.split('_'),
@@ -48580,12 +48492,9 @@ __webpack_require__.r(__webpack_exports__);
 
     //! moment.js locale configuration
 
-    var monthsStrictRegex =
-            /^(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)/i,
-        monthsShortStrictRegex =
-            /(janv\.?|févr\.?|mars|avr\.?|mai|juin|juil\.?|août|sept\.?|oct\.?|nov\.?|déc\.?)/i,
-        monthsRegex =
-            /(janv\.?|févr\.?|mars|avr\.?|mai|juin|juil\.?|août|sept\.?|oct\.?|nov\.?|déc\.?|janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)/i,
+    var monthsStrictRegex = /^(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)/i,
+        monthsShortStrictRegex = /(janv\.?|févr\.?|mars|avr\.?|mai|juin|juil\.?|août|sept\.?|oct\.?|nov\.?|déc\.?)/i,
+        monthsRegex = /(janv\.?|févr\.?|mars|avr\.?|mai|juin|juil\.?|août|sept\.?|oct\.?|nov\.?|déc\.?|janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)/i,
         monthsParse = [
             /^janv/i,
             /^févr/i,
@@ -48605,10 +48514,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'janvier_février_mars_avril_mai_juin_juillet_août_septembre_octobre_novembre_décembre'.split(
             '_'
         ),
-        monthsShort:
-            'janv._févr._mars_avr._mai_juin_juil._août_sept._oct._nov._déc.'.split(
-                '_'
-            ),
+        monthsShort: 'janv._févr._mars_avr._mai_juin_juil._août_sept._oct._nov._déc.'.split(
+            '_'
+        ),
         monthsRegex: monthsRegex,
         monthsShortRegex: monthsRegex,
         monthsStrictRegex: monthsStrictRegex,
@@ -48707,10 +48615,12 @@ __webpack_require__.r(__webpack_exports__);
 
     //! moment.js locale configuration
 
-    var monthsShortWithDots =
-            'jan._feb._mrt._apr._mai_jun._jul._aug._sep._okt._nov._des.'.split('_'),
-        monthsShortWithoutDots =
-            'jan_feb_mrt_apr_mai_jun_jul_aug_sep_okt_nov_des'.split('_');
+    var monthsShortWithDots = 'jan._feb._mrt._apr._mai_jun._jul._aug._sep._okt._nov._des.'.split(
+            '_'
+        ),
+        monthsShortWithoutDots = 'jan_feb_mrt_apr_mai_jun_jul_aug_sep_okt_nov_des'.split(
+            '_'
+        );
 
     var fy = moment.defineLocale('fy', {
         months: 'jannewaris_febrewaris_maart_april_maaie_juny_july_augustus_septimber_oktober_novimber_desimber'.split(
@@ -49033,10 +48943,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'xaneiro_febreiro_marzo_abril_maio_xuño_xullo_agosto_setembro_outubro_novembro_decembro'.split(
             '_'
         ),
-        monthsShort:
-            'xan._feb._mar._abr._mai._xuñ._xul._ago._set._out._nov._dec.'.split(
-                '_'
-            ),
+        monthsShort: 'xan._feb._mar._abr._mai._xuñ._xul._ago._set._out._nov._dec.'.split(
+            '_'
+        ),
         monthsParseExact: true,
         weekdays: 'domingo_luns_martes_mércores_xoves_venres_sábado'.split('_'),
         weekdaysShort: 'dom._lun._mar._mér._xov._ven._sáb.'.split('_'),
@@ -49143,19 +49052,17 @@ __webpack_require__.r(__webpack_exports__);
 
     var gomDeva = moment.defineLocale('gom-deva', {
         months: {
-            standalone:
-                'जानेवारी_फेब्रुवारी_मार्च_एप्रील_मे_जून_जुलय_ऑगस्ट_सप्टेंबर_ऑक्टोबर_नोव्हेंबर_डिसेंबर'.split(
-                    '_'
-                ),
+            standalone: 'जानेवारी_फेब्रुवारी_मार्च_एप्रील_मे_जून_जुलय_ऑगस्ट_सप्टेंबर_ऑक्टोबर_नोव्हेंबर_डिसेंबर'.split(
+                '_'
+            ),
             format: 'जानेवारीच्या_फेब्रुवारीच्या_मार्चाच्या_एप्रीलाच्या_मेयाच्या_जूनाच्या_जुलयाच्या_ऑगस्टाच्या_सप्टेंबराच्या_ऑक्टोबराच्या_नोव्हेंबराच्या_डिसेंबराच्या'.split(
                 '_'
             ),
             isFormat: /MMMM(\s)+D[oD]?/,
         },
-        monthsShort:
-            'जाने._फेब्रु._मार्च_एप्री._मे_जून_जुल._ऑग._सप्टें._ऑक्टो._नोव्हें._डिसें.'.split(
-                '_'
-            ),
+        monthsShort: 'जाने._फेब्रु._मार्च_एप्री._मे_जून_जुल._ऑग._सप्टें._ऑक्टो._नोव्हें._डिसें.'.split(
+            '_'
+        ),
         monthsParseExact: true,
         weekdays: 'आयतार_सोमार_मंगळार_बुधवार_बिरेस्तार_सुक्रार_शेनवार'.split('_'),
         weekdaysShort: 'आयत._सोम._मंगळ._बुध._ब्रेस्त._सुक्र._शेन.'.split('_'),
@@ -49288,17 +49195,17 @@ __webpack_require__.r(__webpack_exports__);
 
     var gomLatn = moment.defineLocale('gom-latn', {
         months: {
-            standalone:
-                'Janer_Febrer_Mars_Abril_Mai_Jun_Julai_Agost_Setembr_Otubr_Novembr_Dezembr'.split(
-                    '_'
-                ),
+            standalone: 'Janer_Febrer_Mars_Abril_Mai_Jun_Julai_Agost_Setembr_Otubr_Novembr_Dezembr'.split(
+                '_'
+            ),
             format: 'Janerachea_Febrerachea_Marsachea_Abrilachea_Maiachea_Junachea_Julaiachea_Agostachea_Setembrachea_Otubrachea_Novembrachea_Dezembrachea'.split(
                 '_'
             ),
             isFormat: /MMMM(\s)+D[oD]?/,
         },
-        monthsShort:
-            'Jan._Feb._Mars_Abr._Mai_Jun_Jul._Ago._Set._Otu._Nov._Dez.'.split('_'),
+        monthsShort: 'Jan._Feb._Mars_Abr._Mai_Jun_Jul._Ago._Set._Otu._Nov._Dez.'.split(
+            '_'
+        ),
         monthsParseExact: true,
         weekdays: "Aitar_Somar_Mongllar_Budhvar_Birestar_Sukrar_Son'var".split('_'),
         weekdaysShort: 'Ait._Som._Mon._Bud._Bre._Suk._Son.'.split('_'),
@@ -49440,10 +49347,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'જાન્યુઆરી_ફેબ્રુઆરી_માર્ચ_એપ્રિલ_મે_જૂન_જુલાઈ_ઑગસ્ટ_સપ્ટેમ્બર_ઑક્ટ્બર_નવેમ્બર_ડિસેમ્બર'.split(
             '_'
         ),
-        monthsShort:
-            'જાન્યુ._ફેબ્રુ._માર્ચ_એપ્રિ._મે_જૂન_જુલા._ઑગ._સપ્ટે._ઑક્ટ્._નવે._ડિસે.'.split(
-                '_'
-            ),
+        monthsShort: 'જાન્યુ._ફેબ્રુ._માર્ચ_એપ્રિ._મે_જૂન_જુલા._ઑગ._સપ્ટે._ઑક્ટ્._નવે._ડિસે.'.split(
+            '_'
+        ),
         monthsParseExact: true,
         weekdays: 'રવિવાર_સોમવાર_મંગળવાર_બુધ્વાર_ગુરુવાર_શુક્રવાર_શનિવાર'.split(
             '_'
@@ -49558,8 +49464,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'ינואר_פברואר_מרץ_אפריל_מאי_יוני_יולי_אוגוסט_ספטמבר_אוקטובר_נובמבר_דצמבר'.split(
             '_'
         ),
-        monthsShort:
-            'ינו׳_פבר׳_מרץ_אפר׳_מאי_יוני_יולי_אוג׳_ספט׳_אוק׳_נוב׳_דצמ׳'.split('_'),
+        monthsShort: 'ינו׳_פבר׳_מרץ_אפר׳_מאי_יוני_יולי_אוג׳_ספט׳_אוק׳_נוב׳_דצמ׳'.split(
+            '_'
+        ),
         weekdays: 'ראשון_שני_שלישי_רביעי_חמישי_שישי_שבת'.split('_'),
         weekdaysShort: 'א׳_ב׳_ג׳_ד׳_ה׳_ו׳_ש׳'.split('_'),
         weekdaysMin: 'א_ב_ג_ד_ה_ו_ש'.split('_'),
@@ -49621,8 +49528,7 @@ __webpack_require__.r(__webpack_exports__);
                 return number + ' שנים';
             },
         },
-        meridiemParse:
-            /אחה"צ|לפנה"צ|אחרי הצהריים|לפני הצהריים|לפנות בוקר|בבוקר|בערב/i,
+        meridiemParse: /אחה"צ|לפנה"צ|אחרי הצהריים|לפני הצהריים|לפנות בוקר|בבוקר|בערב/i,
         isPM: function (input) {
             return /^(אחה"צ|אחרי הצהריים|בערב)$/.test(input);
         },
@@ -49723,13 +49629,13 @@ __webpack_require__.r(__webpack_exports__);
             format: 'जनवरी_फ़रवरी_मार्च_अप्रैल_मई_जून_जुलाई_अगस्त_सितम्बर_अक्टूबर_नवम्बर_दिसम्बर'.split(
                 '_'
             ),
-            standalone:
-                'जनवरी_फरवरी_मार्च_अप्रैल_मई_जून_जुलाई_अगस्त_सितंबर_अक्टूबर_नवंबर_दिसंबर'.split(
-                    '_'
-                ),
+            standalone: 'जनवरी_फरवरी_मार्च_अप्रैल_मई_जून_जुलाई_अगस्त_सितंबर_अक्टूबर_नवंबर_दिसंबर'.split(
+                '_'
+            ),
         },
-        monthsShort:
-            'जन._फ़र._मार्च_अप्रै._मई_जून_जुल._अग._सित._अक्टू._नव._दिस.'.split('_'),
+        monthsShort: 'जन._फ़र._मार्च_अप्रै._मई_जून_जुल._अग._सित._अक्टू._नव._दिस.'.split(
+            '_'
+        ),
         weekdays: 'रविवार_सोमवार_मंगलवार_बुधवार_गुरूवार_शुक्रवार_शनिवार'.split('_'),
         weekdaysShort: 'रवि_सोम_मंगल_बुध_गुरू_शुक्र_शनि'.split('_'),
         weekdaysMin: 'र_सो_मं_बु_गु_शु_श'.split('_'),
@@ -49746,17 +49652,13 @@ __webpack_require__.r(__webpack_exports__);
         longMonthsParse: monthsParse,
         shortMonthsParse: shortMonthsParse,
 
-        monthsRegex:
-            /^(जनवरी|जन\.?|फ़रवरी|फरवरी|फ़र\.?|मार्च?|अप्रैल|अप्रै\.?|मई?|जून?|जुलाई|जुल\.?|अगस्त|अग\.?|सितम्बर|सितंबर|सित\.?|अक्टूबर|अक्टू\.?|नवम्बर|नवंबर|नव\.?|दिसम्बर|दिसंबर|दिस\.?)/i,
+        monthsRegex: /^(जनवरी|जन\.?|फ़रवरी|फरवरी|फ़र\.?|मार्च?|अप्रैल|अप्रै\.?|मई?|जून?|जुलाई|जुल\.?|अगस्त|अग\.?|सितम्बर|सितंबर|सित\.?|अक्टूबर|अक्टू\.?|नवम्बर|नवंबर|नव\.?|दिसम्बर|दिसंबर|दिस\.?)/i,
 
-        monthsShortRegex:
-            /^(जनवरी|जन\.?|फ़रवरी|फरवरी|फ़र\.?|मार्च?|अप्रैल|अप्रै\.?|मई?|जून?|जुलाई|जुल\.?|अगस्त|अग\.?|सितम्बर|सितंबर|सित\.?|अक्टूबर|अक्टू\.?|नवम्बर|नवंबर|नव\.?|दिसम्बर|दिसंबर|दिस\.?)/i,
+        monthsShortRegex: /^(जनवरी|जन\.?|फ़रवरी|फरवरी|फ़र\.?|मार्च?|अप्रैल|अप्रै\.?|मई?|जून?|जुलाई|जुल\.?|अगस्त|अग\.?|सितम्बर|सितंबर|सित\.?|अक्टूबर|अक्टू\.?|नवम्बर|नवंबर|नव\.?|दिसम्बर|दिसंबर|दिस\.?)/i,
 
-        monthsStrictRegex:
-            /^(जनवरी?|फ़रवरी|फरवरी?|मार्च?|अप्रैल?|मई?|जून?|जुलाई?|अगस्त?|सितम्बर|सितंबर|सित?\.?|अक्टूबर|अक्टू\.?|नवम्बर|नवंबर?|दिसम्बर|दिसंबर?)/i,
+        monthsStrictRegex: /^(जनवरी?|फ़रवरी|फरवरी?|मार्च?|अप्रैल?|मई?|जून?|जुलाई?|अगस्त?|सितम्बर|सितंबर|सित?\.?|अक्टूबर|अक्टू\.?|नवम्बर|नवंबर?|दिसम्बर|दिसंबर?)/i,
 
-        monthsShortStrictRegex:
-            /^(जन\.?|फ़र\.?|मार्च?|अप्रै\.?|मई?|जून?|जुल\.?|अग\.?|सित\.?|अक्टू\.?|नव\.?|दिस\.?)/i,
+        monthsShortStrictRegex: /^(जन\.?|फ़र\.?|मार्च?|अप्रै\.?|मई?|जून?|जुल\.?|अग\.?|सित\.?|अक्टू\.?|नव\.?|दिस\.?)/i,
 
         calendar: {
             sameDay: '[आज] LT',
@@ -49919,15 +49821,13 @@ __webpack_require__.r(__webpack_exports__);
             format: 'siječnja_veljače_ožujka_travnja_svibnja_lipnja_srpnja_kolovoza_rujna_listopada_studenoga_prosinca'.split(
                 '_'
             ),
-            standalone:
-                'siječanj_veljača_ožujak_travanj_svibanj_lipanj_srpanj_kolovoz_rujan_listopad_studeni_prosinac'.split(
-                    '_'
-                ),
-        },
-        monthsShort:
-            'sij._velj._ožu._tra._svi._lip._srp._kol._ruj._lis._stu._pro.'.split(
+            standalone: 'siječanj_veljača_ožujak_travanj_svibanj_lipanj_srpanj_kolovoz_rujan_listopad_studeni_prosinac'.split(
                 '_'
             ),
+        },
+        monthsShort: 'sij._velj._ožu._tra._svi._lip._srp._kol._ruj._lis._stu._pro.'.split(
+            '_'
+        ),
         monthsParseExact: true,
         weekdays: 'nedjelja_ponedjeljak_utorak_srijeda_četvrtak_petak_subota'.split(
             '_'
@@ -50028,8 +49928,9 @@ __webpack_require__.r(__webpack_exports__);
 
     //! moment.js locale configuration
 
-    var weekEndings =
-        'vasárnap hétfőn kedden szerdán csütörtökön pénteken szombaton'.split(' ');
+    var weekEndings = 'vasárnap hétfőn kedden szerdán csütörtökön pénteken szombaton'.split(
+        ' '
+    );
     function translate(number, withoutSuffix, key, isFuture) {
         var num = number;
         switch (key) {
@@ -50077,10 +49978,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'január_február_március_április_május_június_július_augusztus_szeptember_október_november_december'.split(
             '_'
         ),
-        monthsShort:
-            'jan._feb._márc._ápr._máj._jún._júl._aug._szept._okt._nov._dec.'.split(
-                '_'
-            ),
+        monthsShort: 'jan._feb._márc._ápr._máj._jún._júl._aug._szept._okt._nov._dec.'.split(
+            '_'
+        ),
         monthsParseExact: true,
         weekdays: 'vasárnap_hétfő_kedd_szerda_csütörtök_péntek_szombat'.split('_'),
         weekdaysShort: 'vas_hét_kedd_sze_csüt_pén_szo'.split('_'),
@@ -50169,16 +50069,14 @@ __webpack_require__.r(__webpack_exports__);
             format: 'հունվարի_փետրվարի_մարտի_ապրիլի_մայիսի_հունիսի_հուլիսի_օգոստոսի_սեպտեմբերի_հոկտեմբերի_նոյեմբերի_դեկտեմբերի'.split(
                 '_'
             ),
-            standalone:
-                'հունվար_փետրվար_մարտ_ապրիլ_մայիս_հունիս_հուլիս_օգոստոս_սեպտեմբեր_հոկտեմբեր_նոյեմբեր_դեկտեմբեր'.split(
-                    '_'
-                ),
-        },
-        monthsShort: 'հնվ_փտր_մրտ_ապր_մյս_հնս_հլս_օգս_սպտ_հկտ_նմբ_դկտ'.split('_'),
-        weekdays:
-            'կիրակի_երկուշաբթի_երեքշաբթի_չորեքշաբթի_հինգշաբթի_ուրբաթ_շաբաթ'.split(
+            standalone: 'հունվար_փետրվար_մարտ_ապրիլ_մայիս_հունիս_հուլիս_օգոստոս_սեպտեմբեր_հոկտեմբեր_նոյեմբեր_դեկտեմբեր'.split(
                 '_'
             ),
+        },
+        monthsShort: 'հնվ_փտր_մրտ_ապր_մյս_հնս_հլս_օգս_սպտ_հկտ_նմբ_դկտ'.split('_'),
+        weekdays: 'կիրակի_երկուշաբթի_երեքշաբթի_չորեքշաբթի_հինգշաբթի_ուրբաթ_շաբաթ'.split(
+            '_'
+        ),
         weekdaysShort: 'կրկ_երկ_երք_չրք_հնգ_ուրբ_շբթ'.split('_'),
         weekdaysMin: 'կրկ_երկ_երք_չրք_հնգ_ուրբ_շբթ'.split('_'),
         longDateFormat: {
@@ -50461,10 +50359,9 @@ __webpack_require__.r(__webpack_exports__);
             '_'
         ),
         monthsShort: 'jan_feb_mar_apr_maí_jún_júl_ágú_sep_okt_nóv_des'.split('_'),
-        weekdays:
-            'sunnudagur_mánudagur_þriðjudagur_miðvikudagur_fimmtudagur_föstudagur_laugardagur'.split(
-                '_'
-            ),
+        weekdays: 'sunnudagur_mánudagur_þriðjudagur_miðvikudagur_fimmtudagur_föstudagur_laugardagur'.split(
+            '_'
+        ),
         weekdaysShort: 'sun_mán_þri_mið_fim_fös_lau'.split('_'),
         weekdaysMin: 'Su_Má_Þr_Mi_Fi_Fö_La'.split('_'),
         longDateFormat: {
@@ -51007,10 +50904,9 @@ __webpack_require__.r(__webpack_exports__);
         ),
         monthsShort: 'იან_თებ_მარ_აპრ_მაი_ივნ_ივლ_აგვ_სექ_ოქტ_ნოე_დეკ'.split('_'),
         weekdays: {
-            standalone:
-                'კვირა_ორშაბათი_სამშაბათი_ოთხშაბათი_ხუთშაბათი_პარასკევი_შაბათი'.split(
-                    '_'
-                ),
+            standalone: 'კვირა_ორშაბათი_სამშაბათი_ოთხშაბათი_ხუთშაბათი_პარასკევი_შაბათი'.split(
+                '_'
+            ),
             format: 'კვირას_ორშაბათს_სამშაბათს_ოთხშაბათს_ხუთშაბათს_პარასკევს_შაბათს'.split(
                 '_'
             ),
@@ -51036,12 +50932,13 @@ __webpack_require__.r(__webpack_exports__);
         },
         relativeTime: {
             future: function (s) {
-                return s.replace(
-                    /(წამ|წუთ|საათ|წელ|დღ|თვ)(ი|ე)/,
-                    function ($0, $1, $2) {
-                        return $2 === 'ი' ? $1 + 'ში' : $1 + $2 + 'ში';
-                    }
-                );
+                return s.replace(/(წამ|წუთ|საათ|წელ|დღ|თვ)(ი|ე)/, function (
+                    $0,
+                    $1,
+                    $2
+                ) {
+                    return $2 === 'ი' ? $1 + 'ში' : $1 + $2 + 'ში';
+                });
             },
             past: function (s) {
                 if (/(წამი|წუთი|საათი|დღე|თვე)/.test(s)) {
@@ -51242,10 +51139,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'មករា_កុម្ភៈ_មីនា_មេសា_ឧសភា_មិថុនា_កក្កដា_សីហា_កញ្ញា_តុលា_វិច្ឆិកា_ធ្នូ'.split(
             '_'
         ),
-        monthsShort:
-            'មករា_កុម្ភៈ_មីនា_មេសា_ឧសភា_មិថុនា_កក្កដា_សីហា_កញ្ញា_តុលា_វិច្ឆិកា_ធ្នូ'.split(
-                '_'
-            ),
+        monthsShort: 'មករា_កុម្ភៈ_មីនា_មេសា_ឧសភា_មិថុនា_កក្កដា_សីហា_កញ្ញា_តុលា_វិច្ឆិកា_ធ្នូ'.split(
+            '_'
+        ),
         weekdays: 'អាទិត្យ_ច័ន្ទ_អង្គារ_ពុធ_ព្រហស្បតិ៍_សុក្រ_សៅរ៍'.split('_'),
         weekdaysShort: 'អា_ច_អ_ព_ព្រ_សុ_ស'.split('_'),
         weekdaysMin: 'អា_ច_អ_ព_ព្រ_សុ_ស'.split('_'),
@@ -51364,10 +51260,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'ಜನವರಿ_ಫೆಬ್ರವರಿ_ಮಾರ್ಚ್_ಏಪ್ರಿಲ್_ಮೇ_ಜೂನ್_ಜುಲೈ_ಆಗಸ್ಟ್_ಸೆಪ್ಟೆಂಬರ್_ಅಕ್ಟೋಬರ್_ನವೆಂಬರ್_ಡಿಸೆಂಬರ್'.split(
             '_'
         ),
-        monthsShort:
-            'ಜನ_ಫೆಬ್ರ_ಮಾರ್ಚ್_ಏಪ್ರಿಲ್_ಮೇ_ಜೂನ್_ಜುಲೈ_ಆಗಸ್ಟ್_ಸೆಪ್ಟೆಂ_ಅಕ್ಟೋ_ನವೆಂ_ಡಿಸೆಂ'.split(
-                '_'
-            ),
+        monthsShort: 'ಜನ_ಫೆಬ್ರ_ಮಾರ್ಚ್_ಏಪ್ರಿಲ್_ಮೇ_ಜೂನ್_ಜುಲೈ_ಆಗಸ್ಟ್_ಸೆಪ್ಟೆಂ_ಅಕ್ಟೋ_ನವೆಂ_ಡಿಸೆಂ'.split(
+            '_'
+        ),
         monthsParseExact: true,
         weekdays: 'ಭಾನುವಾರ_ಸೋಮವಾರ_ಮಂಗಳವಾರ_ಬುಧವಾರ_ಗುರುವಾರ_ಶುಕ್ರವಾರ_ಶನಿವಾರ'.split(
             '_'
@@ -51614,12 +51509,12 @@ __webpack_require__.r(__webpack_exports__);
     var ku = moment.defineLocale('ku', {
         months: months,
         monthsShort: months,
-        weekdays:
-            'یه‌كشه‌ممه‌_دووشه‌ممه‌_سێشه‌ممه‌_چوارشه‌ممه‌_پێنجشه‌ممه‌_هه‌ینی_شه‌ممه‌'.split(
-                '_'
-            ),
-        weekdaysShort:
-            'یه‌كشه‌م_دووشه‌م_سێشه‌م_چوارشه‌م_پێنجشه‌م_هه‌ینی_شه‌ممه‌'.split('_'),
+        weekdays: 'یه‌كشه‌ممه‌_دووشه‌ممه‌_سێشه‌ممه‌_چوارشه‌ممه‌_پێنجشه‌ممه‌_هه‌ینی_شه‌ممه‌'.split(
+            '_'
+        ),
+        weekdaysShort: 'یه‌كشه‌م_دووشه‌م_سێشه‌م_چوارشه‌م_پێنجشه‌م_هه‌ینی_شه‌ممه‌'.split(
+            '_'
+        ),
         weekdaysMin: 'ی_د_س_چ_پ_ه_ش'.split('_'),
         weekdaysParseExact: true,
         longDateFormat: {
@@ -51883,15 +51778,13 @@ __webpack_require__.r(__webpack_exports__);
         months: 'Januar_Februar_Mäerz_Abrëll_Mee_Juni_Juli_August_September_Oktober_November_Dezember'.split(
             '_'
         ),
-        monthsShort:
-            'Jan._Febr._Mrz._Abr._Mee_Jun._Jul._Aug._Sept._Okt._Nov._Dez.'.split(
-                '_'
-            ),
+        monthsShort: 'Jan._Febr._Mrz._Abr._Mee_Jun._Jul._Aug._Sept._Okt._Nov._Dez.'.split(
+            '_'
+        ),
         monthsParseExact: true,
-        weekdays:
-            'Sonndeg_Méindeg_Dënschdeg_Mëttwoch_Donneschdeg_Freideg_Samschdeg'.split(
-                '_'
-            ),
+        weekdays: 'Sonndeg_Méindeg_Dënschdeg_Mëttwoch_Donneschdeg_Freideg_Samschdeg'.split(
+            '_'
+        ),
         weekdaysShort: 'So._Mé._Dë._Më._Do._Fr._Sa.'.split('_'),
         weekdaysMin: 'So_Mé_Dë_Më_Do_Fr_Sa'.split('_'),
         weekdaysParseExact: true,
@@ -51972,10 +51865,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'ມັງກອນ_ກຸມພາ_ມີນາ_ເມສາ_ພຶດສະພາ_ມິຖຸນາ_ກໍລະກົດ_ສິງຫາ_ກັນຍາ_ຕຸລາ_ພະຈິກ_ທັນວາ'.split(
             '_'
         ),
-        monthsShort:
-            'ມັງກອນ_ກຸມພາ_ມີນາ_ເມສາ_ພຶດສະພາ_ມິຖຸນາ_ກໍລະກົດ_ສິງຫາ_ກັນຍາ_ຕຸລາ_ພະຈິກ_ທັນວາ'.split(
-                '_'
-            ),
+        monthsShort: 'ມັງກອນ_ກຸມພາ_ມີນາ_ເມສາ_ພຶດສະພາ_ມິຖຸນາ_ກໍລະກົດ_ສິງຫາ_ກັນຍາ_ຕຸລາ_ພະຈິກ_ທັນວາ'.split(
+            '_'
+        ),
         weekdays: 'ອາທິດ_ຈັນ_ອັງຄານ_ພຸດ_ພະຫັດ_ສຸກ_ເສົາ'.split('_'),
         weekdaysShort: 'ທິດ_ຈັນ_ອັງຄານ_ພຸດ_ພະຫັດ_ສຸກ_ເສົາ'.split('_'),
         weekdaysMin: 'ທ_ຈ_ອຄ_ພ_ພຫ_ສກ_ສ'.split('_'),
@@ -52107,10 +51999,9 @@ __webpack_require__.r(__webpack_exports__);
             format: 'sausio_vasario_kovo_balandžio_gegužės_birželio_liepos_rugpjūčio_rugsėjo_spalio_lapkričio_gruodžio'.split(
                 '_'
             ),
-            standalone:
-                'sausis_vasaris_kovas_balandis_gegužė_birželis_liepa_rugpjūtis_rugsėjis_spalis_lapkritis_gruodis'.split(
-                    '_'
-                ),
+            standalone: 'sausis_vasaris_kovas_balandis_gegužė_birželis_liepa_rugpjūtis_rugsėjis_spalis_lapkritis_gruodis'.split(
+                '_'
+            ),
             isFormat: /D[oD]?(\[[^\[\]]*\]|\s)+MMMM?|MMMM?(\[[^\[\]]*\]|\s)+D[oD]?/,
         },
         monthsShort: 'sau_vas_kov_bal_geg_bir_lie_rgp_rgs_spa_lap_grd'.split('_'),
@@ -52118,10 +52009,9 @@ __webpack_require__.r(__webpack_exports__);
             format: 'sekmadienį_pirmadienį_antradienį_trečiadienį_ketvirtadienį_penktadienį_šeštadienį'.split(
                 '_'
             ),
-            standalone:
-                'sekmadienis_pirmadienis_antradienis_trečiadienis_ketvirtadienis_penktadienis_šeštadienis'.split(
-                    '_'
-                ),
+            standalone: 'sekmadienis_pirmadienis_antradienis_trečiadienis_ketvirtadienis_penktadienis_šeštadienis'.split(
+                '_'
+            ),
             isFormat: /dddd HH:mm/,
         },
         weekdaysShort: 'Sek_Pir_Ant_Tre_Ket_Pen_Šeš'.split('_'),
@@ -52239,10 +52129,9 @@ __webpack_require__.r(__webpack_exports__);
             '_'
         ),
         monthsShort: 'jan_feb_mar_apr_mai_jūn_jūl_aug_sep_okt_nov_dec'.split('_'),
-        weekdays:
-            'svētdiena_pirmdiena_otrdiena_trešdiena_ceturtdiena_piektdiena_sestdiena'.split(
-                '_'
-            ),
+        weekdays: 'svētdiena_pirmdiena_otrdiena_trešdiena_ceturtdiena_piektdiena_sestdiena'.split(
+            '_'
+        ),
         weekdaysShort: 'Sv_P_O_T_C_Pk_S'.split('_'),
         weekdaysMin: 'Sv_P_O_T_C_Pk_S'.split('_'),
         weekdaysParseExact: true,
@@ -52347,8 +52236,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'januar_februar_mart_april_maj_jun_jul_avgust_septembar_oktobar_novembar_decembar'.split(
             '_'
         ),
-        monthsShort:
-            'jan._feb._mar._apr._maj_jun_jul_avg._sep._okt._nov._dec.'.split('_'),
+        monthsShort: 'jan._feb._mar._apr._maj_jun_jul_avg._sep._okt._nov._dec.'.split(
+            '_'
+        ),
         monthsParseExact: true,
         weekdays: 'nedjelja_ponedjeljak_utorak_srijeda_četvrtak_petak_subota'.split(
             '_'
@@ -52450,10 +52340,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'Kohi-tāte_Hui-tanguru_Poutū-te-rangi_Paenga-whāwhā_Haratua_Pipiri_Hōngoingoi_Here-turi-kōkā_Mahuru_Whiringa-ā-nuku_Whiringa-ā-rangi_Hakihea'.split(
             '_'
         ),
-        monthsShort:
-            'Kohi_Hui_Pou_Pae_Hara_Pipi_Hōngoi_Here_Mahu_Whi-nu_Whi-ra_Haki'.split(
-                '_'
-            ),
+        monthsShort: 'Kohi_Hui_Pou_Pae_Hara_Pipi_Hōngoi_Here_Mahu_Whi-nu_Whi-ra_Haki'.split(
+            '_'
+        ),
         monthsRegex: /(?:['a-z\u0101\u014D\u016B]+\-?){1,3}/i,
         monthsStrictRegex: /(?:['a-z\u0101\u014D\u016B]+\-?){1,3}/i,
         monthsShortRegex: /(?:['a-z\u0101\u014D\u016B]+\-?){1,3}/i,
@@ -52634,15 +52523,13 @@ __webpack_require__.r(__webpack_exports__);
         months: 'ജനുവരി_ഫെബ്രുവരി_മാർച്ച്_ഏപ്രിൽ_മേയ്_ജൂൺ_ജൂലൈ_ഓഗസ്റ്റ്_സെപ്റ്റംബർ_ഒക്ടോബർ_നവംബർ_ഡിസംബർ'.split(
             '_'
         ),
-        monthsShort:
-            'ജനു._ഫെബ്രു._മാർ._ഏപ്രി._മേയ്_ജൂൺ_ജൂലൈ._ഓഗ._സെപ്റ്റ._ഒക്ടോ._നവം._ഡിസം.'.split(
-                '_'
-            ),
+        monthsShort: 'ജനു._ഫെബ്രു._മാർ._ഏപ്രി._മേയ്_ജൂൺ_ജൂലൈ._ഓഗ._സെപ്റ്റ._ഒക്ടോ._നവം._ഡിസം.'.split(
+            '_'
+        ),
         monthsParseExact: true,
-        weekdays:
-            'ഞായറാഴ്ച_തിങ്കളാഴ്ച_ചൊവ്വാഴ്ച_ബുധനാഴ്ച_വ്യാഴാഴ്ച_വെള്ളിയാഴ്ച_ശനിയാഴ്ച'.split(
-                '_'
-            ),
+        weekdays: 'ഞായറാഴ്ച_തിങ്കളാഴ്ച_ചൊവ്വാഴ്ച_ബുധനാഴ്ച_വ്യാഴാഴ്ച_വെള്ളിയാഴ്ച_ശനിയാഴ്ച'.split(
+            '_'
+        ),
         weekdaysShort: 'ഞായർ_തിങ്കൾ_ചൊവ്വ_ബുധൻ_വ്യാഴം_വെള്ളി_ശനി'.split('_'),
         weekdaysMin: 'ഞാ_തി_ചൊ_ബു_വ്യാ_വെ_ശ'.split('_'),
         longDateFormat: {
@@ -52761,10 +52648,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'Нэгдүгээр сар_Хоёрдугаар сар_Гуравдугаар сар_Дөрөвдүгээр сар_Тавдугаар сар_Зургадугаар сар_Долдугаар сар_Наймдугаар сар_Есдүгээр сар_Аравдугаар сар_Арван нэгдүгээр сар_Арван хоёрдугаар сар'.split(
             '_'
         ),
-        monthsShort:
-            '1 сар_2 сар_3 сар_4 сар_5 сар_6 сар_7 сар_8 сар_9 сар_10 сар_11 сар_12 сар'.split(
-                '_'
-            ),
+        monthsShort: '1 сар_2 сар_3 сар_4 сар_5 сар_6 сар_7 сар_8 сар_9 сар_10 сар_11 сар_12 сар'.split(
+            '_'
+        ),
         monthsParseExact: true,
         weekdays: 'Ням_Даваа_Мягмар_Лхагва_Пүрэв_Баасан_Бямба'.split('_'),
         weekdaysShort: 'Ням_Дав_Мяг_Лха_Пүр_Баа_Бям'.split('_'),
@@ -52964,10 +52850,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'जानेवारी_फेब्रुवारी_मार्च_एप्रिल_मे_जून_जुलै_ऑगस्ट_सप्टेंबर_ऑक्टोबर_नोव्हेंबर_डिसेंबर'.split(
             '_'
         ),
-        monthsShort:
-            'जाने._फेब्रु._मार्च._एप्रि._मे._जून._जुलै._ऑग._सप्टें._ऑक्टो._नोव्हें._डिसें.'.split(
-                '_'
-            ),
+        monthsShort: 'जाने._फेब्रु._मार्च._एप्रि._मे._जून._जुलै._ऑग._सप्टें._ऑक्टो._नोव्हें._डिसें.'.split(
+            '_'
+        ),
         monthsParseExact: true,
         weekdays: 'रविवार_सोमवार_मंगळवार_बुधवार_गुरूवार_शुक्रवार_शनिवार'.split('_'),
         weekdaysShort: 'रवि_सोम_मंगळ_बुध_गुरू_शुक्र_शनि'.split('_'),
@@ -53266,10 +53151,9 @@ __webpack_require__.r(__webpack_exports__);
             '_'
         ),
         monthsShort: 'Jan_Fra_Mar_Apr_Mej_Ġun_Lul_Aww_Set_Ott_Nov_Diċ'.split('_'),
-        weekdays:
-            'Il-Ħadd_It-Tnejn_It-Tlieta_L-Erbgħa_Il-Ħamis_Il-Ġimgħa_Is-Sibt'.split(
-                '_'
-            ),
+        weekdays: 'Il-Ħadd_It-Tnejn_It-Tlieta_L-Erbgħa_Il-Ħamis_Il-Ġimgħa_Is-Sibt'.split(
+            '_'
+        ),
         weekdaysShort: 'Ħad_Tne_Tli_Erb_Ħam_Ġim_Sib'.split('_'),
         weekdaysMin: 'Ħa_Tn_Tl_Er_Ħa_Ġi_Si'.split('_'),
         longDateFormat: {
@@ -53452,8 +53336,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'januar_februar_mars_april_mai_juni_juli_august_september_oktober_november_desember'.split(
             '_'
         ),
-        monthsShort:
-            'jan._feb._mars_apr._mai_juni_juli_aug._sep._okt._nov._des.'.split('_'),
+        monthsShort: 'jan._feb._mars_apr._mai_juni_juli_aug._sep._okt._nov._des.'.split(
+            '_'
+        ),
         monthsParseExact: true,
         weekdays: 'søndag_mandag_tirsdag_onsdag_torsdag_fredag_lørdag'.split('_'),
         weekdaysShort: 'sø._ma._ti._on._to._fr._lø.'.split('_'),
@@ -53554,10 +53439,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'जनवरी_फेब्रुवरी_मार्च_अप्रिल_मई_जुन_जुलाई_अगष्ट_सेप्टेम्बर_अक्टोबर_नोभेम्बर_डिसेम्बर'.split(
             '_'
         ),
-        monthsShort:
-            'जन._फेब्रु._मार्च_अप्रि._मई_जुन_जुलाई._अग._सेप्ट._अक्टो._नोभे._डिसे.'.split(
-                '_'
-            ),
+        monthsShort: 'जन._फेब्रु._मार्च_अप्रि._मई_जुन_जुलाई._अग._सेप्ट._अक्टो._नोभे._डिसे.'.split(
+            '_'
+        ),
         monthsParseExact: true,
         weekdays: 'आइतबार_सोमबार_मङ्गलबार_बुधबार_बिहिबार_शुक्रबार_शनिबार'.split(
             '_'
@@ -53666,10 +53550,12 @@ __webpack_require__.r(__webpack_exports__);
 
     //! moment.js locale configuration
 
-    var monthsShortWithDots =
-            'jan._feb._mrt._apr._mei_jun._jul._aug._sep._okt._nov._dec.'.split('_'),
-        monthsShortWithoutDots =
-            'jan_feb_mrt_apr_mei_jun_jul_aug_sep_okt_nov_dec'.split('_'),
+    var monthsShortWithDots = 'jan._feb._mrt._apr._mei_jun._jul._aug._sep._okt._nov._dec.'.split(
+            '_'
+        ),
+        monthsShortWithoutDots = 'jan_feb_mrt_apr_mei_jun_jul_aug_sep_okt_nov_dec'.split(
+            '_'
+        ),
         monthsParse = [
             /^jan/i,
             /^feb/i,
@@ -53684,8 +53570,7 @@ __webpack_require__.r(__webpack_exports__);
             /^nov/i,
             /^dec/i,
         ],
-        monthsRegex =
-            /^(januari|februari|maart|april|mei|ju[nl]i|augustus|september|oktober|november|december|jan\.?|feb\.?|mrt\.?|apr\.?|ju[nl]\.?|aug\.?|sep\.?|okt\.?|nov\.?|dec\.?)/i;
+        monthsRegex = /^(januari|februari|maart|april|mei|ju[nl]i|augustus|september|oktober|november|december|jan\.?|feb\.?|mrt\.?|apr\.?|ju[nl]\.?|aug\.?|sep\.?|okt\.?|nov\.?|dec\.?)/i;
 
     var nlBe = moment.defineLocale('nl-be', {
         months: 'januari_februari_maart_april_mei_juni_juli_augustus_september_oktober_november_december'.split(
@@ -53703,17 +53588,16 @@ __webpack_require__.r(__webpack_exports__);
 
         monthsRegex: monthsRegex,
         monthsShortRegex: monthsRegex,
-        monthsStrictRegex:
-            /^(januari|februari|maart|april|mei|ju[nl]i|augustus|september|oktober|november|december)/i,
-        monthsShortStrictRegex:
-            /^(jan\.?|feb\.?|mrt\.?|apr\.?|mei|ju[nl]\.?|aug\.?|sep\.?|okt\.?|nov\.?|dec\.?)/i,
+        monthsStrictRegex: /^(januari|februari|maart|april|mei|ju[nl]i|augustus|september|oktober|november|december)/i,
+        monthsShortStrictRegex: /^(jan\.?|feb\.?|mrt\.?|apr\.?|mei|ju[nl]\.?|aug\.?|sep\.?|okt\.?|nov\.?|dec\.?)/i,
 
         monthsParse: monthsParse,
         longMonthsParse: monthsParse,
         shortMonthsParse: monthsParse,
 
-        weekdays:
-            'zondag_maandag_dinsdag_woensdag_donderdag_vrijdag_zaterdag'.split('_'),
+        weekdays: 'zondag_maandag_dinsdag_woensdag_donderdag_vrijdag_zaterdag'.split(
+            '_'
+        ),
         weekdaysShort: 'zo._ma._di._wo._do._vr._za.'.split('_'),
         weekdaysMin: 'zo_ma_di_wo_do_vr_za'.split('_'),
         weekdaysParseExact: true,
@@ -53787,10 +53671,12 @@ __webpack_require__.r(__webpack_exports__);
 
     //! moment.js locale configuration
 
-    var monthsShortWithDots =
-            'jan._feb._mrt._apr._mei_jun._jul._aug._sep._okt._nov._dec.'.split('_'),
-        monthsShortWithoutDots =
-            'jan_feb_mrt_apr_mei_jun_jul_aug_sep_okt_nov_dec'.split('_'),
+    var monthsShortWithDots = 'jan._feb._mrt._apr._mei_jun._jul._aug._sep._okt._nov._dec.'.split(
+            '_'
+        ),
+        monthsShortWithoutDots = 'jan_feb_mrt_apr_mei_jun_jul_aug_sep_okt_nov_dec'.split(
+            '_'
+        ),
         monthsParse = [
             /^jan/i,
             /^feb/i,
@@ -53805,8 +53691,7 @@ __webpack_require__.r(__webpack_exports__);
             /^nov/i,
             /^dec/i,
         ],
-        monthsRegex =
-            /^(januari|februari|maart|april|mei|ju[nl]i|augustus|september|oktober|november|december|jan\.?|feb\.?|mrt\.?|apr\.?|ju[nl]\.?|aug\.?|sep\.?|okt\.?|nov\.?|dec\.?)/i;
+        monthsRegex = /^(januari|februari|maart|april|mei|ju[nl]i|augustus|september|oktober|november|december|jan\.?|feb\.?|mrt\.?|apr\.?|ju[nl]\.?|aug\.?|sep\.?|okt\.?|nov\.?|dec\.?)/i;
 
     var nl = moment.defineLocale('nl', {
         months: 'januari_februari_maart_april_mei_juni_juli_augustus_september_oktober_november_december'.split(
@@ -53824,17 +53709,16 @@ __webpack_require__.r(__webpack_exports__);
 
         monthsRegex: monthsRegex,
         monthsShortRegex: monthsRegex,
-        monthsStrictRegex:
-            /^(januari|februari|maart|april|mei|ju[nl]i|augustus|september|oktober|november|december)/i,
-        monthsShortStrictRegex:
-            /^(jan\.?|feb\.?|mrt\.?|apr\.?|mei|ju[nl]\.?|aug\.?|sep\.?|okt\.?|nov\.?|dec\.?)/i,
+        monthsStrictRegex: /^(januari|februari|maart|april|mei|ju[nl]i|augustus|september|oktober|november|december)/i,
+        monthsShortStrictRegex: /^(jan\.?|feb\.?|mrt\.?|apr\.?|mei|ju[nl]\.?|aug\.?|sep\.?|okt\.?|nov\.?|dec\.?)/i,
 
         monthsParse: monthsParse,
         longMonthsParse: monthsParse,
         shortMonthsParse: monthsParse,
 
-        weekdays:
-            'zondag_maandag_dinsdag_woensdag_donderdag_vrijdag_zaterdag'.split('_'),
+        weekdays: 'zondag_maandag_dinsdag_woensdag_donderdag_vrijdag_zaterdag'.split(
+            '_'
+        ),
         weekdaysShort: 'zo._ma._di._wo._do._vr._za.'.split('_'),
         weekdaysMin: 'zo_ma_di_wo_do_vr_za'.split('_'),
         weekdaysParseExact: true,
@@ -53914,8 +53798,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'januar_februar_mars_april_mai_juni_juli_august_september_oktober_november_desember'.split(
             '_'
         ),
-        monthsShort:
-            'jan._feb._mars_apr._mai_juni_juli_aug._sep._okt._nov._des.'.split('_'),
+        monthsShort: 'jan._feb._mars_apr._mai_juni_juli_aug._sep._okt._nov._des.'.split(
+            '_'
+        ),
         monthsParseExact: true,
         weekdays: 'sundag_måndag_tysdag_onsdag_torsdag_fredag_laurdag'.split('_'),
         weekdaysShort: 'su._må._ty._on._to._fr._lau.'.split('_'),
@@ -53989,19 +53874,17 @@ __webpack_require__.r(__webpack_exports__);
 
     var ocLnc = moment.defineLocale('oc-lnc', {
         months: {
-            standalone:
-                'genièr_febrièr_març_abril_mai_junh_julhet_agost_setembre_octòbre_novembre_decembre'.split(
-                    '_'
-                ),
+            standalone: 'genièr_febrièr_març_abril_mai_junh_julhet_agost_setembre_octòbre_novembre_decembre'.split(
+                '_'
+            ),
             format: "de genièr_de febrièr_de març_d'abril_de mai_de junh_de julhet_d'agost_de setembre_d'octòbre_de novembre_de decembre".split(
                 '_'
             ),
             isFormat: /D[oD]?(\s)+MMMM/,
         },
-        monthsShort:
-            'gen._febr._març_abr._mai_junh_julh._ago._set._oct._nov._dec.'.split(
-                '_'
-            ),
+        monthsShort: 'gen._febr._març_abr._mai_junh_julh._ago._set._oct._nov._dec.'.split(
+            '_'
+        ),
         monthsParseExact: true,
         weekdays: 'dimenge_diluns_dimars_dimècres_dijòus_divendres_dissabte'.split(
             '_'
@@ -54121,10 +54004,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'ਜਨਵਰੀ_ਫ਼ਰਵਰੀ_ਮਾਰਚ_ਅਪ੍ਰੈਲ_ਮਈ_ਜੂਨ_ਜੁਲਾਈ_ਅਗਸਤ_ਸਤੰਬਰ_ਅਕਤੂਬਰ_ਨਵੰਬਰ_ਦਸੰਬਰ'.split(
             '_'
         ),
-        monthsShort:
-            'ਜਨਵਰੀ_ਫ਼ਰਵਰੀ_ਮਾਰਚ_ਅਪ੍ਰੈਲ_ਮਈ_ਜੂਨ_ਜੁਲਾਈ_ਅਗਸਤ_ਸਤੰਬਰ_ਅਕਤੂਬਰ_ਨਵੰਬਰ_ਦਸੰਬਰ'.split(
-                '_'
-            ),
+        monthsShort: 'ਜਨਵਰੀ_ਫ਼ਰਵਰੀ_ਮਾਰਚ_ਅਪ੍ਰੈਲ_ਮਈ_ਜੂਨ_ਜੁਲਾਈ_ਅਗਸਤ_ਸਤੰਬਰ_ਅਕਤੂਬਰ_ਨਵੰਬਰ_ਦਸੰਬਰ'.split(
+            '_'
+        ),
         weekdays: 'ਐਤਵਾਰ_ਸੋਮਵਾਰ_ਮੰਗਲਵਾਰ_ਬੁਧਵਾਰ_ਵੀਰਵਾਰ_ਸ਼ੁੱਕਰਵਾਰ_ਸ਼ਨੀਚਰਵਾਰ'.split(
             '_'
         ),
@@ -54232,14 +54114,12 @@ __webpack_require__.r(__webpack_exports__);
 
     //! moment.js locale configuration
 
-    var monthsNominative =
-            'styczeń_luty_marzec_kwiecień_maj_czerwiec_lipiec_sierpień_wrzesień_październik_listopad_grudzień'.split(
-                '_'
-            ),
-        monthsSubjective =
-            'stycznia_lutego_marca_kwietnia_maja_czerwca_lipca_sierpnia_września_października_listopada_grudnia'.split(
-                '_'
-            ),
+    var monthsNominative = 'styczeń_luty_marzec_kwiecień_maj_czerwiec_lipiec_sierpień_wrzesień_październik_listopad_grudzień'.split(
+            '_'
+        ),
+        monthsSubjective = 'stycznia_lutego_marca_kwietnia_maja_czerwca_lipca_sierpnia_września_października_listopada_grudnia'.split(
+            '_'
+        ),
         monthsParse = [
             /^sty/i,
             /^lut/i,
@@ -54293,8 +54173,9 @@ __webpack_require__.r(__webpack_exports__);
         monthsParse: monthsParse,
         longMonthsParse: monthsParse,
         shortMonthsParse: monthsParse,
-        weekdays:
-            'niedziela_poniedziałek_wtorek_środa_czwartek_piątek_sobota'.split('_'),
+        weekdays: 'niedziela_poniedziałek_wtorek_środa_czwartek_piątek_sobota'.split(
+            '_'
+        ),
         weekdaysShort: 'ndz_pon_wt_śr_czw_pt_sob'.split('_'),
         weekdaysMin: 'Nd_Pn_Wt_Śr_Cz_Pt_So'.split('_'),
         longDateFormat: {
@@ -54396,10 +54277,9 @@ __webpack_require__.r(__webpack_exports__);
             '_'
         ),
         monthsShort: 'jan_fev_mar_abr_mai_jun_jul_ago_set_out_nov_dez'.split('_'),
-        weekdays:
-            'domingo_segunda-feira_terça-feira_quarta-feira_quinta-feira_sexta-feira_sábado'.split(
-                '_'
-            ),
+        weekdays: 'domingo_segunda-feira_terça-feira_quarta-feira_quinta-feira_sexta-feira_sábado'.split(
+            '_'
+        ),
         weekdaysShort: 'dom_seg_ter_qua_qui_sex_sáb'.split('_'),
         weekdaysMin: 'do_2ª_3ª_4ª_5ª_6ª_sá'.split('_'),
         weekdaysParseExact: true,
@@ -54473,10 +54353,9 @@ __webpack_require__.r(__webpack_exports__);
             '_'
         ),
         monthsShort: 'jan_fev_mar_abr_mai_jun_jul_ago_set_out_nov_dez'.split('_'),
-        weekdays:
-            'Domingo_Segunda-feira_Terça-feira_Quarta-feira_Quinta-feira_Sexta-feira_Sábado'.split(
-                '_'
-            ),
+        weekdays: 'Domingo_Segunda-feira_Terça-feira_Quarta-feira_Quinta-feira_Sexta-feira_Sábado'.split(
+            '_'
+        ),
         weekdaysShort: 'Dom_Seg_Ter_Qua_Qui_Sex_Sáb'.split('_'),
         weekdaysMin: 'Do_2ª_3ª_4ª_5ª_6ª_Sá'.split('_'),
         weekdaysParseExact: true,
@@ -54573,10 +54452,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'ianuarie_februarie_martie_aprilie_mai_iunie_iulie_august_septembrie_octombrie_noiembrie_decembrie'.split(
             '_'
         ),
-        monthsShort:
-            'ian._feb._mart._apr._mai_iun._iul._aug._sept._oct._nov._dec.'.split(
-                '_'
-            ),
+        monthsShort: 'ian._feb._mart._apr._mai_iun._iul._aug._sept._oct._nov._dec.'.split(
+            '_'
+        ),
         monthsParseExact: true,
         weekdays: 'duminică_luni_marți_miercuri_joi_vineri_sâmbătă'.split('_'),
         weekdaysShort: 'Dum_Lun_Mar_Mie_Joi_Vin_Sâm'.split('_'),
@@ -54694,26 +54572,23 @@ __webpack_require__.r(__webpack_exports__);
             format: 'января_февраля_марта_апреля_мая_июня_июля_августа_сентября_октября_ноября_декабря'.split(
                 '_'
             ),
-            standalone:
-                'январь_февраль_март_апрель_май_июнь_июль_август_сентябрь_октябрь_ноябрь_декабрь'.split(
-                    '_'
-                ),
+            standalone: 'январь_февраль_март_апрель_май_июнь_июль_август_сентябрь_октябрь_ноябрь_декабрь'.split(
+                '_'
+            ),
         },
         monthsShort: {
             // по CLDR именно "июл." и "июн.", но какой смысл менять букву на точку?
             format: 'янв._февр._мар._апр._мая_июня_июля_авг._сент._окт._нояб._дек.'.split(
                 '_'
             ),
-            standalone:
-                'янв._февр._март_апр._май_июнь_июль_авг._сент._окт._нояб._дек.'.split(
-                    '_'
-                ),
+            standalone: 'янв._февр._март_апр._май_июнь_июль_авг._сент._окт._нояб._дек.'.split(
+                '_'
+            ),
         },
         weekdays: {
-            standalone:
-                'воскресенье_понедельник_вторник_среда_четверг_пятница_суббота'.split(
-                    '_'
-                ),
+            standalone: 'воскресенье_понедельник_вторник_среда_четверг_пятница_суббота'.split(
+                '_'
+            ),
             format: 'воскресенье_понедельник_вторник_среду_четверг_пятницу_субботу'.split(
                 '_'
             ),
@@ -54726,20 +54601,16 @@ __webpack_require__.r(__webpack_exports__);
         shortMonthsParse: monthsParse,
 
         // полные названия с падежами, по три буквы, для некоторых, по 4 буквы, сокращения с точкой и без точки
-        monthsRegex:
-            /^(январ[ья]|янв\.?|феврал[ья]|февр?\.?|марта?|мар\.?|апрел[ья]|апр\.?|ма[йя]|июн[ья]|июн\.?|июл[ья]|июл\.?|августа?|авг\.?|сентябр[ья]|сент?\.?|октябр[ья]|окт\.?|ноябр[ья]|нояб?\.?|декабр[ья]|дек\.?)/i,
+        monthsRegex: /^(январ[ья]|янв\.?|феврал[ья]|февр?\.?|марта?|мар\.?|апрел[ья]|апр\.?|ма[йя]|июн[ья]|июн\.?|июл[ья]|июл\.?|августа?|авг\.?|сентябр[ья]|сент?\.?|октябр[ья]|окт\.?|ноябр[ья]|нояб?\.?|декабр[ья]|дек\.?)/i,
 
         // копия предыдущего
-        monthsShortRegex:
-            /^(январ[ья]|янв\.?|феврал[ья]|февр?\.?|марта?|мар\.?|апрел[ья]|апр\.?|ма[йя]|июн[ья]|июн\.?|июл[ья]|июл\.?|августа?|авг\.?|сентябр[ья]|сент?\.?|октябр[ья]|окт\.?|ноябр[ья]|нояб?\.?|декабр[ья]|дек\.?)/i,
+        monthsShortRegex: /^(январ[ья]|янв\.?|феврал[ья]|февр?\.?|марта?|мар\.?|апрел[ья]|апр\.?|ма[йя]|июн[ья]|июн\.?|июл[ья]|июл\.?|августа?|авг\.?|сентябр[ья]|сент?\.?|октябр[ья]|окт\.?|ноябр[ья]|нояб?\.?|декабр[ья]|дек\.?)/i,
 
         // полные названия с падежами
-        monthsStrictRegex:
-            /^(январ[яь]|феврал[яь]|марта?|апрел[яь]|ма[яй]|июн[яь]|июл[яь]|августа?|сентябр[яь]|октябр[яь]|ноябр[яь]|декабр[яь])/i,
+        monthsStrictRegex: /^(январ[яь]|феврал[яь]|марта?|апрел[яь]|ма[яй]|июн[яь]|июл[яь]|августа?|сентябр[яь]|октябр[яь]|ноябр[яь]|декабр[яь])/i,
 
         // Выражение, которое соответствует только сокращённым формам
-        monthsShortStrictRegex:
-            /^(янв\.|февр?\.|мар[т.]|апр\.|ма[яй]|июн[ья.]|июл[ья.]|авг\.|сент?\.|окт\.|нояб?\.|дек\.)/i,
+        monthsShortStrictRegex: /^(янв\.|февр?\.|мар[т.]|апр\.|ма[яй]|июн[ья.]|июл[ья.]|авг\.|сент?\.|окт\.|нояб?\.|дек\.)/i,
         longDateFormat: {
             LT: 'H:mm',
             LTS: 'H:mm:ss',
@@ -54981,12 +54852,12 @@ __webpack_require__.r(__webpack_exports__);
         months: 'ođđajagemánnu_guovvamánnu_njukčamánnu_cuoŋománnu_miessemánnu_geassemánnu_suoidnemánnu_borgemánnu_čakčamánnu_golggotmánnu_skábmamánnu_juovlamánnu'.split(
             '_'
         ),
-        monthsShort:
-            'ođđj_guov_njuk_cuo_mies_geas_suoi_borg_čakč_golg_skáb_juov'.split('_'),
-        weekdays:
-            'sotnabeaivi_vuossárga_maŋŋebárga_gaskavahkku_duorastat_bearjadat_lávvardat'.split(
-                '_'
-            ),
+        monthsShort: 'ođđj_guov_njuk_cuo_mies_geas_suoi_borg_čakč_golg_skáb_juov'.split(
+            '_'
+        ),
+        weekdays: 'sotnabeaivi_vuossárga_maŋŋebárga_gaskavahkku_duorastat_bearjadat_lávvardat'.split(
+            '_'
+        ),
         weekdaysShort: 'sotn_vuos_maŋ_gask_duor_bear_láv'.split('_'),
         weekdaysMin: 's_v_m_g_d_b_L'.split('_'),
         longDateFormat: {
@@ -55061,10 +54932,9 @@ __webpack_require__.r(__webpack_exports__);
         monthsShort: 'ජන_පෙබ_මාර්_අප්_මැයි_ජූනි_ජූලි_අගෝ_සැප්_ඔක්_නොවැ_දෙසැ'.split(
             '_'
         ),
-        weekdays:
-            'ඉරිදා_සඳුදා_අඟහරුවාදා_බදාදා_බ්‍රහස්පතින්දා_සිකුරාදා_සෙනසුරාදා'.split(
-                '_'
-            ),
+        weekdays: 'ඉරිදා_සඳුදා_අඟහරුවාදා_බදාදා_බ්‍රහස්පතින්දා_සිකුරාදා_සෙනසුරාදා'.split(
+            '_'
+        ),
         weekdaysShort: 'ඉරි_සඳු_අඟ_බදා_බ්‍රහ_සිකු_සෙන'.split('_'),
         weekdaysMin: 'ඉ_ස_අ_බ_බ්‍ර_සි_සෙ'.split('_'),
         weekdaysParseExact: true,
@@ -55142,10 +55012,9 @@ __webpack_require__.r(__webpack_exports__);
 
     //! moment.js locale configuration
 
-    var months =
-            'január_február_marec_apríl_máj_jún_júl_august_september_október_november_december'.split(
-                '_'
-            ),
+    var months = 'január_február_marec_apríl_máj_jún_júl_august_september_október_november_december'.split(
+            '_'
+        ),
         monthsShort = 'jan_feb_mar_apr_máj_jún_júl_aug_sep_okt_nov_dec'.split('_');
     function plural(n) {
         return n > 1 && n < 5;
@@ -55393,10 +55262,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'januar_februar_marec_april_maj_junij_julij_avgust_september_oktober_november_december'.split(
             '_'
         ),
-        monthsShort:
-            'jan._feb._mar._apr._maj._jun._jul._avg._sep._okt._nov._dec.'.split(
-                '_'
-            ),
+        monthsShort: 'jan._feb._mar._apr._maj._jun._jul._avg._sep._okt._nov._dec.'.split(
+            '_'
+        ),
         monthsParseExact: true,
         weekdays: 'nedelja_ponedeljek_torek_sreda_četrtek_petek_sobota'.split('_'),
         weekdaysShort: 'ned._pon._tor._sre._čet._pet._sob.'.split('_'),
@@ -55584,43 +55452,32 @@ __webpack_require__.r(__webpack_exports__);
         words: {
             //Different grammatical cases
             ss: ['секунда', 'секунде', 'секунди'],
-            m: ['један минут', 'једног минута'],
-            mm: ['минут', 'минута', 'минута'],
+            m: ['један минут', 'једне минуте'],
+            mm: ['минут', 'минуте', 'минута'],
             h: ['један сат', 'једног сата'],
             hh: ['сат', 'сата', 'сати'],
-            d: ['један дан', 'једног дана'],
             dd: ['дан', 'дана', 'дана'],
-            M: ['један месец', 'једног месеца'],
             MM: ['месец', 'месеца', 'месеци'],
-            y: ['једну годину', 'једне године'],
-            yy: ['годину', 'године', 'година'],
+            yy: ['година', 'године', 'година'],
         },
         correctGrammaticalCase: function (number, wordKey) {
-            if (
-                number % 10 >= 1 &&
-                number % 10 <= 4 &&
-                (number % 100 < 10 || number % 100 >= 20)
-            ) {
-                return number % 10 === 1 ? wordKey[0] : wordKey[1];
-            }
-            return wordKey[2];
+            return number === 1
+                ? wordKey[0]
+                : number >= 2 && number <= 4
+                ? wordKey[1]
+                : wordKey[2];
         },
-        translate: function (number, withoutSuffix, key, isFuture) {
+        translate: function (number, withoutSuffix, key) {
             var wordKey = translator.words[key];
-
             if (key.length === 1) {
-                // Nominativ
-                if (key === 'y' && withoutSuffix) return 'једна година';
-                return isFuture || withoutSuffix ? wordKey[0] : wordKey[1];
+                return withoutSuffix ? wordKey[0] : wordKey[1];
+            } else {
+                return (
+                    number +
+                    ' ' +
+                    translator.correctGrammaticalCase(number, wordKey)
+                );
             }
-
-            const word = translator.correctGrammaticalCase(number, wordKey);
-            // Nominativ
-            if (key === 'yy' && withoutSuffix && word === 'годину') {
-                return number + ' година';
-            }
-
-            return number + ' ' + word;
         },
     };
 
@@ -55628,8 +55485,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'јануар_фебруар_март_април_мај_јун_јул_август_септембар_октобар_новембар_децембар'.split(
             '_'
         ),
-        monthsShort:
-            'јан._феб._мар._апр._мај_јун_јул_авг._сеп._окт._нов._дец.'.split('_'),
+        monthsShort: 'јан._феб._мар._апр._мај_јун_јул_авг._сеп._окт._нов._дец.'.split(
+            '_'
+        ),
         monthsParseExact: true,
         weekdays: 'недеља_понедељак_уторак_среда_четвртак_петак_субота'.split('_'),
         weekdaysShort: 'нед._пон._уто._сре._чет._пет._суб.'.split('_'),
@@ -55685,11 +55543,11 @@ __webpack_require__.r(__webpack_exports__);
             mm: translator.translate,
             h: translator.translate,
             hh: translator.translate,
-            d: translator.translate,
+            d: 'дан',
             dd: translator.translate,
-            M: translator.translate,
+            M: 'месец',
             MM: translator.translate,
-            y: translator.translate,
+            y: 'годину',
             yy: translator.translate,
         },
         dayOfMonthOrdinalParse: /\d{1,2}\./,
@@ -55729,43 +55587,32 @@ __webpack_require__.r(__webpack_exports__);
         words: {
             //Different grammatical cases
             ss: ['sekunda', 'sekunde', 'sekundi'],
-            m: ['jedan minut', 'jednog minuta'],
-            mm: ['minut', 'minuta', 'minuta'],
+            m: ['jedan minut', 'jedne minute'],
+            mm: ['minut', 'minute', 'minuta'],
             h: ['jedan sat', 'jednog sata'],
             hh: ['sat', 'sata', 'sati'],
-            d: ['jedan dan', 'jednog dana'],
             dd: ['dan', 'dana', 'dana'],
-            M: ['jedan mesec', 'jednog meseca'],
             MM: ['mesec', 'meseca', 'meseci'],
-            y: ['jednu godinu', 'jedne godine'],
-            yy: ['godinu', 'godine', 'godina'],
+            yy: ['godina', 'godine', 'godina'],
         },
         correctGrammaticalCase: function (number, wordKey) {
-            if (
-                number % 10 >= 1 &&
-                number % 10 <= 4 &&
-                (number % 100 < 10 || number % 100 >= 20)
-            ) {
-                return number % 10 === 1 ? wordKey[0] : wordKey[1];
-            }
-            return wordKey[2];
+            return number === 1
+                ? wordKey[0]
+                : number >= 2 && number <= 4
+                ? wordKey[1]
+                : wordKey[2];
         },
-        translate: function (number, withoutSuffix, key, isFuture) {
+        translate: function (number, withoutSuffix, key) {
             var wordKey = translator.words[key];
-
             if (key.length === 1) {
-                // Nominativ
-                if (key === 'y' && withoutSuffix) return 'jedna godina';
-                return isFuture || withoutSuffix ? wordKey[0] : wordKey[1];
+                return withoutSuffix ? wordKey[0] : wordKey[1];
+            } else {
+                return (
+                    number +
+                    ' ' +
+                    translator.correctGrammaticalCase(number, wordKey)
+                );
             }
-
-            const word = translator.correctGrammaticalCase(number, wordKey);
-            // Nominativ
-            if (key === 'yy' && withoutSuffix && word === 'godinu') {
-                return number + ' godina';
-            }
-
-            return number + ' ' + word;
         },
     };
 
@@ -55773,8 +55620,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'januar_februar_mart_april_maj_jun_jul_avgust_septembar_oktobar_novembar_decembar'.split(
             '_'
         ),
-        monthsShort:
-            'jan._feb._mar._apr._maj_jun_jul_avg._sep._okt._nov._dec.'.split('_'),
+        monthsShort: 'jan._feb._mar._apr._maj_jun_jul_avg._sep._okt._nov._dec.'.split(
+            '_'
+        ),
         monthsParseExact: true,
         weekdays: 'nedelja_ponedeljak_utorak_sreda_četvrtak_petak_subota'.split(
             '_'
@@ -55832,11 +55680,11 @@ __webpack_require__.r(__webpack_exports__);
             mm: translator.translate,
             h: translator.translate,
             hh: translator.translate,
-            d: translator.translate,
+            d: 'dan',
             dd: translator.translate,
-            M: translator.translate,
+            M: 'mesec',
             MM: translator.translate,
-            y: translator.translate,
+            y: 'godinu',
             yy: translator.translate,
         },
         dayOfMonthOrdinalParse: /\d{1,2}\./,
@@ -55876,10 +55724,9 @@ __webpack_require__.r(__webpack_exports__);
             '_'
         ),
         monthsShort: 'Bhi_Ina_Inu_Mab_Ink_Inh_Kho_Igc_Iny_Imp_Lwe_Igo'.split('_'),
-        weekdays:
-            'Lisontfo_Umsombuluko_Lesibili_Lesitsatfu_Lesine_Lesihlanu_Umgcibelo'.split(
-                '_'
-            ),
+        weekdays: 'Lisontfo_Umsombuluko_Lesibili_Lesitsatfu_Lesine_Lesihlanu_Umgcibelo'.split(
+            '_'
+        ),
         weekdaysShort: 'Lis_Umb_Lsb_Les_Lsi_Lsh_Umg'.split('_'),
         weekdaysMin: 'Li_Us_Lb_Lt_Ls_Lh_Ug'.split('_'),
         weekdaysParseExact: true,
@@ -56066,10 +55913,9 @@ __webpack_require__.r(__webpack_exports__);
             '_'
         ),
         monthsShort: 'Jan_Feb_Mac_Apr_Mei_Jun_Jul_Ago_Sep_Okt_Nov_Des'.split('_'),
-        weekdays:
-            'Jumapili_Jumatatu_Jumanne_Jumatano_Alhamisi_Ijumaa_Jumamosi'.split(
-                '_'
-            ),
+        weekdays: 'Jumapili_Jumatatu_Jumanne_Jumatano_Alhamisi_Ijumaa_Jumamosi'.split(
+            '_'
+        ),
         weekdaysShort: 'Jpl_Jtat_Jnne_Jtan_Alh_Ijm_Jmos'.split('_'),
         weekdaysMin: 'J2_J3_J4_J5_Al_Ij_J1'.split('_'),
         weekdaysParseExact: true,
@@ -56164,14 +56010,12 @@ __webpack_require__.r(__webpack_exports__);
         months: 'ஜனவரி_பிப்ரவரி_மார்ச்_ஏப்ரல்_மே_ஜூன்_ஜூலை_ஆகஸ்ட்_செப்டெம்பர்_அக்டோபர்_நவம்பர்_டிசம்பர்'.split(
             '_'
         ),
-        monthsShort:
-            'ஜனவரி_பிப்ரவரி_மார்ச்_ஏப்ரல்_மே_ஜூன்_ஜூலை_ஆகஸ்ட்_செப்டெம்பர்_அக்டோபர்_நவம்பர்_டிசம்பர்'.split(
-                '_'
-            ),
-        weekdays:
-            'ஞாயிற்றுக்கிழமை_திங்கட்கிழமை_செவ்வாய்கிழமை_புதன்கிழமை_வியாழக்கிழமை_வெள்ளிக்கிழமை_சனிக்கிழமை'.split(
-                '_'
-            ),
+        monthsShort: 'ஜனவரி_பிப்ரவரி_மார்ச்_ஏப்ரல்_மே_ஜூன்_ஜூலை_ஆகஸ்ட்_செப்டெம்பர்_அக்டோபர்_நவம்பர்_டிசம்பர்'.split(
+            '_'
+        ),
+        weekdays: 'ஞாயிற்றுக்கிழமை_திங்கட்கிழமை_செவ்வாய்கிழமை_புதன்கிழமை_வியாழக்கிழமை_வெள்ளிக்கிழமை_சனிக்கிழமை'.split(
+            '_'
+        ),
         weekdaysShort: 'ஞாயிறு_திங்கள்_செவ்வாய்_புதன்_வியாழன்_வெள்ளி_சனி'.split(
             '_'
         ),
@@ -56289,15 +56133,13 @@ __webpack_require__.r(__webpack_exports__);
         months: 'జనవరి_ఫిబ్రవరి_మార్చి_ఏప్రిల్_మే_జూన్_జులై_ఆగస్టు_సెప్టెంబర్_అక్టోబర్_నవంబర్_డిసెంబర్'.split(
             '_'
         ),
-        monthsShort:
-            'జన._ఫిబ్ర._మార్చి_ఏప్రి._మే_జూన్_జులై_ఆగ._సెప్._అక్టో._నవ._డిసె.'.split(
-                '_'
-            ),
+        monthsShort: 'జన._ఫిబ్ర._మార్చి_ఏప్రి._మే_జూన్_జులై_ఆగ._సెప్._అక్టో._నవ._డిసె.'.split(
+            '_'
+        ),
         monthsParseExact: true,
-        weekdays:
-            'ఆదివారం_సోమవారం_మంగళవారం_బుధవారం_గురువారం_శుక్రవారం_శనివారం'.split(
-                '_'
-            ),
+        weekdays: 'ఆదివారం_సోమవారం_మంగళవారం_బుధవారం_గురువారం_శుక్రవారం_శనివారం'.split(
+            '_'
+        ),
         weekdaysShort: 'ఆది_సోమ_మంగళ_బుధ_గురు_శుక్ర_శని'.split('_'),
         weekdaysMin: 'ఆ_సో_మం_బు_గు_శు_శ'.split('_'),
         longDateFormat: {
@@ -56509,10 +56351,9 @@ __webpack_require__.r(__webpack_exports__);
             format: 'январи_феврали_марти_апрели_майи_июни_июли_августи_сентябри_октябри_ноябри_декабри'.split(
                 '_'
             ),
-            standalone:
-                'январ_феврал_март_апрел_май_июн_июл_август_сентябр_октябр_ноябр_декабр'.split(
-                    '_'
-                ),
+            standalone: 'январ_феврал_март_апрел_май_июн_июл_август_сентябр_октябр_ноябр_декабр'.split(
+                '_'
+            ),
         },
         monthsShort: 'янв_фев_мар_апр_май_июн_июл_авг_сен_окт_ноя_дек'.split('_'),
         weekdays: 'якшанбе_душанбе_сешанбе_чоршанбе_панҷшанбе_ҷумъа_шанбе'.split(
@@ -56619,10 +56460,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'มกราคม_กุมภาพันธ์_มีนาคม_เมษายน_พฤษภาคม_มิถุนายน_กรกฎาคม_สิงหาคม_กันยายน_ตุลาคม_พฤศจิกายน_ธันวาคม'.split(
             '_'
         ),
-        monthsShort:
-            'ม.ค._ก.พ._มี.ค._เม.ย._พ.ค._มิ.ย._ก.ค._ส.ค._ก.ย._ต.ค._พ.ย._ธ.ค.'.split(
-                '_'
-            ),
+        monthsShort: 'ม.ค._ก.พ._มี.ค._เม.ย._พ.ค._มิ.ย._ก.ค._ส.ค._ก.ย._ต.ค._พ.ย._ธ.ค.'.split(
+            '_'
+        ),
         monthsParseExact: true,
         weekdays: 'อาทิตย์_จันทร์_อังคาร_พุธ_พฤหัสบดี_ศุกร์_เสาร์'.split('_'),
         weekdaysShort: 'อาทิตย์_จันทร์_อังคาร_พุธ_พฤหัส_ศุกร์_เสาร์'.split('_'), // yes, three characters difference
@@ -56952,18 +56792,19 @@ __webpack_require__.r(__webpack_exports__);
         months: 'tera’ jar wa’_tera’ jar cha’_tera’ jar wej_tera’ jar loS_tera’ jar vagh_tera’ jar jav_tera’ jar Soch_tera’ jar chorgh_tera’ jar Hut_tera’ jar wa’maH_tera’ jar wa’maH wa’_tera’ jar wa’maH cha’'.split(
             '_'
         ),
-        monthsShort:
-            'jar wa’_jar cha’_jar wej_jar loS_jar vagh_jar jav_jar Soch_jar chorgh_jar Hut_jar wa’maH_jar wa’maH wa’_jar wa’maH cha’'.split(
-                '_'
-            ),
+        monthsShort: 'jar wa’_jar cha’_jar wej_jar loS_jar vagh_jar jav_jar Soch_jar chorgh_jar Hut_jar wa’maH_jar wa’maH wa’_jar wa’maH cha’'.split(
+            '_'
+        ),
         monthsParseExact: true,
         weekdays: 'lojmItjaj_DaSjaj_povjaj_ghItlhjaj_loghjaj_buqjaj_ghInjaj'.split(
             '_'
         ),
-        weekdaysShort:
-            'lojmItjaj_DaSjaj_povjaj_ghItlhjaj_loghjaj_buqjaj_ghInjaj'.split('_'),
-        weekdaysMin:
-            'lojmItjaj_DaSjaj_povjaj_ghItlhjaj_loghjaj_buqjaj_ghInjaj'.split('_'),
+        weekdaysShort: 'lojmItjaj_DaSjaj_povjaj_ghItlhjaj_loghjaj_buqjaj_ghInjaj'.split(
+            '_'
+        ),
+        weekdaysMin: 'lojmItjaj_DaSjaj_povjaj_ghItlhjaj_loghjaj_buqjaj_ghInjaj'.split(
+            '_'
+        ),
         longDateFormat: {
             LT: 'HH:mm',
             LTS: 'HH:mm:ss',
@@ -57058,7 +56899,7 @@ __webpack_require__.r(__webpack_exports__);
         weekdays: 'Pazar_Pazartesi_Salı_Çarşamba_Perşembe_Cuma_Cumartesi'.split(
             '_'
         ),
-        weekdaysShort: 'Paz_Pzt_Sal_Çar_Per_Cum_Cmt'.split('_'),
+        weekdaysShort: 'Paz_Pts_Sal_Çar_Per_Cum_Cts'.split('_'),
         weekdaysMin: 'Pz_Pt_Sa_Ça_Pe_Cu_Ct'.split('_'),
         meridiem: function (hours, minutes, isLower) {
             if (hours < 12) {
@@ -57265,10 +57106,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'innayr_brˤayrˤ_marˤsˤ_ibrir_mayyw_ywnyw_ywlywz_ɣwšt_šwtanbir_ktˤwbrˤ_nwwanbir_dwjnbir'.split(
             '_'
         ),
-        monthsShort:
-            'innayr_brˤayrˤ_marˤsˤ_ibrir_mayyw_ywnyw_ywlywz_ɣwšt_šwtanbir_ktˤwbrˤ_nwwanbir_dwjnbir'.split(
-                '_'
-            ),
+        monthsShort: 'innayr_brˤayrˤ_marˤsˤ_ibrir_mayyw_ywnyw_ywlywz_ɣwšt_šwtanbir_ktˤwbrˤ_nwwanbir_dwjnbir'.split(
+            '_'
+        ),
         weekdays: 'asamas_aynas_asinas_akras_akwas_asimwas_asiḍyas'.split('_'),
         weekdaysShort: 'asamas_aynas_asinas_akras_akwas_asimwas_asiḍyas'.split('_'),
         weekdaysMin: 'asamas_aynas_asinas_akras_akwas_asimwas_asiḍyas'.split('_'),
@@ -57338,10 +57178,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'ⵉⵏⵏⴰⵢⵔ_ⴱⵕⴰⵢⵕ_ⵎⴰⵕⵚ_ⵉⴱⵔⵉⵔ_ⵎⴰⵢⵢⵓ_ⵢⵓⵏⵢⵓ_ⵢⵓⵍⵢⵓⵣ_ⵖⵓⵛⵜ_ⵛⵓⵜⴰⵏⴱⵉⵔ_ⴽⵟⵓⴱⵕ_ⵏⵓⵡⴰⵏⴱⵉⵔ_ⴷⵓⵊⵏⴱⵉⵔ'.split(
             '_'
         ),
-        monthsShort:
-            'ⵉⵏⵏⴰⵢⵔ_ⴱⵕⴰⵢⵕ_ⵎⴰⵕⵚ_ⵉⴱⵔⵉⵔ_ⵎⴰⵢⵢⵓ_ⵢⵓⵏⵢⵓ_ⵢⵓⵍⵢⵓⵣ_ⵖⵓⵛⵜ_ⵛⵓⵜⴰⵏⴱⵉⵔ_ⴽⵟⵓⴱⵕ_ⵏⵓⵡⴰⵏⴱⵉⵔ_ⴷⵓⵊⵏⴱⵉⵔ'.split(
-                '_'
-            ),
+        monthsShort: 'ⵉⵏⵏⴰⵢⵔ_ⴱⵕⴰⵢⵕ_ⵎⴰⵕⵚ_ⵉⴱⵔⵉⵔ_ⵎⴰⵢⵢⵓ_ⵢⵓⵏⵢⵓ_ⵢⵓⵍⵢⵓⵣ_ⵖⵓⵛⵜ_ⵛⵓⵜⴰⵏⴱⵉⵔ_ⴽⵟⵓⴱⵕ_ⵏⵓⵡⴰⵏⴱⵉⵔ_ⴷⵓⵊⵏⴱⵉⵔ'.split(
+            '_'
+        ),
         weekdays: 'ⴰⵙⴰⵎⴰⵙ_ⴰⵢⵏⴰⵙ_ⴰⵙⵉⵏⴰⵙ_ⴰⴽⵔⴰⵙ_ⴰⴽⵡⴰⵙ_ⴰⵙⵉⵎⵡⴰⵙ_ⴰⵙⵉⴹⵢⴰⵙ'.split('_'),
         weekdaysShort: 'ⴰⵙⴰⵎⴰⵙ_ⴰⵢⵏⴰⵙ_ⴰⵙⵉⵏⴰⵙ_ⴰⴽⵔⴰⵙ_ⴰⴽⵡⴰⵙ_ⴰⵙⵉⵎⵡⴰⵙ_ⴰⵙⵉⴹⵢⴰⵙ'.split('_'),
         weekdaysMin: 'ⴰⵙⴰⵎⴰⵙ_ⴰⵢⵏⴰⵙ_ⴰⵙⵉⵏⴰⵙ_ⴰⴽⵔⴰⵙ_ⴰⴽⵡⴰⵙ_ⴰⵙⵉⵎⵡⴰⵙ_ⴰⵙⵉⴹⵢⴰⵙ'.split('_'),
@@ -57411,10 +57250,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'يانۋار_فېۋرال_مارت_ئاپرېل_ماي_ئىيۇن_ئىيۇل_ئاۋغۇست_سېنتەبىر_ئۆكتەبىر_نويابىر_دېكابىر'.split(
             '_'
         ),
-        monthsShort:
-            'يانۋار_فېۋرال_مارت_ئاپرېل_ماي_ئىيۇن_ئىيۇل_ئاۋغۇست_سېنتەبىر_ئۆكتەبىر_نويابىر_دېكابىر'.split(
-                '_'
-            ),
+        monthsShort: 'يانۋار_فېۋرال_مارت_ئاپرېل_ماي_ئىيۇن_ئىيۇل_ئاۋغۇست_سېنتەبىر_ئۆكتەبىر_نويابىر_دېكابىر'.split(
+            '_'
+        ),
         weekdays: 'يەكشەنبە_دۈشەنبە_سەيشەنبە_چارشەنبە_پەيشەنبە_جۈمە_شەنبە'.split(
             '_'
         ),
@@ -57565,18 +57403,15 @@ __webpack_require__.r(__webpack_exports__);
     }
     function weekdaysCaseReplace(m, format) {
         var weekdays = {
-                nominative:
-                    'неділя_понеділок_вівторок_середа_четвер_п’ятниця_субота'.split(
-                        '_'
-                    ),
-                accusative:
-                    'неділю_понеділок_вівторок_середу_четвер_п’ятницю_суботу'.split(
-                        '_'
-                    ),
-                genitive:
-                    'неділі_понеділка_вівторка_середи_четверга_п’ятниці_суботи'.split(
-                        '_'
-                    ),
+                nominative: 'неділя_понеділок_вівторок_середа_четвер_п’ятниця_субота'.split(
+                    '_'
+                ),
+                accusative: 'неділю_понеділок_вівторок_середу_четвер_п’ятницю_суботу'.split(
+                    '_'
+                ),
+                genitive: 'неділі_понеділка_вівторка_середи_четверга_п’ятниці_суботи'.split(
+                    '_'
+                ),
             },
             nounCase;
 
@@ -57607,10 +57442,9 @@ __webpack_require__.r(__webpack_exports__);
             format: 'січня_лютого_березня_квітня_травня_червня_липня_серпня_вересня_жовтня_листопада_грудня'.split(
                 '_'
             ),
-            standalone:
-                'січень_лютий_березень_квітень_травень_червень_липень_серпень_вересень_жовтень_листопад_грудень'.split(
-                    '_'
-                ),
+            standalone: 'січень_лютий_березень_квітень_травень_червень_липень_серпень_вересень_жовтень_листопад_грудень'.split(
+                '_'
+            ),
         },
         monthsShort: 'січ_лют_бер_квіт_трав_черв_лип_серп_вер_жовт_лист_груд'.split(
             '_'
@@ -57829,10 +57663,9 @@ __webpack_require__.r(__webpack_exports__);
             '_'
         ),
         monthsShort: 'Yan_Fev_Mar_Apr_May_Iyun_Iyul_Avg_Sen_Okt_Noy_Dek'.split('_'),
-        weekdays:
-            'Yakshanba_Dushanba_Seshanba_Chorshanba_Payshanba_Juma_Shanba'.split(
-                '_'
-            ),
+        weekdays: 'Yakshanba_Dushanba_Seshanba_Chorshanba_Payshanba_Juma_Shanba'.split(
+            '_'
+        ),
         weekdaysShort: 'Yak_Dush_Sesh_Chor_Pay_Jum_Shan'.split('_'),
         weekdaysMin: 'Ya_Du_Se_Cho_Pa_Ju_Sha'.split('_'),
         longDateFormat: {
@@ -57972,10 +57805,9 @@ __webpack_require__.r(__webpack_exports__);
         months: 'tháng 1_tháng 2_tháng 3_tháng 4_tháng 5_tháng 6_tháng 7_tháng 8_tháng 9_tháng 10_tháng 11_tháng 12'.split(
             '_'
         ),
-        monthsShort:
-            'Thg 01_Thg 02_Thg 03_Thg 04_Thg 05_Thg 06_Thg 07_Thg 08_Thg 09_Thg 10_Thg 11_Thg 12'.split(
-                '_'
-            ),
+        monthsShort: 'Thg 01_Thg 02_Thg 03_Thg 04_Thg 05_Thg 06_Thg 07_Thg 08_Thg 09_Thg 10_Thg 11_Thg 12'.split(
+            '_'
+        ),
         monthsParseExact: true,
         weekdays: 'chủ nhật_thứ hai_thứ ba_thứ tư_thứ năm_thứ sáu_thứ bảy'.split(
             '_'
@@ -58070,15 +57902,13 @@ __webpack_require__.r(__webpack_exports__);
         months: 'J~áñúá~rý_F~ébrú~árý_~Márc~h_Áp~ríl_~Máý_~Júñé~_Júl~ý_Áú~gúst~_Sép~témb~ér_Ó~ctób~ér_Ñ~óvém~bér_~Décé~mbér'.split(
             '_'
         ),
-        monthsShort:
-            'J~áñ_~Féb_~Már_~Ápr_~Máý_~Júñ_~Júl_~Áúg_~Sép_~Óct_~Ñóv_~Déc'.split(
-                '_'
-            ),
+        monthsShort: 'J~áñ_~Féb_~Már_~Ápr_~Máý_~Júñ_~Júl_~Áúg_~Sép_~Óct_~Ñóv_~Déc'.split(
+            '_'
+        ),
         monthsParseExact: true,
-        weekdays:
-            'S~úñdá~ý_Mó~ñdáý~_Túé~sdáý~_Wéd~ñésd~áý_T~húrs~dáý_~Fríd~áý_S~átúr~dáý'.split(
-                '_'
-            ),
+        weekdays: 'S~úñdá~ý_Mó~ñdáý~_Túé~sdáý~_Wéd~ñésd~áý_T~húrs~dáý_~Fríd~áý_S~átúr~dáý'.split(
+            '_'
+        ),
         weekdaysShort: 'S~úñ_~Móñ_~Túé_~Wéd_~Thú_~Frí_~Sát'.split('_'),
         weekdaysMin: 'S~ú_Mó~_Tú_~Wé_T~h_Fr~_Sá'.split('_'),
         weekdaysParseExact: true,
@@ -59018,7 +58848,7 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 
 /* module decorator */ module = __webpack_require__.nmd(module);
 //! moment.js
-//! version : 2.29.2
+//! version : 2.29.1
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
 //! license : MIT
 //! momentjs.com
@@ -59094,9 +58924,8 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 
     function map(arr, fn) {
         var res = [],
-            i,
-            arrLen = arr.length;
-        for (i = 0; i < arrLen; ++i) {
+            i;
+        for (i = 0; i < arr.length; ++i) {
             res.push(fn(arr[i], i));
         }
         return res;
@@ -59225,10 +59054,7 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
         updateInProgress = false;
 
     function copyConfig(to, from) {
-        var i,
-            prop,
-            val,
-            momentPropertiesLen = momentProperties.length;
+        var i, prop, val;
 
         if (!isUndefined(from._isAMomentObject)) {
             to._isAMomentObject = from._isAMomentObject;
@@ -59261,8 +59087,8 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
             to._locale = from._locale;
         }
 
-        if (momentPropertiesLen > 0) {
-            for (i = 0; i < momentPropertiesLen; i++) {
+        if (momentProperties.length > 0) {
+            for (i = 0; i < momentProperties.length; i++) {
                 prop = momentProperties[i];
                 val = from[prop];
                 if (!isUndefined(val)) {
@@ -59317,9 +59143,8 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
                 var args = [],
                     arg,
                     i,
-                    key,
-                    argLen = arguments.length;
-                for (i = 0; i < argLen; i++) {
+                    key;
+                for (i = 0; i < arguments.length; i++) {
                     arg = '';
                     if (typeof arguments[i] === 'object') {
                         arg += '\n[' + i + '] ';
@@ -59469,8 +59294,7 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
         );
     }
 
-    var formattingTokens =
-            /(\[[^\[]*\])|(\\)?([Hh]mm(ss)?|Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Qo?|N{1,5}|YYYYYY|YYYYY|YYYY|YY|y{2,4}|yo?|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|kk?|mm?|ss?|S{1,9}|x|X|zz?|ZZ?|.)/g,
+    var formattingTokens = /(\[[^\[]*\])|(\\)?([Hh]mm(ss)?|Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Qo?|N{1,5}|YYYYYY|YYYYY|YYYY|YY|y{2,4}|yo?|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|kk?|mm?|ss?|S{1,9}|x|X|zz?|ZZ?|.)/g,
         localFormattingTokens = /(\[[^\[]*\])|(\\)?(LTS|LT|LL?L?L?|l{1,4})/g,
         formatFunctions = {},
         formatTokenFunctions = {};
@@ -59774,9 +59598,8 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
         if (typeof units === 'object') {
             units = normalizeObjectUnits(units);
             var prioritized = getPrioritizedUnits(units),
-                i,
-                prioritizedLen = prioritized.length;
-            for (i = 0; i < prioritizedLen; i++) {
+                i;
+            for (i = 0; i < prioritized.length; i++) {
                 this[prioritized[i].unit](units[prioritized[i].unit]);
             }
         } else {
@@ -59806,8 +59629,7 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
         matchTimestamp = /[+-]?\d+(\.\d{1,3})?/, // 123456789 123456789.123
         // any word (or two) characters or numbers including two/three word month in arabic.
         // includes scottish gaelic two word and hyphenated months
-        matchWord =
-            /[0-9]{0,256}['a-z\u00A0-\u05FF\u0700-\uD7FF\uF900-\uFDCF\uFDF0-\uFF07\uFF10-\uFFEF]{1,256}|[\u0600-\u06FF\/]{1,256}(\s*?[\u0600-\u06FF]{1,256}){1,2}/i,
+        matchWord = /[0-9]{0,256}['a-z\u00A0-\u05FF\u0700-\uD7FF\uF900-\uFDCF\uFDF0-\uFF07\uFF10-\uFFEF]{1,256}|[\u0600-\u06FF\/]{1,256}(\s*?[\u0600-\u06FF]{1,256}){1,2}/i,
         regexes;
 
     regexes = {};
@@ -59833,12 +59655,15 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
         return regexEscape(
             s
                 .replace('\\', '')
-                .replace(
-                    /\\(\[)|\\(\])|\[([^\]\[]*)\]|\\(.)/g,
-                    function (matched, p1, p2, p3, p4) {
-                        return p1 || p2 || p3 || p4;
-                    }
-                )
+                .replace(/\\(\[)|\\(\])|\[([^\]\[]*)\]|\\(.)/g, function (
+                    matched,
+                    p1,
+                    p2,
+                    p3,
+                    p4
+                ) {
+                    return p1 || p2 || p3 || p4;
+                })
         );
     }
 
@@ -59850,8 +59675,7 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 
     function addParseToken(token, callback) {
         var i,
-            func = callback,
-            tokenLen;
+            func = callback;
         if (typeof token === 'string') {
             token = [token];
         }
@@ -59860,8 +59684,7 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
                 array[callback] = toInt(input);
             };
         }
-        tokenLen = token.length;
-        for (i = 0; i < tokenLen; i++) {
+        for (i = 0; i < token.length; i++) {
             tokens[token[i]] = func;
         }
     }
@@ -59972,12 +59795,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 
     // LOCALES
 
-    var defaultLocaleMonths =
-            'January_February_March_April_May_June_July_August_September_October_November_December'.split(
-                '_'
-            ),
-        defaultLocaleMonthsShort =
-            'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_'),
+    var defaultLocaleMonths = 'January_February_March_April_May_June_July_August_September_October_November_December'.split(
+            '_'
+        ),
+        defaultLocaleMonthsShort = 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split(
+            '_'
+        ),
         MONTHS_IN_FORMAT = /D[oD]?(\[[^\[\]]*\]|\s)+MMMM?/,
         defaultMonthsShortRegex = matchWord,
         defaultMonthsRegex = matchWord;
@@ -60419,12 +60242,14 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
     addRegexToken('W', match1to2);
     addRegexToken('WW', match1to2, match2);
 
-    addWeekParseToken(
-        ['w', 'ww', 'W', 'WW'],
-        function (input, week, config, token) {
-            week[token.substr(0, 1)] = toInt(input);
-        }
-    );
+    addWeekParseToken(['w', 'ww', 'W', 'WW'], function (
+        input,
+        week,
+        config,
+        token
+    ) {
+        week[token.substr(0, 1)] = toInt(input);
+    });
 
     // HELPERS
 
@@ -60549,8 +60374,9 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
         return ws.slice(n, 7).concat(ws.slice(0, n));
     }
 
-    var defaultLocaleWeekdays =
-            'Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday'.split('_'),
+    var defaultLocaleWeekdays = 'Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday'.split(
+            '_'
+        ),
         defaultLocaleWeekdaysShort = 'Sun_Mon_Tue_Wed_Thu_Fri_Sat'.split('_'),
         defaultLocaleWeekdaysMin = 'Su_Mo_Tu_We_Th_Fr_Sa'.split('_'),
         defaultWeekdaysRegex = matchWord,
@@ -61098,11 +60924,6 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
         return globalLocale;
     }
 
-    function isLocaleNameSane(name) {
-        // Prevent names that look like filesystem paths, i.e contain '/' or '\'
-        return name.match('^[^/\\\\]*$') != null;
-    }
-
     function loadLocale(name) {
         var oldLocale = null,
             aliasedRequire;
@@ -61111,8 +60932,7 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
             locales[name] === undefined &&
             "object" !== 'undefined' &&
             module &&
-            module.exports &&
-            isLocaleNameSane(name)
+            module.exports
         ) {
             try {
                 oldLocale = globalLocale._abbr;
@@ -61329,10 +61149,8 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 
     // iso 8601 regex
     // 0000-00-00 0000-W00 or 0000-W00-0 + T + 00 or 00:00 or 00:00:00 or 00:00:00.000 + +00:00 or +0000 or +00)
-    var extendedIsoRegex =
-            /^\s*((?:[+-]\d{6}|\d{4})-(?:\d\d-\d\d|W\d\d-\d|W\d\d|\d\d\d|\d\d))(?:(T| )(\d\d(?::\d\d(?::\d\d(?:[.,]\d+)?)?)?)([+-]\d\d(?::?\d\d)?|\s*Z)?)?$/,
-        basicIsoRegex =
-            /^\s*((?:[+-]\d{6}|\d{4})(?:\d\d\d\d|W\d\d\d|W\d\d|\d\d\d|\d\d|))(?:(T| )(\d\d(?:\d\d(?:\d\d(?:[.,]\d+)?)?)?)([+-]\d\d(?::?\d\d)?|\s*Z)?)?$/,
+    var extendedIsoRegex = /^\s*((?:[+-]\d{6}|\d{4})-(?:\d\d-\d\d|W\d\d-\d|W\d\d|\d\d\d|\d\d))(?:(T| )(\d\d(?::\d\d(?::\d\d(?:[.,]\d+)?)?)?)([+-]\d\d(?::?\d\d)?|\s*Z)?)?$/,
+        basicIsoRegex = /^\s*((?:[+-]\d{6}|\d{4})(?:\d\d\d\d|W\d\d\d|W\d\d|\d\d\d|\d\d|))(?:(T| )(\d\d(?:\d\d(?:\d\d(?:[.,]\d+)?)?)?)([+-]\d\d(?::?\d\d)?|\s*Z)?)?$/,
         tzRegex = /Z|[+-]\d\d(?::?\d\d)?/,
         isoDates = [
             ['YYYYYY-MM-DD', /[+-]\d{6}-\d\d-\d\d/],
@@ -61363,8 +61181,7 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
         ],
         aspNetJsonRegex = /^\/?Date\((-?\d+)/i,
         // RFC 2822 regex: For details see https://tools.ietf.org/html/rfc2822#section-3.3
-        rfc2822 =
-            /^(?:(Mon|Tue|Wed|Thu|Fri|Sat|Sun),?\s)?(\d{1,2})\s(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s(\d{2,4})\s(\d\d):(\d\d)(?::(\d\d))?\s(?:(UT|GMT|[ECMP][SD]T)|([Zz])|([+-]\d{4}))$/,
+        rfc2822 = /^(?:(Mon|Tue|Wed|Thu|Fri|Sat|Sun),?\s)?(\d{1,2})\s(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s(\d{2,4})\s(\d\d):(\d\d)(?::(\d\d))?\s(?:(UT|GMT|[ECMP][SD]T)|([Zz])|([+-]\d{4}))$/,
         obsOffsets = {
             UT: 0,
             GMT: 0,
@@ -61387,13 +61204,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
             allowTime,
             dateFormat,
             timeFormat,
-            tzFormat,
-            isoDatesLen = isoDates.length,
-            isoTimesLen = isoTimes.length;
+            tzFormat;
 
         if (match) {
             getParsingFlags(config).iso = true;
-            for (i = 0, l = isoDatesLen; i < l; i++) {
+
+            for (i = 0, l = isoDates.length; i < l; i++) {
                 if (isoDates[i][1].exec(match[1])) {
                     dateFormat = isoDates[i][0];
                     allowTime = isoDates[i][2] !== false;
@@ -61405,7 +61221,7 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
                 return;
             }
             if (match[3]) {
-                for (i = 0, l = isoTimesLen; i < l; i++) {
+                for (i = 0, l = isoTimes.length; i < l; i++) {
                     if (isoTimes[i][1].exec(match[3])) {
                         // match[2] should be 'T' or space
                         timeFormat = (match[2] || ' ') + isoTimes[i][0];
@@ -61785,13 +61601,12 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
             skipped,
             stringLength = string.length,
             totalParsedInputLength = 0,
-            era,
-            tokenLen;
+            era;
 
         tokens =
             expandFormat(config._f, config._locale).match(formattingTokens) || [];
-        tokenLen = tokens.length;
-        for (i = 0; i < tokenLen; i++) {
+
+        for (i = 0; i < tokens.length; i++) {
             token = tokens[i];
             parsedInput = (string.match(getParseRegexForToken(token, config)) ||
                 [])[0];
@@ -61886,16 +61701,15 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
             i,
             currentScore,
             validFormatFound,
-            bestFormatIsValid = false,
-            configfLen = config._f.length;
+            bestFormatIsValid = false;
 
-        if (configfLen === 0) {
+        if (config._f.length === 0) {
             getParsingFlags(config).invalidFormat = true;
             config._d = new Date(NaN);
             return;
         }
 
-        for (i = 0; i < configfLen; i++) {
+        for (i = 0; i < config._f.length; i++) {
             currentScore = 0;
             validFormatFound = false;
             tempConfig = copyConfig({}, config);
@@ -62136,8 +61950,7 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
     function isDurationValid(m) {
         var key,
             unitHasDecimal = false,
-            i,
-            orderLen = ordering.length;
+            i;
         for (key in m) {
             if (
                 hasOwnProp(m, key) &&
@@ -62150,7 +61963,7 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
             }
         }
 
-        for (i = 0; i < orderLen; ++i) {
+        for (i = 0; i < ordering.length; ++i) {
             if (m[ordering[i]]) {
                 if (unitHasDecimal) {
                     return false; // only allow non-integers for smallest unit
@@ -62475,8 +62288,7 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
         // from http://docs.closure-library.googlecode.com/git/closure_goog_date_date.js.source.html
         // somewhat more in line with 4.4.3.2 2004 spec, but allows decimal anywhere
         // and further modified to allow for strings containing both week and day
-        isoRegex =
-            /^(-|\+)?P(?:([-+]?[0-9,.]*)Y)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)W)?(?:([-+]?[0-9,.]*)D)?(?:T(?:([-+]?[0-9,.]*)H)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)S)?)?$/;
+        isoRegex = /^(-|\+)?P(?:([-+]?[0-9,.]*)Y)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)W)?(?:([-+]?[0-9,.]*)D)?(?:T(?:([-+]?[0-9,.]*)H)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)S)?)?$/;
 
     function createDuration(input, key) {
         var duration = input,
@@ -62697,10 +62509,9 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
                 'ms',
             ],
             i,
-            property,
-            propertyLen = properties.length;
+            property;
 
-        for (i = 0; i < propertyLen; i += 1) {
+        for (i = 0; i < properties.length; i += 1) {
             property = properties[i];
             propertyTest = propertyTest || hasOwnProp(input, property);
         }
@@ -63323,17 +63134,19 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
     addRegexToken('NNNN', matchEraName);
     addRegexToken('NNNNN', matchEraNarrow);
 
-    addParseToken(
-        ['N', 'NN', 'NNN', 'NNNN', 'NNNNN'],
-        function (input, array, config, token) {
-            var era = config._locale.erasParse(input, token, config._strict);
-            if (era) {
-                getParsingFlags(config).era = era;
-            } else {
-                getParsingFlags(config).invalidEra = input;
-            }
+    addParseToken(['N', 'NN', 'NNN', 'NNNN', 'NNNNN'], function (
+        input,
+        array,
+        config,
+        token
+    ) {
+        var era = config._locale.erasParse(input, token, config._strict);
+        if (era) {
+            getParsingFlags(config).era = era;
+        } else {
+            getParsingFlags(config).invalidEra = input;
         }
-    );
+    });
 
     addRegexToken('y', matchUnsigned);
     addRegexToken('yy', matchUnsigned);
@@ -63625,12 +63438,14 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
     addRegexToken('GGGGG', match1to6, match6);
     addRegexToken('ggggg', match1to6, match6);
 
-    addWeekParseToken(
-        ['gggg', 'ggggg', 'GGGG', 'GGGGG'],
-        function (input, week, config, token) {
-            week[token.substr(0, 2)] = toInt(input);
-        }
-    );
+    addWeekParseToken(['gggg', 'ggggg', 'GGGG', 'GGGGG'], function (
+        input,
+        week,
+        config,
+        token
+    ) {
+        week[token.substr(0, 2)] = toInt(input);
+    });
 
     addWeekParseToken(['gg', 'GG'], function (input, week, config, token) {
         week[token] = hooks.parseTwoDigitYear(input);
@@ -64653,7 +64468,7 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 
     //! moment.js
 
-    hooks.version = '2.29.2';
+    hooks.version = '2.29.1';
 
     setHookCallback(createLocal);
 
@@ -69663,13 +69478,21 @@ module.exports = function (list, options) {
 /***/ (function(module) {
 
 /*!
-* sweetalert2 v11.4.8
+* sweetalert2 v11.1.9
 * Released under the MIT License.
 */
 (function (global, factory) {
    true ? module.exports = factory() :
   0;
 }(this, function () { 'use strict';
+
+  const DismissReason = Object.freeze({
+    cancel: 'cancel',
+    backdrop: 'backdrop',
+    close: 'close',
+    esc: 'esc',
+    timer: 'timer'
+  });
 
   const consolePrefix = 'SweetAlert2:';
   /**
@@ -69690,28 +69513,27 @@ module.exports = function (list, options) {
   };
   /**
    * Capitalize the first letter of a string
-   * @param {string} str
-   * @returns {string}
+   * @param str
    */
 
   const capitalizeFirstLetter = str => str.charAt(0).toUpperCase() + str.slice(1);
   /**
-   * @param {NodeList | HTMLCollection | NamedNodeMap} nodeList
-   * @returns {array}
+   * Convert NodeList to Array
+   * @param nodeList
    */
 
   const toArray = nodeList => Array.prototype.slice.call(nodeList);
   /**
-   * Standardize console warnings
-   * @param {string | array} message
+   * Standardise console warnings
+   * @param message
    */
 
   const warn = message => {
     console.warn("".concat(consolePrefix, " ").concat(typeof message === 'object' ? message.join(' ') : message));
   };
   /**
-   * Standardize console errors
-   * @param {string} message
+   * Standardise console errors
+   * @param message
    */
 
   const error = message => {
@@ -69726,7 +69548,7 @@ module.exports = function (list, options) {
   const previousWarnOnceMessages = [];
   /**
    * Show a console warning, but only if it hasn't already been shown
-   * @param {string} message
+   * @param message
    */
 
   const warnOnce = message => {
@@ -69753,161 +69575,28 @@ module.exports = function (list, options) {
   const asPromise = arg => hasToPromiseFn(arg) ? arg.toPromise() : Promise.resolve(arg);
   const isPromise = arg => arg && Promise.resolve(arg) === arg;
 
-  const defaultParams = {
-    title: '',
-    titleText: '',
-    text: '',
-    html: '',
-    footer: '',
-    icon: undefined,
-    iconColor: undefined,
-    iconHtml: undefined,
-    template: undefined,
-    toast: false,
-    showClass: {
-      popup: 'swal2-show',
-      backdrop: 'swal2-backdrop-show',
-      icon: 'swal2-icon-show'
-    },
-    hideClass: {
-      popup: 'swal2-hide',
-      backdrop: 'swal2-backdrop-hide',
-      icon: 'swal2-icon-hide'
-    },
-    customClass: {},
-    target: 'body',
-    color: undefined,
-    backdrop: true,
-    heightAuto: true,
-    allowOutsideClick: true,
-    allowEscapeKey: true,
-    allowEnterKey: true,
-    stopKeydownPropagation: true,
-    keydownListenerCapture: false,
-    showConfirmButton: true,
-    showDenyButton: false,
-    showCancelButton: false,
-    preConfirm: undefined,
-    preDeny: undefined,
-    confirmButtonText: 'OK',
-    confirmButtonAriaLabel: '',
-    confirmButtonColor: undefined,
-    denyButtonText: 'No',
-    denyButtonAriaLabel: '',
-    denyButtonColor: undefined,
-    cancelButtonText: 'Cancel',
-    cancelButtonAriaLabel: '',
-    cancelButtonColor: undefined,
-    buttonsStyling: true,
-    reverseButtons: false,
-    focusConfirm: true,
-    focusDeny: false,
-    focusCancel: false,
-    returnFocus: true,
-    showCloseButton: false,
-    closeButtonHtml: '&times;',
-    closeButtonAriaLabel: 'Close this dialog',
-    loaderHtml: '',
-    showLoaderOnConfirm: false,
-    showLoaderOnDeny: false,
-    imageUrl: undefined,
-    imageWidth: undefined,
-    imageHeight: undefined,
-    imageAlt: '',
-    timer: undefined,
-    timerProgressBar: false,
-    width: undefined,
-    padding: undefined,
-    background: undefined,
-    input: undefined,
-    inputPlaceholder: '',
-    inputLabel: '',
-    inputValue: '',
-    inputOptions: {},
-    inputAutoTrim: true,
-    inputAttributes: {},
-    inputValidator: undefined,
-    returnInputValueOnDeny: false,
-    validationMessage: undefined,
-    grow: false,
-    position: 'center',
-    progressSteps: [],
-    currentProgressStep: undefined,
-    progressStepsDistance: undefined,
-    willOpen: undefined,
-    didOpen: undefined,
-    didRender: undefined,
-    willClose: undefined,
-    didClose: undefined,
-    didDestroy: undefined,
-    scrollbarPadding: true
-  };
-  const updatableParams = ['allowEscapeKey', 'allowOutsideClick', 'background', 'buttonsStyling', 'cancelButtonAriaLabel', 'cancelButtonColor', 'cancelButtonText', 'closeButtonAriaLabel', 'closeButtonHtml', 'color', 'confirmButtonAriaLabel', 'confirmButtonColor', 'confirmButtonText', 'currentProgressStep', 'customClass', 'denyButtonAriaLabel', 'denyButtonColor', 'denyButtonText', 'didClose', 'didDestroy', 'footer', 'hideClass', 'html', 'icon', 'iconColor', 'iconHtml', 'imageAlt', 'imageHeight', 'imageUrl', 'imageWidth', 'preConfirm', 'preDeny', 'progressSteps', 'returnFocus', 'reverseButtons', 'showCancelButton', 'showCloseButton', 'showConfirmButton', 'showDenyButton', 'text', 'title', 'titleText', 'willClose'];
-  const deprecatedParams = {};
-  const toastIncompatibleParams = ['allowOutsideClick', 'allowEnterKey', 'backdrop', 'focusConfirm', 'focusDeny', 'focusCancel', 'returnFocus', 'heightAuto', 'keydownListenerCapture'];
-  /**
-   * Is valid parameter
-   * @param {string} paramName
-   */
+  const isJqueryElement = elem => typeof elem === 'object' && elem.jquery;
 
-  const isValidParameter = paramName => {
-    return Object.prototype.hasOwnProperty.call(defaultParams, paramName);
-  };
-  /**
-   * Is valid parameter for Swal.update() method
-   * @param {string} paramName
-   */
+  const isElement = elem => elem instanceof Element || isJqueryElement(elem);
 
-  const isUpdatableParameter = paramName => {
-    return updatableParams.indexOf(paramName) !== -1;
-  };
-  /**
-   * Is deprecated parameter
-   * @param {string} paramName
-   */
+  const argsToParams = args => {
+    const params = {};
 
-  const isDeprecatedParameter = paramName => {
-    return deprecatedParams[paramName];
-  };
+    if (typeof args[0] === 'object' && !isElement(args[0])) {
+      Object.assign(params, args[0]);
+    } else {
+      ['title', 'html', 'icon'].forEach((name, index) => {
+        const arg = args[index];
 
-  const checkIfParamIsValid = param => {
-    if (!isValidParameter(param)) {
-      warn("Unknown parameter \"".concat(param, "\""));
-    }
-  };
-
-  const checkIfToastParamIsValid = param => {
-    if (toastIncompatibleParams.includes(param)) {
-      warn("The parameter \"".concat(param, "\" is incompatible with toasts"));
-    }
-  };
-
-  const checkIfParamIsDeprecated = param => {
-    if (isDeprecatedParameter(param)) {
-      warnAboutDeprecation(param, isDeprecatedParameter(param));
-    }
-  };
-  /**
-   * Show relevant warnings for given params
-   *
-   * @param params
-   */
-
-
-  const showWarningsForParams = params => {
-    if (!params.backdrop && params.allowOutsideClick) {
-      warn('"allowOutsideClick" parameter requires `backdrop` parameter to be set to `true`');
+        if (typeof arg === 'string' || isElement(arg)) {
+          params[name] = arg;
+        } else if (arg !== undefined) {
+          error("Unexpected type of ".concat(name, "! Expected \"string\" or \"Element\", got ").concat(typeof arg));
+        }
+      });
     }
 
-    for (const param in params) {
-      checkIfParamIsValid(param);
-
-      if (params.toast) {
-        checkIfToastParamIsValid(param);
-      }
-
-      checkIfParamIsDeprecated(param);
-    }
+    return params;
   };
 
   const swalPrefix = 'swal2-';
@@ -69922,12 +69611,6 @@ module.exports = function (list, options) {
   };
   const swalClasses = prefix(['container', 'shown', 'height-auto', 'iosfix', 'popup', 'modal', 'no-backdrop', 'no-transition', 'toast', 'toast-shown', 'show', 'hide', 'close', 'title', 'html-container', 'actions', 'confirm', 'deny', 'cancel', 'default-outline', 'footer', 'icon', 'icon-content', 'image', 'input', 'file', 'range', 'select', 'radio', 'checkbox', 'label', 'textarea', 'inputerror', 'input-label', 'validation-message', 'progress-steps', 'active-progress-step', 'progress-step', 'progress-step-line', 'loader', 'loading', 'styled', 'top', 'top-start', 'top-end', 'top-left', 'top-right', 'center', 'center-start', 'center-end', 'center-left', 'center-right', 'bottom', 'bottom-start', 'bottom-end', 'bottom-left', 'bottom-right', 'grow-row', 'grow-column', 'grow-fullscreen', 'rtl', 'timer-progress-bar', 'timer-progress-bar-container', 'scrollbar-measure', 'icon-success', 'icon-warning', 'icon-info', 'icon-question', 'icon-error']);
   const iconTypes = prefix(['success', 'warning', 'info', 'question', 'error']);
-
-  /**
-   * Gets the popup container which contains the backdrop and the popup itself.
-   *
-   * @returns {HTMLElement | null}
-   */
 
   const getContainer = () => document.body.querySelector(".".concat(swalClasses.container));
   const elementBySelector = selectorString => {
@@ -69960,12 +69643,12 @@ module.exports = function (list, options) {
   const getFocusableElements = () => {
     const focusableElementsWithTabindex = toArray(getPopup().querySelectorAll('[tabindex]:not([tabindex="-1"]):not([tabindex="0"])')) // sort according to tabindex
     .sort((a, b) => {
-      const tabindexA = parseInt(a.getAttribute('tabindex'));
-      const tabindexB = parseInt(b.getAttribute('tabindex'));
+      a = parseInt(a.getAttribute('tabindex'));
+      b = parseInt(b.getAttribute('tabindex'));
 
-      if (tabindexA > tabindexB) {
+      if (a > b) {
         return 1;
-      } else if (tabindexA < tabindexB) {
+      } else if (a < b) {
         return -1;
       }
 
@@ -69975,10 +69658,10 @@ module.exports = function (list, options) {
     return uniqueArray(focusableElementsWithTabindex.concat(otherFocusableElements)).filter(el => isVisible(el));
   };
   const isModal = () => {
-    return hasClass(document.body, swalClasses.shown) && !hasClass(document.body, swalClasses['toast-shown']) && !hasClass(document.body, swalClasses['no-backdrop']);
+    return !isToast() && !document.body.classList.contains(swalClasses['no-backdrop']);
   };
   const isToast = () => {
-    return getPopup() && hasClass(getPopup(), swalClasses.toast);
+    return document.body.classList.contains(swalClasses['toast-shown']);
   };
   const isLoading = () => {
     return getPopup().hasAttribute('data-loading');
@@ -69987,15 +69670,8 @@ module.exports = function (list, options) {
   const states = {
     previousBodyPadding: null
   };
-  /**
-   * Securely set innerHTML of an element
-   * https://github.com/sweetalert2/sweetalert2/issues/1926
-   *
-   * @param {HTMLElement} elem
-   * @param {string} html
-   */
-
   const setInnerHtml = (elem, html) => {
+    // #1926
     elem.textContent = '';
 
     if (html) {
@@ -70009,12 +69685,6 @@ module.exports = function (list, options) {
       });
     }
   };
-  /**
-   * @param {HTMLElement} elem
-   * @param {string} className
-   * @returns {boolean}
-   */
-
   const hasClass = (elem, className) => {
     if (!className) {
       return false;
@@ -70050,12 +69720,6 @@ module.exports = function (list, options) {
       addClass(elem, params.customClass[className]);
     }
   };
-  /**
-   * @param {HTMLElement} popup
-   * @param {string} inputType
-   * @returns {HTMLInputElement | null}
-   */
-
   const getInput = (popup, inputType) => {
     if (!inputType) {
       return null;
@@ -70065,25 +69729,21 @@ module.exports = function (list, options) {
       case 'select':
       case 'textarea':
       case 'file':
-        return popup.querySelector(".".concat(swalClasses.popup, " > .").concat(swalClasses[inputType]));
+        return getChildByClass(popup, swalClasses[inputType]);
 
       case 'checkbox':
-        return popup.querySelector(".".concat(swalClasses.popup, " > .").concat(swalClasses.checkbox, " input"));
+        return popup.querySelector(".".concat(swalClasses.checkbox, " input"));
 
       case 'radio':
-        return popup.querySelector(".".concat(swalClasses.popup, " > .").concat(swalClasses.radio, " input:checked")) || popup.querySelector(".".concat(swalClasses.popup, " > .").concat(swalClasses.radio, " input:first-child"));
+        return popup.querySelector(".".concat(swalClasses.radio, " input:checked")) || popup.querySelector(".".concat(swalClasses.radio, " input:first-child"));
 
       case 'range':
-        return popup.querySelector(".".concat(swalClasses.popup, " > .").concat(swalClasses.range, " input"));
+        return popup.querySelector(".".concat(swalClasses.range, " input"));
 
       default:
-        return popup.querySelector(".".concat(swalClasses.popup, " > .").concat(swalClasses.input));
+        return getChildByClass(popup, swalClasses.input);
     }
   };
-  /**
-   * @param {HTMLInputElement} input
-   */
-
   const focusInput = input => {
     input.focus(); // place cursor at end of text in text input
 
@@ -70094,12 +69754,6 @@ module.exports = function (list, options) {
       input.value = val;
     }
   };
-  /**
-   * @param {HTMLElement | HTMLElement[] | null} target
-   * @param {string | string[]} classList
-   * @param {boolean} condition
-   */
-
   const toggleClass = (target, classList, condition) => {
     if (!target || !classList) {
       return;
@@ -70110,7 +69764,7 @@ module.exports = function (list, options) {
     }
 
     classList.forEach(className => {
-      if (Array.isArray(target)) {
+      if (target.forEach) {
         target.forEach(elem => {
           condition ? elem.classList.add(className) : elem.classList.remove(className);
         });
@@ -70119,45 +69773,19 @@ module.exports = function (list, options) {
       }
     });
   };
-  /**
-   * @param {HTMLElement | HTMLElement[] | null} target
-   * @param {string | string[]} classList
-   */
-
   const addClass = (target, classList) => {
     toggleClass(target, classList, true);
   };
-  /**
-   * @param {HTMLElement | HTMLElement[] | null} target
-   * @param {string | string[]} classList
-   */
-
   const removeClass = (target, classList) => {
     toggleClass(target, classList, false);
   };
-  /**
-   * Get direct child of an element by class name
-   *
-   * @param {HTMLElement} elem
-   * @param {string} className
-   * @returns {HTMLElement | null}
-   */
-
-  const getDirectChildByClass = (elem, className) => {
-    const childNodes = toArray(elem.childNodes);
-
-    for (let i = 0; i < childNodes.length; i++) {
-      if (hasClass(childNodes[i], className)) {
-        return childNodes[i];
+  const getChildByClass = (elem, className) => {
+    for (let i = 0; i < elem.childNodes.length; i++) {
+      if (hasClass(elem.childNodes[i], className)) {
+        return elem.childNodes[i];
       }
     }
   };
-  /**
-   * @param {HTMLElement} elem
-   * @param {string} property
-   * @param {*} value
-   */
-
   const applyNumericalStyle = (elem, property, value) => {
     if (value === "".concat(parseInt(value))) {
       value = parseInt(value);
@@ -70169,19 +69797,9 @@ module.exports = function (list, options) {
       elem.style.removeProperty(property);
     }
   };
-  /**
-   * @param {HTMLElement} elem
-   * @param {string} display
-   */
-
-  const show = function (elem) {
-    let display = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'flex';
+  const show = (elem, display = 'flex') => {
     elem.style.display = display;
   };
-  /**
-   * @param {HTMLElement} elem
-   */
-
   const hide = elem => {
     elem.style.display = 'none';
   };
@@ -70206,8 +69824,7 @@ module.exports = function (list, options) {
     const transDuration = parseFloat(style.getPropertyValue('transition-duration') || '0');
     return animDuration > 0 || transDuration > 0;
   };
-  const animateTimerProgressBar = function (timer) {
-    let reset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  const animateTimerProgressBar = (timer, reset = false) => {
     const timerProgressBar = getTimerProgressBar();
 
     if (isVisible(timerProgressBar)) {
@@ -70228,48 +69845,13 @@ module.exports = function (list, options) {
     timerProgressBar.style.removeProperty('transition');
     timerProgressBar.style.width = '100%';
     const timerProgressBarFullWidth = parseInt(window.getComputedStyle(timerProgressBar).width);
-    const timerProgressBarPercent = timerProgressBarWidth / timerProgressBarFullWidth * 100;
+    const timerProgressBarPercent = parseInt(timerProgressBarWidth / timerProgressBarFullWidth * 100);
     timerProgressBar.style.removeProperty('transition');
     timerProgressBar.style.width = "".concat(timerProgressBarPercent, "%");
   };
 
-  /**
-   * Detect Node env
-   *
-   * @returns {boolean}
-   */
+  // Detect Node env
   const isNodeEnv = () => typeof window === 'undefined' || typeof document === 'undefined';
-
-  const RESTORE_FOCUS_TIMEOUT = 100;
-
-  const globalState = {};
-
-  const focusPreviousActiveElement = () => {
-    if (globalState.previousActiveElement && globalState.previousActiveElement.focus) {
-      globalState.previousActiveElement.focus();
-      globalState.previousActiveElement = null;
-    } else if (document.body) {
-      document.body.focus();
-    }
-  }; // Restore previous active (focused) element
-
-
-  const restoreActiveElement = returnFocus => {
-    return new Promise(resolve => {
-      if (!returnFocus) {
-        return resolve();
-      }
-
-      const x = window.scrollX;
-      const y = window.scrollY;
-      globalState.restoreFocusTimeout = setTimeout(() => {
-        focusPreviousActiveElement();
-        resolve();
-      }, RESTORE_FOCUS_TIMEOUT); // issues/900
-
-      window.scrollTo(x, y);
-    });
-  };
 
   const sweetHTML = "\n <div aria-labelledby=\"".concat(swalClasses.title, "\" aria-describedby=\"").concat(swalClasses['html-container'], "\" class=\"").concat(swalClasses.popup, "\" tabindex=\"-1\">\n   <button type=\"button\" class=\"").concat(swalClasses.close, "\"></button>\n   <ul class=\"").concat(swalClasses['progress-steps'], "\"></ul>\n   <div class=\"").concat(swalClasses.icon, "\"></div>\n   <img class=\"").concat(swalClasses.image, "\" />\n   <h2 class=\"").concat(swalClasses.title, "\" id=\"").concat(swalClasses.title, "\"></h2>\n   <div class=\"").concat(swalClasses['html-container'], "\" id=\"").concat(swalClasses['html-container'], "\"></div>\n   <input class=\"").concat(swalClasses.input, "\" />\n   <input type=\"file\" class=\"").concat(swalClasses.file, "\" />\n   <div class=\"").concat(swalClasses.range, "\">\n     <input type=\"range\" />\n     <output></output>\n   </div>\n   <select class=\"").concat(swalClasses.select, "\"></select>\n   <div class=\"").concat(swalClasses.radio, "\"></div>\n   <label for=\"").concat(swalClasses.checkbox, "\" class=\"").concat(swalClasses.checkbox, "\">\n     <input type=\"checkbox\" />\n     <span class=\"").concat(swalClasses.label, "\"></span>\n   </label>\n   <textarea class=\"").concat(swalClasses.textarea, "\"></textarea>\n   <div class=\"").concat(swalClasses['validation-message'], "\" id=\"").concat(swalClasses['validation-message'], "\"></div>\n   <div class=\"").concat(swalClasses.actions, "\">\n     <div class=\"").concat(swalClasses.loader, "\"></div>\n     <button type=\"button\" class=\"").concat(swalClasses.confirm, "\"></button>\n     <button type=\"button\" class=\"").concat(swalClasses.deny, "\"></button>\n     <button type=\"button\" class=\"").concat(swalClasses.cancel, "\"></button>\n   </div>\n   <div class=\"").concat(swalClasses.footer, "\"></div>\n   <div class=\"").concat(swalClasses['timer-progress-bar-container'], "\">\n     <div class=\"").concat(swalClasses['timer-progress-bar'], "\"></div>\n   </div>\n </div>\n").replace(/(^|\n)\s*/g, '');
 
@@ -70286,18 +69868,20 @@ module.exports = function (list, options) {
   };
 
   const resetValidationMessage = () => {
-    globalState.currentInstance.resetValidationMessage();
+    if (Swal.isVisible()) {
+      Swal.resetValidationMessage();
+    }
   };
 
   const addInputChangeListeners = () => {
     const popup = getPopup();
-    const input = getDirectChildByClass(popup, swalClasses.input);
-    const file = getDirectChildByClass(popup, swalClasses.file);
+    const input = getChildByClass(popup, swalClasses.input);
+    const file = getChildByClass(popup, swalClasses.file);
     const range = popup.querySelector(".".concat(swalClasses.range, " input"));
     const rangeOutput = popup.querySelector(".".concat(swalClasses.range, " output"));
-    const select = getDirectChildByClass(popup, swalClasses.select);
+    const select = getChildByClass(popup, swalClasses.select);
     const checkbox = popup.querySelector(".".concat(swalClasses.checkbox, " input"));
-    const textarea = getDirectChildByClass(popup, swalClasses.textarea);
+    const textarea = getChildByClass(popup, swalClasses.textarea);
     input.oninput = resetValidationMessage;
     file.onchange = resetValidationMessage;
     select.onchange = resetValidationMessage;
@@ -70362,34 +69946,22 @@ module.exports = function (list, options) {
     addInputChangeListeners();
   };
 
-  /**
-   * @param {HTMLElement | object | string} param
-   * @param {HTMLElement} target
-   */
-
   const parseHtmlToContainer = (param, target) => {
     // DOM element
     if (param instanceof HTMLElement) {
-      target.appendChild(param);
-    } // Object
-    else if (typeof param === 'object') {
-      handleObject(param, target);
-    } // Plain string
-    else if (param) {
+      target.appendChild(param); // Object
+    } else if (typeof param === 'object') {
+      handleObject(param, target); // Plain string
+    } else if (param) {
       setInnerHtml(target, param);
     }
   };
-  /**
-   * @param {object} param
-   * @param {HTMLElement} target
-   */
 
   const handleObject = (param, target) => {
     // JQuery element(s)
     if (param.jquery) {
-      handleJqueryElem(target, param);
-    } // For other objects use their string representation
-    else {
+      handleJqueryElem(target, param); // For other objects use their string representation
+    } else {
       setInnerHtml(target, param.toString());
     }
   };
@@ -70417,9 +69989,8 @@ module.exports = function (list, options) {
     const testEl = document.createElement('div');
     const transEndEventNames = {
       WebkitAnimation: 'webkitAnimationEnd',
-      // Chrome, Safari and Opera
-      animation: 'animationend' // Standard syntax
-
+      OAnimation: 'oAnimationEnd oanimationend',
+      animation: 'animationend'
     };
 
     for (const i in transEndEventNames) {
@@ -70444,7 +70015,10 @@ module.exports = function (list, options) {
 
   const renderActions = (instance, params) => {
     const actions = getActions();
-    const loader = getLoader(); // Actions (buttons) wrapper
+    const loader = getLoader();
+    const confirmButton = getConfirmButton();
+    const denyButton = getDenyButton();
+    const cancelButton = getCancelButton(); // Actions (buttons) wrapper
 
     if (!params.showConfirmButton && !params.showDenyButton && !params.showCancelButton) {
       hide(actions);
@@ -70453,18 +70027,7 @@ module.exports = function (list, options) {
     } // Custom class
 
 
-    applyCustomClass(actions, params, 'actions'); // Render all the buttons
-
-    renderButtons(actions, loader, params); // Loader
-
-    setInnerHtml(loader, params.loaderHtml);
-    applyCustomClass(loader, params, 'loader');
-  };
-
-  function renderButtons(actions, loader, params) {
-    const confirmButton = getConfirmButton();
-    const denyButton = getDenyButton();
-    const cancelButton = getCancelButton(); // Render buttons
+    applyCustomClass(actions, params, 'actions'); // Render buttons
 
     renderButton(confirmButton, 'confirm', params);
     renderButton(denyButton, 'deny', params);
@@ -70472,16 +70035,15 @@ module.exports = function (list, options) {
     handleButtonsStyling(confirmButton, denyButton, cancelButton, params);
 
     if (params.reverseButtons) {
-      if (params.toast) {
-        actions.insertBefore(cancelButton, confirmButton);
-        actions.insertBefore(denyButton, confirmButton);
-      } else {
-        actions.insertBefore(cancelButton, loader);
-        actions.insertBefore(denyButton, loader);
-        actions.insertBefore(confirmButton, loader);
-      }
-    }
-  }
+      actions.insertBefore(cancelButton, loader);
+      actions.insertBefore(denyButton, loader);
+      actions.insertBefore(confirmButton, loader);
+    } // Loader
+
+
+    setInnerHtml(loader, params.loaderHtml);
+    applyCustomClass(loader, params, 'loader');
+  };
 
   function handleButtonsStyling(confirmButton, denyButton, cancelButton, params) {
     if (!params.buttonsStyling) {
@@ -70560,7 +70122,7 @@ module.exports = function (list, options) {
   };
 
   /**
-   * This module contains `WeakMap`s for each effectively-"private  property" that a `Swal` has.
+   * This module containts `WeakMap`s for each effectively-"private  property" that a `Swal` has.
    * For example, to set the private property "foo" of `this` to "bar", you can `privateProps.foo.set(this, 'bar')`
    * This is the approach that Babel will probably take to implement private methods/fields
    *   https://github.com/tc39/proposal-private-methods
@@ -70582,7 +70144,7 @@ module.exports = function (list, options) {
     const rerender = !innerParams || params.input !== innerParams.input;
     inputTypes.forEach(inputType => {
       const inputClass = swalClasses[inputType];
-      const inputContainer = getDirectChildByClass(popup, inputClass); // set attributes
+      const inputContainer = getChildByClass(popup, inputClass); // set attributes
 
       setAttributes(inputType, params.inputAttributes); // set class
 
@@ -70670,7 +70232,7 @@ module.exports = function (list, options) {
 
   const getInputContainer = inputType => {
     const inputClass = swalClasses[inputType] ? swalClasses[inputType] : swalClasses.input;
-    return getDirectChildByClass(getPopup(), inputClass);
+    return getChildByClass(getPopup(), inputClass);
   };
 
   const renderInputType = {};
@@ -70726,9 +70288,8 @@ module.exports = function (list, options) {
   };
 
   renderInputType.checkbox = (checkboxContainer, params) => {
-    /** @type {HTMLInputElement} */
     const checkbox = getInput(getPopup(), 'checkbox');
-    checkbox.value = '1';
+    checkbox.value = 1;
     checkbox.id = swalClasses.checkbox;
     checkbox.checked = Boolean(params.inputValue);
     const label = checkboxContainer.querySelector('span');
@@ -70741,12 +70302,12 @@ module.exports = function (list, options) {
     setInputPlaceholder(textarea, params);
     setInputLabel(textarea, textarea, params);
 
-    const getMargin = el => parseInt(window.getComputedStyle(el).marginLeft) + parseInt(window.getComputedStyle(el).marginRight); // https://github.com/sweetalert2/sweetalert2/issues/2291
-
+    const getMargin = el => parseInt(window.getComputedStyle(el).marginLeft) + parseInt(window.getComputedStyle(el).marginRight);
 
     setTimeout(() => {
-      // https://github.com/sweetalert2/sweetalert2/issues/1699
+      // #2291
       if ('MutationObserver' in window) {
+        // #1699
         const initialPopupWidth = parseInt(window.getComputedStyle(getPopup()).width);
 
         const textareaResizeHandler = () => {
@@ -70774,13 +70335,11 @@ module.exports = function (list, options) {
 
     if (params.html) {
       parseHtmlToContainer(params.html, htmlContainer);
-      show(htmlContainer, 'block');
-    } // Content as plain text
-    else if (params.text) {
+      show(htmlContainer, 'block'); // Content as plain text
+    } else if (params.text) {
       htmlContainer.textContent = params.text;
-      show(htmlContainer, 'block');
-    } // No content
-    else {
+      show(htmlContainer, 'block'); // No content
+    } else {
       hide(htmlContainer);
     }
 
@@ -70847,13 +70406,13 @@ module.exports = function (list, options) {
 
     setColor(icon, params); // Success icon background color
 
-    adjustSuccessIconBackgroundColor(); // Custom class
+    adjustSuccessIconBackgoundColor(); // Custom class
 
     applyCustomClass(icon, params, 'icon');
   }; // Adjust success icon background color to match the popup background color
 
 
-  const adjustSuccessIconBackgroundColor = () => {
+  const adjustSuccessIconBackgoundColor = () => {
     const popup = getPopup();
     const popupBackgroundColor = window.getComputedStyle(popup).getPropertyValue('background-color');
     const successIconParts = popup.querySelectorAll('[class^=swal2-success-circular-line], .swal2-success-fix');
@@ -70863,18 +70422,15 @@ module.exports = function (list, options) {
     }
   };
 
-  const successIconHtml = "\n  <div class=\"swal2-success-circular-line-left\"></div>\n  <span class=\"swal2-success-line-tip\"></span> <span class=\"swal2-success-line-long\"></span>\n  <div class=\"swal2-success-ring\"></div> <div class=\"swal2-success-fix\"></div>\n  <div class=\"swal2-success-circular-line-right\"></div>\n";
-  const errorIconHtml = "\n  <span class=\"swal2-x-mark\">\n    <span class=\"swal2-x-mark-line-left\"></span>\n    <span class=\"swal2-x-mark-line-right\"></span>\n  </span>\n";
-
   const setContent = (icon, params) => {
     icon.textContent = '';
 
     if (params.iconHtml) {
       setInnerHtml(icon, iconContent(params.iconHtml));
     } else if (params.icon === 'success') {
-      setInnerHtml(icon, successIconHtml);
+      setInnerHtml(icon, "\n      <div class=\"swal2-success-circular-line-left\"></div>\n      <span class=\"swal2-success-line-tip\"></span> <span class=\"swal2-success-line-long\"></span>\n      <div class=\"swal2-success-ring\"></div> <div class=\"swal2-success-fix\"></div>\n      <div class=\"swal2-success-circular-line-right\"></div>\n    ");
     } else if (params.icon === 'error') {
-      setInnerHtml(icon, errorIconHtml);
+      setInnerHtml(icon, "\n      <span class=\"swal2-x-mark\">\n        <span class=\"swal2-x-mark-line-left\"></span>\n        <span class=\"swal2-x-mark-line-right\"></span>\n      </span>\n    ");
     } else {
       const defaultIconHtml = {
         question: '?',
@@ -70987,9 +70543,9 @@ module.exports = function (list, options) {
   const renderPopup = (instance, params) => {
     const container = getContainer();
     const popup = getPopup(); // Width
-    // https://github.com/sweetalert2/sweetalert2/issues/2170
 
     if (params.toast) {
+      // #2170
       applyNumericalStyle(container, 'width', params.width);
       popup.style.width = '100%';
       popup.insertBefore(getLoader(), getIcon());
@@ -70998,12 +70554,7 @@ module.exports = function (list, options) {
     } // Padding
 
 
-    applyNumericalStyle(popup, 'padding', params.padding); // Color
-
-    if (params.color) {
-      popup.style.color = params.color;
-    } // Background
-
+    applyNumericalStyle(popup, 'padding', params.padding); // Background
 
     if (params.background) {
       popup.style.background = params.background;
@@ -71055,584 +70606,62 @@ module.exports = function (list, options) {
     }
   };
 
-  const DismissReason = Object.freeze({
-    cancel: 'cancel',
-    backdrop: 'backdrop',
-    close: 'close',
-    esc: 'esc',
-    timer: 'timer'
-  });
-
-  // Adding aria-hidden="true" to elements outside of the active modal dialog ensures that
-  // elements not within the active modal dialog will not be surfaced if a user opens a screen
-  // reader’s list of elements (headings, form controls, landmarks, etc.) in the document.
-
-  const setAriaHidden = () => {
-    const bodyChildren = toArray(document.body.children);
-    bodyChildren.forEach(el => {
-      if (el === getContainer() || el.contains(getContainer())) {
-        return;
-      }
-
-      if (el.hasAttribute('aria-hidden')) {
-        el.setAttribute('data-previous-aria-hidden', el.getAttribute('aria-hidden'));
-      }
-
-      el.setAttribute('aria-hidden', 'true');
-    });
-  };
-  const unsetAriaHidden = () => {
-    const bodyChildren = toArray(document.body.children);
-    bodyChildren.forEach(el => {
-      if (el.hasAttribute('data-previous-aria-hidden')) {
-        el.setAttribute('aria-hidden', el.getAttribute('data-previous-aria-hidden'));
-        el.removeAttribute('data-previous-aria-hidden');
-      } else {
-        el.removeAttribute('aria-hidden');
-      }
-    });
-  };
-
-  const swalStringParams = ['swal-title', 'swal-html', 'swal-footer'];
-  const getTemplateParams = params => {
-    const template = typeof params.template === 'string' ? document.querySelector(params.template) : params.template;
-
-    if (!template) {
-      return {};
-    }
-    /** @type {DocumentFragment} */
-
-
-    const templateContent = template.content;
-    showWarningsForElements(templateContent);
-    const result = Object.assign(getSwalParams(templateContent), getSwalButtons(templateContent), getSwalImage(templateContent), getSwalIcon(templateContent), getSwalInput(templateContent), getSwalStringParams(templateContent, swalStringParams));
-    return result;
-  };
-  /**
-   * @param {DocumentFragment} templateContent
+  /*
+   * Global function to determine if SweetAlert2 popup is shown
    */
 
-  const getSwalParams = templateContent => {
-    const result = {};
-    toArray(templateContent.querySelectorAll('swal-param')).forEach(param => {
-      showWarningsForAttributes(param, ['name', 'value']);
-      const paramName = param.getAttribute('name');
-      const value = param.getAttribute('value');
-
-      if (typeof defaultParams[paramName] === 'boolean' && value === 'false') {
-        result[paramName] = false;
-      }
-
-      if (typeof defaultParams[paramName] === 'object') {
-        result[paramName] = JSON.parse(value);
-      }
-    });
-    return result;
+  const isVisible$1 = () => {
+    return isVisible(getPopup());
   };
-  /**
-   * @param {DocumentFragment} templateContent
+  /*
+   * Global function to click 'Confirm' button
    */
 
-
-  const getSwalButtons = templateContent => {
-    const result = {};
-    toArray(templateContent.querySelectorAll('swal-button')).forEach(button => {
-      showWarningsForAttributes(button, ['type', 'color', 'aria-label']);
-      const type = button.getAttribute('type');
-      result["".concat(type, "ButtonText")] = button.innerHTML;
-      result["show".concat(capitalizeFirstLetter(type), "Button")] = true;
-
-      if (button.hasAttribute('color')) {
-        result["".concat(type, "ButtonColor")] = button.getAttribute('color');
-      }
-
-      if (button.hasAttribute('aria-label')) {
-        result["".concat(type, "ButtonAriaLabel")] = button.getAttribute('aria-label');
-      }
-    });
-    return result;
-  };
-  /**
-   * @param {DocumentFragment} templateContent
+  const clickConfirm = () => getConfirmButton() && getConfirmButton().click();
+  /*
+   * Global function to click 'Deny' button
    */
 
-
-  const getSwalImage = templateContent => {
-    const result = {};
-    /** @type {HTMLElement} */
-
-    const image = templateContent.querySelector('swal-image');
-
-    if (image) {
-      showWarningsForAttributes(image, ['src', 'width', 'height', 'alt']);
-
-      if (image.hasAttribute('src')) {
-        result.imageUrl = image.getAttribute('src');
-      }
-
-      if (image.hasAttribute('width')) {
-        result.imageWidth = image.getAttribute('width');
-      }
-
-      if (image.hasAttribute('height')) {
-        result.imageHeight = image.getAttribute('height');
-      }
-
-      if (image.hasAttribute('alt')) {
-        result.imageAlt = image.getAttribute('alt');
-      }
-    }
-
-    return result;
-  };
-  /**
-   * @param {DocumentFragment} templateContent
+  const clickDeny = () => getDenyButton() && getDenyButton().click();
+  /*
+   * Global function to click 'Cancel' button
    */
 
+  const clickCancel = () => getCancelButton() && getCancelButton().click();
 
-  const getSwalIcon = templateContent => {
-    const result = {};
-    /** @type {HTMLElement} */
-
-    const icon = templateContent.querySelector('swal-icon');
-
-    if (icon) {
-      showWarningsForAttributes(icon, ['type', 'color']);
-
-      if (icon.hasAttribute('type')) {
-        result.icon = icon.getAttribute('type');
-      }
-
-      if (icon.hasAttribute('color')) {
-        result.iconColor = icon.getAttribute('color');
-      }
-
-      result.iconHtml = icon.innerHTML;
-    }
-
-    return result;
-  };
-  /**
-   * @param {DocumentFragment} templateContent
-   */
-
-
-  const getSwalInput = templateContent => {
-    const result = {};
-    /** @type {HTMLElement} */
-
-    const input = templateContent.querySelector('swal-input');
-
-    if (input) {
-      showWarningsForAttributes(input, ['type', 'label', 'placeholder', 'value']);
-      result.input = input.getAttribute('type') || 'text';
-
-      if (input.hasAttribute('label')) {
-        result.inputLabel = input.getAttribute('label');
-      }
-
-      if (input.hasAttribute('placeholder')) {
-        result.inputPlaceholder = input.getAttribute('placeholder');
-      }
-
-      if (input.hasAttribute('value')) {
-        result.inputValue = input.getAttribute('value');
-      }
-    }
-
-    const inputOptions = templateContent.querySelectorAll('swal-input-option');
-
-    if (inputOptions.length) {
-      result.inputOptions = {};
-      toArray(inputOptions).forEach(option => {
-        showWarningsForAttributes(option, ['value']);
-        const optionValue = option.getAttribute('value');
-        const optionName = option.innerHTML;
-        result.inputOptions[optionValue] = optionName;
-      });
-    }
-
-    return result;
-  };
-  /**
-   * @param {DocumentFragment} templateContent
-   * @param {string[]} paramNames
-   */
-
-
-  const getSwalStringParams = (templateContent, paramNames) => {
-    const result = {};
-
-    for (const i in paramNames) {
-      const paramName = paramNames[i];
-      /** @type {HTMLElement} */
-
-      const tag = templateContent.querySelector(paramName);
-
-      if (tag) {
-        showWarningsForAttributes(tag, []);
-        result[paramName.replace(/^swal-/, '')] = tag.innerHTML.trim();
-      }
-    }
-
-    return result;
-  };
-  /**
-   * @param {DocumentFragment} templateContent
-   */
-
-
-  const showWarningsForElements = templateContent => {
-    const allowedElements = swalStringParams.concat(['swal-param', 'swal-button', 'swal-image', 'swal-icon', 'swal-input', 'swal-input-option']);
-    toArray(templateContent.children).forEach(el => {
-      const tagName = el.tagName.toLowerCase();
-
-      if (allowedElements.indexOf(tagName) === -1) {
-        warn("Unrecognized element <".concat(tagName, ">"));
-      }
-    });
-  };
-  /**
-   * @param {HTMLElement} el
-   * @param {string[]} allowedAttributes
-   */
-
-
-  const showWarningsForAttributes = (el, allowedAttributes) => {
-    toArray(el.attributes).forEach(attribute => {
-      if (allowedAttributes.indexOf(attribute.name) === -1) {
-        warn(["Unrecognized attribute \"".concat(attribute.name, "\" on <").concat(el.tagName.toLowerCase(), ">."), "".concat(allowedAttributes.length ? "Allowed attributes are: ".concat(allowedAttributes.join(', ')) : 'To set the value, use HTML within the element.')]);
-      }
-    });
-  };
-
-  var defaultInputValidators = {
-    email: (string, validationMessage) => {
-      return /^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9-]{2,24}$/.test(string) ? Promise.resolve() : Promise.resolve(validationMessage || 'Invalid email address');
-    },
-    url: (string, validationMessage) => {
-      // taken from https://stackoverflow.com/a/3809435 with a small change from #1306 and #2013
-      return /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-z]{2,63}\b([-a-zA-Z0-9@:%_+.~#?&/=]*)$/.test(string) ? Promise.resolve() : Promise.resolve(validationMessage || 'Invalid URL');
-    }
-  };
-
-  function setDefaultInputValidators(params) {
-    // Use default `inputValidator` for supported input types if not provided
-    if (!params.inputValidator) {
-      Object.keys(defaultInputValidators).forEach(key => {
-        if (params.input === key) {
-          params.inputValidator = defaultInputValidators[key];
-        }
-      });
-    }
+  function fire(...args) {
+    const Swal = this;
+    return new Swal(...args);
   }
 
-  function validateCustomTargetElement(params) {
-    // Determine if the custom target element is valid
-    if (!params.target || typeof params.target === 'string' && !document.querySelector(params.target) || typeof params.target !== 'string' && !params.target.appendChild) {
-      warn('Target parameter is not valid, defaulting to "body"');
-      params.target = 'body';
+  /**
+   * Returns an extended version of `Swal` containing `params` as defaults.
+   * Useful for reusing Swal configuration.
+   *
+   * For example:
+   *
+   * Before:
+   * const textPromptOptions = { input: 'text', showCancelButton: true }
+   * const {value: firstName} = await Swal.fire({ ...textPromptOptions, title: 'What is your first name?' })
+   * const {value: lastName} = await Swal.fire({ ...textPromptOptions, title: 'What is your last name?' })
+   *
+   * After:
+   * const TextPrompt = Swal.mixin({ input: 'text', showCancelButton: true })
+   * const {value: firstName} = await TextPrompt('What is your first name?')
+   * const {value: lastName} = await TextPrompt('What is your last name?')
+   *
+   * @param mixinParams
+   */
+  function mixin(mixinParams) {
+    class MixinSwal extends this {
+      _main(params, priorityMixinParams) {
+        return super._main(params, Object.assign({}, mixinParams, priorityMixinParams));
+      }
+
     }
+
+    return MixinSwal;
   }
-  /**
-   * Set type, text and actions on popup
-   *
-   * @param params
-   */
-
-
-  function setParameters(params) {
-    setDefaultInputValidators(params); // showLoaderOnConfirm && preConfirm
-
-    if (params.showLoaderOnConfirm && !params.preConfirm) {
-      warn('showLoaderOnConfirm is set to true, but preConfirm is not defined.\n' + 'showLoaderOnConfirm should be used together with preConfirm, see usage example:\n' + 'https://sweetalert2.github.io/#ajax-request');
-    }
-
-    validateCustomTargetElement(params); // Replace newlines with <br> in title
-
-    if (typeof params.title === 'string') {
-      params.title = params.title.split('\n').join('<br />');
-    }
-
-    init(params);
-  }
-
-  class Timer {
-    constructor(callback, delay) {
-      this.callback = callback;
-      this.remaining = delay;
-      this.running = false;
-      this.start();
-    }
-
-    start() {
-      if (!this.running) {
-        this.running = true;
-        this.started = new Date();
-        this.id = setTimeout(this.callback, this.remaining);
-      }
-
-      return this.remaining;
-    }
-
-    stop() {
-      if (this.running) {
-        this.running = false;
-        clearTimeout(this.id);
-        this.remaining -= new Date().getTime() - this.started.getTime();
-      }
-
-      return this.remaining;
-    }
-
-    increase(n) {
-      const running = this.running;
-
-      if (running) {
-        this.stop();
-      }
-
-      this.remaining += n;
-
-      if (running) {
-        this.start();
-      }
-
-      return this.remaining;
-    }
-
-    getTimerLeft() {
-      if (this.running) {
-        this.stop();
-        this.start();
-      }
-
-      return this.remaining;
-    }
-
-    isRunning() {
-      return this.running;
-    }
-
-  }
-
-  const fixScrollbar = () => {
-    // for queues, do not do this more than once
-    if (states.previousBodyPadding !== null) {
-      return;
-    } // if the body has overflow
-
-
-    if (document.body.scrollHeight > window.innerHeight) {
-      // add padding so the content doesn't shift after removal of scrollbar
-      states.previousBodyPadding = parseInt(window.getComputedStyle(document.body).getPropertyValue('padding-right'));
-      document.body.style.paddingRight = "".concat(states.previousBodyPadding + measureScrollbar(), "px");
-    }
-  };
-  const undoScrollbar = () => {
-    if (states.previousBodyPadding !== null) {
-      document.body.style.paddingRight = "".concat(states.previousBodyPadding, "px");
-      states.previousBodyPadding = null;
-    }
-  };
-
-  /* istanbul ignore file */
-
-  const iOSfix = () => {
-    const iOS = // @ts-ignore
-    /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream || navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
-
-    if (iOS && !hasClass(document.body, swalClasses.iosfix)) {
-      const offset = document.body.scrollTop;
-      document.body.style.top = "".concat(offset * -1, "px");
-      addClass(document.body, swalClasses.iosfix);
-      lockBodyScroll();
-      addBottomPaddingForTallPopups();
-    }
-  };
-  /**
-   * https://github.com/sweetalert2/sweetalert2/issues/1948
-   */
-
-  const addBottomPaddingForTallPopups = () => {
-    const ua = navigator.userAgent;
-    const iOS = !!ua.match(/iPad/i) || !!ua.match(/iPhone/i);
-    const webkit = !!ua.match(/WebKit/i);
-    const iOSSafari = iOS && webkit && !ua.match(/CriOS/i);
-
-    if (iOSSafari) {
-      const bottomPanelHeight = 44;
-
-      if (getPopup().scrollHeight > window.innerHeight - bottomPanelHeight) {
-        getContainer().style.paddingBottom = "".concat(bottomPanelHeight, "px");
-      }
-    }
-  };
-  /**
-   * https://github.com/sweetalert2/sweetalert2/issues/1246
-   */
-
-
-  const lockBodyScroll = () => {
-    const container = getContainer();
-    let preventTouchMove;
-
-    container.ontouchstart = e => {
-      preventTouchMove = shouldPreventTouchMove(e);
-    };
-
-    container.ontouchmove = e => {
-      if (preventTouchMove) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    };
-  };
-
-  const shouldPreventTouchMove = event => {
-    const target = event.target;
-    const container = getContainer();
-
-    if (isStylus(event) || isZoom(event)) {
-      return false;
-    }
-
-    if (target === container) {
-      return true;
-    }
-
-    if (!isScrollable(container) && target.tagName !== 'INPUT' && // #1603
-    target.tagName !== 'TEXTAREA' && // #2266
-    !(isScrollable(getHtmlContainer()) && // #1944
-    getHtmlContainer().contains(target))) {
-      return true;
-    }
-
-    return false;
-  };
-  /**
-   * https://github.com/sweetalert2/sweetalert2/issues/1786
-   *
-   * @param {*} event
-   * @returns {boolean}
-   */
-
-
-  const isStylus = event => {
-    return event.touches && event.touches.length && event.touches[0].touchType === 'stylus';
-  };
-  /**
-   * https://github.com/sweetalert2/sweetalert2/issues/1891
-   *
-   * @param {TouchEvent} event
-   * @returns {boolean}
-   */
-
-
-  const isZoom = event => {
-    return event.touches && event.touches.length > 1;
-  };
-
-  const undoIOSfix = () => {
-    if (hasClass(document.body, swalClasses.iosfix)) {
-      const offset = parseInt(document.body.style.top, 10);
-      removeClass(document.body, swalClasses.iosfix);
-      document.body.style.top = '';
-      document.body.scrollTop = offset * -1;
-    }
-  };
-
-  const SHOW_CLASS_TIMEOUT = 10;
-  /**
-   * Open popup, add necessary classes and styles, fix scrollbar
-   *
-   * @param params
-   */
-
-  const openPopup = params => {
-    const container = getContainer();
-    const popup = getPopup();
-
-    if (typeof params.willOpen === 'function') {
-      params.willOpen(popup);
-    }
-
-    const bodyStyles = window.getComputedStyle(document.body);
-    const initialBodyOverflow = bodyStyles.overflowY;
-    addClasses$1(container, popup, params); // scrolling is 'hidden' until animation is done, after that 'auto'
-
-    setTimeout(() => {
-      setScrollingVisibility(container, popup);
-    }, SHOW_CLASS_TIMEOUT);
-
-    if (isModal()) {
-      fixScrollContainer(container, params.scrollbarPadding, initialBodyOverflow);
-      setAriaHidden();
-    }
-
-    if (!isToast() && !globalState.previousActiveElement) {
-      globalState.previousActiveElement = document.activeElement;
-    }
-
-    if (typeof params.didOpen === 'function') {
-      setTimeout(() => params.didOpen(popup));
-    }
-
-    removeClass(container, swalClasses['no-transition']);
-  };
-
-  const swalOpenAnimationFinished = event => {
-    const popup = getPopup();
-
-    if (event.target !== popup) {
-      return;
-    }
-
-    const container = getContainer();
-    popup.removeEventListener(animationEndEvent, swalOpenAnimationFinished);
-    container.style.overflowY = 'auto';
-  };
-
-  const setScrollingVisibility = (container, popup) => {
-    if (animationEndEvent && hasCssAnimation(popup)) {
-      container.style.overflowY = 'hidden';
-      popup.addEventListener(animationEndEvent, swalOpenAnimationFinished);
-    } else {
-      container.style.overflowY = 'auto';
-    }
-  };
-
-  const fixScrollContainer = (container, scrollbarPadding, initialBodyOverflow) => {
-    iOSfix();
-
-    if (scrollbarPadding && initialBodyOverflow !== 'hidden') {
-      fixScrollbar();
-    } // sweetalert2/issues/1247
-
-
-    setTimeout(() => {
-      container.scrollTop = 0;
-    });
-  };
-
-  const addClasses$1 = (container, popup, params) => {
-    addClass(container, params.showClass.backdrop); // this workaround with opacity is needed for https://github.com/sweetalert2/sweetalert2/issues/2059
-
-    popup.style.setProperty('opacity', '0', 'important');
-    show(popup, 'grid');
-    setTimeout(() => {
-      // Animate popup right after showing it
-      addClass(popup, params.showClass.popup); // and remove the opacity workaround
-
-      popup.style.removeProperty('opacity');
-    }, SHOW_CLASS_TIMEOUT); // 10ms in order to fix #2062
-
-    addClass([document.documentElement, document.body], swalClasses.shown);
-
-    if (params.heightAuto && params.backdrop && !params.toast) {
-      addClass([document.documentElement, document.body], swalClasses['height-auto']);
-    }
-  };
 
   /**
    * Shows loader (spinner), this is useful with AJAX requests.
@@ -71643,7 +70672,7 @@ module.exports = function (list, options) {
     let popup = getPopup();
 
     if (!popup) {
-      new Swal(); // eslint-disable-line no-new
+      Swal.fire();
     }
 
     popup = getPopup();
@@ -71680,178 +70709,322 @@ module.exports = function (list, options) {
     addClass([popup, actions], swalClasses.loading);
   };
 
-  const handleInputOptionsAndValue = (instance, params) => {
-    if (params.input === 'select' || params.input === 'radio') {
-      handleInputOptions(instance, params);
-    } else if (['text', 'email', 'number', 'tel', 'textarea'].includes(params.input) && (hasToPromiseFn(params.inputValue) || isPromise(params.inputValue))) {
-      showLoading(getConfirmButton());
-      handleInputValue(instance, params);
+  const RESTORE_FOCUS_TIMEOUT = 100;
+
+  const globalState = {};
+
+  const focusPreviousActiveElement = () => {
+    if (globalState.previousActiveElement && globalState.previousActiveElement.focus) {
+      globalState.previousActiveElement.focus();
+      globalState.previousActiveElement = null;
+    } else if (document.body) {
+      document.body.focus();
     }
-  };
-  const getInputValue = (instance, innerParams) => {
-    const input = instance.getInput();
+  }; // Restore previous active (focused) element
 
-    if (!input) {
-      return null;
-    }
 
-    switch (innerParams.input) {
-      case 'checkbox':
-        return getCheckboxValue(input);
+  const restoreActiveElement = returnFocus => {
+    return new Promise(resolve => {
+      if (!returnFocus) {
+        return resolve();
+      }
 
-      case 'radio':
-        return getRadioValue(input);
+      const x = window.scrollX;
+      const y = window.scrollY;
+      globalState.restoreFocusTimeout = setTimeout(() => {
+        focusPreviousActiveElement();
+        resolve();
+      }, RESTORE_FOCUS_TIMEOUT); // issues/900
 
-      case 'file':
-        return getFileValue(input);
-
-      default:
-        return innerParams.inputAutoTrim ? input.value.trim() : input.value;
-    }
-  };
-
-  const getCheckboxValue = input => input.checked ? 1 : 0;
-
-  const getRadioValue = input => input.checked ? input.value : null;
-
-  const getFileValue = input => input.files.length ? input.getAttribute('multiple') !== null ? input.files : input.files[0] : null;
-
-  const handleInputOptions = (instance, params) => {
-    const popup = getPopup();
-
-    const processInputOptions = inputOptions => populateInputOptions[params.input](popup, formatInputOptions(inputOptions), params);
-
-    if (hasToPromiseFn(params.inputOptions) || isPromise(params.inputOptions)) {
-      showLoading(getConfirmButton());
-      asPromise(params.inputOptions).then(inputOptions => {
-        instance.hideLoading();
-        processInputOptions(inputOptions);
-      });
-    } else if (typeof params.inputOptions === 'object') {
-      processInputOptions(params.inputOptions);
-    } else {
-      error("Unexpected type of inputOptions! Expected object, Map or Promise, got ".concat(typeof params.inputOptions));
-    }
-  };
-
-  const handleInputValue = (instance, params) => {
-    const input = instance.getInput();
-    hide(input);
-    asPromise(params.inputValue).then(inputValue => {
-      input.value = params.input === 'number' ? parseFloat(inputValue) || 0 : "".concat(inputValue);
-      show(input);
-      input.focus();
-      instance.hideLoading();
-    }).catch(err => {
-      error("Error in inputValue promise: ".concat(err));
-      input.value = '';
-      show(input);
-      input.focus();
-      instance.hideLoading();
+      window.scrollTo(x, y);
     });
   };
 
-  const populateInputOptions = {
-    select: (popup, inputOptions, params) => {
-      const select = getDirectChildByClass(popup, swalClasses.select);
+  /**
+   * If `timer` parameter is set, returns number of milliseconds of timer remained.
+   * Otherwise, returns undefined.
+   */
 
-      const renderOption = (parent, optionLabel, optionValue) => {
-        const option = document.createElement('option');
-        option.value = optionValue;
-        setInnerHtml(option, optionLabel);
-        option.selected = isSelected(optionValue, params.inputValue);
-        parent.appendChild(option);
-      };
+  const getTimerLeft = () => {
+    return globalState.timeout && globalState.timeout.getTimerLeft();
+  };
+  /**
+   * Stop timer. Returns number of milliseconds of timer remained.
+   * If `timer` parameter isn't set, returns undefined.
+   */
 
-      inputOptions.forEach(inputOption => {
-        const optionValue = inputOption[0];
-        const optionLabel = inputOption[1]; // <optgroup> spec:
-        // https://www.w3.org/TR/html401/interact/forms.html#h-17.6
-        // "...all OPTGROUP elements must be specified directly within a SELECT element (i.e., groups may not be nested)..."
-        // check whether this is a <optgroup>
-
-        if (Array.isArray(optionLabel)) {
-          // if it is an array, then it is an <optgroup>
-          const optgroup = document.createElement('optgroup');
-          optgroup.label = optionValue;
-          optgroup.disabled = false; // not configurable for now
-
-          select.appendChild(optgroup);
-          optionLabel.forEach(o => renderOption(optgroup, o[1], o[0]));
-        } else {
-          // case of <option>
-          renderOption(select, optionLabel, optionValue);
-        }
-      });
-      select.focus();
-    },
-    radio: (popup, inputOptions, params) => {
-      const radio = getDirectChildByClass(popup, swalClasses.radio);
-      inputOptions.forEach(inputOption => {
-        const radioValue = inputOption[0];
-        const radioLabel = inputOption[1];
-        const radioInput = document.createElement('input');
-        const radioLabelElement = document.createElement('label');
-        radioInput.type = 'radio';
-        radioInput.name = swalClasses.radio;
-        radioInput.value = radioValue;
-
-        if (isSelected(radioValue, params.inputValue)) {
-          radioInput.checked = true;
-        }
-
-        const label = document.createElement('span');
-        setInnerHtml(label, radioLabel);
-        label.className = swalClasses.label;
-        radioLabelElement.appendChild(radioInput);
-        radioLabelElement.appendChild(label);
-        radio.appendChild(radioLabelElement);
-      });
-      const radios = radio.querySelectorAll('input');
-
-      if (radios.length) {
-        radios[0].focus();
-      }
+  const stopTimer = () => {
+    if (globalState.timeout) {
+      stopTimerProgressBar();
+      return globalState.timeout.stop();
     }
   };
   /**
-   * Converts `inputOptions` into an array of `[value, label]`s
-   * @param inputOptions
+   * Resume timer. Returns number of milliseconds of timer remained.
+   * If `timer` parameter isn't set, returns undefined.
    */
 
-  const formatInputOptions = inputOptions => {
-    const result = [];
+  const resumeTimer = () => {
+    if (globalState.timeout) {
+      const remaining = globalState.timeout.start();
+      animateTimerProgressBar(remaining);
+      return remaining;
+    }
+  };
+  /**
+   * Resume timer. Returns number of milliseconds of timer remained.
+   * If `timer` parameter isn't set, returns undefined.
+   */
 
-    if (typeof Map !== 'undefined' && inputOptions instanceof Map) {
-      inputOptions.forEach((value, key) => {
-        let valueFormatted = value;
+  const toggleTimer = () => {
+    const timer = globalState.timeout;
+    return timer && (timer.running ? stopTimer() : resumeTimer());
+  };
+  /**
+   * Increase timer. Returns number of milliseconds of an updated timer.
+   * If `timer` parameter isn't set, returns undefined.
+   */
 
-        if (typeof valueFormatted === 'object') {
-          // case of <optgroup>
-          valueFormatted = formatInputOptions(valueFormatted);
+  const increaseTimer = n => {
+    if (globalState.timeout) {
+      const remaining = globalState.timeout.increase(n);
+      animateTimerProgressBar(remaining, true);
+      return remaining;
+    }
+  };
+  /**
+   * Check if timer is running. Returns true if timer is running
+   * or false if timer is paused or stopped.
+   * If `timer` parameter isn't set, returns undefined
+   */
+
+  const isTimerRunning = () => {
+    return globalState.timeout && globalState.timeout.isRunning();
+  };
+
+  let bodyClickListenerAdded = false;
+  const clickHandlers = {};
+  function bindClickHandler(attr = 'data-swal-template') {
+    clickHandlers[attr] = this;
+
+    if (!bodyClickListenerAdded) {
+      document.body.addEventListener('click', bodyClickListener);
+      bodyClickListenerAdded = true;
+    }
+  }
+
+  const bodyClickListener = event => {
+    for (let el = event.target; el && el !== document; el = el.parentNode) {
+      for (const attr in clickHandlers) {
+        const template = el.getAttribute(attr);
+
+        if (template) {
+          clickHandlers[attr].fire({
+            template
+          });
+          return;
         }
+      }
+    }
+  };
 
-        result.push([key, valueFormatted]);
-      });
-    } else {
-      Object.keys(inputOptions).forEach(key => {
-        let valueFormatted = inputOptions[key];
+  const defaultParams = {
+    title: '',
+    titleText: '',
+    text: '',
+    html: '',
+    footer: '',
+    icon: undefined,
+    iconColor: undefined,
+    iconHtml: undefined,
+    template: undefined,
+    toast: false,
+    showClass: {
+      popup: 'swal2-show',
+      backdrop: 'swal2-backdrop-show',
+      icon: 'swal2-icon-show'
+    },
+    hideClass: {
+      popup: 'swal2-hide',
+      backdrop: 'swal2-backdrop-hide',
+      icon: 'swal2-icon-hide'
+    },
+    customClass: {},
+    target: 'body',
+    backdrop: true,
+    heightAuto: true,
+    allowOutsideClick: true,
+    allowEscapeKey: true,
+    allowEnterKey: true,
+    stopKeydownPropagation: true,
+    keydownListenerCapture: false,
+    showConfirmButton: true,
+    showDenyButton: false,
+    showCancelButton: false,
+    preConfirm: undefined,
+    preDeny: undefined,
+    confirmButtonText: 'OK',
+    confirmButtonAriaLabel: '',
+    confirmButtonColor: undefined,
+    denyButtonText: 'No',
+    denyButtonAriaLabel: '',
+    denyButtonColor: undefined,
+    cancelButtonText: 'Cancel',
+    cancelButtonAriaLabel: '',
+    cancelButtonColor: undefined,
+    buttonsStyling: true,
+    reverseButtons: false,
+    focusConfirm: true,
+    focusDeny: false,
+    focusCancel: false,
+    returnFocus: true,
+    showCloseButton: false,
+    closeButtonHtml: '&times;',
+    closeButtonAriaLabel: 'Close this dialog',
+    loaderHtml: '',
+    showLoaderOnConfirm: false,
+    showLoaderOnDeny: false,
+    imageUrl: undefined,
+    imageWidth: undefined,
+    imageHeight: undefined,
+    imageAlt: '',
+    timer: undefined,
+    timerProgressBar: false,
+    width: undefined,
+    padding: undefined,
+    background: undefined,
+    input: undefined,
+    inputPlaceholder: '',
+    inputLabel: '',
+    inputValue: '',
+    inputOptions: {},
+    inputAutoTrim: true,
+    inputAttributes: {},
+    inputValidator: undefined,
+    returnInputValueOnDeny: false,
+    validationMessage: undefined,
+    grow: false,
+    position: 'center',
+    progressSteps: [],
+    currentProgressStep: undefined,
+    progressStepsDistance: undefined,
+    willOpen: undefined,
+    didOpen: undefined,
+    didRender: undefined,
+    willClose: undefined,
+    didClose: undefined,
+    didDestroy: undefined,
+    scrollbarPadding: true
+  };
+  const updatableParams = ['allowEscapeKey', 'allowOutsideClick', 'background', 'buttonsStyling', 'cancelButtonAriaLabel', 'cancelButtonColor', 'cancelButtonText', 'closeButtonAriaLabel', 'closeButtonHtml', 'confirmButtonAriaLabel', 'confirmButtonColor', 'confirmButtonText', 'currentProgressStep', 'customClass', 'denyButtonAriaLabel', 'denyButtonColor', 'denyButtonText', 'didClose', 'didDestroy', 'footer', 'hideClass', 'html', 'icon', 'iconColor', 'iconHtml', 'imageAlt', 'imageHeight', 'imageUrl', 'imageWidth', 'preConfirm', 'preDeny', 'progressSteps', 'returnFocus', 'reverseButtons', 'showCancelButton', 'showCloseButton', 'showConfirmButton', 'showDenyButton', 'text', 'title', 'titleText', 'willClose'];
+  const deprecatedParams = {};
+  const toastIncompatibleParams = ['allowOutsideClick', 'allowEnterKey', 'backdrop', 'focusConfirm', 'focusDeny', 'focusCancel', 'returnFocus', 'heightAuto', 'keydownListenerCapture'];
+  /**
+   * Is valid parameter
+   * @param {String} paramName
+   */
 
-        if (typeof valueFormatted === 'object') {
-          // case of <optgroup>
-          valueFormatted = formatInputOptions(valueFormatted);
-        }
+  const isValidParameter = paramName => {
+    return Object.prototype.hasOwnProperty.call(defaultParams, paramName);
+  };
+  /**
+   * Is valid parameter for Swal.update() method
+   * @param {String} paramName
+   */
 
-        result.push([key, valueFormatted]);
-      });
+  const isUpdatableParameter = paramName => {
+    return updatableParams.indexOf(paramName) !== -1;
+  };
+  /**
+   * Is deprecated parameter
+   * @param {String} paramName
+   */
+
+  const isDeprecatedParameter = paramName => {
+    return deprecatedParams[paramName];
+  };
+
+  const checkIfParamIsValid = param => {
+    if (!isValidParameter(param)) {
+      warn("Unknown parameter \"".concat(param, "\""));
+    }
+  };
+
+  const checkIfToastParamIsValid = param => {
+    if (toastIncompatibleParams.includes(param)) {
+      warn("The parameter \"".concat(param, "\" is incompatible with toasts"));
+    }
+  };
+
+  const checkIfParamIsDeprecated = param => {
+    if (isDeprecatedParameter(param)) {
+      warnAboutDeprecation(param, isDeprecatedParameter(param));
+    }
+  };
+  /**
+   * Show relevant warnings for given params
+   *
+   * @param params
+   */
+
+
+  const showWarningsForParams = params => {
+    if (!params.backdrop && params.allowOutsideClick) {
+      warn('"allowOutsideClick" parameter requires `backdrop` parameter to be set to `true`');
     }
 
-    return result;
+    for (const param in params) {
+      checkIfParamIsValid(param);
+
+      if (params.toast) {
+        checkIfToastParamIsValid(param);
+      }
+
+      checkIfParamIsDeprecated(param);
+    }
   };
 
-  const isSelected = (optionValue, inputValue) => {
-    return inputValue && inputValue.toString() === optionValue.toString();
-  };
+
+
+  var staticMethods = /*#__PURE__*/Object.freeze({
+    isValidParameter: isValidParameter,
+    isUpdatableParameter: isUpdatableParameter,
+    isDeprecatedParameter: isDeprecatedParameter,
+    argsToParams: argsToParams,
+    isVisible: isVisible$1,
+    clickConfirm: clickConfirm,
+    clickDeny: clickDeny,
+    clickCancel: clickCancel,
+    getContainer: getContainer,
+    getPopup: getPopup,
+    getTitle: getTitle,
+    getHtmlContainer: getHtmlContainer,
+    getImage: getImage,
+    getIcon: getIcon,
+    getInputLabel: getInputLabel,
+    getCloseButton: getCloseButton,
+    getActions: getActions,
+    getConfirmButton: getConfirmButton,
+    getDenyButton: getDenyButton,
+    getCancelButton: getCancelButton,
+    getLoader: getLoader,
+    getFooter: getFooter,
+    getTimerProgressBar: getTimerProgressBar,
+    getFocusableElements: getFocusableElements,
+    getValidationMessage: getValidationMessage,
+    isLoading: isLoading,
+    fire: fire,
+    mixin: mixin,
+    showLoading: showLoading,
+    enableLoading: showLoading,
+    getTimerLeft: getTimerLeft,
+    stopTimer: stopTimer,
+    resumeTimer: resumeTimer,
+    toggleTimer: toggleTimer,
+    increaseTimer: increaseTimer,
+    isTimerRunning: isTimerRunning,
+    bindClickHandler: bindClickHandler
+  });
 
   /**
    * Hides loader and shows back the button which was hidden by .showLoading()
@@ -71894,11 +71067,6 @@ module.exports = function (list, options) {
     }
   };
 
-  /**
-   * Gets the input DOM node, this method works with input parameter.
-   * @returns {HTMLElement | null}
-   */
-
   function getInput$1(instance) {
     const innerParams = privateProps.innerParams.get(instance || this);
     const domCache = privateProps.domCache.get(instance || this);
@@ -71910,8 +71078,142 @@ module.exports = function (list, options) {
     return getInput(domCache.popup, innerParams.input);
   }
 
+  const fixScrollbar = () => {
+    // for queues, do not do this more than once
+    if (states.previousBodyPadding !== null) {
+      return;
+    } // if the body has overflow
+
+
+    if (document.body.scrollHeight > window.innerHeight) {
+      // add padding so the content doesn't shift after removal of scrollbar
+      states.previousBodyPadding = parseInt(window.getComputedStyle(document.body).getPropertyValue('padding-right'));
+      document.body.style.paddingRight = "".concat(states.previousBodyPadding + measureScrollbar(), "px");
+    }
+  };
+  const undoScrollbar = () => {
+    if (states.previousBodyPadding !== null) {
+      document.body.style.paddingRight = "".concat(states.previousBodyPadding, "px");
+      states.previousBodyPadding = null;
+    }
+  };
+
+  /* istanbul ignore file */
+
+  const iOSfix = () => {
+    const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream || navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+
+    if (iOS && !hasClass(document.body, swalClasses.iosfix)) {
+      const offset = document.body.scrollTop;
+      document.body.style.top = "".concat(offset * -1, "px");
+      addClass(document.body, swalClasses.iosfix);
+      lockBodyScroll();
+      addBottomPaddingForTallPopups(); // #1948
+    }
+  };
+
+  const addBottomPaddingForTallPopups = () => {
+    const safari = !navigator.userAgent.match(/(CriOS|FxiOS|EdgiOS|YaBrowser|UCBrowser)/i);
+
+    if (safari) {
+      const bottomPanelHeight = 44;
+
+      if (getPopup().scrollHeight > window.innerHeight - bottomPanelHeight) {
+        getContainer().style.paddingBottom = "".concat(bottomPanelHeight, "px");
+      }
+    }
+  };
+
+  const lockBodyScroll = () => {
+    // #1246
+    const container = getContainer();
+    let preventTouchMove;
+
+    container.ontouchstart = e => {
+      preventTouchMove = shouldPreventTouchMove(e);
+    };
+
+    container.ontouchmove = e => {
+      if (preventTouchMove) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+  };
+
+  const shouldPreventTouchMove = event => {
+    const target = event.target;
+    const container = getContainer();
+
+    if (isStylys(event) || isZoom(event)) {
+      return false;
+    }
+
+    if (target === container) {
+      return true;
+    }
+
+    if (!isScrollable(container) && target.tagName !== 'INPUT' && // #1603
+    target.tagName !== 'TEXTAREA' && // #2266
+    !(isScrollable(getHtmlContainer()) && // #1944
+    getHtmlContainer().contains(target))) {
+      return true;
+    }
+
+    return false;
+  };
+
+  const isStylys = event => {
+    // #1786
+    return event.touches && event.touches.length && event.touches[0].touchType === 'stylus';
+  };
+
+  const isZoom = event => {
+    // #1891
+    return event.touches && event.touches.length > 1;
+  };
+
+  const undoIOSfix = () => {
+    if (hasClass(document.body, swalClasses.iosfix)) {
+      const offset = parseInt(document.body.style.top, 10);
+      removeClass(document.body, swalClasses.iosfix);
+      document.body.style.top = '';
+      document.body.scrollTop = offset * -1;
+    }
+  };
+
+  // Adding aria-hidden="true" to elements outside of the active modal dialog ensures that
+  // elements not within the active modal dialog will not be surfaced if a user opens a screen
+  // reader’s list of elements (headings, form controls, landmarks, etc.) in the document.
+
+  const setAriaHidden = () => {
+    const bodyChildren = toArray(document.body.children);
+    bodyChildren.forEach(el => {
+      if (el === getContainer() || el.contains(getContainer())) {
+        return;
+      }
+
+      if (el.hasAttribute('aria-hidden')) {
+        el.setAttribute('data-previous-aria-hidden', el.getAttribute('aria-hidden'));
+      }
+
+      el.setAttribute('aria-hidden', 'true');
+    });
+  };
+  const unsetAriaHidden = () => {
+    const bodyChildren = toArray(document.body.children);
+    bodyChildren.forEach(el => {
+      if (el.hasAttribute('data-previous-aria-hidden')) {
+        el.setAttribute('aria-hidden', el.getAttribute('data-previous-aria-hidden'));
+        el.removeAttribute('data-previous-aria-hidden');
+      } else {
+        el.removeAttribute('aria-hidden');
+      }
+    });
+  };
+
   /**
-   * This module contains `WeakMap`s for each effectively-"private  property" that a `Swal` has.
+   * This module containts `WeakMap`s for each effectively-"private  property" that a `Swal` has.
    * For example, to set the private property "foo" of `this` to "bar", you can `privateProps.foo.set(this, 'bar')`
    * This is the approach that Babel will probably take to implement private methods/fields
    *   https://github.com/tc39/proposal-private-methods
@@ -71925,183 +71227,6 @@ module.exports = function (list, options) {
   };
 
   /*
-   * Global function to determine if SweetAlert2 popup is shown
-   */
-
-  const isVisible$1 = () => {
-    return isVisible(getPopup());
-  };
-  /*
-   * Global function to click 'Confirm' button
-   */
-
-  const clickConfirm = () => getConfirmButton() && getConfirmButton().click();
-  /*
-   * Global function to click 'Deny' button
-   */
-
-  const clickDeny = () => getDenyButton() && getDenyButton().click();
-  /*
-   * Global function to click 'Cancel' button
-   */
-
-  const clickCancel = () => getCancelButton() && getCancelButton().click();
-
-  const removeKeydownHandler = globalState => {
-    if (globalState.keydownTarget && globalState.keydownHandlerAdded) {
-      globalState.keydownTarget.removeEventListener('keydown', globalState.keydownHandler, {
-        capture: globalState.keydownListenerCapture
-      });
-      globalState.keydownHandlerAdded = false;
-    }
-  };
-  const addKeydownHandler = (instance, globalState, innerParams, dismissWith) => {
-    removeKeydownHandler(globalState);
-
-    if (!innerParams.toast) {
-      globalState.keydownHandler = e => keydownHandler(instance, e, dismissWith);
-
-      globalState.keydownTarget = innerParams.keydownListenerCapture ? window : getPopup();
-      globalState.keydownListenerCapture = innerParams.keydownListenerCapture;
-      globalState.keydownTarget.addEventListener('keydown', globalState.keydownHandler, {
-        capture: globalState.keydownListenerCapture
-      });
-      globalState.keydownHandlerAdded = true;
-    }
-  }; // Focus handling
-
-  const setFocus = (innerParams, index, increment) => {
-    const focusableElements = getFocusableElements(); // search for visible elements and select the next possible match
-
-    if (focusableElements.length) {
-      index = index + increment; // rollover to first item
-
-      if (index === focusableElements.length) {
-        index = 0; // go to last item
-      } else if (index === -1) {
-        index = focusableElements.length - 1;
-      }
-
-      return focusableElements[index].focus();
-    } // no visible focusable elements, focus the popup
-
-
-    getPopup().focus();
-  };
-  const arrowKeysNextButton = ['ArrowRight', 'ArrowDown'];
-  const arrowKeysPreviousButton = ['ArrowLeft', 'ArrowUp'];
-
-  const keydownHandler = (instance, e, dismissWith) => {
-    const innerParams = privateProps.innerParams.get(instance);
-
-    if (!innerParams) {
-      return; // This instance has already been destroyed
-    } // Ignore keydown during IME composition
-    // https://developer.mozilla.org/en-US/docs/Web/API/Document/keydown_event#ignoring_keydown_during_ime_composition
-    // https://github.com/sweetalert2/sweetalert2/issues/720
-    // https://github.com/sweetalert2/sweetalert2/issues/2406
-
-
-    if (e.isComposing || e.keyCode === 229) {
-      return;
-    }
-
-    if (innerParams.stopKeydownPropagation) {
-      e.stopPropagation();
-    } // ENTER
-
-
-    if (e.key === 'Enter') {
-      handleEnter(instance, e, innerParams);
-    } // TAB
-    else if (e.key === 'Tab') {
-      handleTab(e, innerParams);
-    } // ARROWS - switch focus between buttons
-    else if ([...arrowKeysNextButton, ...arrowKeysPreviousButton].includes(e.key)) {
-      handleArrows(e.key);
-    } // ESC
-    else if (e.key === 'Escape') {
-      handleEsc(e, innerParams, dismissWith);
-    }
-  };
-
-  const handleEnter = (instance, e, innerParams) => {
-    // https://github.com/sweetalert2/sweetalert2/issues/2386
-    if (!callIfFunction(innerParams.allowEnterKey)) {
-      return;
-    }
-
-    if (e.target && instance.getInput() && e.target.outerHTML === instance.getInput().outerHTML) {
-      if (['textarea', 'file'].includes(innerParams.input)) {
-        return; // do not submit
-      }
-
-      clickConfirm();
-      e.preventDefault();
-    }
-  };
-
-  const handleTab = (e, innerParams) => {
-    const targetElement = e.target;
-    const focusableElements = getFocusableElements();
-    let btnIndex = -1;
-
-    for (let i = 0; i < focusableElements.length; i++) {
-      if (targetElement === focusableElements[i]) {
-        btnIndex = i;
-        break;
-      }
-    } // Cycle to the next button
-
-
-    if (!e.shiftKey) {
-      setFocus(innerParams, btnIndex, 1);
-    } // Cycle to the prev button
-    else {
-      setFocus(innerParams, btnIndex, -1);
-    }
-
-    e.stopPropagation();
-    e.preventDefault();
-  };
-
-  const handleArrows = key => {
-    const confirmButton = getConfirmButton();
-    const denyButton = getDenyButton();
-    const cancelButton = getCancelButton();
-
-    if (![confirmButton, denyButton, cancelButton].includes(document.activeElement)) {
-      return;
-    }
-
-    const sibling = arrowKeysNextButton.includes(key) ? 'nextElementSibling' : 'previousElementSibling';
-    let buttonToFocus = document.activeElement;
-
-    for (let i = 0; i < getActions().children.length; i++) {
-      buttonToFocus = buttonToFocus[sibling];
-
-      if (!buttonToFocus) {
-        return;
-      }
-
-      if (isVisible(buttonToFocus) && buttonToFocus instanceof HTMLButtonElement) {
-        break;
-      }
-    }
-
-    if (buttonToFocus instanceof HTMLButtonElement) {
-      buttonToFocus.focus();
-    }
-  };
-
-  const handleEsc = (e, innerParams, dismissWith) => {
-    if (callIfFunction(innerParams.allowEscapeKey)) {
-      e.preventDefault();
-      dismissWith(DismissReason.esc);
-    }
-  };
-
-  /*
    * Instance method to close sweetAlert
    */
 
@@ -72110,7 +71235,10 @@ module.exports = function (list, options) {
       triggerDidCloseAndDispose(instance, didClose);
     } else {
       restoreActiveElement(returnFocus).then(() => triggerDidCloseAndDispose(instance, didClose));
-      removeKeydownHandler(globalState);
+      globalState.keydownTarget.removeEventListener('keydown', globalState.keydownHandler, {
+        capture: globalState.keydownListenerCapture
+      });
+      globalState.keydownHandlerAdded = false;
     }
 
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent); // workaround for #2088
@@ -72188,6 +71316,7 @@ module.exports = function (list, options) {
       rejectPromise(error);
     }
   }
+
   const handleAwaitingPromise = instance => {
     if (instance.isAwaitingPromise()) {
       privateProps.awaitingPromise.delete(instance); // The instance might have been previously partly destroyed, we must resume the destroy process in this case #2335
@@ -72331,123 +71460,553 @@ module.exports = function (list, options) {
     return domCache.progressSteps;
   }
 
+  class Timer {
+    constructor(callback, delay) {
+      this.callback = callback;
+      this.remaining = delay;
+      this.running = false;
+      this.start();
+    }
+
+    start() {
+      if (!this.running) {
+        this.running = true;
+        this.started = new Date();
+        this.id = setTimeout(this.callback, this.remaining);
+      }
+
+      return this.remaining;
+    }
+
+    stop() {
+      if (this.running) {
+        this.running = false;
+        clearTimeout(this.id);
+        this.remaining -= new Date() - this.started;
+      }
+
+      return this.remaining;
+    }
+
+    increase(n) {
+      const running = this.running;
+
+      if (running) {
+        this.stop();
+      }
+
+      this.remaining += n;
+
+      if (running) {
+        this.start();
+      }
+
+      return this.remaining;
+    }
+
+    getTimerLeft() {
+      if (this.running) {
+        this.stop();
+        this.start();
+      }
+
+      return this.remaining;
+    }
+
+    isRunning() {
+      return this.running;
+    }
+
+  }
+
+  var defaultInputValidators = {
+    email: (string, validationMessage) => {
+      return /^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9-]{2,24}$/.test(string) ? Promise.resolve() : Promise.resolve(validationMessage || 'Invalid email address');
+    },
+    url: (string, validationMessage) => {
+      // taken from https://stackoverflow.com/a/3809435 with a small change from #1306 and #2013
+      return /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-z]{2,63}\b([-a-zA-Z0-9@:%_+.~#?&/=]*)$/.test(string) ? Promise.resolve() : Promise.resolve(validationMessage || 'Invalid URL');
+    }
+  };
+
+  function setDefaultInputValidators(params) {
+    // Use default `inputValidator` for supported input types if not provided
+    if (!params.inputValidator) {
+      Object.keys(defaultInputValidators).forEach(key => {
+        if (params.input === key) {
+          params.inputValidator = defaultInputValidators[key];
+        }
+      });
+    }
+  }
+
+  function validateCustomTargetElement(params) {
+    // Determine if the custom target element is valid
+    if (!params.target || typeof params.target === 'string' && !document.querySelector(params.target) || typeof params.target !== 'string' && !params.target.appendChild) {
+      warn('Target parameter is not valid, defaulting to "body"');
+      params.target = 'body';
+    }
+  }
   /**
-   * Updates popup parameters.
+   * Set type, text and actions on popup
+   *
+   * @param params
+   * @returns {boolean}
    */
 
-  function update(params) {
+
+  function setParameters(params) {
+    setDefaultInputValidators(params); // showLoaderOnConfirm && preConfirm
+
+    if (params.showLoaderOnConfirm && !params.preConfirm) {
+      warn('showLoaderOnConfirm is set to true, but preConfirm is not defined.\n' + 'showLoaderOnConfirm should be used together with preConfirm, see usage example:\n' + 'https://sweetalert2.github.io/#ajax-request');
+    }
+
+    validateCustomTargetElement(params); // Replace newlines with <br> in title
+
+    if (typeof params.title === 'string') {
+      params.title = params.title.split('\n').join('<br />');
+    }
+
+    init(params);
+  }
+
+  const swalStringParams = ['swal-title', 'swal-html', 'swal-footer'];
+  const getTemplateParams = params => {
+    const template = typeof params.template === 'string' ? document.querySelector(params.template) : params.template;
+
+    if (!template) {
+      return {};
+    }
+
+    const templateContent = template.content;
+    showWarningsForElements(templateContent);
+    const result = Object.assign(getSwalParams(templateContent), getSwalButtons(templateContent), getSwalImage(templateContent), getSwalIcon(templateContent), getSwalInput(templateContent), getSwalStringParams(templateContent, swalStringParams));
+    return result;
+  };
+
+  const getSwalParams = templateContent => {
+    const result = {};
+    toArray(templateContent.querySelectorAll('swal-param')).forEach(param => {
+      showWarningsForAttributes(param, ['name', 'value']);
+      const paramName = param.getAttribute('name');
+      let value = param.getAttribute('value');
+
+      if (typeof defaultParams[paramName] === 'boolean' && value === 'false') {
+        value = false;
+      }
+
+      if (typeof defaultParams[paramName] === 'object') {
+        value = JSON.parse(value);
+      }
+
+      result[paramName] = value;
+    });
+    return result;
+  };
+
+  const getSwalButtons = templateContent => {
+    const result = {};
+    toArray(templateContent.querySelectorAll('swal-button')).forEach(button => {
+      showWarningsForAttributes(button, ['type', 'color', 'aria-label']);
+      const type = button.getAttribute('type');
+      result["".concat(type, "ButtonText")] = button.innerHTML;
+      result["show".concat(capitalizeFirstLetter(type), "Button")] = true;
+
+      if (button.hasAttribute('color')) {
+        result["".concat(type, "ButtonColor")] = button.getAttribute('color');
+      }
+
+      if (button.hasAttribute('aria-label')) {
+        result["".concat(type, "ButtonAriaLabel")] = button.getAttribute('aria-label');
+      }
+    });
+    return result;
+  };
+
+  const getSwalImage = templateContent => {
+    const result = {};
+    const image = templateContent.querySelector('swal-image');
+
+    if (image) {
+      showWarningsForAttributes(image, ['src', 'width', 'height', 'alt']);
+
+      if (image.hasAttribute('src')) {
+        result.imageUrl = image.getAttribute('src');
+      }
+
+      if (image.hasAttribute('width')) {
+        result.imageWidth = image.getAttribute('width');
+      }
+
+      if (image.hasAttribute('height')) {
+        result.imageHeight = image.getAttribute('height');
+      }
+
+      if (image.hasAttribute('alt')) {
+        result.imageAlt = image.getAttribute('alt');
+      }
+    }
+
+    return result;
+  };
+
+  const getSwalIcon = templateContent => {
+    const result = {};
+    const icon = templateContent.querySelector('swal-icon');
+
+    if (icon) {
+      showWarningsForAttributes(icon, ['type', 'color']);
+
+      if (icon.hasAttribute('type')) {
+        result.icon = icon.getAttribute('type');
+      }
+
+      if (icon.hasAttribute('color')) {
+        result.iconColor = icon.getAttribute('color');
+      }
+
+      result.iconHtml = icon.innerHTML;
+    }
+
+    return result;
+  };
+
+  const getSwalInput = templateContent => {
+    const result = {};
+    const input = templateContent.querySelector('swal-input');
+
+    if (input) {
+      showWarningsForAttributes(input, ['type', 'label', 'placeholder', 'value']);
+      result.input = input.getAttribute('type') || 'text';
+
+      if (input.hasAttribute('label')) {
+        result.inputLabel = input.getAttribute('label');
+      }
+
+      if (input.hasAttribute('placeholder')) {
+        result.inputPlaceholder = input.getAttribute('placeholder');
+      }
+
+      if (input.hasAttribute('value')) {
+        result.inputValue = input.getAttribute('value');
+      }
+    }
+
+    const inputOptions = templateContent.querySelectorAll('swal-input-option');
+
+    if (inputOptions.length) {
+      result.inputOptions = {};
+      toArray(inputOptions).forEach(option => {
+        showWarningsForAttributes(option, ['value']);
+        const optionValue = option.getAttribute('value');
+        const optionName = option.innerHTML;
+        result.inputOptions[optionValue] = optionName;
+      });
+    }
+
+    return result;
+  };
+
+  const getSwalStringParams = (templateContent, paramNames) => {
+    const result = {};
+
+    for (const i in paramNames) {
+      const paramName = paramNames[i];
+      const tag = templateContent.querySelector(paramName);
+
+      if (tag) {
+        showWarningsForAttributes(tag, []);
+        result[paramName.replace(/^swal-/, '')] = tag.innerHTML.trim();
+      }
+    }
+
+    return result;
+  };
+
+  const showWarningsForElements = template => {
+    const allowedElements = swalStringParams.concat(['swal-param', 'swal-button', 'swal-image', 'swal-icon', 'swal-input', 'swal-input-option']);
+    toArray(template.children).forEach(el => {
+      const tagName = el.tagName.toLowerCase();
+
+      if (allowedElements.indexOf(tagName) === -1) {
+        warn("Unrecognized element <".concat(tagName, ">"));
+      }
+    });
+  };
+
+  const showWarningsForAttributes = (el, allowedAttributes) => {
+    toArray(el.attributes).forEach(attribute => {
+      if (allowedAttributes.indexOf(attribute.name) === -1) {
+        warn(["Unrecognized attribute \"".concat(attribute.name, "\" on <").concat(el.tagName.toLowerCase(), ">."), "".concat(allowedAttributes.length ? "Allowed attributes are: ".concat(allowedAttributes.join(', ')) : 'To set the value, use HTML within the element.')]);
+      }
+    });
+  };
+
+  const SHOW_CLASS_TIMEOUT = 10;
+  /**
+   * Open popup, add necessary classes and styles, fix scrollbar
+   *
+   * @param params
+   */
+
+  const openPopup = params => {
+    const container = getContainer();
     const popup = getPopup();
-    const innerParams = privateProps.innerParams.get(this);
 
-    if (!popup || hasClass(popup, innerParams.hideClass.popup)) {
-      return warn("You're trying to update the closed or closing popup, that won't work. Use the update() method in preConfirm parameter or show a new popup.");
+    if (typeof params.willOpen === 'function') {
+      params.willOpen(popup);
     }
 
-    const validUpdatableParams = filterValidParams(params);
-    const updatedParams = Object.assign({}, innerParams, validUpdatableParams);
-    render(this, updatedParams);
-    privateProps.innerParams.set(this, updatedParams);
-    Object.defineProperties(this, {
-      params: {
-        value: Object.assign({}, this.params, params),
-        writable: false,
-        enumerable: true
-      }
-    });
-  }
+    const bodyStyles = window.getComputedStyle(document.body);
+    const initialBodyOverflow = bodyStyles.overflowY;
+    addClasses$1(container, popup, params); // scrolling is 'hidden' until animation is done, after that 'auto'
 
-  const filterValidParams = params => {
-    const validUpdatableParams = {};
-    Object.keys(params).forEach(param => {
-      if (isUpdatableParameter(param)) {
-        validUpdatableParams[param] = params[param];
-      } else {
-        warn("Invalid parameter to update: \"".concat(param, "\". Updatable params are listed here: https://github.com/sweetalert2/sweetalert2/blob/master/src/utils/params.js\n\nIf you think this parameter should be updatable, request it here: https://github.com/sweetalert2/sweetalert2/issues/new?template=02_feature_request.md"));
-      }
-    });
-    return validUpdatableParams;
+    setTimeout(() => {
+      setScrollingVisibility(container, popup);
+    }, SHOW_CLASS_TIMEOUT);
+
+    if (isModal()) {
+      fixScrollContainer(container, params.scrollbarPadding, initialBodyOverflow);
+      setAriaHidden();
+    }
+
+    if (!isToast() && !globalState.previousActiveElement) {
+      globalState.previousActiveElement = document.activeElement;
+    }
+
+    if (typeof params.didOpen === 'function') {
+      setTimeout(() => params.didOpen(popup));
+    }
+
+    removeClass(container, swalClasses['no-transition']);
   };
 
-  function _destroy() {
-    const domCache = privateProps.domCache.get(this);
-    const innerParams = privateProps.innerParams.get(this);
+  const swalOpenAnimationFinished = event => {
+    const popup = getPopup();
 
-    if (!innerParams) {
-      disposeWeakMaps(this); // The WeakMaps might have been partly destroyed, we must recall it to dispose any remaining WeakMaps #2335
-
-      return; // This instance has already been destroyed
-    } // Check if there is another Swal closing
-
-
-    if (domCache.popup && globalState.swalCloseEventFinishedCallback) {
-      globalState.swalCloseEventFinishedCallback();
-      delete globalState.swalCloseEventFinishedCallback;
-    } // Check if there is a swal disposal defer timer
-
-
-    if (globalState.deferDisposalTimer) {
-      clearTimeout(globalState.deferDisposalTimer);
-      delete globalState.deferDisposalTimer;
+    if (event.target !== popup) {
+      return;
     }
 
-    if (typeof innerParams.didDestroy === 'function') {
-      innerParams.didDestroy();
-    }
-
-    disposeSwal(this);
-  }
-
-  const disposeSwal = instance => {
-    disposeWeakMaps(instance); // Unset this.params so GC will dispose it (#1569)
-
-    delete instance.params; // Unset globalState props so GC will dispose globalState (#1569)
-
-    delete globalState.keydownHandler;
-    delete globalState.keydownTarget; // Unset currentInstance
-
-    delete globalState.currentInstance;
+    const container = getContainer();
+    popup.removeEventListener(animationEndEvent, swalOpenAnimationFinished);
+    container.style.overflowY = 'auto';
   };
 
-  const disposeWeakMaps = instance => {
-    // If the current instance is awaiting a promise result, we keep the privateMethods to call them once the promise result is retrieved #2335
-    if (instance.isAwaitingPromise()) {
-      unsetWeakMaps(privateProps, instance);
-      privateProps.awaitingPromise.set(instance, true);
+  const setScrollingVisibility = (container, popup) => {
+    if (animationEndEvent && hasCssAnimation(popup)) {
+      container.style.overflowY = 'hidden';
+      popup.addEventListener(animationEndEvent, swalOpenAnimationFinished);
     } else {
-      unsetWeakMaps(privateMethods, instance);
-      unsetWeakMaps(privateProps, instance);
+      container.style.overflowY = 'auto';
     }
   };
 
-  const unsetWeakMaps = (obj, instance) => {
-    for (const i in obj) {
-      obj[i].delete(instance);
+  const fixScrollContainer = (container, scrollbarPadding, initialBodyOverflow) => {
+    iOSfix();
+
+    if (scrollbarPadding && initialBodyOverflow !== 'hidden') {
+      fixScrollbar();
+    } // sweetalert2/issues/1247
+
+
+    setTimeout(() => {
+      container.scrollTop = 0;
+    });
+  };
+
+  const addClasses$1 = (container, popup, params) => {
+    addClass(container, params.showClass.backdrop); // the workaround with setting/unsetting opacity is needed for #2019 and 2059
+
+    popup.style.setProperty('opacity', '0', 'important');
+    show(popup, 'grid');
+    setTimeout(() => {
+      // Animate popup right after showing it
+      addClass(popup, params.showClass.popup); // and remove the opacity workaround
+
+      popup.style.removeProperty('opacity');
+    }, SHOW_CLASS_TIMEOUT); // 10ms in order to fix #2062
+
+    addClass([document.documentElement, document.body], swalClasses.shown);
+
+    if (params.heightAuto && params.backdrop && !params.toast) {
+      addClass([document.documentElement, document.body], swalClasses['height-auto']);
     }
   };
 
+  const handleInputOptionsAndValue = (instance, params) => {
+    if (params.input === 'select' || params.input === 'radio') {
+      handleInputOptions(instance, params);
+    } else if (['text', 'email', 'number', 'tel', 'textarea'].includes(params.input) && (hasToPromiseFn(params.inputValue) || isPromise(params.inputValue))) {
+      showLoading(getConfirmButton());
+      handleInputValue(instance, params);
+    }
+  };
+  const getInputValue = (instance, innerParams) => {
+    const input = instance.getInput();
 
+    if (!input) {
+      return null;
+    }
 
-  var instanceMethods = /*#__PURE__*/Object.freeze({
-    hideLoading: hideLoading,
-    disableLoading: hideLoading,
-    getInput: getInput$1,
-    close: close,
-    isAwaitingPromise: isAwaitingPromise,
-    rejectPromise: rejectPromise,
-    handleAwaitingPromise: handleAwaitingPromise,
-    closePopup: close,
-    closeModal: close,
-    closeToast: close,
-    enableButtons: enableButtons,
-    disableButtons: disableButtons,
-    enableInput: enableInput,
-    disableInput: disableInput,
-    showValidationMessage: showValidationMessage,
-    resetValidationMessage: resetValidationMessage$1,
-    getProgressSteps: getProgressSteps$1,
-    update: update,
-    _destroy: _destroy
-  });
+    switch (innerParams.input) {
+      case 'checkbox':
+        return getCheckboxValue(input);
+
+      case 'radio':
+        return getRadioValue(input);
+
+      case 'file':
+        return getFileValue(input);
+
+      default:
+        return innerParams.inputAutoTrim ? input.value.trim() : input.value;
+    }
+  };
+
+  const getCheckboxValue = input => input.checked ? 1 : 0;
+
+  const getRadioValue = input => input.checked ? input.value : null;
+
+  const getFileValue = input => input.files.length ? input.getAttribute('multiple') !== null ? input.files : input.files[0] : null;
+
+  const handleInputOptions = (instance, params) => {
+    const popup = getPopup();
+
+    const processInputOptions = inputOptions => populateInputOptions[params.input](popup, formatInputOptions(inputOptions), params);
+
+    if (hasToPromiseFn(params.inputOptions) || isPromise(params.inputOptions)) {
+      showLoading(getConfirmButton());
+      asPromise(params.inputOptions).then(inputOptions => {
+        instance.hideLoading();
+        processInputOptions(inputOptions);
+      });
+    } else if (typeof params.inputOptions === 'object') {
+      processInputOptions(params.inputOptions);
+    } else {
+      error("Unexpected type of inputOptions! Expected object, Map or Promise, got ".concat(typeof params.inputOptions));
+    }
+  };
+
+  const handleInputValue = (instance, params) => {
+    const input = instance.getInput();
+    hide(input);
+    asPromise(params.inputValue).then(inputValue => {
+      input.value = params.input === 'number' ? parseFloat(inputValue) || 0 : "".concat(inputValue);
+      show(input);
+      input.focus();
+      instance.hideLoading();
+    }).catch(err => {
+      error("Error in inputValue promise: ".concat(err));
+      input.value = '';
+      show(input);
+      input.focus();
+      instance.hideLoading();
+    });
+  };
+
+  const populateInputOptions = {
+    select: (popup, inputOptions, params) => {
+      const select = getChildByClass(popup, swalClasses.select);
+
+      const renderOption = (parent, optionLabel, optionValue) => {
+        const option = document.createElement('option');
+        option.value = optionValue;
+        setInnerHtml(option, optionLabel);
+        option.selected = isSelected(optionValue, params.inputValue);
+        parent.appendChild(option);
+      };
+
+      inputOptions.forEach(inputOption => {
+        const optionValue = inputOption[0];
+        const optionLabel = inputOption[1]; // <optgroup> spec:
+        // https://www.w3.org/TR/html401/interact/forms.html#h-17.6
+        // "...all OPTGROUP elements must be specified directly within a SELECT element (i.e., groups may not be nested)..."
+        // check whether this is a <optgroup>
+
+        if (Array.isArray(optionLabel)) {
+          // if it is an array, then it is an <optgroup>
+          const optgroup = document.createElement('optgroup');
+          optgroup.label = optionValue;
+          optgroup.disabled = false; // not configurable for now
+
+          select.appendChild(optgroup);
+          optionLabel.forEach(o => renderOption(optgroup, o[1], o[0]));
+        } else {
+          // case of <option>
+          renderOption(select, optionLabel, optionValue);
+        }
+      });
+      select.focus();
+    },
+    radio: (popup, inputOptions, params) => {
+      const radio = getChildByClass(popup, swalClasses.radio);
+      inputOptions.forEach(inputOption => {
+        const radioValue = inputOption[0];
+        const radioLabel = inputOption[1];
+        const radioInput = document.createElement('input');
+        const radioLabelElement = document.createElement('label');
+        radioInput.type = 'radio';
+        radioInput.name = swalClasses.radio;
+        radioInput.value = radioValue;
+
+        if (isSelected(radioValue, params.inputValue)) {
+          radioInput.checked = true;
+        }
+
+        const label = document.createElement('span');
+        setInnerHtml(label, radioLabel);
+        label.className = swalClasses.label;
+        radioLabelElement.appendChild(radioInput);
+        radioLabelElement.appendChild(label);
+        radio.appendChild(radioLabelElement);
+      });
+      const radios = radio.querySelectorAll('input');
+
+      if (radios.length) {
+        radios[0].focus();
+      }
+    }
+  };
+  /**
+   * Converts `inputOptions` into an array of `[value, label]`s
+   * @param inputOptions
+   */
+
+  const formatInputOptions = inputOptions => {
+    const result = [];
+
+    if (typeof Map !== 'undefined' && inputOptions instanceof Map) {
+      inputOptions.forEach((value, key) => {
+        let valueFormatted = value;
+
+        if (typeof valueFormatted === 'object') {
+          // case of <optgroup>
+          valueFormatted = formatInputOptions(valueFormatted);
+        }
+
+        result.push([key, valueFormatted]);
+      });
+    } else {
+      Object.keys(inputOptions).forEach(key => {
+        let valueFormatted = inputOptions[key];
+
+        if (typeof valueFormatted === 'object') {
+          // case of <optgroup>
+          valueFormatted = formatInputOptions(valueFormatted);
+        }
+
+        result.push([key, valueFormatted]);
+      });
+    }
+
+    return result;
+  };
+
+  const isSelected = (optionValue, inputValue) => {
+    return inputValue && inputValue.toString() === optionValue.toString();
+  };
 
   const handleConfirmButtonClick = instance => {
     const innerParams = privateProps.innerParams.get(instance);
@@ -72478,11 +72037,6 @@ module.exports = function (list, options) {
   /* 'confirm' | 'deny' */
   ) => {
     const innerParams = privateProps.innerParams.get(instance);
-
-    if (!innerParams.input) {
-      return error("The \"input\" parameter is needed to be set when using returnInputValueOn".concat(capitalizeFirstLetter(type)));
-    }
-
     const inputValue = getInputValue(instance, innerParams);
 
     if (innerParams.inputValidator) {
@@ -72525,13 +72079,12 @@ module.exports = function (list, options) {
     }
 
     if (innerParams.preDeny) {
-      privateProps.awaitingPromise.set(instance || undefined, true); // Flagging the instance as awaiting a promise so it's own promise's reject/resolve methods doesn't get destroyed until the result from this preDeny's promise is received
+      privateProps.awaitingPromise.set(instance || undefined, true); // Flagging the instance as awaiting a promise so it's own promise's reject/resolve methods doesnt get destroyed until the result from this preDeny's promise is received
 
       const preDenyPromise = Promise.resolve().then(() => asPromise(innerParams.preDeny(value, innerParams.validationMessage)));
       preDenyPromise.then(preDenyValue => {
         if (preDenyValue === false) {
           instance.hideLoading();
-          handleAwaitingPromise(instance);
         } else {
           instance.closePopup({
             isDenied: true,
@@ -72567,19 +72120,146 @@ module.exports = function (list, options) {
 
     if (innerParams.preConfirm) {
       instance.resetValidationMessage();
-      privateProps.awaitingPromise.set(instance || undefined, true); // Flagging the instance as awaiting a promise so it's own promise's reject/resolve methods doesn't get destroyed until the result from this preConfirm's promise is received
+      privateProps.awaitingPromise.set(instance || undefined, true); // Flagging the instance as awaiting a promise so it's own promise's reject/resolve methods doesnt get destroyed until the result from this preConfirm's promise is received
 
       const preConfirmPromise = Promise.resolve().then(() => asPromise(innerParams.preConfirm(value, innerParams.validationMessage)));
       preConfirmPromise.then(preConfirmValue => {
         if (isVisible(getValidationMessage()) || preConfirmValue === false) {
           instance.hideLoading();
-          handleAwaitingPromise(instance);
         } else {
           succeedWith(instance, typeof preConfirmValue === 'undefined' ? value : preConfirmValue);
         }
       }).catch(error$$1 => rejectWith(instance || undefined, error$$1));
     } else {
       succeedWith(instance, value);
+    }
+  };
+
+  const addKeydownHandler = (instance, globalState, innerParams, dismissWith) => {
+    if (globalState.keydownTarget && globalState.keydownHandlerAdded) {
+      globalState.keydownTarget.removeEventListener('keydown', globalState.keydownHandler, {
+        capture: globalState.keydownListenerCapture
+      });
+      globalState.keydownHandlerAdded = false;
+    }
+
+    if (!innerParams.toast) {
+      globalState.keydownHandler = e => keydownHandler(instance, e, dismissWith);
+
+      globalState.keydownTarget = innerParams.keydownListenerCapture ? window : getPopup();
+      globalState.keydownListenerCapture = innerParams.keydownListenerCapture;
+      globalState.keydownTarget.addEventListener('keydown', globalState.keydownHandler, {
+        capture: globalState.keydownListenerCapture
+      });
+      globalState.keydownHandlerAdded = true;
+    }
+  }; // Focus handling
+
+  const setFocus = (innerParams, index, increment) => {
+    const focusableElements = getFocusableElements(); // search for visible elements and select the next possible match
+
+    if (focusableElements.length) {
+      index = index + increment; // rollover to first item
+
+      if (index === focusableElements.length) {
+        index = 0; // go to last item
+      } else if (index === -1) {
+        index = focusableElements.length - 1;
+      }
+
+      return focusableElements[index].focus();
+    } // no visible focusable elements, focus the popup
+
+
+    getPopup().focus();
+  };
+  const arrowKeysNextButton = ['ArrowRight', 'ArrowDown'];
+  const arrowKeysPreviousButton = ['ArrowLeft', 'ArrowUp'];
+
+  const keydownHandler = (instance, e, dismissWith) => {
+    const innerParams = privateProps.innerParams.get(instance);
+
+    if (!innerParams) {
+      return; // This instance has already been destroyed
+    }
+
+    if (innerParams.stopKeydownPropagation) {
+      e.stopPropagation();
+    } // ENTER
+
+
+    if (e.key === 'Enter') {
+      handleEnter(instance, e, innerParams); // TAB
+    } else if (e.key === 'Tab') {
+      handleTab(e, innerParams); // ARROWS - switch focus between buttons
+    } else if ([...arrowKeysNextButton, ...arrowKeysPreviousButton].includes(e.key)) {
+      handleArrows(e.key); // ESC
+    } else if (e.key === 'Escape') {
+      handleEsc(e, innerParams, dismissWith);
+    }
+  };
+
+  const handleEnter = (instance, e, innerParams) => {
+    // #720 #721
+    if (e.isComposing) {
+      return;
+    }
+
+    if (e.target && instance.getInput() && e.target.outerHTML === instance.getInput().outerHTML) {
+      if (['textarea', 'file'].includes(innerParams.input)) {
+        return; // do not submit
+      }
+
+      clickConfirm();
+      e.preventDefault();
+    }
+  };
+
+  const handleTab = (e, innerParams) => {
+    const targetElement = e.target;
+    const focusableElements = getFocusableElements();
+    let btnIndex = -1;
+
+    for (let i = 0; i < focusableElements.length; i++) {
+      if (targetElement === focusableElements[i]) {
+        btnIndex = i;
+        break;
+      }
+    }
+
+    if (!e.shiftKey) {
+      // Cycle to the next button
+      setFocus(innerParams, btnIndex, 1);
+    } else {
+      // Cycle to the prev button
+      setFocus(innerParams, btnIndex, -1);
+    }
+
+    e.stopPropagation();
+    e.preventDefault();
+  };
+
+  const handleArrows = key => {
+    const confirmButton = getConfirmButton();
+    const denyButton = getDenyButton();
+    const cancelButton = getCancelButton();
+
+    if (![confirmButton, denyButton, cancelButton].includes(document.activeElement)) {
+      return;
+    }
+
+    const sibling = arrowKeysNextButton.includes(key) ? 'nextElementSibling' : 'previousElementSibling';
+    const buttonToFocus = document.activeElement[sibling];
+
+    if (buttonToFocus) {
+      buttonToFocus.focus();
+    }
+  };
+
+  const handleEsc = (e, innerParams, dismissWith) => {
+    if (callIfFunction(innerParams.allowEscapeKey)) {
+      e.preventDefault();
+      dismissWith(DismissReason.esc);
     }
   };
 
@@ -72603,21 +72283,12 @@ module.exports = function (list, options) {
     domCache.popup.onclick = () => {
       const innerParams = privateProps.innerParams.get(instance);
 
-      if (innerParams && (isAnyButtonShown(innerParams) || innerParams.timer || innerParams.input)) {
+      if (innerParams.showConfirmButton || innerParams.showDenyButton || innerParams.showCancelButton || innerParams.showCloseButton || innerParams.timer || innerParams.input) {
         return;
       }
 
       dismissWith(DismissReason.close);
     };
-  };
-  /**
-   * @param {*} innerParams
-   * @returns {boolean}
-   */
-
-
-  const isAnyButtonShown = innerParams => {
-    return innerParams.showConfirmButton || innerParams.showDenyButton || innerParams.showCancelButton || innerParams.showCloseButton;
   };
 
   let ignoreOutsideClick = false;
@@ -72662,272 +72333,43 @@ module.exports = function (list, options) {
     };
   };
 
-  const isJqueryElement = elem => typeof elem === 'object' && elem.jquery;
+  function _main(userParams, mixinParams = {}) {
+    showWarningsForParams(Object.assign({}, mixinParams, userParams));
 
-  const isElement = elem => elem instanceof Element || isJqueryElement(elem);
+    if (globalState.currentInstance) {
+      globalState.currentInstance._destroy();
 
-  const argsToParams = args => {
-    const params = {};
-
-    if (typeof args[0] === 'object' && !isElement(args[0])) {
-      Object.assign(params, args[0]);
-    } else {
-      ['title', 'html', 'icon'].forEach((name, index) => {
-        const arg = args[index];
-
-        if (typeof arg === 'string' || isElement(arg)) {
-          params[name] = arg;
-        } else if (arg !== undefined) {
-          error("Unexpected type of ".concat(name, "! Expected \"string\" or \"Element\", got ").concat(typeof arg));
-        }
-      });
+      if (isModal()) {
+        unsetAriaHidden();
+      }
     }
 
+    globalState.currentInstance = this;
+    const innerParams = prepareParams(userParams, mixinParams);
+    setParameters(innerParams);
+    Object.freeze(innerParams); // clear the previous timer
+
+    if (globalState.timeout) {
+      globalState.timeout.stop();
+      delete globalState.timeout;
+    } // clear the restore focus timeout
+
+
+    clearTimeout(globalState.restoreFocusTimeout);
+    const domCache = populateDomCache(this);
+    render(this, innerParams);
+    privateProps.innerParams.set(this, innerParams);
+    return swalPromise(this, domCache, innerParams);
+  }
+
+  const prepareParams = (userParams, mixinParams) => {
+    const templateParams = getTemplateParams(userParams);
+    const params = Object.assign({}, defaultParams, mixinParams, templateParams, userParams); // precedence is described in #2131
+
+    params.showClass = Object.assign({}, defaultParams.showClass, params.showClass);
+    params.hideClass = Object.assign({}, defaultParams.hideClass, params.hideClass);
     return params;
   };
-
-  function fire() {
-    const Swal = this; // eslint-disable-line @typescript-eslint/no-this-alias
-
-    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    return new Swal(...args);
-  }
-
-  /**
-   * Returns an extended version of `Swal` containing `params` as defaults.
-   * Useful for reusing Swal configuration.
-   *
-   * For example:
-   *
-   * Before:
-   * const textPromptOptions = { input: 'text', showCancelButton: true }
-   * const {value: firstName} = await Swal.fire({ ...textPromptOptions, title: 'What is your first name?' })
-   * const {value: lastName} = await Swal.fire({ ...textPromptOptions, title: 'What is your last name?' })
-   *
-   * After:
-   * const TextPrompt = Swal.mixin({ input: 'text', showCancelButton: true })
-   * const {value: firstName} = await TextPrompt('What is your first name?')
-   * const {value: lastName} = await TextPrompt('What is your last name?')
-   *
-   * @param mixinParams
-   */
-  function mixin(mixinParams) {
-    class MixinSwal extends this {
-      _main(params, priorityMixinParams) {
-        return super._main(params, Object.assign({}, mixinParams, priorityMixinParams));
-      }
-
-    }
-
-    return MixinSwal;
-  }
-
-  /**
-   * If `timer` parameter is set, returns number of milliseconds of timer remained.
-   * Otherwise, returns undefined.
-   */
-
-  const getTimerLeft = () => {
-    return globalState.timeout && globalState.timeout.getTimerLeft();
-  };
-  /**
-   * Stop timer. Returns number of milliseconds of timer remained.
-   * If `timer` parameter isn't set, returns undefined.
-   */
-
-  const stopTimer = () => {
-    if (globalState.timeout) {
-      stopTimerProgressBar();
-      return globalState.timeout.stop();
-    }
-  };
-  /**
-   * Resume timer. Returns number of milliseconds of timer remained.
-   * If `timer` parameter isn't set, returns undefined.
-   */
-
-  const resumeTimer = () => {
-    if (globalState.timeout) {
-      const remaining = globalState.timeout.start();
-      animateTimerProgressBar(remaining);
-      return remaining;
-    }
-  };
-  /**
-   * Resume timer. Returns number of milliseconds of timer remained.
-   * If `timer` parameter isn't set, returns undefined.
-   */
-
-  const toggleTimer = () => {
-    const timer = globalState.timeout;
-    return timer && (timer.running ? stopTimer() : resumeTimer());
-  };
-  /**
-   * Increase timer. Returns number of milliseconds of an updated timer.
-   * If `timer` parameter isn't set, returns undefined.
-   */
-
-  const increaseTimer = n => {
-    if (globalState.timeout) {
-      const remaining = globalState.timeout.increase(n);
-      animateTimerProgressBar(remaining, true);
-      return remaining;
-    }
-  };
-  /**
-   * Check if timer is running. Returns true if timer is running
-   * or false if timer is paused or stopped.
-   * If `timer` parameter isn't set, returns undefined
-   */
-
-  const isTimerRunning = () => {
-    return globalState.timeout && globalState.timeout.isRunning();
-  };
-
-  let bodyClickListenerAdded = false;
-  const clickHandlers = {};
-  function bindClickHandler() {
-    let attr = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'data-swal-template';
-    clickHandlers[attr] = this;
-
-    if (!bodyClickListenerAdded) {
-      document.body.addEventListener('click', bodyClickListener);
-      bodyClickListenerAdded = true;
-    }
-  }
-
-  const bodyClickListener = event => {
-    for (let el = event.target; el && el !== document; el = el.parentNode) {
-      for (const attr in clickHandlers) {
-        const template = el.getAttribute(attr);
-
-        if (template) {
-          clickHandlers[attr].fire({
-            template
-          });
-          return;
-        }
-      }
-    }
-  };
-
-
-
-  var staticMethods = /*#__PURE__*/Object.freeze({
-    isValidParameter: isValidParameter,
-    isUpdatableParameter: isUpdatableParameter,
-    isDeprecatedParameter: isDeprecatedParameter,
-    argsToParams: argsToParams,
-    isVisible: isVisible$1,
-    clickConfirm: clickConfirm,
-    clickDeny: clickDeny,
-    clickCancel: clickCancel,
-    getContainer: getContainer,
-    getPopup: getPopup,
-    getTitle: getTitle,
-    getHtmlContainer: getHtmlContainer,
-    getImage: getImage,
-    getIcon: getIcon,
-    getInputLabel: getInputLabel,
-    getCloseButton: getCloseButton,
-    getActions: getActions,
-    getConfirmButton: getConfirmButton,
-    getDenyButton: getDenyButton,
-    getCancelButton: getCancelButton,
-    getLoader: getLoader,
-    getFooter: getFooter,
-    getTimerProgressBar: getTimerProgressBar,
-    getFocusableElements: getFocusableElements,
-    getValidationMessage: getValidationMessage,
-    isLoading: isLoading,
-    fire: fire,
-    mixin: mixin,
-    showLoading: showLoading,
-    enableLoading: showLoading,
-    getTimerLeft: getTimerLeft,
-    stopTimer: stopTimer,
-    resumeTimer: resumeTimer,
-    toggleTimer: toggleTimer,
-    increaseTimer: increaseTimer,
-    isTimerRunning: isTimerRunning,
-    bindClickHandler: bindClickHandler
-  });
-
-  let currentInstance;
-
-  class SweetAlert {
-    constructor() {
-      // Prevent run in Node env
-      if (typeof window === 'undefined') {
-        return;
-      }
-
-      currentInstance = this; // @ts-ignore
-
-      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-
-      const outerParams = Object.freeze(this.constructor.argsToParams(args));
-      Object.defineProperties(this, {
-        params: {
-          value: outerParams,
-          writable: false,
-          enumerable: true,
-          configurable: true
-        }
-      }); // @ts-ignore
-
-      const promise = this._main(this.params);
-
-      privateProps.promise.set(this, promise);
-    }
-
-    _main(userParams) {
-      let mixinParams = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      showWarningsForParams(Object.assign({}, mixinParams, userParams));
-
-      if (globalState.currentInstance) {
-        globalState.currentInstance._destroy();
-
-        if (isModal()) {
-          unsetAriaHidden();
-        }
-      }
-
-      globalState.currentInstance = this;
-      const innerParams = prepareParams(userParams, mixinParams);
-      setParameters(innerParams);
-      Object.freeze(innerParams); // clear the previous timer
-
-      if (globalState.timeout) {
-        globalState.timeout.stop();
-        delete globalState.timeout;
-      } // clear the restore focus timeout
-
-
-      clearTimeout(globalState.restoreFocusTimeout);
-      const domCache = populateDomCache(this);
-      render(this, innerParams);
-      privateProps.innerParams.set(this, innerParams);
-      return swalPromise(this, domCache, innerParams);
-    } // `catch` cannot be the name of a module export, so we define our thenable methods here instead
-
-
-    then(onFulfilled) {
-      const promise = privateProps.promise.get(this);
-      return promise.then(onFulfilled);
-    }
-
-    finally(onFinally) {
-      const promise = privateProps.promise.get(this);
-      return promise.finally(onFinally);
-    }
-
-  }
 
   const swalPromise = (instance, domCache, innerParams) => {
     return new Promise((resolve, reject) => {
@@ -72963,15 +72405,6 @@ module.exports = function (list, options) {
     });
   };
 
-  const prepareParams = (userParams, mixinParams) => {
-    const templateParams = getTemplateParams(userParams);
-    const params = Object.assign({}, defaultParams, mixinParams, templateParams, userParams); // precedence is described in #2131
-
-    params.showClass = Object.assign({}, defaultParams.showClass, params.showClass);
-    params.hideClass = Object.assign({}, defaultParams.hideClass, params.hideClass);
-    return params;
-  };
-
   const populateDomCache = instance => {
     const domCache = {
       popup: getPopup(),
@@ -73001,7 +72434,6 @@ module.exports = function (list, options) {
 
       if (innerParams.timerProgressBar) {
         show(timerProgressBar);
-        applyCustomClass(timerProgressBar, innerParams, 'timerProgressBar');
         setTimeout(() => {
           if (globalState$$1.timeout && globalState$$1.timeout.running) {
             // timer can be already stopped or unset at this point
@@ -73046,10 +72478,162 @@ module.exports = function (list, options) {
   };
 
   const blurActiveElement = () => {
-    if (document.activeElement instanceof HTMLElement && typeof document.activeElement.blur === 'function') {
+    if (document.activeElement && typeof document.activeElement.blur === 'function') {
       document.activeElement.blur();
     }
-  }; // Assign instance methods from src/instanceMethods/*.js to prototype
+  };
+
+  /**
+   * Updates popup parameters.
+   */
+
+  function update(params) {
+    const popup = getPopup();
+    const innerParams = privateProps.innerParams.get(this);
+
+    if (!popup || hasClass(popup, innerParams.hideClass.popup)) {
+      return warn("You're trying to update the closed or closing popup, that won't work. Use the update() method in preConfirm parameter or show a new popup.");
+    }
+
+    const validUpdatableParams = {}; // assign valid params from `params` to `defaults`
+
+    Object.keys(params).forEach(param => {
+      if (Swal.isUpdatableParameter(param)) {
+        validUpdatableParams[param] = params[param];
+      } else {
+        warn("Invalid parameter to update: \"".concat(param, "\". Updatable params are listed here: https://github.com/sweetalert2/sweetalert2/blob/master/src/utils/params.js\n\nIf you think this parameter should be updatable, request it here: https://github.com/sweetalert2/sweetalert2/issues/new?template=02_feature_request.md"));
+      }
+    });
+    const updatedParams = Object.assign({}, innerParams, validUpdatableParams);
+    render(this, updatedParams);
+    privateProps.innerParams.set(this, updatedParams);
+    Object.defineProperties(this, {
+      params: {
+        value: Object.assign({}, this.params, params),
+        writable: false,
+        enumerable: true
+      }
+    });
+  }
+
+  function _destroy() {
+    const domCache = privateProps.domCache.get(this);
+    const innerParams = privateProps.innerParams.get(this);
+
+    if (!innerParams) {
+      disposeWeakMaps(this); // The WeakMaps might have been partly destroyed, we must recall it to dispose any remaining weakmaps #2335
+
+      return; // This instance has already been destroyed
+    } // Check if there is another Swal closing
+
+
+    if (domCache.popup && globalState.swalCloseEventFinishedCallback) {
+      globalState.swalCloseEventFinishedCallback();
+      delete globalState.swalCloseEventFinishedCallback;
+    } // Check if there is a swal disposal defer timer
+
+
+    if (globalState.deferDisposalTimer) {
+      clearTimeout(globalState.deferDisposalTimer);
+      delete globalState.deferDisposalTimer;
+    }
+
+    if (typeof innerParams.didDestroy === 'function') {
+      innerParams.didDestroy();
+    }
+
+    disposeSwal(this);
+  }
+
+  const disposeSwal = instance => {
+    disposeWeakMaps(instance); // Unset this.params so GC will dispose it (#1569)
+
+    delete instance.params; // Unset globalState props so GC will dispose globalState (#1569)
+
+    delete globalState.keydownHandler;
+    delete globalState.keydownTarget; // Unset currentInstance
+
+    delete globalState.currentInstance;
+  };
+
+  const disposeWeakMaps = instance => {
+    // If the current instance is awaiting a promise result, we keep the privateMethods to call them once the promise result is retreived #2335
+    if (instance.isAwaitingPromise()) {
+      unsetWeakMaps(privateProps, instance);
+      privateProps.awaitingPromise.set(instance, true);
+    } else {
+      unsetWeakMaps(privateMethods, instance);
+      unsetWeakMaps(privateProps, instance);
+    }
+  };
+
+  const unsetWeakMaps = (obj, instance) => {
+    for (const i in obj) {
+      obj[i].delete(instance);
+    }
+  };
+
+
+
+  var instanceMethods = /*#__PURE__*/Object.freeze({
+    hideLoading: hideLoading,
+    disableLoading: hideLoading,
+    getInput: getInput$1,
+    close: close,
+    isAwaitingPromise: isAwaitingPromise,
+    rejectPromise: rejectPromise,
+    closePopup: close,
+    closeModal: close,
+    closeToast: close,
+    enableButtons: enableButtons,
+    disableButtons: disableButtons,
+    enableInput: enableInput,
+    disableInput: disableInput,
+    showValidationMessage: showValidationMessage,
+    resetValidationMessage: resetValidationMessage$1,
+    getProgressSteps: getProgressSteps$1,
+    _main: _main,
+    update: update,
+    _destroy: _destroy
+  });
+
+  let currentInstance;
+
+  class SweetAlert {
+    constructor(...args) {
+      // Prevent run in Node env
+      if (typeof window === 'undefined') {
+        return;
+      }
+
+      currentInstance = this;
+      const outerParams = Object.freeze(this.constructor.argsToParams(args));
+      Object.defineProperties(this, {
+        params: {
+          value: outerParams,
+          writable: false,
+          enumerable: true,
+          configurable: true
+        }
+      });
+
+      const promise = this._main(this.params);
+
+      privateProps.promise.set(this, promise);
+    } // `catch` cannot be the name of a module export, so we define our thenable methods here instead
+
+
+    then(onFulfilled) {
+      const promise = privateProps.promise.get(this);
+      return promise.then(onFulfilled);
+    }
+
+    finally(onFinally) {
+      const promise = privateProps.promise.get(this);
+      return promise.finally(onFinally);
+    }
+
+  } // Assign instance methods from src/instanceMethods/*.js to prototype
 
 
   Object.assign(SweetAlert.prototype, instanceMethods); // Assign static methods from src/staticMethods/*.js to constructor
@@ -73057,17 +72641,16 @@ module.exports = function (list, options) {
   Object.assign(SweetAlert, staticMethods); // Proxy to instance methods to constructor, for now, for backwards compatibility
 
   Object.keys(instanceMethods).forEach(key => {
-    SweetAlert[key] = function () {
+    SweetAlert[key] = function (...args) {
       if (currentInstance) {
-        return currentInstance[key](...arguments);
+        return currentInstance[key](...args);
       }
     };
   });
   SweetAlert.DismissReason = DismissReason;
-  SweetAlert.version = '11.4.8';
+  SweetAlert.version = '11.1.9';
 
-  const Swal = SweetAlert; // @ts-ignore
-
+  const Swal = SweetAlert;
   Swal.default = Swal;
 
   return Swal;
@@ -73075,7 +72658,7 @@ module.exports = function (list, options) {
 }));
 if (typeof this !== 'undefined' && this.Sweetalert2){  this.swal = this.sweetAlert = this.Swal = this.SweetAlert = this.Sweetalert2}
 
-"undefined"!=typeof document&&function(e,t){var n=e.createElement("style");if(e.getElementsByTagName("head")[0].appendChild(n),n.styleSheet)n.styleSheet.disabled||(n.styleSheet.cssText=t);else try{n.innerHTML=t}catch(e){n.innerText=t}}(document,".swal2-popup.swal2-toast{box-sizing:border-box;grid-column:1/4!important;grid-row:1/4!important;grid-template-columns:1fr 99fr 1fr;padding:1em;overflow-y:hidden;background:#fff;box-shadow:0 0 1px rgba(0,0,0,.075),0 1px 2px rgba(0,0,0,.075),1px 2px 4px rgba(0,0,0,.075),1px 3px 8px rgba(0,0,0,.075),2px 4px 16px rgba(0,0,0,.075);pointer-events:all}.swal2-popup.swal2-toast>*{grid-column:2}.swal2-popup.swal2-toast .swal2-title{margin:.5em 1em;padding:0;font-size:1em;text-align:initial}.swal2-popup.swal2-toast .swal2-loading{justify-content:center}.swal2-popup.swal2-toast .swal2-input{height:2em;margin:.5em;font-size:1em}.swal2-popup.swal2-toast .swal2-validation-message{font-size:1em}.swal2-popup.swal2-toast .swal2-footer{margin:.5em 0 0;padding:.5em 0 0;font-size:.8em}.swal2-popup.swal2-toast .swal2-close{grid-column:3/3;grid-row:1/99;align-self:center;width:.8em;height:.8em;margin:0;font-size:2em}.swal2-popup.swal2-toast .swal2-html-container{margin:.5em 1em;padding:0;font-size:1em;text-align:initial}.swal2-popup.swal2-toast .swal2-html-container:empty{padding:0}.swal2-popup.swal2-toast .swal2-loader{grid-column:1;grid-row:1/99;align-self:center;width:2em;height:2em;margin:.25em}.swal2-popup.swal2-toast .swal2-icon{grid-column:1;grid-row:1/99;align-self:center;width:2em;min-width:2em;height:2em;margin:0 .5em 0 0}.swal2-popup.swal2-toast .swal2-icon .swal2-icon-content{display:flex;align-items:center;font-size:1.8em;font-weight:700}.swal2-popup.swal2-toast .swal2-icon.swal2-success .swal2-success-ring{width:2em;height:2em}.swal2-popup.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line]{top:.875em;width:1.375em}.swal2-popup.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line][class$=left]{left:.3125em}.swal2-popup.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line][class$=right]{right:.3125em}.swal2-popup.swal2-toast .swal2-actions{justify-content:flex-start;height:auto;margin:0;margin-top:.5em;padding:0 .5em}.swal2-popup.swal2-toast .swal2-styled{margin:.25em .5em;padding:.4em .6em;font-size:1em}.swal2-popup.swal2-toast .swal2-success{border-color:#a5dc86}.swal2-popup.swal2-toast .swal2-success [class^=swal2-success-circular-line]{position:absolute;width:1.6em;height:3em;transform:rotate(45deg);border-radius:50%}.swal2-popup.swal2-toast .swal2-success [class^=swal2-success-circular-line][class$=left]{top:-.8em;left:-.5em;transform:rotate(-45deg);transform-origin:2em 2em;border-radius:4em 0 0 4em}.swal2-popup.swal2-toast .swal2-success [class^=swal2-success-circular-line][class$=right]{top:-.25em;left:.9375em;transform-origin:0 1.5em;border-radius:0 4em 4em 0}.swal2-popup.swal2-toast .swal2-success .swal2-success-ring{width:2em;height:2em}.swal2-popup.swal2-toast .swal2-success .swal2-success-fix{top:0;left:.4375em;width:.4375em;height:2.6875em}.swal2-popup.swal2-toast .swal2-success [class^=swal2-success-line]{height:.3125em}.swal2-popup.swal2-toast .swal2-success [class^=swal2-success-line][class$=tip]{top:1.125em;left:.1875em;width:.75em}.swal2-popup.swal2-toast .swal2-success [class^=swal2-success-line][class$=long]{top:.9375em;right:.1875em;width:1.375em}.swal2-popup.swal2-toast .swal2-success.swal2-icon-show .swal2-success-line-tip{-webkit-animation:swal2-toast-animate-success-line-tip .75s;animation:swal2-toast-animate-success-line-tip .75s}.swal2-popup.swal2-toast .swal2-success.swal2-icon-show .swal2-success-line-long{-webkit-animation:swal2-toast-animate-success-line-long .75s;animation:swal2-toast-animate-success-line-long .75s}.swal2-popup.swal2-toast.swal2-show{-webkit-animation:swal2-toast-show .5s;animation:swal2-toast-show .5s}.swal2-popup.swal2-toast.swal2-hide{-webkit-animation:swal2-toast-hide .1s forwards;animation:swal2-toast-hide .1s forwards}.swal2-container{display:grid;position:fixed;z-index:1060;top:0;right:0;bottom:0;left:0;box-sizing:border-box;grid-template-areas:\"top-start     top            top-end\" \"center-start  center         center-end\" \"bottom-start  bottom-center  bottom-end\";grid-template-rows:minmax(-webkit-min-content,auto) minmax(-webkit-min-content,auto) minmax(-webkit-min-content,auto);grid-template-rows:minmax(min-content,auto) minmax(min-content,auto) minmax(min-content,auto);height:100%;padding:.625em;overflow-x:hidden;transition:background-color .1s;-webkit-overflow-scrolling:touch}.swal2-container.swal2-backdrop-show,.swal2-container.swal2-noanimation{background:rgba(0,0,0,.4)}.swal2-container.swal2-backdrop-hide{background:0 0!important}.swal2-container.swal2-bottom-start,.swal2-container.swal2-center-start,.swal2-container.swal2-top-start{grid-template-columns:minmax(0,1fr) auto auto}.swal2-container.swal2-bottom,.swal2-container.swal2-center,.swal2-container.swal2-top{grid-template-columns:auto minmax(0,1fr) auto}.swal2-container.swal2-bottom-end,.swal2-container.swal2-center-end,.swal2-container.swal2-top-end{grid-template-columns:auto auto minmax(0,1fr)}.swal2-container.swal2-top-start>.swal2-popup{align-self:start}.swal2-container.swal2-top>.swal2-popup{grid-column:2;align-self:start;justify-self:center}.swal2-container.swal2-top-end>.swal2-popup,.swal2-container.swal2-top-right>.swal2-popup{grid-column:3;align-self:start;justify-self:end}.swal2-container.swal2-center-left>.swal2-popup,.swal2-container.swal2-center-start>.swal2-popup{grid-row:2;align-self:center}.swal2-container.swal2-center>.swal2-popup{grid-column:2;grid-row:2;align-self:center;justify-self:center}.swal2-container.swal2-center-end>.swal2-popup,.swal2-container.swal2-center-right>.swal2-popup{grid-column:3;grid-row:2;align-self:center;justify-self:end}.swal2-container.swal2-bottom-left>.swal2-popup,.swal2-container.swal2-bottom-start>.swal2-popup{grid-column:1;grid-row:3;align-self:end}.swal2-container.swal2-bottom>.swal2-popup{grid-column:2;grid-row:3;justify-self:center;align-self:end}.swal2-container.swal2-bottom-end>.swal2-popup,.swal2-container.swal2-bottom-right>.swal2-popup{grid-column:3;grid-row:3;align-self:end;justify-self:end}.swal2-container.swal2-grow-fullscreen>.swal2-popup,.swal2-container.swal2-grow-row>.swal2-popup{grid-column:1/4;width:100%}.swal2-container.swal2-grow-column>.swal2-popup,.swal2-container.swal2-grow-fullscreen>.swal2-popup{grid-row:1/4;align-self:stretch}.swal2-container.swal2-no-transition{transition:none!important}.swal2-popup{display:none;position:relative;box-sizing:border-box;grid-template-columns:minmax(0,100%);width:32em;max-width:100%;padding:0 0 1.25em;border:none;border-radius:5px;background:#fff;color:#545454;font-family:inherit;font-size:1rem}.swal2-popup:focus{outline:0}.swal2-popup.swal2-loading{overflow-y:hidden}.swal2-title{position:relative;max-width:100%;margin:0;padding:.8em 1em 0;color:inherit;font-size:1.875em;font-weight:600;text-align:center;text-transform:none;word-wrap:break-word}.swal2-actions{display:flex;z-index:1;box-sizing:border-box;flex-wrap:wrap;align-items:center;justify-content:center;width:auto;margin:1.25em auto 0;padding:0}.swal2-actions:not(.swal2-loading) .swal2-styled[disabled]{opacity:.4}.swal2-actions:not(.swal2-loading) .swal2-styled:hover{background-image:linear-gradient(rgba(0,0,0,.1),rgba(0,0,0,.1))}.swal2-actions:not(.swal2-loading) .swal2-styled:active{background-image:linear-gradient(rgba(0,0,0,.2),rgba(0,0,0,.2))}.swal2-loader{display:none;align-items:center;justify-content:center;width:2.2em;height:2.2em;margin:0 1.875em;-webkit-animation:swal2-rotate-loading 1.5s linear 0s infinite normal;animation:swal2-rotate-loading 1.5s linear 0s infinite normal;border-width:.25em;border-style:solid;border-radius:100%;border-color:#2778c4 transparent #2778c4 transparent}.swal2-styled{margin:.3125em;padding:.625em 1.1em;transition:box-shadow .1s;box-shadow:0 0 0 3px transparent;font-weight:500}.swal2-styled:not([disabled]){cursor:pointer}.swal2-styled.swal2-confirm{border:0;border-radius:.25em;background:initial;background-color:#7066e0;color:#fff;font-size:1em}.swal2-styled.swal2-confirm:focus{box-shadow:0 0 0 3px rgba(112,102,224,.5)}.swal2-styled.swal2-deny{border:0;border-radius:.25em;background:initial;background-color:#dc3741;color:#fff;font-size:1em}.swal2-styled.swal2-deny:focus{box-shadow:0 0 0 3px rgba(220,55,65,.5)}.swal2-styled.swal2-cancel{border:0;border-radius:.25em;background:initial;background-color:#6e7881;color:#fff;font-size:1em}.swal2-styled.swal2-cancel:focus{box-shadow:0 0 0 3px rgba(110,120,129,.5)}.swal2-styled.swal2-default-outline:focus{box-shadow:0 0 0 3px rgba(100,150,200,.5)}.swal2-styled:focus{outline:0}.swal2-styled::-moz-focus-inner{border:0}.swal2-footer{justify-content:center;margin:1em 0 0;padding:1em 1em 0;border-top:1px solid #eee;color:inherit;font-size:1em}.swal2-timer-progress-bar-container{position:absolute;right:0;bottom:0;left:0;grid-column:auto!important;overflow:hidden;border-bottom-right-radius:5px;border-bottom-left-radius:5px}.swal2-timer-progress-bar{width:100%;height:.25em;background:rgba(0,0,0,.2)}.swal2-image{max-width:100%;margin:2em auto 1em}.swal2-close{z-index:2;align-items:center;justify-content:center;width:1.2em;height:1.2em;margin-top:0;margin-right:0;margin-bottom:-1.2em;padding:0;overflow:hidden;transition:color .1s,box-shadow .1s;border:none;border-radius:5px;background:0 0;color:#ccc;font-family:serif;font-family:monospace;font-size:2.5em;cursor:pointer;justify-self:end}.swal2-close:hover{transform:none;background:0 0;color:#f27474}.swal2-close:focus{outline:0;box-shadow:inset 0 0 0 3px rgba(100,150,200,.5)}.swal2-close::-moz-focus-inner{border:0}.swal2-html-container{z-index:1;justify-content:center;margin:1em 1.6em .3em;padding:0;overflow:auto;color:inherit;font-size:1.125em;font-weight:400;line-height:normal;text-align:center;word-wrap:break-word;word-break:break-word}.swal2-checkbox,.swal2-file,.swal2-input,.swal2-radio,.swal2-select,.swal2-textarea{margin:1em 2em 3px}.swal2-file,.swal2-input,.swal2-textarea{box-sizing:border-box;width:auto;transition:border-color .1s,box-shadow .1s;border:1px solid #d9d9d9;border-radius:.1875em;background:inherit;box-shadow:inset 0 1px 1px rgba(0,0,0,.06),0 0 0 3px transparent;color:inherit;font-size:1.125em}.swal2-file.swal2-inputerror,.swal2-input.swal2-inputerror,.swal2-textarea.swal2-inputerror{border-color:#f27474!important;box-shadow:0 0 2px #f27474!important}.swal2-file:focus,.swal2-input:focus,.swal2-textarea:focus{border:1px solid #b4dbed;outline:0;box-shadow:inset 0 1px 1px rgba(0,0,0,.06),0 0 0 3px rgba(100,150,200,.5)}.swal2-file::-moz-placeholder,.swal2-input::-moz-placeholder,.swal2-textarea::-moz-placeholder{color:#ccc}.swal2-file:-ms-input-placeholder,.swal2-input:-ms-input-placeholder,.swal2-textarea:-ms-input-placeholder{color:#ccc}.swal2-file::placeholder,.swal2-input::placeholder,.swal2-textarea::placeholder{color:#ccc}.swal2-range{margin:1em 2em 3px;background:#fff}.swal2-range input{width:80%}.swal2-range output{width:20%;color:inherit;font-weight:600;text-align:center}.swal2-range input,.swal2-range output{height:2.625em;padding:0;font-size:1.125em;line-height:2.625em}.swal2-input{height:2.625em;padding:0 .75em}.swal2-file{width:75%;margin-right:auto;margin-left:auto;background:inherit;font-size:1.125em}.swal2-textarea{height:6.75em;padding:.75em}.swal2-select{min-width:50%;max-width:100%;padding:.375em .625em;background:inherit;color:inherit;font-size:1.125em}.swal2-checkbox,.swal2-radio{align-items:center;justify-content:center;background:#fff;color:inherit}.swal2-checkbox label,.swal2-radio label{margin:0 .6em;font-size:1.125em}.swal2-checkbox input,.swal2-radio input{flex-shrink:0;margin:0 .4em}.swal2-input-label{display:flex;justify-content:center;margin:1em auto 0}.swal2-validation-message{align-items:center;justify-content:center;margin:1em 0 0;padding:.625em;overflow:hidden;background:#f0f0f0;color:#666;font-size:1em;font-weight:300}.swal2-validation-message::before{content:\"!\";display:inline-block;width:1.5em;min-width:1.5em;height:1.5em;margin:0 .625em;border-radius:50%;background-color:#f27474;color:#fff;font-weight:600;line-height:1.5em;text-align:center}.swal2-icon{position:relative;box-sizing:content-box;justify-content:center;width:5em;height:5em;margin:2.5em auto .6em;border:.25em solid transparent;border-radius:50%;border-color:#000;font-family:inherit;line-height:5em;cursor:default;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.swal2-icon .swal2-icon-content{display:flex;align-items:center;font-size:3.75em}.swal2-icon.swal2-error{border-color:#f27474;color:#f27474}.swal2-icon.swal2-error .swal2-x-mark{position:relative;flex-grow:1}.swal2-icon.swal2-error [class^=swal2-x-mark-line]{display:block;position:absolute;top:2.3125em;width:2.9375em;height:.3125em;border-radius:.125em;background-color:#f27474}.swal2-icon.swal2-error [class^=swal2-x-mark-line][class$=left]{left:1.0625em;transform:rotate(45deg)}.swal2-icon.swal2-error [class^=swal2-x-mark-line][class$=right]{right:1em;transform:rotate(-45deg)}.swal2-icon.swal2-error.swal2-icon-show{-webkit-animation:swal2-animate-error-icon .5s;animation:swal2-animate-error-icon .5s}.swal2-icon.swal2-error.swal2-icon-show .swal2-x-mark{-webkit-animation:swal2-animate-error-x-mark .5s;animation:swal2-animate-error-x-mark .5s}.swal2-icon.swal2-warning{border-color:#facea8;color:#f8bb86}.swal2-icon.swal2-warning.swal2-icon-show{-webkit-animation:swal2-animate-error-icon .5s;animation:swal2-animate-error-icon .5s}.swal2-icon.swal2-warning.swal2-icon-show .swal2-icon-content{-webkit-animation:swal2-animate-i-mark .5s;animation:swal2-animate-i-mark .5s}.swal2-icon.swal2-info{border-color:#9de0f6;color:#3fc3ee}.swal2-icon.swal2-info.swal2-icon-show{-webkit-animation:swal2-animate-error-icon .5s;animation:swal2-animate-error-icon .5s}.swal2-icon.swal2-info.swal2-icon-show .swal2-icon-content{-webkit-animation:swal2-animate-i-mark .8s;animation:swal2-animate-i-mark .8s}.swal2-icon.swal2-question{border-color:#c9dae1;color:#87adbd}.swal2-icon.swal2-question.swal2-icon-show{-webkit-animation:swal2-animate-error-icon .5s;animation:swal2-animate-error-icon .5s}.swal2-icon.swal2-question.swal2-icon-show .swal2-icon-content{-webkit-animation:swal2-animate-question-mark .8s;animation:swal2-animate-question-mark .8s}.swal2-icon.swal2-success{border-color:#a5dc86;color:#a5dc86}.swal2-icon.swal2-success [class^=swal2-success-circular-line]{position:absolute;width:3.75em;height:7.5em;transform:rotate(45deg);border-radius:50%}.swal2-icon.swal2-success [class^=swal2-success-circular-line][class$=left]{top:-.4375em;left:-2.0635em;transform:rotate(-45deg);transform-origin:3.75em 3.75em;border-radius:7.5em 0 0 7.5em}.swal2-icon.swal2-success [class^=swal2-success-circular-line][class$=right]{top:-.6875em;left:1.875em;transform:rotate(-45deg);transform-origin:0 3.75em;border-radius:0 7.5em 7.5em 0}.swal2-icon.swal2-success .swal2-success-ring{position:absolute;z-index:2;top:-.25em;left:-.25em;box-sizing:content-box;width:100%;height:100%;border:.25em solid rgba(165,220,134,.3);border-radius:50%}.swal2-icon.swal2-success .swal2-success-fix{position:absolute;z-index:1;top:.5em;left:1.625em;width:.4375em;height:5.625em;transform:rotate(-45deg)}.swal2-icon.swal2-success [class^=swal2-success-line]{display:block;position:absolute;z-index:2;height:.3125em;border-radius:.125em;background-color:#a5dc86}.swal2-icon.swal2-success [class^=swal2-success-line][class$=tip]{top:2.875em;left:.8125em;width:1.5625em;transform:rotate(45deg)}.swal2-icon.swal2-success [class^=swal2-success-line][class$=long]{top:2.375em;right:.5em;width:2.9375em;transform:rotate(-45deg)}.swal2-icon.swal2-success.swal2-icon-show .swal2-success-line-tip{-webkit-animation:swal2-animate-success-line-tip .75s;animation:swal2-animate-success-line-tip .75s}.swal2-icon.swal2-success.swal2-icon-show .swal2-success-line-long{-webkit-animation:swal2-animate-success-line-long .75s;animation:swal2-animate-success-line-long .75s}.swal2-icon.swal2-success.swal2-icon-show .swal2-success-circular-line-right{-webkit-animation:swal2-rotate-success-circular-line 4.25s ease-in;animation:swal2-rotate-success-circular-line 4.25s ease-in}.swal2-progress-steps{flex-wrap:wrap;align-items:center;max-width:100%;margin:1.25em auto;padding:0;background:inherit;font-weight:600}.swal2-progress-steps li{display:inline-block;position:relative}.swal2-progress-steps .swal2-progress-step{z-index:20;flex-shrink:0;width:2em;height:2em;border-radius:2em;background:#2778c4;color:#fff;line-height:2em;text-align:center}.swal2-progress-steps .swal2-progress-step.swal2-active-progress-step{background:#2778c4}.swal2-progress-steps .swal2-progress-step.swal2-active-progress-step~.swal2-progress-step{background:#add8e6;color:#fff}.swal2-progress-steps .swal2-progress-step.swal2-active-progress-step~.swal2-progress-step-line{background:#add8e6}.swal2-progress-steps .swal2-progress-step-line{z-index:10;flex-shrink:0;width:2.5em;height:.4em;margin:0 -1px;background:#2778c4}[class^=swal2]{-webkit-tap-highlight-color:transparent}.swal2-show{-webkit-animation:swal2-show .3s;animation:swal2-show .3s}.swal2-hide{-webkit-animation:swal2-hide .15s forwards;animation:swal2-hide .15s forwards}.swal2-noanimation{transition:none}.swal2-scrollbar-measure{position:absolute;top:-9999px;width:50px;height:50px;overflow:scroll}.swal2-rtl .swal2-close{margin-right:initial;margin-left:0}.swal2-rtl .swal2-timer-progress-bar{right:0;left:auto}@-webkit-keyframes swal2-toast-show{0%{transform:translateY(-.625em) rotateZ(2deg)}33%{transform:translateY(0) rotateZ(-2deg)}66%{transform:translateY(.3125em) rotateZ(2deg)}100%{transform:translateY(0) rotateZ(0)}}@keyframes swal2-toast-show{0%{transform:translateY(-.625em) rotateZ(2deg)}33%{transform:translateY(0) rotateZ(-2deg)}66%{transform:translateY(.3125em) rotateZ(2deg)}100%{transform:translateY(0) rotateZ(0)}}@-webkit-keyframes swal2-toast-hide{100%{transform:rotateZ(1deg);opacity:0}}@keyframes swal2-toast-hide{100%{transform:rotateZ(1deg);opacity:0}}@-webkit-keyframes swal2-toast-animate-success-line-tip{0%{top:.5625em;left:.0625em;width:0}54%{top:.125em;left:.125em;width:0}70%{top:.625em;left:-.25em;width:1.625em}84%{top:1.0625em;left:.75em;width:.5em}100%{top:1.125em;left:.1875em;width:.75em}}@keyframes swal2-toast-animate-success-line-tip{0%{top:.5625em;left:.0625em;width:0}54%{top:.125em;left:.125em;width:0}70%{top:.625em;left:-.25em;width:1.625em}84%{top:1.0625em;left:.75em;width:.5em}100%{top:1.125em;left:.1875em;width:.75em}}@-webkit-keyframes swal2-toast-animate-success-line-long{0%{top:1.625em;right:1.375em;width:0}65%{top:1.25em;right:.9375em;width:0}84%{top:.9375em;right:0;width:1.125em}100%{top:.9375em;right:.1875em;width:1.375em}}@keyframes swal2-toast-animate-success-line-long{0%{top:1.625em;right:1.375em;width:0}65%{top:1.25em;right:.9375em;width:0}84%{top:.9375em;right:0;width:1.125em}100%{top:.9375em;right:.1875em;width:1.375em}}@-webkit-keyframes swal2-show{0%{transform:scale(.7)}45%{transform:scale(1.05)}80%{transform:scale(.95)}100%{transform:scale(1)}}@keyframes swal2-show{0%{transform:scale(.7)}45%{transform:scale(1.05)}80%{transform:scale(.95)}100%{transform:scale(1)}}@-webkit-keyframes swal2-hide{0%{transform:scale(1);opacity:1}100%{transform:scale(.5);opacity:0}}@keyframes swal2-hide{0%{transform:scale(1);opacity:1}100%{transform:scale(.5);opacity:0}}@-webkit-keyframes swal2-animate-success-line-tip{0%{top:1.1875em;left:.0625em;width:0}54%{top:1.0625em;left:.125em;width:0}70%{top:2.1875em;left:-.375em;width:3.125em}84%{top:3em;left:1.3125em;width:1.0625em}100%{top:2.8125em;left:.8125em;width:1.5625em}}@keyframes swal2-animate-success-line-tip{0%{top:1.1875em;left:.0625em;width:0}54%{top:1.0625em;left:.125em;width:0}70%{top:2.1875em;left:-.375em;width:3.125em}84%{top:3em;left:1.3125em;width:1.0625em}100%{top:2.8125em;left:.8125em;width:1.5625em}}@-webkit-keyframes swal2-animate-success-line-long{0%{top:3.375em;right:2.875em;width:0}65%{top:3.375em;right:2.875em;width:0}84%{top:2.1875em;right:0;width:3.4375em}100%{top:2.375em;right:.5em;width:2.9375em}}@keyframes swal2-animate-success-line-long{0%{top:3.375em;right:2.875em;width:0}65%{top:3.375em;right:2.875em;width:0}84%{top:2.1875em;right:0;width:3.4375em}100%{top:2.375em;right:.5em;width:2.9375em}}@-webkit-keyframes swal2-rotate-success-circular-line{0%{transform:rotate(-45deg)}5%{transform:rotate(-45deg)}12%{transform:rotate(-405deg)}100%{transform:rotate(-405deg)}}@keyframes swal2-rotate-success-circular-line{0%{transform:rotate(-45deg)}5%{transform:rotate(-45deg)}12%{transform:rotate(-405deg)}100%{transform:rotate(-405deg)}}@-webkit-keyframes swal2-animate-error-x-mark{0%{margin-top:1.625em;transform:scale(.4);opacity:0}50%{margin-top:1.625em;transform:scale(.4);opacity:0}80%{margin-top:-.375em;transform:scale(1.15)}100%{margin-top:0;transform:scale(1);opacity:1}}@keyframes swal2-animate-error-x-mark{0%{margin-top:1.625em;transform:scale(.4);opacity:0}50%{margin-top:1.625em;transform:scale(.4);opacity:0}80%{margin-top:-.375em;transform:scale(1.15)}100%{margin-top:0;transform:scale(1);opacity:1}}@-webkit-keyframes swal2-animate-error-icon{0%{transform:rotateX(100deg);opacity:0}100%{transform:rotateX(0);opacity:1}}@keyframes swal2-animate-error-icon{0%{transform:rotateX(100deg);opacity:0}100%{transform:rotateX(0);opacity:1}}@-webkit-keyframes swal2-rotate-loading{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}@keyframes swal2-rotate-loading{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}@-webkit-keyframes swal2-animate-question-mark{0%{transform:rotateY(-360deg)}100%{transform:rotateY(0)}}@keyframes swal2-animate-question-mark{0%{transform:rotateY(-360deg)}100%{transform:rotateY(0)}}@-webkit-keyframes swal2-animate-i-mark{0%{transform:rotateZ(45deg);opacity:0}25%{transform:rotateZ(-25deg);opacity:.4}50%{transform:rotateZ(15deg);opacity:.8}75%{transform:rotateZ(-5deg);opacity:1}100%{transform:rotateX(0);opacity:1}}@keyframes swal2-animate-i-mark{0%{transform:rotateZ(45deg);opacity:0}25%{transform:rotateZ(-25deg);opacity:.4}50%{transform:rotateZ(15deg);opacity:.8}75%{transform:rotateZ(-5deg);opacity:1}100%{transform:rotateX(0);opacity:1}}body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown){overflow:hidden}body.swal2-height-auto{height:auto!important}body.swal2-no-backdrop .swal2-container{background-color:transparent!important;pointer-events:none}body.swal2-no-backdrop .swal2-container .swal2-popup{pointer-events:all}body.swal2-no-backdrop .swal2-container .swal2-modal{box-shadow:0 0 10px rgba(0,0,0,.4)}@media print{body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown){overflow-y:scroll!important}body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown)>[aria-hidden=true]{display:none}body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) .swal2-container{position:static!important}}body.swal2-toast-shown .swal2-container{box-sizing:border-box;width:360px;max-width:100%;background-color:transparent;pointer-events:none}body.swal2-toast-shown .swal2-container.swal2-top{top:0;right:auto;bottom:auto;left:50%;transform:translateX(-50%)}body.swal2-toast-shown .swal2-container.swal2-top-end,body.swal2-toast-shown .swal2-container.swal2-top-right{top:0;right:0;bottom:auto;left:auto}body.swal2-toast-shown .swal2-container.swal2-top-left,body.swal2-toast-shown .swal2-container.swal2-top-start{top:0;right:auto;bottom:auto;left:0}body.swal2-toast-shown .swal2-container.swal2-center-left,body.swal2-toast-shown .swal2-container.swal2-center-start{top:50%;right:auto;bottom:auto;left:0;transform:translateY(-50%)}body.swal2-toast-shown .swal2-container.swal2-center{top:50%;right:auto;bottom:auto;left:50%;transform:translate(-50%,-50%)}body.swal2-toast-shown .swal2-container.swal2-center-end,body.swal2-toast-shown .swal2-container.swal2-center-right{top:50%;right:0;bottom:auto;left:auto;transform:translateY(-50%)}body.swal2-toast-shown .swal2-container.swal2-bottom-left,body.swal2-toast-shown .swal2-container.swal2-bottom-start{top:auto;right:auto;bottom:0;left:0}body.swal2-toast-shown .swal2-container.swal2-bottom{top:auto;right:auto;bottom:0;left:50%;transform:translateX(-50%)}body.swal2-toast-shown .swal2-container.swal2-bottom-end,body.swal2-toast-shown .swal2-container.swal2-bottom-right{top:auto;right:0;bottom:0;left:auto}");
+"undefined"!=typeof document&&function(e,t){var n=e.createElement("style");if(e.getElementsByTagName("head")[0].appendChild(n),n.styleSheet)n.styleSheet.disabled||(n.styleSheet.cssText=t);else try{n.innerHTML=t}catch(e){n.innerText=t}}(document,".swal2-popup.swal2-toast{box-sizing:border-box;grid-column:1/4!important;grid-row:1/4!important;grid-template-columns:1fr 99fr 1fr;padding:1em;overflow-y:hidden;background:#fff;box-shadow:0 0 1px rgba(0,0,0,.075),0 1px 2px rgba(0,0,0,.075),1px 2px 4px rgba(0,0,0,.075),1px 3px 8px rgba(0,0,0,.075),2px 4px 16px rgba(0,0,0,.075);pointer-events:all}.swal2-popup.swal2-toast>*{grid-column:2}.swal2-popup.swal2-toast .swal2-title{margin:.5em 1em;padding:0;font-size:1em;text-align:initial}.swal2-popup.swal2-toast .swal2-loading{justify-content:center}.swal2-popup.swal2-toast .swal2-input{height:2em;margin:.5em;font-size:1em}.swal2-popup.swal2-toast .swal2-validation-message{font-size:1em}.swal2-popup.swal2-toast .swal2-footer{margin:.5em 0 0;padding:.5em 0 0;font-size:.8em}.swal2-popup.swal2-toast .swal2-close{grid-column:3/3;grid-row:1/99;align-self:center;width:.8em;height:.8em;margin:0;font-size:2em}.swal2-popup.swal2-toast .swal2-html-container{margin:.5em 1em;padding:0;font-size:1em;text-align:initial}.swal2-popup.swal2-toast .swal2-html-container:empty{padding:0}.swal2-popup.swal2-toast .swal2-loader{grid-column:1;grid-row:1/99;align-self:center;width:2em;height:2em;margin:.25em}.swal2-popup.swal2-toast .swal2-icon{grid-column:1;grid-row:1/99;align-self:center;width:2em;min-width:2em;height:2em;margin:0 .5em 0 0}.swal2-popup.swal2-toast .swal2-icon .swal2-icon-content{display:flex;align-items:center;font-size:1.8em;font-weight:700}.swal2-popup.swal2-toast .swal2-icon.swal2-success .swal2-success-ring{width:2em;height:2em}.swal2-popup.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line]{top:.875em;width:1.375em}.swal2-popup.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line][class$=left]{left:.3125em}.swal2-popup.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line][class$=right]{right:.3125em}.swal2-popup.swal2-toast .swal2-actions{justify-content:flex-start;height:auto;margin:0;margin-top:.5em;padding:0 .5em}.swal2-popup.swal2-toast .swal2-styled{margin:.25em .5em;padding:.4em .6em;font-size:1em}.swal2-popup.swal2-toast .swal2-success{border-color:#a5dc86}.swal2-popup.swal2-toast .swal2-success [class^=swal2-success-circular-line]{position:absolute;width:1.6em;height:3em;transform:rotate(45deg);border-radius:50%}.swal2-popup.swal2-toast .swal2-success [class^=swal2-success-circular-line][class$=left]{top:-.8em;left:-.5em;transform:rotate(-45deg);transform-origin:2em 2em;border-radius:4em 0 0 4em}.swal2-popup.swal2-toast .swal2-success [class^=swal2-success-circular-line][class$=right]{top:-.25em;left:.9375em;transform-origin:0 1.5em;border-radius:0 4em 4em 0}.swal2-popup.swal2-toast .swal2-success .swal2-success-ring{width:2em;height:2em}.swal2-popup.swal2-toast .swal2-success .swal2-success-fix{top:0;left:.4375em;width:.4375em;height:2.6875em}.swal2-popup.swal2-toast .swal2-success [class^=swal2-success-line]{height:.3125em}.swal2-popup.swal2-toast .swal2-success [class^=swal2-success-line][class$=tip]{top:1.125em;left:.1875em;width:.75em}.swal2-popup.swal2-toast .swal2-success [class^=swal2-success-line][class$=long]{top:.9375em;right:.1875em;width:1.375em}.swal2-popup.swal2-toast .swal2-success.swal2-icon-show .swal2-success-line-tip{-webkit-animation:swal2-toast-animate-success-line-tip .75s;animation:swal2-toast-animate-success-line-tip .75s}.swal2-popup.swal2-toast .swal2-success.swal2-icon-show .swal2-success-line-long{-webkit-animation:swal2-toast-animate-success-line-long .75s;animation:swal2-toast-animate-success-line-long .75s}.swal2-popup.swal2-toast.swal2-show{-webkit-animation:swal2-toast-show .5s;animation:swal2-toast-show .5s}.swal2-popup.swal2-toast.swal2-hide{-webkit-animation:swal2-toast-hide .1s forwards;animation:swal2-toast-hide .1s forwards}.swal2-container{display:grid;position:fixed;z-index:1060;top:0;right:0;bottom:0;left:0;box-sizing:border-box;grid-template-areas:\"top-start     top            top-end\" \"center-start  center         center-end\" \"bottom-start  bottom-center  bottom-end\";grid-template-rows:minmax(-webkit-min-content,auto) minmax(-webkit-min-content,auto) minmax(-webkit-min-content,auto);grid-template-rows:minmax(min-content,auto) minmax(min-content,auto) minmax(min-content,auto);height:100%;padding:.625em;overflow-x:hidden;transition:background-color .1s;-webkit-overflow-scrolling:touch}.swal2-container.swal2-backdrop-show,.swal2-container.swal2-noanimation{background:rgba(0,0,0,.4)}.swal2-container.swal2-backdrop-hide{background:0 0!important}.swal2-container.swal2-bottom-start,.swal2-container.swal2-center-start,.swal2-container.swal2-top-start{grid-template-columns:minmax(0,1fr) auto auto}.swal2-container.swal2-bottom,.swal2-container.swal2-center,.swal2-container.swal2-top{grid-template-columns:auto minmax(0,1fr) auto}.swal2-container.swal2-bottom-end,.swal2-container.swal2-center-end,.swal2-container.swal2-top-end{grid-template-columns:auto auto minmax(0,1fr)}.swal2-container.swal2-top-start>.swal2-popup{align-self:start}.swal2-container.swal2-top>.swal2-popup{grid-column:2;align-self:start;justify-self:center}.swal2-container.swal2-top-end>.swal2-popup,.swal2-container.swal2-top-right>.swal2-popup{grid-column:3;align-self:start;justify-self:end}.swal2-container.swal2-center-left>.swal2-popup,.swal2-container.swal2-center-start>.swal2-popup{grid-row:2;align-self:center}.swal2-container.swal2-center>.swal2-popup{grid-column:2;grid-row:2;align-self:center;justify-self:center}.swal2-container.swal2-center-end>.swal2-popup,.swal2-container.swal2-center-right>.swal2-popup{grid-column:3;grid-row:2;align-self:center;justify-self:end}.swal2-container.swal2-bottom-left>.swal2-popup,.swal2-container.swal2-bottom-start>.swal2-popup{grid-column:1;grid-row:3;align-self:end}.swal2-container.swal2-bottom>.swal2-popup{grid-column:2;grid-row:3;justify-self:center;align-self:end}.swal2-container.swal2-bottom-end>.swal2-popup,.swal2-container.swal2-bottom-right>.swal2-popup{grid-column:3;grid-row:3;align-self:end;justify-self:end}.swal2-container.swal2-grow-fullscreen>.swal2-popup,.swal2-container.swal2-grow-row>.swal2-popup{grid-column:1/4;width:100%}.swal2-container.swal2-grow-column>.swal2-popup,.swal2-container.swal2-grow-fullscreen>.swal2-popup{grid-row:1/4;align-self:stretch}.swal2-container.swal2-no-transition{transition:none!important}.swal2-popup{display:none;position:relative;box-sizing:border-box;grid-template-columns:minmax(0,100%);width:32em;max-width:100%;padding:0 0 1.25em;border:none;border-radius:5px;background:#fff;color:#545454;font-family:inherit;font-size:1rem}.swal2-popup:focus{outline:0}.swal2-popup.swal2-loading{overflow-y:hidden}.swal2-title{position:relative;max-width:100%;margin:0;padding:.8em 1em 0;color:#595959;font-size:1.875em;font-weight:600;text-align:center;text-transform:none;word-wrap:break-word}.swal2-actions{display:flex;z-index:1;box-sizing:border-box;flex-wrap:wrap;align-items:center;justify-content:center;width:auto;margin:1.25em auto 0;padding:0}.swal2-actions:not(.swal2-loading) .swal2-styled[disabled]{opacity:.4}.swal2-actions:not(.swal2-loading) .swal2-styled:hover{background-image:linear-gradient(rgba(0,0,0,.1),rgba(0,0,0,.1))}.swal2-actions:not(.swal2-loading) .swal2-styled:active{background-image:linear-gradient(rgba(0,0,0,.2),rgba(0,0,0,.2))}.swal2-loader{display:none;align-items:center;justify-content:center;width:2.2em;height:2.2em;margin:0 1.875em;-webkit-animation:swal2-rotate-loading 1.5s linear 0s infinite normal;animation:swal2-rotate-loading 1.5s linear 0s infinite normal;border-width:.25em;border-style:solid;border-radius:100%;border-color:#2778c4 transparent #2778c4 transparent}.swal2-styled{margin:.3125em;padding:.625em 1.1em;transition:box-shadow .1s;box-shadow:0 0 0 3px transparent;font-weight:500}.swal2-styled:not([disabled]){cursor:pointer}.swal2-styled.swal2-confirm{border:0;border-radius:.25em;background:initial;background-color:#7367f0;color:#fff;font-size:1em}.swal2-styled.swal2-confirm:focus{box-shadow:0 0 0 3px rgba(115,103,240,.5)}.swal2-styled.swal2-deny{border:0;border-radius:.25em;background:initial;background-color:#ea5455;color:#fff;font-size:1em}.swal2-styled.swal2-deny:focus{box-shadow:0 0 0 3px rgba(234,84,85,.5)}.swal2-styled.swal2-cancel{border:0;border-radius:.25em;background:initial;background-color:#6e7d88;color:#fff;font-size:1em}.swal2-styled.swal2-cancel:focus{box-shadow:0 0 0 3px rgba(110,125,136,.5)}.swal2-styled.swal2-default-outline:focus{box-shadow:0 0 0 3px rgba(100,150,200,.5)}.swal2-styled:focus{outline:0}.swal2-styled::-moz-focus-inner{border:0}.swal2-footer{justify-content:center;margin:1em 0 0;padding:1em 1em 0;border-top:1px solid #eee;color:#545454;font-size:1em}.swal2-timer-progress-bar-container{position:absolute;right:0;bottom:0;left:0;grid-column:auto!important;height:.25em;overflow:hidden;border-bottom-right-radius:5px;border-bottom-left-radius:5px}.swal2-timer-progress-bar{width:100%;height:.25em;background:rgba(0,0,0,.2)}.swal2-image{max-width:100%;margin:2em auto 1em}.swal2-close{z-index:2;align-items:center;justify-content:center;width:1.2em;height:1.2em;margin-top:0;margin-right:0;margin-bottom:-1.2em;padding:0;overflow:hidden;transition:color .1s,box-shadow .1s;border:none;border-radius:5px;background:0 0;color:#ccc;font-family:serif;font-family:monospace;font-size:2.5em;cursor:pointer;justify-self:end}.swal2-close:hover{transform:none;background:0 0;color:#f27474}.swal2-close:focus{outline:0;box-shadow:inset 0 0 0 3px rgba(100,150,200,.5)}.swal2-close::-moz-focus-inner{border:0}.swal2-html-container{z-index:1;justify-content:center;margin:1em 1.6em .3em;padding:0;overflow:auto;color:#545454;font-size:1.125em;font-weight:400;line-height:normal;text-align:center;word-wrap:break-word;word-break:break-word}.swal2-checkbox,.swal2-file,.swal2-input,.swal2-radio,.swal2-select,.swal2-textarea{margin:1em 2em 0}.swal2-file,.swal2-input,.swal2-textarea{box-sizing:border-box;width:auto;transition:border-color .1s,box-shadow .1s;border:1px solid #d9d9d9;border-radius:.1875em;background:inherit;box-shadow:inset 0 1px 1px rgba(0,0,0,.06),0 0 0 3px transparent;color:inherit;font-size:1.125em}.swal2-file.swal2-inputerror,.swal2-input.swal2-inputerror,.swal2-textarea.swal2-inputerror{border-color:#f27474!important;box-shadow:0 0 2px #f27474!important}.swal2-file:focus,.swal2-input:focus,.swal2-textarea:focus{border:1px solid #b4dbed;outline:0;box-shadow:inset 0 1px 1px rgba(0,0,0,.06),0 0 0 3px rgba(100,150,200,.5)}.swal2-file::-moz-placeholder,.swal2-input::-moz-placeholder,.swal2-textarea::-moz-placeholder{color:#ccc}.swal2-file:-ms-input-placeholder,.swal2-input:-ms-input-placeholder,.swal2-textarea:-ms-input-placeholder{color:#ccc}.swal2-file::placeholder,.swal2-input::placeholder,.swal2-textarea::placeholder{color:#ccc}.swal2-range{margin:1em 2em 0;background:#fff}.swal2-range input{width:80%}.swal2-range output{width:20%;color:inherit;font-weight:600;text-align:center}.swal2-range input,.swal2-range output{height:2.625em;padding:0;font-size:1.125em;line-height:2.625em}.swal2-input{height:2.625em;padding:0 .75em}.swal2-file{width:75%;margin-right:auto;margin-left:auto;background:inherit;font-size:1.125em}.swal2-textarea{height:6.75em;padding:.75em}.swal2-select{min-width:50%;max-width:100%;padding:.375em .625em;background:inherit;color:inherit;font-size:1.125em}.swal2-checkbox,.swal2-radio{align-items:center;justify-content:center;background:#fff;color:inherit}.swal2-checkbox label,.swal2-radio label{margin:0 .6em;font-size:1.125em}.swal2-checkbox input,.swal2-radio input{flex-shrink:0;margin:0 .4em}.swal2-input-label{display:flex;justify-content:center;margin:1em auto 0}.swal2-validation-message{align-items:center;justify-content:center;margin:1em 0 0;padding:.625em;overflow:hidden;background:#f0f0f0;color:#666;font-size:1em;font-weight:300}.swal2-validation-message::before{content:\"!\";display:inline-block;width:1.5em;min-width:1.5em;height:1.5em;margin:0 .625em;border-radius:50%;background-color:#f27474;color:#fff;font-weight:600;line-height:1.5em;text-align:center}.swal2-icon{position:relative;box-sizing:content-box;justify-content:center;width:5em;height:5em;margin:2.5em auto .6em;border:.25em solid transparent;border-radius:50%;border-color:#000;font-family:inherit;line-height:5em;cursor:default;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.swal2-icon .swal2-icon-content{display:flex;align-items:center;font-size:3.75em}.swal2-icon.swal2-error{border-color:#f27474;color:#f27474}.swal2-icon.swal2-error .swal2-x-mark{position:relative;flex-grow:1}.swal2-icon.swal2-error [class^=swal2-x-mark-line]{display:block;position:absolute;top:2.3125em;width:2.9375em;height:.3125em;border-radius:.125em;background-color:#f27474}.swal2-icon.swal2-error [class^=swal2-x-mark-line][class$=left]{left:1.0625em;transform:rotate(45deg)}.swal2-icon.swal2-error [class^=swal2-x-mark-line][class$=right]{right:1em;transform:rotate(-45deg)}.swal2-icon.swal2-error.swal2-icon-show{-webkit-animation:swal2-animate-error-icon .5s;animation:swal2-animate-error-icon .5s}.swal2-icon.swal2-error.swal2-icon-show .swal2-x-mark{-webkit-animation:swal2-animate-error-x-mark .5s;animation:swal2-animate-error-x-mark .5s}.swal2-icon.swal2-warning{border-color:#facea8;color:#f8bb86}.swal2-icon.swal2-info{border-color:#9de0f6;color:#3fc3ee}.swal2-icon.swal2-question{border-color:#c9dae1;color:#87adbd}.swal2-icon.swal2-success{border-color:#a5dc86;color:#a5dc86}.swal2-icon.swal2-success [class^=swal2-success-circular-line]{position:absolute;width:3.75em;height:7.5em;transform:rotate(45deg);border-radius:50%}.swal2-icon.swal2-success [class^=swal2-success-circular-line][class$=left]{top:-.4375em;left:-2.0635em;transform:rotate(-45deg);transform-origin:3.75em 3.75em;border-radius:7.5em 0 0 7.5em}.swal2-icon.swal2-success [class^=swal2-success-circular-line][class$=right]{top:-.6875em;left:1.875em;transform:rotate(-45deg);transform-origin:0 3.75em;border-radius:0 7.5em 7.5em 0}.swal2-icon.swal2-success .swal2-success-ring{position:absolute;z-index:2;top:-.25em;left:-.25em;box-sizing:content-box;width:100%;height:100%;border:.25em solid rgba(165,220,134,.3);border-radius:50%}.swal2-icon.swal2-success .swal2-success-fix{position:absolute;z-index:1;top:.5em;left:1.625em;width:.4375em;height:5.625em;transform:rotate(-45deg)}.swal2-icon.swal2-success [class^=swal2-success-line]{display:block;position:absolute;z-index:2;height:.3125em;border-radius:.125em;background-color:#a5dc86}.swal2-icon.swal2-success [class^=swal2-success-line][class$=tip]{top:2.875em;left:.8125em;width:1.5625em;transform:rotate(45deg)}.swal2-icon.swal2-success [class^=swal2-success-line][class$=long]{top:2.375em;right:.5em;width:2.9375em;transform:rotate(-45deg)}.swal2-icon.swal2-success.swal2-icon-show .swal2-success-line-tip{-webkit-animation:swal2-animate-success-line-tip .75s;animation:swal2-animate-success-line-tip .75s}.swal2-icon.swal2-success.swal2-icon-show .swal2-success-line-long{-webkit-animation:swal2-animate-success-line-long .75s;animation:swal2-animate-success-line-long .75s}.swal2-icon.swal2-success.swal2-icon-show .swal2-success-circular-line-right{-webkit-animation:swal2-rotate-success-circular-line 4.25s ease-in;animation:swal2-rotate-success-circular-line 4.25s ease-in}.swal2-progress-steps{flex-wrap:wrap;align-items:center;max-width:100%;margin:1.25em auto;padding:0;background:inherit;font-weight:600}.swal2-progress-steps li{display:inline-block;position:relative}.swal2-progress-steps .swal2-progress-step{z-index:20;flex-shrink:0;width:2em;height:2em;border-radius:2em;background:#2778c4;color:#fff;line-height:2em;text-align:center}.swal2-progress-steps .swal2-progress-step.swal2-active-progress-step{background:#2778c4}.swal2-progress-steps .swal2-progress-step.swal2-active-progress-step~.swal2-progress-step{background:#add8e6;color:#fff}.swal2-progress-steps .swal2-progress-step.swal2-active-progress-step~.swal2-progress-step-line{background:#add8e6}.swal2-progress-steps .swal2-progress-step-line{z-index:10;flex-shrink:0;width:2.5em;height:.4em;margin:0 -1px;background:#2778c4}[class^=swal2]{-webkit-tap-highlight-color:transparent}.swal2-show{-webkit-animation:swal2-show .3s;animation:swal2-show .3s}.swal2-hide{-webkit-animation:swal2-hide .15s forwards;animation:swal2-hide .15s forwards}.swal2-noanimation{transition:none}.swal2-scrollbar-measure{position:absolute;top:-9999px;width:50px;height:50px;overflow:scroll}.swal2-rtl .swal2-close{margin-right:initial;margin-left:0}.swal2-rtl .swal2-timer-progress-bar{right:0;left:auto}@-webkit-keyframes swal2-toast-show{0%{transform:translateY(-.625em) rotateZ(2deg)}33%{transform:translateY(0) rotateZ(-2deg)}66%{transform:translateY(.3125em) rotateZ(2deg)}100%{transform:translateY(0) rotateZ(0)}}@keyframes swal2-toast-show{0%{transform:translateY(-.625em) rotateZ(2deg)}33%{transform:translateY(0) rotateZ(-2deg)}66%{transform:translateY(.3125em) rotateZ(2deg)}100%{transform:translateY(0) rotateZ(0)}}@-webkit-keyframes swal2-toast-hide{100%{transform:rotateZ(1deg);opacity:0}}@keyframes swal2-toast-hide{100%{transform:rotateZ(1deg);opacity:0}}@-webkit-keyframes swal2-toast-animate-success-line-tip{0%{top:.5625em;left:.0625em;width:0}54%{top:.125em;left:.125em;width:0}70%{top:.625em;left:-.25em;width:1.625em}84%{top:1.0625em;left:.75em;width:.5em}100%{top:1.125em;left:.1875em;width:.75em}}@keyframes swal2-toast-animate-success-line-tip{0%{top:.5625em;left:.0625em;width:0}54%{top:.125em;left:.125em;width:0}70%{top:.625em;left:-.25em;width:1.625em}84%{top:1.0625em;left:.75em;width:.5em}100%{top:1.125em;left:.1875em;width:.75em}}@-webkit-keyframes swal2-toast-animate-success-line-long{0%{top:1.625em;right:1.375em;width:0}65%{top:1.25em;right:.9375em;width:0}84%{top:.9375em;right:0;width:1.125em}100%{top:.9375em;right:.1875em;width:1.375em}}@keyframes swal2-toast-animate-success-line-long{0%{top:1.625em;right:1.375em;width:0}65%{top:1.25em;right:.9375em;width:0}84%{top:.9375em;right:0;width:1.125em}100%{top:.9375em;right:.1875em;width:1.375em}}@-webkit-keyframes swal2-show{0%{transform:scale(.7)}45%{transform:scale(1.05)}80%{transform:scale(.95)}100%{transform:scale(1)}}@keyframes swal2-show{0%{transform:scale(.7)}45%{transform:scale(1.05)}80%{transform:scale(.95)}100%{transform:scale(1)}}@-webkit-keyframes swal2-hide{0%{transform:scale(1);opacity:1}100%{transform:scale(.5);opacity:0}}@keyframes swal2-hide{0%{transform:scale(1);opacity:1}100%{transform:scale(.5);opacity:0}}@-webkit-keyframes swal2-animate-success-line-tip{0%{top:1.1875em;left:.0625em;width:0}54%{top:1.0625em;left:.125em;width:0}70%{top:2.1875em;left:-.375em;width:3.125em}84%{top:3em;left:1.3125em;width:1.0625em}100%{top:2.8125em;left:.8125em;width:1.5625em}}@keyframes swal2-animate-success-line-tip{0%{top:1.1875em;left:.0625em;width:0}54%{top:1.0625em;left:.125em;width:0}70%{top:2.1875em;left:-.375em;width:3.125em}84%{top:3em;left:1.3125em;width:1.0625em}100%{top:2.8125em;left:.8125em;width:1.5625em}}@-webkit-keyframes swal2-animate-success-line-long{0%{top:3.375em;right:2.875em;width:0}65%{top:3.375em;right:2.875em;width:0}84%{top:2.1875em;right:0;width:3.4375em}100%{top:2.375em;right:.5em;width:2.9375em}}@keyframes swal2-animate-success-line-long{0%{top:3.375em;right:2.875em;width:0}65%{top:3.375em;right:2.875em;width:0}84%{top:2.1875em;right:0;width:3.4375em}100%{top:2.375em;right:.5em;width:2.9375em}}@-webkit-keyframes swal2-rotate-success-circular-line{0%{transform:rotate(-45deg)}5%{transform:rotate(-45deg)}12%{transform:rotate(-405deg)}100%{transform:rotate(-405deg)}}@keyframes swal2-rotate-success-circular-line{0%{transform:rotate(-45deg)}5%{transform:rotate(-45deg)}12%{transform:rotate(-405deg)}100%{transform:rotate(-405deg)}}@-webkit-keyframes swal2-animate-error-x-mark{0%{margin-top:1.625em;transform:scale(.4);opacity:0}50%{margin-top:1.625em;transform:scale(.4);opacity:0}80%{margin-top:-.375em;transform:scale(1.15)}100%{margin-top:0;transform:scale(1);opacity:1}}@keyframes swal2-animate-error-x-mark{0%{margin-top:1.625em;transform:scale(.4);opacity:0}50%{margin-top:1.625em;transform:scale(.4);opacity:0}80%{margin-top:-.375em;transform:scale(1.15)}100%{margin-top:0;transform:scale(1);opacity:1}}@-webkit-keyframes swal2-animate-error-icon{0%{transform:rotateX(100deg);opacity:0}100%{transform:rotateX(0);opacity:1}}@keyframes swal2-animate-error-icon{0%{transform:rotateX(100deg);opacity:0}100%{transform:rotateX(0);opacity:1}}@-webkit-keyframes swal2-rotate-loading{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}@keyframes swal2-rotate-loading{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown){overflow:hidden}body.swal2-height-auto{height:auto!important}body.swal2-no-backdrop .swal2-container{background-color:transparent!important;pointer-events:none}body.swal2-no-backdrop .swal2-container .swal2-popup{pointer-events:all}body.swal2-no-backdrop .swal2-container .swal2-modal{box-shadow:0 0 10px rgba(0,0,0,.4)}@media print{body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown){overflow-y:scroll!important}body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown)>[aria-hidden=true]{display:none}body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) .swal2-container{position:static!important}}body.swal2-toast-shown .swal2-container{box-sizing:border-box;width:360px;max-width:100%;background-color:transparent;pointer-events:none}body.swal2-toast-shown .swal2-container.swal2-top{top:0;right:auto;bottom:auto;left:50%;transform:translateX(-50%)}body.swal2-toast-shown .swal2-container.swal2-top-end,body.swal2-toast-shown .swal2-container.swal2-top-right{top:0;right:0;bottom:auto;left:auto}body.swal2-toast-shown .swal2-container.swal2-top-left,body.swal2-toast-shown .swal2-container.swal2-top-start{top:0;right:auto;bottom:auto;left:0}body.swal2-toast-shown .swal2-container.swal2-center-left,body.swal2-toast-shown .swal2-container.swal2-center-start{top:50%;right:auto;bottom:auto;left:0;transform:translateY(-50%)}body.swal2-toast-shown .swal2-container.swal2-center{top:50%;right:auto;bottom:auto;left:50%;transform:translate(-50%,-50%)}body.swal2-toast-shown .swal2-container.swal2-center-end,body.swal2-toast-shown .swal2-container.swal2-center-right{top:50%;right:0;bottom:auto;left:auto;transform:translateY(-50%)}body.swal2-toast-shown .swal2-container.swal2-bottom-left,body.swal2-toast-shown .swal2-container.swal2-bottom-start{top:auto;right:auto;bottom:0;left:0}body.swal2-toast-shown .swal2-container.swal2-bottom{top:auto;right:auto;bottom:0;left:50%;transform:translateX(-50%)}body.swal2-toast-shown .swal2-container.swal2-bottom-end,body.swal2-toast-shown .swal2-container.swal2-bottom-right{top:auto;right:0;bottom:0;left:auto}");
 
 /***/ }),
 
@@ -80770,8 +80353,12 @@ var render = function () {
             _vm._v(" "),
             _c("td", [_vm._v(_vm._s(quote.installment_number))]),
             _vm._v(" "),
-            _c("td", { staticClass: "text-right" }, [
-              _vm._v(_vm._s(_vm._f("currency")(quote.value))),
+            _c("th", { staticClass: "text-right font-weight-bold" }, [
+              _vm._v(
+                "\n          " +
+                  _vm._s(_vm._f("currency")(quote.value)) +
+                  "\n        "
+              ),
             ]),
             _vm._v(" "),
             _c("td", { staticClass: "text-right" }, [
@@ -80961,6 +80548,7 @@ var render = function () {
                             step: "any",
                             id: "amount",
                             placeholder: "$",
+                            min: _vm.min_amount,
                           },
                           domProps: { value: _vm.amount_value },
                           on: {
@@ -80972,10 +80560,25 @@ var render = function () {
                             },
                           },
                         }),
+                        _vm._v(" "),
+                        _c(
+                          "small",
+                          {
+                            staticClass: "form-text text-muted",
+                            attrs: { id: "addAmountHelpBlock" },
+                          },
+                          [
+                            _vm._v(
+                              "\n                Monto mínimo\n                " +
+                                _vm._s(_vm._f("currency")(_vm.min_amount)) +
+                                "\n              "
+                            ),
+                          ]
+                        ),
                       ]),
                       _vm._v(" "),
                       _c("div", { staticClass: "form-group col-3" }, [
-                        _vm.amount_value > 0
+                        _vm.amount_value > _vm.min_amount
                           ? _c(
                               "button",
                               {
@@ -82706,10 +82309,7 @@ var render = function () {
                             attrs: { type: "button" },
                             on: {
                               click: function ($event) {
-                                return _vm.printEntryPdf(
-                                  e.id,
-                                  e.user.name + "_" + e.user.last_name
-                                )
+                                return _vm.printEntryPdf(e.id)
                               },
                             },
                           },
@@ -90909,7 +90509,7 @@ if (inBrowser && window.Vue) {
   \****************************************************/
 /***/ (function(module) {
 
-!function(t,e){ true?module.exports=e():0}("undefined"!=typeof self?self:this,(function(){return(()=>{var t={646:t=>{t.exports=function(t){if(Array.isArray(t)){for(var e=0,n=new Array(t.length);e<t.length;e++)n[e]=t[e];return n}}},713:t=>{t.exports=function(t,e,n){return e in t?Object.defineProperty(t,e,{value:n,enumerable:!0,configurable:!0,writable:!0}):t[e]=n,t}},860:t=>{t.exports=function(t){if(Symbol.iterator in Object(t)||"[object Arguments]"===Object.prototype.toString.call(t))return Array.from(t)}},206:t=>{t.exports=function(){throw new TypeError("Invalid attempt to spread non-iterable instance")}},319:(t,e,n)=>{var o=n(646),i=n(860),s=n(206);t.exports=function(t){return o(t)||i(t)||s()}},8:t=>{function e(n){return"function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?t.exports=e=function(t){return typeof t}:t.exports=e=function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t},e(n)}t.exports=e}},e={};function n(o){var i=e[o];if(void 0!==i)return i.exports;var s=e[o]={exports:{}};return t[o](s,s.exports,n),s.exports}n.n=t=>{var e=t&&t.__esModule?()=>t.default:()=>t;return n.d(e,{a:e}),e},n.d=(t,e)=>{for(var o in e)n.o(e,o)&&!n.o(t,o)&&Object.defineProperty(t,o,{enumerable:!0,get:e[o]})},n.o=(t,e)=>Object.prototype.hasOwnProperty.call(t,e),n.r=t=>{"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(t,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(t,"__esModule",{value:!0})};var o={};return(()=>{"use strict";n.r(o),n.d(o,{VueSelect:()=>m,default:()=>O,mixins:()=>_});var t=n(319),e=n.n(t),i=n(8),s=n.n(i),r=n(713),a=n.n(r);const l={props:{autoscroll:{type:Boolean,default:!0}},watch:{typeAheadPointer:function(){this.autoscroll&&this.maybeAdjustScroll()},open:function(t){var e=this;this.autoscroll&&t&&this.$nextTick((function(){return e.maybeAdjustScroll()}))}},methods:{maybeAdjustScroll:function(){var t,e=(null===(t=this.$refs.dropdownMenu)||void 0===t?void 0:t.children[this.typeAheadPointer])||!1;if(e){var n=this.getDropdownViewport(),o=e.getBoundingClientRect(),i=o.top,s=o.bottom,r=o.height;if(i<n.top)return this.$refs.dropdownMenu.scrollTop=e.offsetTop;if(s>n.bottom)return this.$refs.dropdownMenu.scrollTop=e.offsetTop-(n.height-r)}},getDropdownViewport:function(){return this.$refs.dropdownMenu?this.$refs.dropdownMenu.getBoundingClientRect():{height:0,top:0,bottom:0}}}},c={data:function(){return{typeAheadPointer:-1}},watch:{filteredOptions:function(){for(var t=0;t<this.filteredOptions.length;t++)if(this.selectable(this.filteredOptions[t])){this.typeAheadPointer=t;break}},open:function(t){t&&this.typeAheadToLastSelected()},selectedValue:function(){this.open&&this.typeAheadToLastSelected()}},methods:{typeAheadUp:function(){for(var t=this.typeAheadPointer-1;t>=0;t--)if(this.selectable(this.filteredOptions[t])){this.typeAheadPointer=t;break}},typeAheadDown:function(){for(var t=this.typeAheadPointer+1;t<this.filteredOptions.length;t++)if(this.selectable(this.filteredOptions[t])){this.typeAheadPointer=t;break}},typeAheadSelect:function(){var t=this.filteredOptions[this.typeAheadPointer];t&&this.selectable(t)&&this.select(t)},typeAheadToLastSelected:function(){this.typeAheadPointer=0!==this.selectedValue.length?this.filteredOptions.indexOf(this.selectedValue[this.selectedValue.length-1]):-1}}},u={props:{loading:{type:Boolean,default:!1}},data:function(){return{mutableLoading:!1}},watch:{search:function(){this.$emit("search",this.search,this.toggleLoading)},loading:function(t){this.mutableLoading=t}},methods:{toggleLoading:function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:null;return this.mutableLoading=null==t?!this.mutableLoading:t}}};function p(t,e,n,o,i,s,r,a){var l,c="function"==typeof t?t.options:t;if(e&&(c.render=e,c.staticRenderFns=n,c._compiled=!0),o&&(c.functional=!0),s&&(c._scopeId="data-v-"+s),r?(l=function(t){(t=t||this.$vnode&&this.$vnode.ssrContext||this.parent&&this.parent.$vnode&&this.parent.$vnode.ssrContext)||"undefined"==typeof __VUE_SSR_CONTEXT__||(t=__VUE_SSR_CONTEXT__),i&&i.call(this,t),t&&t._registeredComponents&&t._registeredComponents.add(r)},c._ssrRegister=l):i&&(l=a?function(){i.call(this,(c.functional?this.parent:this).$root.$options.shadowRoot)}:i),l)if(c.functional){c._injectStyles=l;var u=c.render;c.render=function(t,e){return l.call(e),u(t,e)}}else{var p=c.beforeCreate;c.beforeCreate=p?[].concat(p,l):[l]}return{exports:t,options:c}}const h={Deselect:p({},(function(){var t=this.$createElement,e=this._self._c||t;return e("svg",{attrs:{xmlns:"http://www.w3.org/2000/svg",width:"10",height:"10"}},[e("path",{attrs:{d:"M6.895455 5l2.842897-2.842898c.348864-.348863.348864-.914488 0-1.263636L9.106534.261648c-.348864-.348864-.914489-.348864-1.263636 0L5 3.104545 2.157102.261648c-.348863-.348864-.914488-.348864-1.263636 0L.261648.893466c-.348864.348864-.348864.914489 0 1.263636L3.104545 5 .261648 7.842898c-.348864.348863-.348864.914488 0 1.263636l.631818.631818c.348864.348864.914773.348864 1.263636 0L5 6.895455l2.842898 2.842897c.348863.348864.914772.348864 1.263636 0l.631818-.631818c.348864-.348864.348864-.914489 0-1.263636L6.895455 5z"}})])}),[],!1,null,null,null).exports,OpenIndicator:p({},(function(){var t=this.$createElement,e=this._self._c||t;return e("svg",{attrs:{xmlns:"http://www.w3.org/2000/svg",width:"14",height:"10"}},[e("path",{attrs:{d:"M9.211364 7.59931l4.48338-4.867229c.407008-.441854.407008-1.158247 0-1.60046l-.73712-.80023c-.407008-.441854-1.066904-.441854-1.474243 0L7 5.198617 2.51662.33139c-.407008-.441853-1.066904-.441853-1.474243 0l-.737121.80023c-.407008.441854-.407008 1.158248 0 1.600461l4.48338 4.867228L7 10l2.211364-2.40069z"}})])}),[],!1,null,null,null).exports},d={inserted:function(t,e,n){var o=n.context;if(o.appendToBody){var i=o.$refs.toggle.getBoundingClientRect(),s=i.height,r=i.top,a=i.left,l=i.width,c=window.scrollX||window.pageXOffset,u=window.scrollY||window.pageYOffset;t.unbindPosition=o.calculatePosition(t,o,{width:l+"px",left:c+a+"px",top:u+r+s+"px"}),document.body.appendChild(t)}},unbind:function(t,e,n){n.context.appendToBody&&(t.unbindPosition&&"function"==typeof t.unbindPosition&&t.unbindPosition(),t.parentNode&&t.parentNode.removeChild(t))}};const f=function(t){var e={};return Object.keys(t).sort().forEach((function(n){e[n]=t[n]})),JSON.stringify(e)};var y=0;const b=function(){return++y};function g(t,e){var n=Object.keys(t);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(t);e&&(o=o.filter((function(e){return Object.getOwnPropertyDescriptor(t,e).enumerable}))),n.push.apply(n,o)}return n}function v(t){for(var e=1;e<arguments.length;e++){var n=null!=arguments[e]?arguments[e]:{};e%2?g(Object(n),!0).forEach((function(e){a()(t,e,n[e])})):Object.getOwnPropertyDescriptors?Object.defineProperties(t,Object.getOwnPropertyDescriptors(n)):g(Object(n)).forEach((function(e){Object.defineProperty(t,e,Object.getOwnPropertyDescriptor(n,e))}))}return t}const m=p({components:v({},h),directives:{appendToBody:d},mixins:[l,c,u],props:{value:{},components:{type:Object,default:function(){return{}}},options:{type:Array,default:function(){return[]}},disabled:{type:Boolean,default:!1},clearable:{type:Boolean,default:!0},deselectFromDropdown:{type:Boolean,default:!1},searchable:{type:Boolean,default:!0},multiple:{type:Boolean,default:!1},placeholder:{type:String,default:""},transition:{type:String,default:"vs__fade"},clearSearchOnSelect:{type:Boolean,default:!0},closeOnSelect:{type:Boolean,default:!0},label:{type:String,default:"label"},autocomplete:{type:String,default:"off"},reduce:{type:Function,default:function(t){return t}},selectable:{type:Function,default:function(t){return!0}},getOptionLabel:{type:Function,default:function(t){return"object"===s()(t)?t.hasOwnProperty(this.label)?t[this.label]:console.warn('[vue-select warn]: Label key "option.'.concat(this.label,'" does not')+" exist in options object ".concat(JSON.stringify(t),".\n")+"https://vue-select.org/api/props.html#getoptionlabel"):t}},getOptionKey:{type:Function,default:function(t){if("object"!==s()(t))return t;try{return t.hasOwnProperty("id")?t.id:f(t)}catch(e){return console.warn("[vue-select warn]: Could not stringify this option to generate unique key. Please provide'getOptionKey' prop to return a unique key for each option.\nhttps://vue-select.org/api/props.html#getoptionkey",t,e)}}},onTab:{type:Function,default:function(){this.selectOnTab&&!this.isComposing&&this.typeAheadSelect()}},taggable:{type:Boolean,default:!1},tabindex:{type:Number,default:null},pushTags:{type:Boolean,default:!1},filterable:{type:Boolean,default:!0},filterBy:{type:Function,default:function(t,e,n){return(e||"").toLocaleLowerCase().indexOf(n.toLocaleLowerCase())>-1}},filter:{type:Function,default:function(t,e){var n=this;return t.filter((function(t){var o=n.getOptionLabel(t);return"number"==typeof o&&(o=o.toString()),n.filterBy(t,o,e)}))}},createOption:{type:Function,default:function(t){return"object"===s()(this.optionList[0])?a()({},this.label,t):t}},resetOnOptionsChange:{default:!1,validator:function(t){return["function","boolean"].includes(s()(t))}},clearSearchOnBlur:{type:Function,default:function(t){var e=t.clearSearchOnSelect,n=t.multiple;return e&&!n}},noDrop:{type:Boolean,default:!1},inputId:{type:String},dir:{type:String,default:"auto"},selectOnTab:{type:Boolean,default:!1},selectOnKeyCodes:{type:Array,default:function(){return[13]}},searchInputQuerySelector:{type:String,default:"[type=search]"},mapKeydown:{type:Function,default:function(t,e){return t}},appendToBody:{type:Boolean,default:!1},calculatePosition:{type:Function,default:function(t,e,n){var o=n.width,i=n.top,s=n.left;t.style.top=i,t.style.left=s,t.style.width=o}},dropdownShouldOpen:{type:Function,default:function(t){var e=t.noDrop,n=t.open,o=t.mutableLoading;return!e&&(n&&!o)}},uid:{type:[String,Number],default:function(){return b()}}},data:function(){return{search:"",open:!1,isComposing:!1,pushedTags:[],_value:[]}},computed:{isTrackingValues:function(){return void 0===this.value||this.$options.propsData.hasOwnProperty("reduce")},selectedValue:function(){var t=this.value;return this.isTrackingValues&&(t=this.$data._value),null!=t&&""!==t?[].concat(t):[]},optionList:function(){return this.options.concat(this.pushTags?this.pushedTags:[])},searchEl:function(){return this.$scopedSlots.search?this.$refs.selectedOptions.querySelector(this.searchInputQuerySelector):this.$refs.search},scope:function(){var t=this,e={search:this.search,loading:this.loading,searching:this.searching,filteredOptions:this.filteredOptions};return{search:{attributes:v({disabled:this.disabled,placeholder:this.searchPlaceholder,tabindex:this.tabindex,readonly:!this.searchable,id:this.inputId,"aria-autocomplete":"list","aria-labelledby":"vs".concat(this.uid,"__combobox"),"aria-controls":"vs".concat(this.uid,"__listbox"),ref:"search",type:"search",autocomplete:this.autocomplete,value:this.search},this.dropdownOpen&&this.filteredOptions[this.typeAheadPointer]?{"aria-activedescendant":"vs".concat(this.uid,"__option-").concat(this.typeAheadPointer)}:{}),events:{compositionstart:function(){return t.isComposing=!0},compositionend:function(){return t.isComposing=!1},keydown:this.onSearchKeyDown,blur:this.onSearchBlur,focus:this.onSearchFocus,input:function(e){return t.search=e.target.value}}},spinner:{loading:this.mutableLoading},noOptions:{search:this.search,loading:this.mutableLoading,searching:this.searching},openIndicator:{attributes:{ref:"openIndicator",role:"presentation",class:"vs__open-indicator"}},listHeader:e,listFooter:e,header:v({},e,{deselect:this.deselect}),footer:v({},e,{deselect:this.deselect})}},childComponents:function(){return v({},h,{},this.components)},stateClasses:function(){return{"vs--open":this.dropdownOpen,"vs--single":!this.multiple,"vs--multiple":this.multiple,"vs--searching":this.searching&&!this.noDrop,"vs--searchable":this.searchable&&!this.noDrop,"vs--unsearchable":!this.searchable,"vs--loading":this.mutableLoading,"vs--disabled":this.disabled}},searching:function(){return!!this.search},dropdownOpen:function(){return this.dropdownShouldOpen(this)},searchPlaceholder:function(){return this.isValueEmpty&&this.placeholder?this.placeholder:void 0},filteredOptions:function(){var t=[].concat(this.optionList);if(!this.filterable&&!this.taggable)return t;var e=this.search.length?this.filter(t,this.search,this):t;if(this.taggable&&this.search.length){var n=this.createOption(this.search);this.optionExists(n)||e.unshift(n)}return e},isValueEmpty:function(){return 0===this.selectedValue.length},showClearButton:function(){return!this.multiple&&this.clearable&&!this.open&&!this.isValueEmpty}},watch:{options:function(t,e){var n=this;!this.taggable&&("function"==typeof n.resetOnOptionsChange?n.resetOnOptionsChange(t,e,n.selectedValue):n.resetOnOptionsChange)&&this.clearSelection(),this.value&&this.isTrackingValues&&this.setInternalValueFromOptions(this.value)},value:{immediate:!0,handler:function(t){this.isTrackingValues&&this.setInternalValueFromOptions(t)}},multiple:function(){this.clearSelection()},open:function(t){this.$emit(t?"open":"close")}},created:function(){this.mutableLoading=this.loading,this.$on("option:created",this.pushTag)},methods:{setInternalValueFromOptions:function(t){var e=this;Array.isArray(t)?this.$data._value=t.map((function(t){return e.findOptionFromReducedValue(t)})):this.$data._value=this.findOptionFromReducedValue(t)},select:function(t){this.$emit("option:selecting",t),this.isOptionSelected(t)?this.deselectFromDropdown&&(this.clearable||this.multiple&&this.selectedValue.length>1)&&this.deselect(t):(this.taggable&&!this.optionExists(t)&&this.$emit("option:created",t),this.multiple&&(t=this.selectedValue.concat(t)),this.updateValue(t),this.$emit("option:selected",t)),this.onAfterSelect(t)},deselect:function(t){var e=this;this.$emit("option:deselecting",t),this.updateValue(this.selectedValue.filter((function(n){return!e.optionComparator(n,t)}))),this.$emit("option:deselected",t)},clearSelection:function(){this.updateValue(this.multiple?[]:null)},onAfterSelect:function(t){this.closeOnSelect&&(this.open=!this.open,this.searchEl.blur()),this.clearSearchOnSelect&&(this.search="")},updateValue:function(t){var e=this;void 0===this.value&&(this.$data._value=t),null!==t&&(t=Array.isArray(t)?t.map((function(t){return e.reduce(t)})):this.reduce(t)),this.$emit("input",t)},toggleDropdown:function(t){var n=t.target!==this.searchEl;n&&t.preventDefault();var o=[].concat(e()(this.$refs.deselectButtons||[]),e()([this.$refs.clearButton]||0));void 0===this.searchEl||o.filter(Boolean).some((function(e){return e.contains(t.target)||e===t.target}))?t.preventDefault():this.open&&n?this.searchEl.blur():this.disabled||(this.open=!0,this.searchEl.focus())},isOptionSelected:function(t){var e=this;return this.selectedValue.some((function(n){return e.optionComparator(n,t)}))},isOptionDeselectable:function(t){return this.isOptionSelected(t)&&this.deselectFromDropdown},optionComparator:function(t,e){return this.getOptionKey(t)===this.getOptionKey(e)},findOptionFromReducedValue:function(t){var n=this,o=[].concat(e()(this.options),e()(this.pushedTags)).filter((function(e){return JSON.stringify(n.reduce(e))===JSON.stringify(t)}));return 1===o.length?o[0]:o.find((function(t){return n.optionComparator(t,n.$data._value)}))||t},closeSearchOptions:function(){this.open=!1,this.$emit("search:blur")},maybeDeleteValue:function(){if(!this.searchEl.value.length&&this.selectedValue&&this.selectedValue.length&&this.clearable){var t=null;this.multiple&&(t=e()(this.selectedValue.slice(0,this.selectedValue.length-1))),this.updateValue(t)}},optionExists:function(t){var e=this;return this.optionList.some((function(n){return e.optionComparator(n,t)}))},normalizeOptionForSlot:function(t){return"object"===s()(t)?t:a()({},this.label,t)},pushTag:function(t){this.pushedTags.push(t)},onEscape:function(){this.search.length?this.search="":this.searchEl.blur()},onSearchBlur:function(){if(!this.mousedown||this.searching){var t=this.clearSearchOnSelect,e=this.multiple;return this.clearSearchOnBlur({clearSearchOnSelect:t,multiple:e})&&(this.search=""),void this.closeSearchOptions()}this.mousedown=!1,0!==this.search.length||0!==this.options.length||this.closeSearchOptions()},onSearchFocus:function(){this.open=!0,this.$emit("search:focus")},onMousedown:function(){this.mousedown=!0},onMouseUp:function(){this.mousedown=!1},onSearchKeyDown:function(t){var e=this,n=function(t){return t.preventDefault(),!e.isComposing&&e.typeAheadSelect()},o={8:function(t){return e.maybeDeleteValue()},9:function(t){return e.onTab()},27:function(t){return e.onEscape()},38:function(t){return t.preventDefault(),e.typeAheadUp()},40:function(t){return t.preventDefault(),e.typeAheadDown()}};this.selectOnKeyCodes.forEach((function(t){return o[t]=n}));var i=this.mapKeydown(o,this);if("function"==typeof i[t.keyCode])return i[t.keyCode](t)}}},(function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("div",{staticClass:"v-select",class:t.stateClasses,attrs:{dir:t.dir}},[t._t("header",null,null,t.scope.header),t._v(" "),n("div",{ref:"toggle",staticClass:"vs__dropdown-toggle",attrs:{id:"vs"+t.uid+"__combobox",role:"combobox","aria-expanded":t.dropdownOpen.toString(),"aria-owns":"vs"+t.uid+"__listbox","aria-label":"Search for option"},on:{mousedown:function(e){return t.toggleDropdown(e)}}},[n("div",{ref:"selectedOptions",staticClass:"vs__selected-options"},[t._l(t.selectedValue,(function(e){return t._t("selected-option-container",[n("span",{key:t.getOptionKey(e),staticClass:"vs__selected"},[t._t("selected-option",[t._v("\n            "+t._s(t.getOptionLabel(e))+"\n          ")],null,t.normalizeOptionForSlot(e)),t._v(" "),t.multiple?n("button",{ref:"deselectButtons",refInFor:!0,staticClass:"vs__deselect",attrs:{disabled:t.disabled,type:"button",title:"Deselect "+t.getOptionLabel(e),"aria-label":"Deselect "+t.getOptionLabel(e)},on:{click:function(n){return t.deselect(e)}}},[n(t.childComponents.Deselect,{tag:"component"})],1):t._e()],2)],{option:t.normalizeOptionForSlot(e),deselect:t.deselect,multiple:t.multiple,disabled:t.disabled})})),t._v(" "),t._t("search",[n("input",t._g(t._b({staticClass:"vs__search"},"input",t.scope.search.attributes,!1),t.scope.search.events))],null,t.scope.search)],2),t._v(" "),n("div",{ref:"actions",staticClass:"vs__actions"},[n("button",{directives:[{name:"show",rawName:"v-show",value:t.showClearButton,expression:"showClearButton"}],ref:"clearButton",staticClass:"vs__clear",attrs:{disabled:t.disabled,type:"button",title:"Clear Selected","aria-label":"Clear Selected"},on:{click:t.clearSelection}},[n(t.childComponents.Deselect,{tag:"component"})],1),t._v(" "),t._t("open-indicator",[t.noDrop?t._e():n(t.childComponents.OpenIndicator,t._b({tag:"component"},"component",t.scope.openIndicator.attributes,!1))],null,t.scope.openIndicator),t._v(" "),t._t("spinner",[n("div",{directives:[{name:"show",rawName:"v-show",value:t.mutableLoading,expression:"mutableLoading"}],staticClass:"vs__spinner"},[t._v("Loading...")])],null,t.scope.spinner)],2)]),t._v(" "),n("transition",{attrs:{name:t.transition}},[t.dropdownOpen?n("ul",{directives:[{name:"append-to-body",rawName:"v-append-to-body"}],key:"vs"+t.uid+"__listbox",ref:"dropdownMenu",staticClass:"vs__dropdown-menu",attrs:{id:"vs"+t.uid+"__listbox",role:"listbox",tabindex:"-1"},on:{mousedown:function(e){return e.preventDefault(),t.onMousedown(e)},mouseup:t.onMouseUp}},[t._t("list-header",null,null,t.scope.listHeader),t._v(" "),t._l(t.filteredOptions,(function(e,o){return n("li",{key:t.getOptionKey(e),staticClass:"vs__dropdown-option",class:{"vs__dropdown-option--deselect":t.isOptionDeselectable(e)&&o===t.typeAheadPointer,"vs__dropdown-option--selected":t.isOptionSelected(e),"vs__dropdown-option--highlight":o===t.typeAheadPointer,"vs__dropdown-option--disabled":!t.selectable(e)},attrs:{id:"vs"+t.uid+"__option-"+o,role:"option","aria-selected":o===t.typeAheadPointer||null},on:{mouseover:function(n){t.selectable(e)&&(t.typeAheadPointer=o)},click:function(n){n.preventDefault(),n.stopPropagation(),t.selectable(e)&&t.select(e)}}},[t._t("option",[t._v("\n          "+t._s(t.getOptionLabel(e))+"\n        ")],null,t.normalizeOptionForSlot(e))],2)})),t._v(" "),0===t.filteredOptions.length?n("li",{staticClass:"vs__no-options"},[t._t("no-options",[t._v("\n          Sorry, no matching options.\n        ")],null,t.scope.noOptions)],2):t._e(),t._v(" "),t._t("list-footer",null,null,t.scope.listFooter)],2):n("ul",{staticStyle:{display:"none",visibility:"hidden"},attrs:{id:"vs"+t.uid+"__listbox",role:"listbox"}})]),t._v(" "),t._t("footer",null,null,t.scope.footer)],2)}),[],!1,null,null,null).exports,_={ajax:u,pointer:c,pointerScroll:l},O=m})(),o})()}));
+!function(t,e){ true?module.exports=e():0}("undefined"!=typeof self?self:this,(function(){return function(t){var e={};function n(o){if(e[o])return e[o].exports;var i=e[o]={i:o,l:!1,exports:{}};return t[o].call(i.exports,i,i.exports,n),i.l=!0,i.exports}return n.m=t,n.c=e,n.d=function(t,e,o){n.o(t,e)||Object.defineProperty(t,e,{enumerable:!0,get:o})},n.r=function(t){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(t,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(t,"__esModule",{value:!0})},n.t=function(t,e){if(1&e&&(t=n(t)),8&e)return t;if(4&e&&"object"==typeof t&&t&&t.__esModule)return t;var o=Object.create(null);if(n.r(o),Object.defineProperty(o,"default",{enumerable:!0,value:t}),2&e&&"string"!=typeof t)for(var i in t)n.d(o,i,function(e){return t[e]}.bind(null,i));return o},n.n=function(t){var e=t&&t.__esModule?function(){return t.default}:function(){return t};return n.d(e,"a",e),e},n.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},n.p="/",n(n.s=8)}([function(t,e,n){var o=n(4),i=n(5),r=n(6);t.exports=function(t){return o(t)||i(t)||r()}},function(t,e){function n(e){return"function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?t.exports=n=function(t){return typeof t}:t.exports=n=function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t},n(e)}t.exports=n},function(t,e,n){},function(t,e){t.exports=function(t,e,n){return e in t?Object.defineProperty(t,e,{value:n,enumerable:!0,configurable:!0,writable:!0}):t[e]=n,t}},function(t,e){t.exports=function(t){if(Array.isArray(t)){for(var e=0,n=new Array(t.length);e<t.length;e++)n[e]=t[e];return n}}},function(t,e){t.exports=function(t){if(Symbol.iterator in Object(t)||"[object Arguments]"===Object.prototype.toString.call(t))return Array.from(t)}},function(t,e){t.exports=function(){throw new TypeError("Invalid attempt to spread non-iterable instance")}},function(t,e,n){"use strict";var o=n(2);n.n(o).a},function(t,e,n){"use strict";n.r(e);var o=n(0),i=n.n(o),r=n(1),s=n.n(r),a=n(3),l=n.n(a),c={props:{autoscroll:{type:Boolean,default:!0}},watch:{typeAheadPointer:function(){this.autoscroll&&this.maybeAdjustScroll()},open:function(t){var e=this;this.autoscroll&&t&&this.$nextTick((function(){return e.maybeAdjustScroll()}))}},methods:{maybeAdjustScroll:function(){var t,e=(null===(t=this.$refs.dropdownMenu)||void 0===t?void 0:t.children[this.typeAheadPointer])||!1;if(e){var n=this.getDropdownViewport(),o=e.getBoundingClientRect(),i=o.top,r=o.bottom,s=o.height;if(i<n.top)return this.$refs.dropdownMenu.scrollTop=e.offsetTop;if(r>n.bottom)return this.$refs.dropdownMenu.scrollTop=e.offsetTop-(n.height-s)}},getDropdownViewport:function(){return this.$refs.dropdownMenu?this.$refs.dropdownMenu.getBoundingClientRect():{height:0,top:0,bottom:0}}}},u={data:function(){return{typeAheadPointer:-1}},watch:{filteredOptions:function(){for(var t=0;t<this.filteredOptions.length;t++)if(this.selectable(this.filteredOptions[t])){this.typeAheadPointer=t;break}}},methods:{typeAheadUp:function(){for(var t=this.typeAheadPointer-1;t>=0;t--)if(this.selectable(this.filteredOptions[t])){this.typeAheadPointer=t;break}},typeAheadDown:function(){for(var t=this.typeAheadPointer+1;t<this.filteredOptions.length;t++)if(this.selectable(this.filteredOptions[t])){this.typeAheadPointer=t;break}},typeAheadSelect:function(){var t=this.filteredOptions[this.typeAheadPointer];t&&this.select(t)}}},p={props:{loading:{type:Boolean,default:!1}},data:function(){return{mutableLoading:!1}},watch:{search:function(){this.$emit("search",this.search,this.toggleLoading)},loading:function(t){this.mutableLoading=t}},methods:{toggleLoading:function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:null;return this.mutableLoading=null==t?!this.mutableLoading:t}}};function d(t,e,n,o,i,r,s,a){var l,c="function"==typeof t?t.options:t;if(e&&(c.render=e,c.staticRenderFns=n,c._compiled=!0),o&&(c.functional=!0),r&&(c._scopeId="data-v-"+r),s?(l=function(t){(t=t||this.$vnode&&this.$vnode.ssrContext||this.parent&&this.parent.$vnode&&this.parent.$vnode.ssrContext)||"undefined"==typeof __VUE_SSR_CONTEXT__||(t=__VUE_SSR_CONTEXT__),i&&i.call(this,t),t&&t._registeredComponents&&t._registeredComponents.add(s)},c._ssrRegister=l):i&&(l=a?function(){i.call(this,this.$root.$options.shadowRoot)}:i),l)if(c.functional){c._injectStyles=l;var u=c.render;c.render=function(t,e){return l.call(e),u(t,e)}}else{var p=c.beforeCreate;c.beforeCreate=p?[].concat(p,l):[l]}return{exports:t,options:c}}var h={Deselect:d({},(function(){var t=this.$createElement,e=this._self._c||t;return e("svg",{attrs:{xmlns:"http://www.w3.org/2000/svg",width:"10",height:"10"}},[e("path",{attrs:{d:"M6.895455 5l2.842897-2.842898c.348864-.348863.348864-.914488 0-1.263636L9.106534.261648c-.348864-.348864-.914489-.348864-1.263636 0L5 3.104545 2.157102.261648c-.348863-.348864-.914488-.348864-1.263636 0L.261648.893466c-.348864.348864-.348864.914489 0 1.263636L3.104545 5 .261648 7.842898c-.348864.348863-.348864.914488 0 1.263636l.631818.631818c.348864.348864.914773.348864 1.263636 0L5 6.895455l2.842898 2.842897c.348863.348864.914772.348864 1.263636 0l.631818-.631818c.348864-.348864.348864-.914489 0-1.263636L6.895455 5z"}})])}),[],!1,null,null,null).exports,OpenIndicator:d({},(function(){var t=this.$createElement,e=this._self._c||t;return e("svg",{attrs:{xmlns:"http://www.w3.org/2000/svg",width:"14",height:"10"}},[e("path",{attrs:{d:"M9.211364 7.59931l4.48338-4.867229c.407008-.441854.407008-1.158247 0-1.60046l-.73712-.80023c-.407008-.441854-1.066904-.441854-1.474243 0L7 5.198617 2.51662.33139c-.407008-.441853-1.066904-.441853-1.474243 0l-.737121.80023c-.407008.441854-.407008 1.158248 0 1.600461l4.48338 4.867228L7 10l2.211364-2.40069z"}})])}),[],!1,null,null,null).exports},f={inserted:function(t,e,n){var o=n.context;if(o.appendToBody){var i=o.$refs.toggle.getBoundingClientRect(),r=i.height,s=i.top,a=i.left,l=i.width,c=window.scrollX||window.pageXOffset,u=window.scrollY||window.pageYOffset;t.unbindPosition=o.calculatePosition(t,o,{width:l+"px",left:c+a+"px",top:u+s+r+"px"}),document.body.appendChild(t)}},unbind:function(t,e,n){n.context.appendToBody&&(t.unbindPosition&&"function"==typeof t.unbindPosition&&t.unbindPosition(),t.parentNode&&t.parentNode.removeChild(t))}};var y=function(t){var e={};return Object.keys(t).sort().forEach((function(n){e[n]=t[n]})),JSON.stringify(e)},b=0;var g=function(){return++b};function v(t,e){var n=Object.keys(t);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(t);e&&(o=o.filter((function(e){return Object.getOwnPropertyDescriptor(t,e).enumerable}))),n.push.apply(n,o)}return n}function m(t){for(var e=1;e<arguments.length;e++){var n=null!=arguments[e]?arguments[e]:{};e%2?v(Object(n),!0).forEach((function(e){l()(t,e,n[e])})):Object.getOwnPropertyDescriptors?Object.defineProperties(t,Object.getOwnPropertyDescriptors(n)):v(Object(n)).forEach((function(e){Object.defineProperty(t,e,Object.getOwnPropertyDescriptor(n,e))}))}return t}var _={components:m({},h),directives:{appendToBody:f},mixins:[c,u,p],props:{value:{},components:{type:Object,default:function(){return{}}},options:{type:Array,default:function(){return[]}},disabled:{type:Boolean,default:!1},clearable:{type:Boolean,default:!0},deselectFromDropdown:{type:Boolean,default:!1},searchable:{type:Boolean,default:!0},multiple:{type:Boolean,default:!1},placeholder:{type:String,default:""},transition:{type:String,default:"vs__fade"},clearSearchOnSelect:{type:Boolean,default:!0},closeOnSelect:{type:Boolean,default:!0},label:{type:String,default:"label"},autocomplete:{type:String,default:"off"},reduce:{type:Function,default:function(t){return t}},selectable:{type:Function,default:function(t){return!0}},getOptionLabel:{type:Function,default:function(t){return"object"===s()(t)?t.hasOwnProperty(this.label)?t[this.label]:console.warn('[vue-select warn]: Label key "option.'.concat(this.label,'" does not')+" exist in options object ".concat(JSON.stringify(t),".\n")+"https://vue-select.org/api/props.html#getoptionlabel"):t}},getOptionKey:{type:Function,default:function(t){if("object"!==s()(t))return t;try{return t.hasOwnProperty("id")?t.id:y(t)}catch(e){return console.warn("[vue-select warn]: Could not stringify this option to generate unique key. Please provide'getOptionKey' prop to return a unique key for each option.\nhttps://vue-select.org/api/props.html#getoptionkey",t,e)}}},onTab:{type:Function,default:function(){this.selectOnTab&&!this.isComposing&&this.typeAheadSelect()}},taggable:{type:Boolean,default:!1},tabindex:{type:Number,default:null},pushTags:{type:Boolean,default:!1},filterable:{type:Boolean,default:!0},filterBy:{type:Function,default:function(t,e,n){return(e||"").toLocaleLowerCase().indexOf(n.toLocaleLowerCase())>-1}},filter:{type:Function,default:function(t,e){var n=this;return t.filter((function(t){var o=n.getOptionLabel(t);return"number"==typeof o&&(o=o.toString()),n.filterBy(t,o,e)}))}},createOption:{type:Function,default:function(t){return"object"===s()(this.optionList[0])?l()({},this.label,t):t}},resetOnOptionsChange:{default:!1,validator:function(t){return["function","boolean"].includes(s()(t))}},clearSearchOnBlur:{type:Function,default:function(t){var e=t.clearSearchOnSelect,n=t.multiple;return e&&!n}},noDrop:{type:Boolean,default:!1},inputId:{type:String},dir:{type:String,default:"auto"},selectOnTab:{type:Boolean,default:!1},selectOnKeyCodes:{type:Array,default:function(){return[13]}},searchInputQuerySelector:{type:String,default:"[type=search]"},mapKeydown:{type:Function,default:function(t,e){return t}},appendToBody:{type:Boolean,default:!1},calculatePosition:{type:Function,default:function(t,e,n){var o=n.width,i=n.top,r=n.left;t.style.top=i,t.style.left=r,t.style.width=o}},dropdownShouldOpen:{type:Function,default:function(t){var e=t.noDrop,n=t.open,o=t.mutableLoading;return!e&&(n&&!o)}},uid:{type:[String,Number],default:function(){return g()}}},data:function(){return{search:"",open:!1,isComposing:!1,pushedTags:[],_value:[]}},computed:{isTrackingValues:function(){return void 0===this.value||this.$options.propsData.hasOwnProperty("reduce")},selectedValue:function(){var t=this.value;return this.isTrackingValues&&(t=this.$data._value),t?[].concat(t):[]},optionList:function(){return this.options.concat(this.pushTags?this.pushedTags:[])},searchEl:function(){return this.$scopedSlots.search?this.$refs.selectedOptions.querySelector(this.searchInputQuerySelector):this.$refs.search},scope:function(){var t=this,e={search:this.search,loading:this.loading,searching:this.searching,filteredOptions:this.filteredOptions};return{search:{attributes:m({disabled:this.disabled,placeholder:this.searchPlaceholder,tabindex:this.tabindex,readonly:!this.searchable,id:this.inputId,"aria-autocomplete":"list","aria-labelledby":"vs".concat(this.uid,"__combobox"),"aria-controls":"vs".concat(this.uid,"__listbox"),ref:"search",type:"search",autocomplete:this.autocomplete,value:this.search},this.dropdownOpen&&this.filteredOptions[this.typeAheadPointer]?{"aria-activedescendant":"vs".concat(this.uid,"__option-").concat(this.typeAheadPointer)}:{}),events:{compositionstart:function(){return t.isComposing=!0},compositionend:function(){return t.isComposing=!1},keydown:this.onSearchKeyDown,blur:this.onSearchBlur,focus:this.onSearchFocus,input:function(e){return t.search=e.target.value}}},spinner:{loading:this.mutableLoading},noOptions:{search:this.search,loading:this.mutableLoading,searching:this.searching},openIndicator:{attributes:{ref:"openIndicator",role:"presentation",class:"vs__open-indicator"}},listHeader:e,listFooter:e,header:m({},e,{deselect:this.deselect}),footer:m({},e,{deselect:this.deselect})}},childComponents:function(){return m({},h,{},this.components)},stateClasses:function(){return{"vs--open":this.dropdownOpen,"vs--single":!this.multiple,"vs--multiple":this.multiple,"vs--searching":this.searching&&!this.noDrop,"vs--searchable":this.searchable&&!this.noDrop,"vs--unsearchable":!this.searchable,"vs--loading":this.mutableLoading,"vs--disabled":this.disabled}},searching:function(){return!!this.search},dropdownOpen:function(){return this.dropdownShouldOpen(this)},searchPlaceholder:function(){return this.isValueEmpty&&this.placeholder?this.placeholder:void 0},filteredOptions:function(){var t=[].concat(this.optionList);if(!this.filterable&&!this.taggable)return t;var e=this.search.length?this.filter(t,this.search,this):t;if(this.taggable&&this.search.length){var n=this.createOption(this.search);this.optionExists(n)||e.unshift(n)}return e},isValueEmpty:function(){return 0===this.selectedValue.length},showClearButton:function(){return!this.multiple&&this.clearable&&!this.open&&!this.isValueEmpty}},watch:{options:function(t,e){var n=this;!this.taggable&&("function"==typeof n.resetOnOptionsChange?n.resetOnOptionsChange(t,e,n.selectedValue):n.resetOnOptionsChange)&&this.clearSelection(),this.value&&this.isTrackingValues&&this.setInternalValueFromOptions(this.value)},value:{immediate:!0,handler:function(t){this.isTrackingValues&&this.setInternalValueFromOptions(t)}},multiple:function(){this.clearSelection()},open:function(t){this.$emit(t?"open":"close")}},created:function(){this.mutableLoading=this.loading,this.$on("option:created",this.pushTag)},methods:{setInternalValueFromOptions:function(t){var e=this;Array.isArray(t)?this.$data._value=t.map((function(t){return e.findOptionFromReducedValue(t)})):this.$data._value=this.findOptionFromReducedValue(t)},select:function(t){this.$emit("option:selecting",t),this.isOptionSelected(t)?this.deselectFromDropdown&&(this.clearable||this.multiple&&this.selectedValue.length>1)&&this.deselect(t):(this.taggable&&!this.optionExists(t)&&this.$emit("option:created",t),this.multiple&&(t=this.selectedValue.concat(t)),this.updateValue(t),this.$emit("option:selected",t)),this.onAfterSelect(t)},deselect:function(t){var e=this;this.$emit("option:deselecting",t),this.updateValue(this.selectedValue.filter((function(n){return!e.optionComparator(n,t)}))),this.$emit("option:deselected",t)},clearSelection:function(){this.updateValue(this.multiple?[]:null)},onAfterSelect:function(t){this.closeOnSelect&&(this.open=!this.open,this.searchEl.blur()),this.clearSearchOnSelect&&(this.search="")},updateValue:function(t){var e=this;void 0===this.value&&(this.$data._value=t),null!==t&&(t=Array.isArray(t)?t.map((function(t){return e.reduce(t)})):this.reduce(t)),this.$emit("input",t)},toggleDropdown:function(t){var e=t.target!==this.searchEl;e&&t.preventDefault();var n=[].concat(i()(this.$refs.deselectButtons||[]),i()([this.$refs.clearButton]||0));void 0===this.searchEl||n.filter(Boolean).some((function(e){return e.contains(t.target)||e===t.target}))?t.preventDefault():this.open&&e?this.searchEl.blur():this.disabled||(this.open=!0,this.searchEl.focus())},isOptionSelected:function(t){var e=this;return this.selectedValue.some((function(n){return e.optionComparator(n,t)}))},isOptionDeselectable:function(t){return this.isOptionSelected(t)&&this.deselectFromDropdown},optionComparator:function(t,e){return this.getOptionKey(t)===this.getOptionKey(e)},findOptionFromReducedValue:function(t){var e=this,n=[].concat(i()(this.options),i()(this.pushedTags)).filter((function(n){return JSON.stringify(e.reduce(n))===JSON.stringify(t)}));return 1===n.length?n[0]:n.find((function(t){return e.optionComparator(t,e.$data._value)}))||t},closeSearchOptions:function(){this.open=!1,this.$emit("search:blur")},maybeDeleteValue:function(){if(!this.searchEl.value.length&&this.selectedValue&&this.selectedValue.length&&this.clearable){var t=null;this.multiple&&(t=i()(this.selectedValue.slice(0,this.selectedValue.length-1))),this.updateValue(t)}},optionExists:function(t){var e=this;return this.optionList.some((function(n){return e.optionComparator(n,t)}))},normalizeOptionForSlot:function(t){return"object"===s()(t)?t:l()({},this.label,t)},pushTag:function(t){this.pushedTags.push(t)},onEscape:function(){this.search.length?this.search="":this.searchEl.blur()},onSearchBlur:function(){if(!this.mousedown||this.searching){var t=this.clearSearchOnSelect,e=this.multiple;return this.clearSearchOnBlur({clearSearchOnSelect:t,multiple:e})&&(this.search=""),void this.closeSearchOptions()}this.mousedown=!1,0!==this.search.length||0!==this.options.length||this.closeSearchOptions()},onSearchFocus:function(){this.open=!0,this.$emit("search:focus")},onMousedown:function(){this.mousedown=!0},onMouseUp:function(){this.mousedown=!1},onSearchKeyDown:function(t){var e=this,n=function(t){return t.preventDefault(),!e.isComposing&&e.typeAheadSelect()},o={8:function(t){return e.maybeDeleteValue()},9:function(t){return e.onTab()},27:function(t){return e.onEscape()},38:function(t){return t.preventDefault(),e.typeAheadUp()},40:function(t){return t.preventDefault(),e.typeAheadDown()}};this.selectOnKeyCodes.forEach((function(t){return o[t]=n}));var i=this.mapKeydown(o,this);if("function"==typeof i[t.keyCode])return i[t.keyCode](t)}}},O=(n(7),d(_,(function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("div",{staticClass:"v-select",class:t.stateClasses,attrs:{dir:t.dir}},[t._t("header",null,null,t.scope.header),t._v(" "),n("div",{ref:"toggle",staticClass:"vs__dropdown-toggle",attrs:{id:"vs"+t.uid+"__combobox",role:"combobox","aria-expanded":t.dropdownOpen.toString(),"aria-owns":"vs"+t.uid+"__listbox","aria-label":"Search for option"},on:{mousedown:function(e){return t.toggleDropdown(e)}}},[n("div",{ref:"selectedOptions",staticClass:"vs__selected-options"},[t._l(t.selectedValue,(function(e){return t._t("selected-option-container",[n("span",{key:t.getOptionKey(e),staticClass:"vs__selected"},[t._t("selected-option",[t._v("\n            "+t._s(t.getOptionLabel(e))+"\n          ")],null,t.normalizeOptionForSlot(e)),t._v(" "),t.multiple?n("button",{ref:"deselectButtons",refInFor:!0,staticClass:"vs__deselect",attrs:{disabled:t.disabled,type:"button",title:"Deselect "+t.getOptionLabel(e),"aria-label":"Deselect "+t.getOptionLabel(e)},on:{click:function(n){return t.deselect(e)}}},[n(t.childComponents.Deselect,{tag:"component"})],1):t._e()],2)],{option:t.normalizeOptionForSlot(e),deselect:t.deselect,multiple:t.multiple,disabled:t.disabled})})),t._v(" "),t._t("search",[n("input",t._g(t._b({staticClass:"vs__search"},"input",t.scope.search.attributes,!1),t.scope.search.events))],null,t.scope.search)],2),t._v(" "),n("div",{ref:"actions",staticClass:"vs__actions"},[n("button",{directives:[{name:"show",rawName:"v-show",value:t.showClearButton,expression:"showClearButton"}],ref:"clearButton",staticClass:"vs__clear",attrs:{disabled:t.disabled,type:"button",title:"Clear Selected","aria-label":"Clear Selected"},on:{click:t.clearSelection}},[n(t.childComponents.Deselect,{tag:"component"})],1),t._v(" "),t._t("open-indicator",[t.noDrop?t._e():n(t.childComponents.OpenIndicator,t._b({tag:"component"},"component",t.scope.openIndicator.attributes,!1))],null,t.scope.openIndicator),t._v(" "),t._t("spinner",[n("div",{directives:[{name:"show",rawName:"v-show",value:t.mutableLoading,expression:"mutableLoading"}],staticClass:"vs__spinner"},[t._v("Loading...")])],null,t.scope.spinner)],2)]),t._v(" "),n("transition",{attrs:{name:t.transition}},[t.dropdownOpen?n("ul",{directives:[{name:"append-to-body",rawName:"v-append-to-body"}],key:"vs"+t.uid+"__listbox",ref:"dropdownMenu",staticClass:"vs__dropdown-menu",attrs:{id:"vs"+t.uid+"__listbox",role:"listbox",tabindex:"-1"},on:{mousedown:function(e){return e.preventDefault(),t.onMousedown(e)},mouseup:t.onMouseUp}},[t._t("list-header",null,null,t.scope.listHeader),t._v(" "),t._l(t.filteredOptions,(function(e,o){return n("li",{key:t.getOptionKey(e),staticClass:"vs__dropdown-option",class:{"vs__dropdown-option--deselect":t.isOptionDeselectable(e)&&o===t.typeAheadPointer,"vs__dropdown-option--selected":t.isOptionSelected(e),"vs__dropdown-option--highlight":o===t.typeAheadPointer,"vs__dropdown-option--disabled":!t.selectable(e)},attrs:{id:"vs"+t.uid+"__option-"+o,role:"option","aria-selected":o===t.typeAheadPointer||null},on:{mouseover:function(n){t.selectable(e)&&(t.typeAheadPointer=o)},click:function(n){n.preventDefault(),n.stopPropagation(),t.selectable(e)&&t.select(e)}}},[t._t("option",[t._v("\n          "+t._s(t.getOptionLabel(e))+"\n        ")],null,t.normalizeOptionForSlot(e))],2)})),t._v(" "),0===t.filteredOptions.length?n("li",{staticClass:"vs__no-options"},[t._t("no-options",[t._v("Sorry, no matching options.")],null,t.scope.noOptions)],2):t._e(),t._v(" "),t._t("list-footer",null,null,t.scope.listFooter)],2):n("ul",{staticStyle:{display:"none",visibility:"hidden"},attrs:{id:"vs"+t.uid+"__listbox",role:"listbox"}})]),t._v(" "),t._t("footer",null,null,t.scope.footer)],2)}),[],!1,null,null,null).exports),w={ajax:p,pointer:u,pointerScroll:c};n.d(e,"VueSelect",(function(){return O})),n.d(e,"mixins",(function(){return w}));e.default=O}])}));
 //# sourceMappingURL=vue-select.js.map
 
 /***/ }),

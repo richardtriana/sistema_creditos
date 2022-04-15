@@ -268,53 +268,28 @@ export default {
       });
     },
     saveConfiguration() {
-      this.assignErrors(false);
+      let me = this;
+
       var form = new FormData($("#form_configuration")[0]);
-      form.append("id", this.formConfiguration.id);
+      form.append("id", me.formConfiguration.id);
       form.set(
         "condition_quotation",
-        this.formConfiguration.condition_quotation
+        me.formConfiguration.condition_quotation
       );
 
+      me.$root.assignErrors(false, me.formErrors);
+
       axios
-        .post("api/configurations", form)
+        .post("api/configurations", form, me.$root.config)
         .then((response) => {
-          this.formConfiguration = response.data.configuration;
+          me.formConfiguration = response.data.configuration;
+          me.$root.assignErrors(false, me.formErrors);
         })
         .catch((response) => {
-          this.assignErrors(response);
+          me.$root.assignErrors(response, me.formErrors);
         });
     },
-    assignErrors(response) {
-      const fillable = [
-        "name",
-        "legal_representative",
-        "nit",
-        "address",
-        "email",
-        "telephone",
-        "mobile",
-        "file0",
-        "condition_order",
-        "condition_quotation",
-        "whatsapp_msg",
-      ];
 
-      if (response) {
-        var errors = response.response.data.errors;
-        console.log(errors);
-
-        fillable.forEach((index) => {
-          if (errors[index] != undefined) {
-            this.formErrors[index] = errors[index][0];
-          }
-        });
-      } else {
-        fillable.forEach((index) => {
-          this.formErrors[index] = "";
-        });
-      }
-    },
     readImage(input) {
       var id = $(input).data("info");
       if (input.files && input.files[0]) {
