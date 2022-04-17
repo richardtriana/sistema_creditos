@@ -268,21 +268,25 @@ export default {
       });
     },
     saveConfiguration() {
-      this.$root.assignErrors(false, this.formErrors);
+      let me = this;
+
       var form = new FormData($("#form_configuration")[0]);
-      form.append("id", this.formConfiguration.id);
+      form.append("id", me.formConfiguration.id);
       form.set(
         "condition_quotation",
-        this.formConfiguration.condition_quotation
+        me.formConfiguration.condition_quotation
       );
 
+      me.$root.assignErrors(false, me.formErrors);
+
       axios
-        .post("api/configurations", form, this.$root.config)
+        .post("api/configurations", form, me.$root.config)
         .then((response) => {
-          this.formConfiguration = response.data.configuration;
+          me.formConfiguration = response.data.configuration;
+          me.$root.assignErrors(false, me.formErrors);
         })
         .catch((response) => {
-          this.$root.assignErrors(response, this.formErrors);
+          me.$root.assignErrors(response, me.formErrors);
         });
     },
 

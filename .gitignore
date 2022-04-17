@@ -4,6 +4,7 @@
 /public/js/app.js
 .env
 .env.backup
+.env.dev
 .phpunit.result.cache
 docker-compose.override.yml
 Homestead.json
