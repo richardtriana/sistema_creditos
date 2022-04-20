@@ -87,6 +87,13 @@ class ExpenseController extends Controller
 		$box = Box::where('headquarter_id', $expense->headquarter_id)->firstOrFail();
 		$sub_amount_box = new BoxController();
 		$sub_amount_box->subAmountBox($box->id, $request['price']);
+
+		return response()->json([
+			'status' => 'success',
+			'code' =>  200,
+			'message' => 'Registro exitoso',
+			'expense' =>  $expense
+		], 200);
 	}
 
 	/**
@@ -98,6 +105,21 @@ class ExpenseController extends Controller
 	 */
 	public function update(Request $request, Expense $expense)
 	{
+		$validate = Validator::make($request->all(), [
+			'description' => 'required|string|max:255',
+			'date' => 'required|date',
+			'type_output' => 'required|string|exists:type_expenses,description',
+		]);
+
+		if ($validate->fails()) {
+			return response()->json([
+				'status' => 'error',
+				'code' =>  400,
+				'message' => 'Validación de datos incorrecta',
+				'errors' =>  $validate->errors()
+			], 400);
+		}
+
 		$expense->description = $request['description'];
 		$expense->date = $request['date'];
 		$expense->type_output = $request['type_output'];
