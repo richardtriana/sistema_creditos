@@ -72,7 +72,8 @@ class ClientController extends Controller
 			'civil_status' => 'nullable|string|in:Soltero,Casado,Union libre,Divorciado,Viudo',
 			'workplace' => 'nullable|string|max:255',
 			'occupation' => 'nullable|string|max:255',
-			'independent' => 'nullable|boolean'
+			'independent' => 'nullable|boolean',
+			'maximum_credit_allowed' => 'required|numeric',
 		]);
 
 		if ($validate->fails()) {
@@ -100,6 +101,7 @@ class ClientController extends Controller
 		$client->workplace = $request['workplace'];
 		$client->occupation = $request['occupation'];
 		$client->independent = $request['independent'];
+		$client->maximum_credit_allowed = $request['maximum_credit_allowed'];
 		$client->photo = 'undefined';
 		$client->save();
 
@@ -167,7 +169,8 @@ class ClientController extends Controller
 			'civil_status' => 'nullable|string|max:255',
 			'workplace' => 'nullable|string|max:255',
 			'occupation' => 'nullable|string|max:255',
-			'independent' => 'nullable|boolean'
+			'independent' => 'nullable|boolean',
+			'maximum_credit_allowed' => 'required|numeric'
 		]);
 
 
@@ -179,8 +182,6 @@ class ClientController extends Controller
 				'errors' =>  $validate->errors()
 			], 400);
 		}
-
-
 
 		$client = Client::find($request->id);
 		$client->name = $request['name'];
@@ -197,6 +198,7 @@ class ClientController extends Controller
 		$client->workplace = $request['workplace'];
 		$client->occupation = $request['occupation'];
 		$client->independent = $request['independent'];
+		$client->maximum_credit_allowed = $request['maximum_credit_allowed'];
 		$client->photo = 'undefined';
 		$client->update();
 

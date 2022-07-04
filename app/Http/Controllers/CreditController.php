@@ -357,15 +357,17 @@ class CreditController extends Controller
 			if ($payment_date < $now) {
 				$days_past_due = $installment->days_past_due ? $installment->days_past_due :  $now->diffInDays($payment_date);
 				$day_value_default = $installment->interest_value / 30;
-				$late_interests_actual =  $days_past_due > 30 ?  $day_value_default * 30 : $day_value_default * $days_past_due;
-				$late_interests_value = $installment->late_interests_value ? $installment->late_interests_value : $late_interests_actual;
-
+				$late_interest_value =  $days_past_due > 30 ?  $day_value_default * 30 : $day_value_default * $days_past_due;
+		
 				$installment->days_past_due  = $days_past_due > 30 ? 30 : $days_past_due;
-				$installment->late_interests_value  =  $late_interests_value;
+				$installment->late_interests_value  =  $late_interest_value;
 				if ($installment->paid_capital > 0 && $installment->paid_capital < $installment->capital_value) {
 					$installment->value = $installment->capital_value - $installment->paid_capital;
+					$installment->is_paid = false;
 				} else {
-					$installment->value  += $late_interests_value;
+					$installment->value  += $late_interest_value;
+					$installment->is_paid = true;
+
 				}
 			}
 		}
@@ -456,6 +458,8 @@ class CreditController extends Controller
 		$to = $request->to;
 		$this_month = Carbon::now()->month;
 		$status = $request->status;
+		$start_date = $request->start_date;
+		$end_date = $request->end_date;
 
 		switch ($status) {
 			case 'all':
@@ -504,6 +508,14 @@ class CreditController extends Controller
 					}
 					if ($to != '' && $to != 'undefined' && $to != null) {
 						$query->whereDate("$query_date", '<=', $to);
+					}
+				})
+				->where(function ($query) use ($start_date, $end_date) {
+					if ($start_date != '' && $start_date != 'undefined' && $start_date != null) {
+						$query->whereDate("start_date", '>=', $start_date);
+					}
+					if ($end_date != '' && $end_date != 'undefined' && $end_date != null) {
+						$query->whereRaw("DATE_ADD(`start_date`, INTERVAL `number_installments` MONTH) <= '$end_date'");
 					}
 				});
 		}
