@@ -36,13 +36,16 @@ class CreditController extends Controller
 	public function index(Request $request)
 	{
 
+		$installment_controller = new InstallmentController();
+		$installment_controller->correctStatusInstallments();
+
 		$credits = Credit::select();
 		$status = $request->status != null ? $request->status : 1;
 		$status = $status == 0 ? [0, 3] : [$request->status];
 
 		if ($request->credit && ($request->credit != '')) {
 			$credits  =   $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
-				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document', 'c.phone_1', 'c.phone_2')
+				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document', 'c.phone_1', 'c.phone_2','c.maximum_credit_allowed')
 				->where('document', 'LIKE', "%$request->credit%")
 				->orWhere('name', 'LIKE', "%$request->credit%")
 				->orWhere('email', 'LIKE', "%$request->credit%")
@@ -50,7 +53,7 @@ class CreditController extends Controller
 				->whereIn('credits.status', $status);
 		} else {
 			$credits  =     $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
-				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document', 'c.phone_1', 'c.phone_2')
+				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document', 'c.phone_1', 'c.phone_2','c.maximum_credit_allowed')
 				->whereIn('credits.status', $status);
 		}
 		$credits = $credits
@@ -305,6 +308,8 @@ class CreditController extends Controller
 	public function changeStatus(Request $request,  Credit $credit)
 	{
 		$credit_provider = '';
+		$client_id = $credit->client->id;
+
 		if ($credit->provider_id != null && $credit->provider_id != 0) {
 			$credit_provider = CreditProvider::where('credit_id', $credit->id)->first();
 
@@ -314,6 +319,9 @@ class CreditController extends Controller
 						$update_main_box = new MainBoxController();
 						$update_main_box->subAmountMainBox($credit->credit_value);
 						$credit->disbursement_date = date('Y-m-d');
+
+						$validate_credit_limit = new ClientController();
+						$validate_credit_limit->validateCreditLimit($client_id,$credit->credit_value);
 					}
 
 					if ($request->status  == 2 && $credit->status == 1) {
@@ -332,6 +340,9 @@ class CreditController extends Controller
 				$update_main_box = new MainBoxController();
 				$update_main_box->subAmountMainBox($credit->credit_value);
 				$credit->disbursement_date = date('Y-m-d');
+
+				$validate_credit_limit = new ClientController();
+				$validate_credit_limit->validateCreditLimit($client_id,$credit->credit_value);
 			}
 			if ($request->status  == 2 && $credit->status == 1) {
 				$update_main_box = new MainBoxController();
@@ -340,32 +351,32 @@ class CreditController extends Controller
 			$credit->status = $request->status;
 		}
 
-		if ($request->status  == 2 && $request->description != null) {
-			$credit->description  = "$credit->description \nRechazado por: $request->description";
+		if ($request->status == 2 && $request->description != null) {
+			$credit->description  = "$credit->description \n Rechazado por: $request->description";
 		}
 		$credit->save();
 	}
 
 	public function installments(Request $request, $id)
 	{
+
 		$credit = Credit::findOrFail($id);
 		$installments =  $credit->installments()->get();
 		foreach ($installments as $installment) {
 			$now = now();
 			$payment_date = Carbon::createFromFormat('Y-m-d', $installment->payment_date);
 
-			if ($payment_date < $now) {
+			if (($payment_date < $now) &&  $installment->status != '1' ) {
 				$days_past_due = $installment->days_past_due ? $installment->days_past_due :  $now->diffInDays($payment_date);
 				$day_value_default = $installment->interest_value / 30;
-				$late_interests_actual =  $days_past_due > 30 ?  $day_value_default * 30 : $day_value_default * $days_past_due;
-				$late_interests_value = $installment->late_interests_value ? $installment->late_interests_value : $late_interests_actual;
+				$late_interest_value =  $days_past_due > 30 ?  $day_value_default * 30 : $day_value_default * $days_past_due;
 
 				$installment->days_past_due  = $days_past_due > 30 ? 30 : $days_past_due;
-				$installment->late_interests_value  =  $late_interests_value;
+				$installment->late_interests_value  =  $late_interest_value;
 				if ($installment->paid_capital > 0 && $installment->paid_capital < $installment->capital_value) {
 					$installment->value = $installment->capital_value - $installment->paid_capital;
 				} else {
-					$installment->value  += $late_interests_value;
+					$installment->value  += $late_interest_value;
 				}
 			}
 		}
@@ -456,6 +467,8 @@ class CreditController extends Controller
 		$to = $request->to;
 		$this_month = Carbon::now()->month;
 		$status = $request->status;
+		$start_date = $request->start_date;
+		$end_date = $request->end_date;
 
 		switch ($status) {
 			case 'all':
@@ -505,6 +518,14 @@ class CreditController extends Controller
 					if ($to != '' && $to != 'undefined' && $to != null) {
 						$query->whereDate("$query_date", '<=', $to);
 					}
+				})
+				->where(function ($query) use ($start_date, $end_date) {
+					if ($start_date != '' && $start_date != 'undefined' && $start_date != null) {
+						$query->whereDate("start_date", '>=', $start_date);
+					}
+					if ($end_date != '' && $end_date != 'undefined' && $end_date != null) {
+						$query->whereRaw("DATE_ADD(`start_date`, INTERVAL `number_installments` MONTH) <= '$end_date'");
+					}
 				});
 		}
 		$credits = $credits->first();
@@ -542,9 +563,9 @@ class CreditController extends Controller
 			$entry->user_id = $request->user()->id;
 			$entry->credit_id = $credit->id;
 			$entry->description = "
-				Cliente: {$client->name} {$client->last_name}
-				Nro. Credito: $credit->id
-				";
+				Cliente: {$client->name} {$client->last_name} \n".
+				"Nro. Credito: $credit->id \n" .
+				"Cupo crédito: {$client->maximum_credit_allowed}";
 			$entry->date = date('Y-m-d');
 			$entry->type_entry = 'Recoger capital de crédito';
 			$entry->price = $pending_value;

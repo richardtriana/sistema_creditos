@@ -15,7 +15,7 @@
           <th>Capital abonado</th>
           <th v-if="allow_payment">Estado</th>
           <th v-if="allow_payment"></th>
-          <th>Reversar <br /> Pago</th>
+          <th  v-if="$root.validatePermission('installment-reverse')">Reversar <br /> Pago</th>
         </tr>
       </thead>
       <tbody>
@@ -60,7 +60,7 @@
               Pagar
             </button>
           </td>
-          <td>
+          <td  v-if="$root.validatePermission('installment-reverse')">
             <button class="btn btn-warning" @click="reversePayment(quote)">
               <i class="bi bi-arrow-counterclockwise"></i>
             </button>
@@ -111,8 +111,26 @@ export default {
           )
           .then(function (response) {
             //me.printEntryPdf(response.data.entry_id);
-            me.listCreditInstallments(me.id_credit, 1);
-          });
+            Swal.fire({
+              icon: "success",
+              title: ".",
+              text: "La operación se ha realizado correctamente",
+            });
+          })
+          .catch(function (error) {
+            console.log('error', error)
+            // handle error
+            if (error) {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "No se pudo realizar esta operación",
+              });
+            }
+          })
+          .finally(
+            me.listCreditInstallments(me.id_credit, 1)
+          )
       } else {
         Swal.fire({
           icon: "error",
@@ -146,7 +164,7 @@ export default {
             title: ".",
             text: "La operación se ha realizado correctamente",
           });
-          this.listCreditInstallments(this.id_credit, 1)
+
         })
         .catch(function (error) {
           // handle error
@@ -158,6 +176,9 @@ export default {
             });
           }
         })
+        .finally(
+          this.listCreditInstallments(this.id_credit, 1)
+        )
     }
   },
 };

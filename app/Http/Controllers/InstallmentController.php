@@ -9,7 +9,9 @@ use App\Models\Expense;
 use App\Models\Installment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
+
 use PDF;
 
 class InstallmentController extends Controller
@@ -173,20 +175,25 @@ class InstallmentController extends Controller
       //Valor de la cuota o abono
       $amount = $request->amount;
     }
+
     $amount_receipt = $amount;
     $now = now();
     $status = 0;
 
+    // DB::enableQueryLog(); // Enable query log
     $installment = $credit->installments();
     if (!$quote) {
       $installment = $installment->whereDate('payment_date', '<=', $now);
     }
+
     $installment = $installment->where(function ($query) {
-      $query->where('paid_balance', '<=', 0)
-        ->orWhereNull('paid_balance')
-        ->orWhereColumn('paid_capital', '<', 'capital_value');
+      $query
+        ->whereRaw('((paid_capital) +0.1) < ((capital_value))')
+        ->orWhereNull('paid_balance');
     })
       ->first();
+
+    // dd(DB::getQueryLog()); // Show results of log
 
     if (($installment) == null && !$quote) {
       $installment = $credit->installments()
@@ -220,7 +227,7 @@ class InstallmentController extends Controller
         $amount_capital = $amount -  $installment->interest_value; //ok
         $interest = $installment->interest_value;
         if ($installment->paid_balance == null || $installment->paid_balance == 0) {
-          if ($amount_capital + 1 < $installment->capital_value) {
+          if ($amount_capital < $installment->capital_value) {
             $status = 0;
           }
         }
@@ -238,24 +245,20 @@ class InstallmentController extends Controller
 
         $days_past_due = $installment->days_past_due ? $installment->days_past_due :  $now->diffInDays($payment_date);
         $day_value_default = $installment->interest_value / 30;
-        $late_interests_actual =  $days_past_due > 30 ?  $day_value_default * 30 : $day_value_default * $days_past_due;
-        $late_interests_value = $installment->late_interests_value ? $installment->late_interests_value : $late_interests_actual;
+        $late_interests_value =  $days_past_due > 30 ?  $day_value_default * 30 : $day_value_default * $days_past_due;
         $installment->days_past_due  = $days_past_due > 30 ? 30 : $days_past_due;
         $installment->late_interests_value  = $late_interests_value;
         $interest = $installment->interest_value + $late_interests_value;
 
         $amount_capital = $amount -  $interest; //ok
-        if ($quote) {
-          $status = 1;
-        } else {
-          $status = $amount + 1 < ($installment->value + $late_interests_value) ? 0 : 1;
-        }
+        $status = $amount + 1 < ($installment->value + $late_interests_value) ? 0 : 1;
         $balance -= $late_interests_value;
         $balance = $balance < 0 ?? (int) 0;
       }
+
       $installment->paid_balance +=  ($amount_capital + $interest);
       $installment->paid_capital += $amount_capital;
-      $installment->status  = $status;
+      $installment->status  = $quote ? 1 : $status;
       $installment->payment_register = date('Y-m-d');
 
       if (!$installment->save()) {
@@ -364,7 +367,8 @@ class InstallmentController extends Controller
         . "# cuota: {$no_installment}\n"
         . "Efectivo: {$amount_receipt}\n"
         . "Valor pagado: {$amount_paid}\n"
-        . "Regreso: {$balance}";
+        . "Regreso: {$balance} \n" .
+        "Cupo crédito: {$client->maximum_credit_allowed}";
       $entry->date = date('Y-m-d');
       $entry->type_entry = $type_entry;
       $entry->price = $amount;
@@ -405,6 +409,7 @@ class InstallmentController extends Controller
 
   public function reversePaymentInstallment(Request $request, $id)
   {
+    date_default_timezone_set('America/Bogota');
     $headquarter_id = $request->user()->headquarter_id;
     $user_id = $request->user()->id;
 
@@ -415,14 +420,21 @@ class InstallmentController extends Controller
     $credit = $installment->credit;
 
     $type_output = 'Reversar pago';
-    $description = "Reversar pago\n" .
+    $description = "Reversar pago \n" .
       "#Credito:  $credit->id \n" .
       "#Cuota Nro:  $installment->installment_number \n" .
-      "#Cliente:  {$credit->client->name} {$credit->client->last_name}  \n";
+      "#Cliente:  {$credit->client->name} {$credit->client->last_name}  \n" .
+      "Fecha y hora: " . date('Y-m-d h:i:s A');
 
     // Certificar egreso
     $expense  = new ExpenseController();
     $expense->addExpense($user_id, $headquarter_id, $description, date('Y-m-d'), $type_output, $paid_balance);
+
+    //Resetar valores de la cuota
+    $installment->paid_balance = 0;
+    $installment->paid_capital = 0;
+    $installment->status = 0;
+    $installment->save();
 
     //Restar valores en el crédito
     $credit_paid = new CreditController;
@@ -430,11 +442,17 @@ class InstallmentController extends Controller
 
     //Actualizar valores de cuotas
     $this->updateInstallments($credit->id);
+  }
 
-    //Resetar valores de la cuota
-    $installment->paid_balance = 0;
-    $installment->paid_capital = 0;
-    $installment->status = 0;
-    $installment->save();
+  public function correctStatusInstallments()
+  {
+    $installments = Installment::where('capital_value', '<=', 'paid_capital')
+      ->get();
+
+    foreach ($installments as $installment) {
+      $installment = Installment::find($installment->id);
+      $installment->status = 1;
+      $installment->save();
+    }
   }
 }
