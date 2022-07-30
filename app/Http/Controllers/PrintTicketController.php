@@ -76,6 +76,7 @@ class PrintTicketController extends Controller
 			$printer->text(sprintf('%-20s %-20s', 'Monto Cancelado', $installment->value));
 			$printer->text("\n");
 			$printer->setTextSize(1, 2);
+			$printer->setEmphasis(true);
 			$printer->text(sprintf('%-20s %-20s', 'Cupo crédito', $client->maximum_credit_allowed));
 			$printer->setTextSize(1, 1);
 			$printer->text("\n");
@@ -157,6 +158,7 @@ class PrintTicketController extends Controller
 			$printer->text(sprintf('%-20s %-20s', 'Monto Cancelado', $amount));
 			$printer->text("\n");
 			$printer->setTextSize(1, 2);
+			$printer->setEmphasis(true);
 			$printer->text(sprintf('%-20s %-20s', 'Cupo crédito', $client->maximum_credit_allowed));
 			$printer->setTextSize(1, 1);
 			$printer->text("\n");
@@ -234,6 +236,7 @@ class PrintTicketController extends Controller
 			$printer->text('Descripcion: ' . $credit->description);
 			$printer->text("\n");
 			$printer->setTextSize(1, 2);
+			$printer->setEmphasis(true);
 			$printer->text(sprintf('%-20s %-20s', 'Cupo crédito', $client->maximum_credit_allowed));
 			$printer->setTextSize(1, 1);
 			$printer->text("\n");
