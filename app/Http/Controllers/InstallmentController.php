@@ -9,7 +9,9 @@ use App\Models\Expense;
 use App\Models\Installment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
+
 use PDF;
 
 class InstallmentController extends Controller
@@ -173,21 +175,25 @@ class InstallmentController extends Controller
       //Valor de la cuota o abono
       $amount = $request->amount;
     }
+
     $amount_receipt = $amount;
     $now = now();
     $status = 0;
 
+    // DB::enableQueryLog(); // Enable query log
     $installment = $credit->installments();
     if (!$quote) {
       $installment = $installment->whereDate('payment_date', '<=', $now);
     }
+
     $installment = $installment->where(function ($query) {
-      // $query
-      //   ->orWhereNull('paid_balance')
-      $query->whereColumn('paid_capital', '<', 'capital_value')
+      $query
+        ->whereRaw('((paid_capital) +0.1) < ((capital_value))')
         ->orWhereNull('paid_balance');
     })
       ->first();
+
+    // dd(DB::getQueryLog()); // Show results of log
 
     if (($installment) == null && !$quote) {
       $installment = $credit->installments()
@@ -245,17 +251,14 @@ class InstallmentController extends Controller
         $interest = $installment->interest_value + $late_interests_value;
 
         $amount_capital = $amount -  $interest; //ok
-        if ($quote) {
-          $status = 1;
-        } else {
-          $status = $amount + 1 < ($installment->value + $late_interests_value) ? 0 : 1;
-        }
+        $status = $amount + 1 < ($installment->value + $late_interests_value) ? 0 : 1;
         $balance -= $late_interests_value;
         $balance = $balance < 0 ?? (int) 0;
       }
+
       $installment->paid_balance +=  ($amount_capital + $interest);
       $installment->paid_capital += $amount_capital;
-      $installment->status  = $status;
+      $installment->status  = $quote ? 1 : $status;
       $installment->payment_register = date('Y-m-d');
 
       if (!$installment->save()) {
@@ -364,7 +367,8 @@ class InstallmentController extends Controller
         . "# cuota: {$no_installment}\n"
         . "Efectivo: {$amount_receipt}\n"
         . "Valor pagado: {$amount_paid}\n"
-        . "Regreso: {$balance}";
+        . "Regreso: {$balance} \n" .
+        "Cupo crédito: {$client->maximum_credit_allowed}";
       $entry->date = date('Y-m-d');
       $entry->type_entry = $type_entry;
       $entry->price = $amount;
@@ -438,5 +442,17 @@ class InstallmentController extends Controller
 
     //Actualizar valores de cuotas
     $this->updateInstallments($credit->id);
+  }
+
+  public function correctStatusInstallments()
+  {
+    $installments = Installment::where('capital_value', '<=', 'paid_capital')
+      ->get();
+
+    foreach ($installments as $installment) {
+      $installment = Installment::find($installment->id);
+      $installment->status = 1;
+      $installment->save();
+    }
   }
 }

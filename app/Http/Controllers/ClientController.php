@@ -253,4 +253,10 @@ class ClientController extends Controller
 
 		return $clients;
 	}
+
+	public function validateCreditLimit($client_id, $amount) {
+		$client = Client::find($client_id);
+		$client->maximum_credit_allowed -= $amount;
+		$client->update();
+	}
 }
