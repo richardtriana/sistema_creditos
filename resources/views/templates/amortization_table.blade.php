@@ -40,6 +40,9 @@
     <h2>
       {{ $company->name}}
     </h2>
+    <h6>
+      Cupo de crédito: {{$client->maximum_credit_allowed}}
+    </h6>
     <h3>
       Calendario de pagos
     </h3>

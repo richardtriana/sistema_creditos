@@ -18,6 +18,7 @@ use App\Http\Controllers\TypeExpenseController;
 use App\Http\Controllers\UserController;
 use App\Models\Company;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -37,6 +38,16 @@ Route::get('/company-logo', function () {
 	$configuration = new Company();
 	$image = $configuration->select('logo')->first();
 	return $image;
+});
+
+Route::get('execute-migrations', function () {
+	try {
+		Artisan::call('migrate');
+		dd('Migrations Executed');
+	} catch (\Throwable $th) {
+		//throw $th;
+		dd('Error executing migrations', $th);
+	}
 });
 
 //Credit  except index
@@ -121,14 +132,11 @@ Route::group(['middleware' => ['auth:api']], function () {
 
 	//Installments
 	Route::resource('/installments', InstallmentController::class);
+	Route::post('/installments/correct-status-installments', [InstallmentController::class, 'correctStatusInstallments']);
 	Route::post('/installment/{credit}/pay-installment', [InstallmentController::class, 'payInstallment']);
-	Route::post('/installment/reverse-payment/{id}', [InstallmentController::class, 'reversePaymentInstallment']);
-	
+	Route::post('/installment/reverse-payment/{id}', [InstallmentController::class, 'reversePaymentInstallment'])->middleware('permission:installment.reverse');
 
-	//Print ticket
-	Route::get('/print-installment', [PrintTicketController::class, 'printInstallment']);
-
-	//Por revisar
+	//Imprimir tickets
 	Route::get('/print-installment', [PrintTicketController::class, 'printInstallment']);
 	Route::get('/print-entry/{entry}', [PrintTicketController::class, 'printEntry']);
 

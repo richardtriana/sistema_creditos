@@ -2,41 +2,20 @@
   <div class="page">
     <div class="page-header d-flex justify-content-between p-4 border my-2">
       <h3>Creditos</h3>
-      <button
-        type="button"
-        class="btn btn-primary"
-        data-toggle="modal"
-        data-target="#formCreditModal"
-        v-if="$root.validatePermission('credit-store')"
-      >
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#formCreditModal"
+        v-if="$root.validatePermission('credit-store')">
         Crear Credito
       </button>
     </div>
     <div class="page-search d-flex justify-content-between p-4 border my-2">
       <div class="form-row col-8 m-auto">
         <div class="col">
-          <input
-            type="text"
-            id="search_client"
-            name="search_client"
-            class="form-control col"
-            placeholder="Buscar cliente | Documento"            
-            v-model="search_client"
-          />
+          <input type="text" id="search_client" name="search_client" class="form-control col"
+            placeholder="Buscar cliente | Documento" v-model="search_client" />
         </div>
         <div class="col">
-          <select
-            name="status"
-            id="status"
-            v-model="status"
-            class="custom-select col"
-            
-          >
-            <option
-              v-for="(st, index) in creditStatus"
-              :value="index"
-              :key="index"
-            >
+          <select name="status" id="status" v-model="status" class="custom-select col">
+            <option v-for="(st, index) in creditStatus" :value="index" :key="index">
               {{ st }}
             </option>
           </select>
@@ -56,6 +35,7 @@
               <th>Cliente</th>
               <th>Sede</th>
               <th>Nro. Documento</th>
+              <th>Cupo disponible</th>
               <th>Descripción</th>
               <th>Valor crédito</th>
               <th>Valor Abonado</th>
@@ -71,12 +51,10 @@
               <th>Paz y salvo</th>
               <th>Recoger crédito</th>
               <th>Cobro jurídico</th>
-              <th
-                v-if="
-                  $root.validatePermission('credit-update') ||
-                  $root.validatePermission('credit-status')
-                "
-              >
+              <th v-if="
+                $root.validatePermission('credit-update') ||
+                $root.validatePermission('credit-status')
+              ">
                 Opciones
               </th>
             </tr>
@@ -86,18 +64,12 @@
             <tr v-for="credit in creditList.data" :key="credit.index">
               <td>{{ credit.id }}</td>
               <td>{{ credit.name }} {{ credit.last_name }}</td>
-              <td>{{  credit.headquarter.headquarter }}</td>
+              <td>{{ credit.headquarter.headquarter }}</td>
               <td>{{ credit.type_document }} {{ credit.document }}</td>
+              <td> {{ credit.maximum_credit_allowed }}</td>
               <td>
-                <textarea
-                  name="description"
-                  id="description"
-                  cols="10"
-                  rows="4"
-                  class="form-control-plaintext"
-                  readonly
-                  v-model="credit.description"
-                ></textarea>
+                <textarea name="description" id="description" cols="10" rows="4" class="form-control-plaintext" readonly
+                  v-model="credit.description"></textarea>
               </td>
               <td class="text-right">{{ credit.credit_value | currency }}</td>
               <td class="text-right">{{ credit.paid_value | currency }}</td>
@@ -105,44 +77,27 @@
               <td>
                 {{ creditStatus[credit.status] }}
               </td>
-              <td
-                class="text-center"
-                v-if="$root.validatePermission('credit-index')"
-              >
-                <button
-                  data-toggle="modal"
-                  data-target="#cuotasModal"
-                  class="btn btn-info"
-                  @click="showInstallment(credit)"
-                >
+              <td class="text-center" v-if="$root.validatePermission('credit-index')">
+                <button data-toggle="modal" data-target="#cuotasModal" class="btn btn-info"
+                  @click="showInstallment(credit)">
                   <i class="bi bi-eye"></i>
                 </button>
               </td>
-              <td
-                class="text-center"
-                v-if="$root.validatePermission('credit-index')"
-              >
-                <button
-                  class="btn btn-danger"
-                  @click="
-                    printTable(credit.id, credit.name + '_' + credit.last_name)
-                  "
-                >
+              <td class="text-center" v-if="$root.validatePermission('credit-index')">
+                <button class="btn btn-danger" @click="
+                  printTable(credit.id, credit.name + '_' + credit.last_name)
+                ">
                   <i class="bi bi-file-pdf"></i>
                 </button>
               </td>
               <td>
                 <div v-if="credit.status == 4">
-                  <button
-                    type="button"
-                    class="btn btn-danger"
-                    @click="
-                      downloadReceiptPDF(
-                        credit.id,
-                        credit.name + '_' + credit.last_name
-                      )
-                    "
-                  >
+                  <button type="button" class="btn btn-danger" @click="
+                    downloadReceiptPDF(
+                      credit.id,
+                      credit.name + '_' + credit.last_name
+                    )
+                  ">
                     <i class="bi bi-file-earmark-pdf"></i>
                     Descargar
                   </button>
@@ -150,70 +105,39 @@
                 <div v-else>No disponible por el momento</div>
               </td>
               <td>
-                <button
-                  v-if="credit.status == 1"
-                  class="btn btn-success"
-                  @click="collectCredit(credit.id)"
-                >
+                <button v-if="credit.status == 1" class="btn btn-success" @click="collectCredit(credit.id)">
                   <i class="bi bi-box-arrow-in-down"></i>
                   Recoger
                 </button>
               </td>
               <td>
-                <button
-                  v-if="credit.status == 1"
-                  class="btn btn-danger"
-                  @click="changeStatus(credit.id, 5)"
-                >
+                <button v-if="credit.status == 1" class="btn btn-danger" @click="changeStatus(credit.id, 5)">
                   <i class="bi bi-x-circle"></i> Pasar a cobro jurídico
                 </button>
-                <button
-                  v-if="credit.status == 5"
-                  class="btn btn-success"
-                  @click="changeStatus(credit.id, 1)"
-                >
+                <button v-if="credit.status == 5" class="btn btn-success" @click="changeStatus(credit.id, 1)">
                   <i class="bi bi-check"></i> Deshacer cobro jurídico
                 </button>
               </td>
 
-              <td
-                class="text-right"
-                v-if="
-                  $root.validatePermission('credit-update') ||
-                  $root.validatePermission('credit-status')
-                "
-              >
-                <div
-                  v-if="$root.validatePermission('credit-update')"
-                  class="d-inline"
-                >
-                  <button
-                    v-if="credit.status == 1"
-                    class="btn btn-primary"
-                    @click="showData(credit)"
-                  >
+              <td class="text-right" v-if="
+                $root.validatePermission('credit-update') ||
+                $root.validatePermission('credit-status')
+              ">
+                <div v-if="$root.validatePermission('credit-update')" class="d-inline">
+                  <button v-if="credit.status == 1" class="btn btn-primary" @click="showData(credit)">
                     <i class="bi bi-pen"></i>
                   </button>
                   <button v-else class="btn btn-secondary" disabled>
                     <i class="bi bi-pen"></i>
                   </button>
                 </div>
-                <div
-                  v-if="$root.validatePermission('credit-status')"
-                  class="d-inline"
-                >
-                  <button
-                    v-if="credit.status == 0 || credit.status == 3"
-                    class="btn btn-danger"
-                    @click="changeStatus(credit.id, 2)"
-                  >
+                <div v-if="$root.validatePermission('credit-status')" class="d-inline">
+                  <button v-if="credit.status == 0 || credit.status == 3" class="btn btn-danger"
+                    @click="changeStatus(credit.id, 2)">
                     <i class="bi bi-x-circle"></i>
                   </button>
-                  <button
-                    v-if="credit.status == 0 || credit.status == 3"
-                    class="btn btn-success"
-                    @click="changeStatus(credit.id, 1)"
-                  >
+                  <button v-if="credit.status == 0 || credit.status == 3" class="btn btn-success"
+                    @click="changeStatus(credit.id, 1)">
                     <i class="bi bi-check2-circle"></i>
                   </button>
                 </div>
@@ -223,24 +147,13 @@
           <tbody v-else>
             <tr class="text-center">
               <td colspan="11">
-                <div
-                  class="alert alert-danger text-center"
-                  style="margin: 2px auto; width: 30%"
-                >
+                <div class="alert alert-danger text-center" style="margin: 2px auto; width: 30%">
                   <p>No se encontraron clientes con creditos.</p>
                   <p>Crear cliente.</p>
                 </div>
-                <div
-                  class="alert alert-info"
-                  style="margin: 2px auto; width: 30%"
-                >
+                <div class="alert alert-info" style="margin: 2px auto; width: 30%">
                   Crear un nuevo Cliente
-                  <button
-                    type="button"
-                    class="btn btn-primary"
-                    data-toggle="modal"
-                    data-target="#formClientModal"
-                  >
+                  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#formClientModal">
                     Crear cliente
                   </button>
                 </div>
@@ -248,24 +161,14 @@
             </tr>
           </tbody>
         </table>
-        <pagination
-          :align="'center'"
-          :data="creditList"
-          :limit="2"
-          @pagination-change-page="listCredits"
-        >
+        <pagination :align="'center'" :data="creditList" :limit="2" @pagination-change-page="listCredits">
           <span slot="prev-nav"><i class="bi bi-chevron-double-left"></i></span>
-          <span slot="next-nav"
-            ><i class="bi bi-chevron-double-right"></i
-          ></span>
+          <span slot="next-nav"><i class="bi bi-chevron-double-right"></i></span>
         </pagination>
       </section>
     </div>
 
-    <modal-create-edit-client
-      ref="ModalCreateEditClient"
-      @list-clients="listCredits(1)"
-    />
+    <modal-create-edit-client ref="ModalCreateEditClient" @list-clients="listCredits(1)" />
 
     <create-edit-credit ref="CreateEditCredit" @list-credits="listCredits(1)" />
 
@@ -345,9 +248,9 @@ export default {
       this.$refs.ModalCreateEditClient.showEditClient(client);
     },
     changeStatus: function (id, status) {
-       var data = {
-          status: status,
-        };
+      var data = {
+        status: status,
+      };
       Swal.fire({
         title: "¿Quieres cambiar el estado del credito?",
         showCancelButton: true,

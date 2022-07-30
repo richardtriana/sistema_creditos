@@ -43,6 +43,7 @@ class ReportController extends Controller
 			->where('credits.status', 1)
 			->leftJoin('credits', 'installments.credit_id', 'credits.id')
 			->leftJoin('clients', 'credits.client_id', 'clients.id')
+			->with('headquarter')
 			->paginate(15);
 
 		return $installments;
@@ -55,6 +56,8 @@ class ReportController extends Controller
 		$to = $request->to;
 		$this_month = Carbon::now()->month;
 		$status = $request->status;
+		$start_date = $request->start_date;
+		$end_date = $request->end_date;
 
 		switch ($status) {
 			case 'all':
@@ -79,7 +82,7 @@ class ReportController extends Controller
 				$query_date = 'updated_at';
 				break;
 		}
-		$credits = Credit::select();
+		$credits = Credit::select()->selectRaw("DATE_ADD(`start_date`, INTERVAL `number_installments` MONTH) as end_date");
 
 		if ($status == null) {
 			$credits = $credits->whereMonth('created_at', $this_month);
@@ -99,11 +102,19 @@ class ReportController extends Controller
 					if ($to != '' && $to != 'undefined' && $to != null) {
 						$query->whereDate("$query_date", '<=', $to);
 					}
+				})
+				->where(function ($query) use ($start_date, $end_date) {
+					if ($start_date != '' && $start_date != 'undefined' && $start_date != null) {
+						$query->whereDate("start_date", '>=', $start_date);
+					}
+					if ($end_date != '' && $end_date != 'undefined' && $end_date != null) {
+						$query->whereRaw("DATE_ADD(`start_date`, INTERVAL `number_installments` MONTH) <= '$end_date'");
+					}
 				});
 		}
 
 		$credits = $credits
-			->with('client:id,name,last_name')->paginate(15);
+			->with('client:id,name,last_name,phone_1,phone_2', 'headquarter:id,headquarter')->paginate(15);
 		$total_credits = new CreditController;
 		$total_credits = $total_credits->getTotalValueCredits($request);
 

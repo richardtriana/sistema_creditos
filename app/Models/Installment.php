@@ -30,4 +30,9 @@ class Installment extends Model
   {
     return $this->belongsTo(Credit::class, 'credit_id');
   }
+
+  public function headquarter()
+  {
+      return $this->credit()->with('headquarter:id,headquarter');
+  }
 }

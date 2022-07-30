@@ -57,6 +57,10 @@
       <tr>
         <td colspan="3"></td>
       </tr>
+      <tr>
+        <td>Cupo de crédito </td>
+        <td>{{$client->maximum_credit_allowed}}</td>
+      </tr>
     </table>
   </section>
   <br><br>
