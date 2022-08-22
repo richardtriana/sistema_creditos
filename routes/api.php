@@ -89,8 +89,8 @@ Route::group(['middleware' => ['auth:api']], function () {
 	//Headquarters
 	Route::get('/headquarters/list-all-headquarters',  [HeadquarterController::class, 'listAllHeadquarters']);
 	Route::get('/headquarters/list-headquarter',  [HeadquarterController::class, 'listHeadquarter']);
-	Route::resource('/headquarters',  HeadquarterController::class);
 	Route::post('/headquarters/{headquarter}/change-status',  [HeadquarterController::class, 'changeStatus']);
+	Route::resource('/headquarters',  HeadquarterController::class);
 
 	//Providers
 	Route::post('/credit-providers/pay-credit-provider/{credit_provider}', [CreditProviderController::class, 'payCreditProvider']);

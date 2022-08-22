@@ -48,7 +48,6 @@ class CreditController extends Controller
 				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document', 'c.phone_1', 'c.phone_2','c.maximum_credit_allowed')
 				->where('document', 'LIKE', "%$request->credit%")
 				->orWhere('name', 'LIKE', "%$request->credit%")
-				->orWhere('email', 'LIKE', "%$request->credit%")
 				->orWhere('last_name', 'LIKE', "%$request->credit%")
 				->whereIn('credits.status', $status);
 		} else {

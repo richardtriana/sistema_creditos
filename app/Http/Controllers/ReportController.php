@@ -185,9 +185,8 @@ class ReportController extends Controller
 			DB::raw('SUM(capital_value) as capital_value'),
 			'headquarters.headquarter as headquarter',
 			'clients.name',
-			'clients.last_name'
-
-
+			'clients.last_name',
+			'clients.document'
 		)
 			->selectRaw('count(credits.id) as number_of_credits')
 			->selectRaw("count(case when credits.status = '0' then 1 end) as pending")
@@ -196,10 +195,12 @@ class ReportController extends Controller
 			->selectRaw("count(case when credits.status = '3' then 1 end) as pending_provider")
 			->selectRaw("count(case when credits.status = '4' then 1 end) as completed")
 			->groupBy('headquarter')
-			->groupBy('clients.name', 'clients.last_name')
+			->groupBy('clients.name', 'clients.last_name', 'clients.document')
 			->leftJoin('headquarters', 'headquarters.id', 'credits.headquarter_id')
 			->leftJoin('clients', 'clients.id', 'credits.client_id')
 			->where('clients.document',  'LIKE', "%$request->document%")
+			->orWhere('clients.name', 'LIKE', "%$request->document%")
+			->orWhere('clients.last_name', 'LIKE', "%$request->document%")
 			->get();
 
 		return $credits;

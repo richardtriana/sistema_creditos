@@ -56,7 +56,6 @@ class HeadquarterController extends Controller
 	{
 		$validate = Validator::make($request->all(), [
 			'headquarter' => 'required|string|min:3|max:50',
-			'status' => 'required|boolean',
 			'address' => 'nullable|string',
 			'nit' => 'nullable|string',
 			'email' => 'required|email:rfc,dns|unique:users|max:255',
@@ -72,6 +71,7 @@ class HeadquarterController extends Controller
 			$headquarter->legal_representative = $request['legal_representative'];
 			$headquarter->pos_printer = $request['pos_printer'];
 			$headquarter->phone = $request['phone'];
+			$headquarter->status = 1;
 
 			if ($headquarter->save()) {
 				$box = new Box();
