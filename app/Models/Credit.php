@@ -44,11 +44,6 @@ class Credit extends Model
         return $this->belongsTo(Client::class, 'client_id');
     }
 
-    public function debtor()
-    {
-        return $this->belongsTo(Client::class, 'debtor_id');
-    }
-
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
@@ -71,6 +66,21 @@ class Credit extends Model
     public function credit_provider()
     {
         return $this->hasOne(CreditProvider::class);
+    }
+
+    public function products()
+    {
+        return $this->belongsToMany(Product::class);
+    }
+
+    public function guarantees()
+    {
+        return $this->belongsToMany(Guarantee::class);
+    }
+
+    public function debtors()
+    {
+        return $this->belongsToMany(Client::class, 'credit_debtor', 'id', 'debtor_id');
     }
 
 }

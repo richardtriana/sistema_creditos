@@ -37,12 +37,12 @@ class UserController extends Controller
             ], 400);
         }
 
-        if(strpos($request->username, "@")){
+        if (strpos($request->username, "@")) {
             $condition = [
                 'validate' => 'string|exists:users,email',
                 'where' => 'email'
             ];
-        }else{
+        } else {
             $condition = [
                 'validate' => 'alpha_num|exists:users',
                 'where' => 'username'
@@ -94,9 +94,7 @@ class UserController extends Controller
                     'message' => 'Contraseña incorrecta'
                 ];
             }
-
-            
-        }else{
+        } else {
             $data = [
                 'status' => 'error',
                 'code' => 400,
@@ -106,7 +104,7 @@ class UserController extends Controller
 
         return response()->json($data, $data['code']);
     }
-    
+
     /**
      * Display a listing of the resource.
      *
@@ -132,7 +130,6 @@ class UserController extends Controller
      */
     public function create()
     {
- 
     }
 
     /**
@@ -174,7 +171,7 @@ class UserController extends Controller
         $user->password = Hash::make($request['password']);
         $user->name = $request['name'];
         $user->last_name = $request['last_name'];
-        $user->phone = $request['phone']; 
+        $user->phone = $request['phone'];
         $user->address = $request['address'];
         $user->type_document = $request['type_document'];
         $user->document = $request['document'];
@@ -270,18 +267,17 @@ class UserController extends Controller
         $user->username = $request['username'];
         $user->name = $request['name'];
         $user->last_name = $request['last_name'];
-        $user->phone = $request['phone']; 
+        $user->phone = $request['phone'];
         $user->address = $request['address'];
         $user->type_document = $request['type_document'];
         $user->document = $request['document'];
         $user->photo = 'undefined';
 
-        if(!is_null($request['password'])){
+        if (!is_null($request['password'])) {
             $user->password = Hash::make($request['password']);
         }
-        
-        $user->update();
 
+        $user->update();
 
         $user->syncRoles($request->input('rol'));
 

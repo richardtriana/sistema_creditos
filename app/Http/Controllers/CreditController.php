@@ -45,25 +45,26 @@ class CreditController extends Controller
 
 		if ($request->credit && ($request->credit != '')) {
 			$credits  =   $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
-				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document', 'c.phone_1', 'c.phone_2','c.maximum_credit_allowed')
+				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document', 'c.phone_1', 'c.phone_2', 'c.maximum_credit_allowed')
 				->where('document', 'LIKE', "%$request->credit%")
 				->orWhere('name', 'LIKE', "%$request->credit%")
 				->orWhere('last_name', 'LIKE', "%$request->credit%")
 				->whereIn('credits.status', $status);
 		} else {
 			$credits  =     $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
-				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document', 'c.phone_1', 'c.phone_2','c.maximum_credit_allowed')
+				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document', 'c.phone_1', 'c.phone_2', 'c.maximum_credit_allowed')
 				->whereIn('credits.status', $status);
 		}
 		$credits = $credits
 			->orderBy('id', 'desc')
 			->with('headquarter:id,headquarter')
 			->paginate(10);
+
 		return $credits;
 	}
 
 	/**
-	 * Show the form for creating a new resource.
+	 * Show the form for creating a new resource. 
 	 *
 	 * @return \Illuminate\Http\Response
 	 */
@@ -89,10 +90,9 @@ class CreditController extends Controller
 				Rule::requiredIf($request->provider == 1),
 				'exists:providers,id'
 			],
-			'debtor_id' => [
+			'debtors' => [
 				'nullable',
-				Rule::requiredIf($request->debtor == 1),
-				'exists:clients,id'
+				Rule::requiredIf($request->debtor == 1)
 			],
 			'headquarter_id' => 'required|integer|exists:headquarters,id',
 			'number_installments' => 'required|integer',
@@ -107,44 +107,8 @@ class CreditController extends Controller
 			'interest_value' => 'nullable|numeric',
 			'description' => 'nullable|string',
 			'disbursement_date' => 'nullable|date',
-		]);
-
-		if ($validate->fails()) {
-			return response()->json([
-				'status' => 'error',
-				'code' =>  400,
-				'message' => 'Validación de datos incorrecta',
-				'errors' =>  $validate->errors()
-			], 400);
-		}
-
-		$validate = Validator::make($request->all(), [
-			'client_id' => 'required|integer|exists:clients,id',
-			'provider' => 'nullable|boolean',
-			'debtor' => 'nullable|boolean',
-			'provider_id' => [
-				'nullable',
-				Rule::requiredIf($request->provider == 1),
-				'exists:providers,id'
-			],
-			'debtor_id' => [
-				'nullable',
-				Rule::requiredIf($request->debtor == 1),
-				'exists:clients,id'
-			],
-			'headquarter_id' => 'required|integer|exists:headquarters,id',
-			'number_installments' => 'required|integer',
-			'number_paid_installments' => 'nullable|integer',
-			'day_limit' => 'nullable|integer',
-			'start_date' => 'required|date',
-			'interest' => 'required|numeric',
-			'annual_interest_percentage' => 'nullable|numeric',
-			'credit_value' =>  'required|numeric',
-			'paid_value' => 'nullable|numeric',
-			'capital_value' => 'nullable|numeric',
-			'interest_value' => 'nullable|numeric',
-			'description' => 'nullable|string',
-			'disbursement_date' => 'nullable|date',
+			'products' => 'nullable|array',
+			'guarantees' => 'nullable|array'
 		]);
 
 		if ($validate->fails()) {
@@ -159,11 +123,10 @@ class CreditController extends Controller
 		$listInstallments = new InstallmentController();
 		$listInstallments = $listInstallments->calculateInstallments($request);
 
-
 		$credit = new Credit();
 		$credit->client_id = $request['client_id'];
 		$credit->provider_id = $request['provider_id'];
-		$credit->debtor_id = $request['debtor_id'];
+		// $credit->debtor_id = $request['debtor_id'];
 		$credit->user_id = $request->user()->id;
 		$credit->debtor = $request['debtor'] ?  $request['debtor'] : false;
 		$credit->provider = $request['provider'] ?  $request['provider'] : false;
@@ -187,6 +150,26 @@ class CreditController extends Controller
 		$credit->installment_value = $listInstallments['installment'];
 
 		if ($credit->save()) {
+
+			if (!empty($request->debtors)) {
+				foreach ($request->debtors as $debtor) {
+					$credit_debtor_controller = new CreditDebtorController();
+					$credit_debtor_controller->store($credit->id, $debtor['id']);
+				}
+			}
+			if (!empty($request->products)) {
+				foreach ($request->products as $product) {
+					$credit_product_controller = new CreditProductController();
+					$credit_product_controller->store($credit->id, $product['id']);
+				}
+			}
+			if (!empty($request->guarantees)) {
+				foreach ($request->guarantees as $guarantee) {
+					$credit_guarantee_controller = new CreditGuaranteeController();
+					$credit_guarantee_controller->store($credit->id, $guarantee['id']);
+				}
+			}
+
 			foreach ($listInstallments['listInstallments'] as $new_installment) {
 				$installment = new Installment();
 				$installment->credit_id = $credit->id;
@@ -233,10 +216,9 @@ class CreditController extends Controller
 				Rule::requiredIf($request->provider == 1),
 				'exists:providers,id'
 			],
-			'debtor_id' => [
+			'debtors' => [
 				'nullable',
-				Rule::requiredIf($request->debtor == 1),
-				'exists:clients,id'
+				Rule::requiredIf($request->debtor == 1)
 			],
 			'headquarter_id' => 'required|integer|exists:headquarters,id',
 			'number_installments' => 'required|integer',
@@ -251,7 +233,9 @@ class CreditController extends Controller
 			'interest_value' => 'nullable|numeric',
 			'description' => 'nullable|string',
 			'disbursement_date' => 'nullable|date',
-			'installment_value' => 'required|numeric'
+			'installment_value' => 'required|numeric',
+			'products' => 'nullable|array',
+			'guarantees' => 'nullable|array'
 		]);
 
 		if ($validate->fails()) {
@@ -266,7 +250,6 @@ class CreditController extends Controller
 		$credit = Credit::find($request->id);
 		$credit->client_id = $request['client_id'];
 		$credit->provider_id = $request['provider_id'];
-		$credit->debtor_id = $request['debtor_id'];
 		$credit->debtor = $request['debtor'];
 		$credit->provider = $request['provider'];
 		$credit->headquarter_id = $request['headquarter_id'];
@@ -280,7 +263,23 @@ class CreditController extends Controller
 		$credit->installment_value = $request['installment_value'];
 		$credit->description = $request['description'];
 
-		$credit->save();
+		if ($credit->save()) {
+
+			foreach ($request->debtors as $debtor) {
+				$credit_debtor_controller = new CreditDebtorController();
+				$credit_debtor_controller->store($credit->id, $debtor);
+			}
+
+			foreach ($request->products as $product) {
+				$credit_product_controller = new CreditProductController();
+				$credit_product_controller->store($credit->id, $product);
+			}
+
+			foreach ($request->guarantees as $guarantee) {
+				$credit_guarantee_controller = new CreditGuaranteeController();
+				$credit_guarantee_controller->store($credit->id, $guarantee);
+			}
+		}
 
 		return response()->json([
 			'status' => 'success',
@@ -318,9 +317,10 @@ class CreditController extends Controller
 						$update_main_box = new MainBoxController();
 						$update_main_box->subAmountMainBox($credit->credit_value);
 						$credit->disbursement_date = date('Y-m-d');
+						$credit->approved_by = $request->user()->id;
 
 						$validate_credit_limit = new ClientController();
-						$validate_credit_limit->validateCreditLimit($client_id,$credit->credit_value);
+						$validate_credit_limit->validateCreditLimit($client_id, $credit->credit_value);
 					}
 
 					if ($request->status  == 2 && $credit->status == 1) {
@@ -339,9 +339,10 @@ class CreditController extends Controller
 				$update_main_box = new MainBoxController();
 				$update_main_box->subAmountMainBox($credit->credit_value);
 				$credit->disbursement_date = date('Y-m-d');
+				$credit->approved_by = $request->user()->id;
 
 				$validate_credit_limit = new ClientController();
-				$validate_credit_limit->validateCreditLimit($client_id,$credit->credit_value);
+				$validate_credit_limit->validateCreditLimit($client_id, $credit->credit_value);
 			}
 			if ($request->status  == 2 && $credit->status == 1) {
 				$update_main_box = new MainBoxController();
@@ -365,10 +366,10 @@ class CreditController extends Controller
 			$now = now();
 			$payment_date = Carbon::createFromFormat('Y-m-d', $installment->payment_date);
 
-			if (($payment_date < $now) &&  $installment->status != '1' ) {
+			if (($payment_date < $now) &&  $installment->status != '1') {
 				$days_past_due = $installment->days_past_due ? $installment->days_past_due :  $now->diffInDays($payment_date);
 				$day_value_default = $installment->interest_value / 30;
-				$late_interest_value =  $days_past_due > 30 ?  $day_value_default * 30 : $day_value_default * $days_past_due;
+				$late_interest_value =  $day_value_default * $days_past_due;
 
 				$installment->days_past_due  = $days_past_due > 30 ? 30 : $days_past_due;
 				$installment->late_interests_value  =  $late_interest_value;
@@ -382,7 +383,6 @@ class CreditController extends Controller
 
 		return $installments;
 	}
-
 
 	public function updateValuesCredit($id, $total_amount, $capital, $interest)
 	{
@@ -562,7 +562,7 @@ class CreditController extends Controller
 			$entry->user_id = $request->user()->id;
 			$entry->credit_id = $credit->id;
 			$entry->description = "
-				Cliente: {$client->name} {$client->last_name} \n".
+				Cliente: {$client->name} {$client->last_name} \n" .
 				"Nro. Credito: $credit->id \n" .
 				"Cupo crédito: {$client->maximum_credit_allowed}";
 			$entry->date = date('Y-m-d');
