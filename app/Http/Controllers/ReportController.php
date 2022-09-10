@@ -14,10 +14,17 @@ class ReportController extends Controller
 {
 	public function ReportPortfolio(Request $request)
 	{
-		//var_dump($request->to);
-		$from = $request->from;
-		$to = $request->to;
 		$now = date("Y-m-d");
+		$status = $request->status;
+		if ($status != 'all') {
+			$from = null;
+			$to = null;
+		} else {
+			$from = $request->from;
+			$to = $request->to;
+		}
+
+
 		$payment_date_add_days = date("Y-m-d", strtotime($now . "+ 5 days"));
 
 		$installments = Installment::select(
@@ -30,13 +37,24 @@ class ReportController extends Controller
 			'credits.credit_value',
 			'credits.status',
 		)
-			->where(function ($query) use ($payment_date_add_days, $from, $to) {
+			->where(function ($query) use ($payment_date_add_days, $from, $to, $now, $status) {
 				$query->whereDate('payment_date', '<=', $payment_date_add_days);
 				if ($from != '' && $from != 'undefined' && $from != null) {
 					$query->whereDate('payment_date', '>=', $from);
 				}
 				if ($to != '' && $to != 'undefined' && $to != null) {
 					$query->whereDate('payment_date', '<=', $to);
+				}
+				if ($status) {
+					if ($status == 'now') {
+						$query->whereDate('payment_date', '=', $now);
+					}
+					if ($status == 'expired') {
+						$query->whereDate('payment_date', '<', $now);
+					}
+					if ($status == 'dueSoon') {
+						$query->whereDate('payment_date', '>', $now);
+					}
 				}
 			})
 			->whereNull('payment_register')

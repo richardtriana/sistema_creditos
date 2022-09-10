@@ -27,6 +27,14 @@
             </small>
           </div>
           <div class="form-group col-md-4">
+            <label for="headquarter_id">Sede</label>
+            <v-select :options="headquarterList" label="headquarter" aria-logname="{}"
+              :reduce="(headquarter) => headquarter.id" v-model="formClient.headquarter_id"
+              :class="[formErrors.headquarter_id ? 'is-invalid' : '']" placeholder="Seleccionar sede">
+            </v-select>
+            <small id="headquarter_id_help" class="form-text text-danger">{{ formErrors.headquarter_id }}</small>
+          </div>
+          <div class="form-group col-md-4">
             <label for="maximum_credit_allowed">Cupo de crédito</label>
             <input type="number" step="any" class="form-control" id="maximum_credit_allowed"
               v-model="formClient.maximum_credit_allowed" placeholder="Cupo de crédito"
@@ -183,8 +191,10 @@
 export default {
   data() {
     return {
+      headquarterList: [],
       editar: false,
       formClient: {
+        headquarter_id: "",
         name: "",
         last_name: "",
         type_document: "CC",
@@ -202,6 +212,7 @@ export default {
         maximum_credit_allowed: ""
       },
       formErrors: {
+        headquarter_id: "",
         name: "",
         last_name: "",
         type_document: "",
@@ -222,6 +233,14 @@ export default {
     };
   },
   methods: {
+    listHeadquarters() {
+      let me = this;
+      axios
+        .get(`api/headquarters/list-all-headquarters`, me.$root.config)
+        .then(function (response) {
+          me.headquarterList = response.data;
+        });
+    },
     createClient() {
       let me = this;
       me.$root.assignErrors(false, me.formErrors);
@@ -260,7 +279,6 @@ export default {
           me.$root.assignErrors(response, me.formErrors);
         });
 
-
       me.editar = false;
     },
     resetData() {
@@ -271,5 +289,8 @@ export default {
       me.$root.assignErrors(false, me.formErrors);
     },
   },
+  mounted() {
+    this.listHeadquarters();
+  }
 };
 </script>

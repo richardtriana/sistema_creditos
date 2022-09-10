@@ -70,6 +70,10 @@
             <router-link class="dropdown-item" to="/roles" v-if="validatePermission('rol-index')"> Roles </router-link>
             <router-link class="dropdown-item" to="/users" v-if="validatePermission('user-index')"> Usuarios
             </router-link>
+            <router-link class="dropdown-item" to="/products" v-if="validatePermission('product-index')"> Productos
+            </router-link>
+            <router-link class="dropdown-item" to="/guarantees" v-if="validatePermission('guarantee-index')"> Garantias
+            </router-link>
           </div>
         </li>
       </ul>
