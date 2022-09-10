@@ -11,7 +11,7 @@
 				id="search_client_document"
 				name="search_client_document"
 				class="form-control w-50"
-				placeholder="Documento"
+			 placeholder="Buscar cliente | Documento"
 				v-model="search_client_document"
 			/>
 			<div class="p-2">
@@ -46,7 +46,10 @@
 					<tbody v-if="ReportGeneralClientList.length > 0">
 						<tr v-for="(report, index) in ReportGeneralClientList" :key="index">
 							<td>{{ index + 1 }}</td>
-							<td>{{ report.name }} {{ report.last_name }}</td>
+							<td>
+								{{ report.name }} {{ report.last_name }} <br>
+									{{ report.document }}
+							 </td>
 							<td>{{ report.headquarter }}</td>
 							<td>{{ report.number_of_credits }}</td>
 							<td>{{ report.pending }}</td>

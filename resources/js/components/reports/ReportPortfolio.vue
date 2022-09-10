@@ -7,29 +7,24 @@
       <h6 class="text-primary text-uppercase">Filtrar:</h6>
       <form>
         <div class="form-row">
-          <div class="form-group col-4 ml-auto">
-            <label for="">Desde:</label>
-            <input
-              type="date"
-              id="search_from"
-              name="search_from"
-              class="form-control"
-              placeholder="Desde"
-              v-model="search_from"
-              :max="now"
-            />
+          <div class="form-group col-4">
+            <label for="search_status">Estado vencimiento:</label>
+            <select name="search_status" id="search_status" v-model="search_status" class="custom-select">
+              <option value="all">Todos</option>
+              <option value="expired">Vencido</option>
+              <option value="now">Vence hoy</option>
+              <option value="dueSoon">Próximos a vencer</option>
+            </select>
           </div>
-          <div class="form-group col-4 mr-auto">
+          <div class="form-group col-4">
+            <label for="">Desde:</label>
+            <input type="date" id="search_from" name="search_from" class="form-control" placeholder="Desde"
+              v-model="search_from" :max="now" />
+          </div>
+          <div class="form-group col-4">
             <label for="">Hasta:</label>
-            <input
-              type="date"
-              id="search_to"
-              name="search_to"
-              class="form-control"
-              placeholder="Desde"
-              v-model="search_to"
-              :max="now"
-            />
+            <input type="date" id="search_to" name="search_to" class="form-control" placeholder="Desde"
+              v-model="search_to" :max="now" />
           </div>
         </div>
         <div class="form-row text-right m-auto">
@@ -60,66 +55,39 @@
               <td>{{ report.credit_id }}</td>
               <td>{{ report.name }} {{ report.last_name }}</td>
               <td>
-                <a
-                  v-if="report.phone_1 != null"
-                  target="_blank"
-                  :href="`https://wa.me/57${report.phone_1}?text=${infoCompany.whatsapp_msg}`"
-                  ><i class="bi bi-whatsapp"></i> {{ report.phone_1 }}</a
-                >
+                <a v-if="report.phone_1 != null" target="_blank"
+                  :href="`https://wa.me/57${report.phone_1}?text=${infoCompany.whatsapp_msg}`"><i
+                    class="bi bi-whatsapp"></i> {{ report.phone_1 }}</a>
                 <br />
-                <a
-                  v-if="report.phone_2 != null"
-                  target="_blank"
-                  :href="`https://wa.me/57${report.phone_2}?text=${infoCompany.whatsapp_msg}`"
-                  ><i class="bi bi-whatsapp"></i> {{ report.phone_2 }}</a
-                >
+                <a v-if="report.phone_2 != null" target="_blank"
+                  :href="`https://wa.me/57${report.phone_2}?text=${infoCompany.whatsapp_msg}`"><i
+                    class="bi bi-whatsapp"></i> {{ report.phone_2 }}</a>
               </td>
               <td class="text-right">{{ report.value | currency }}</td>
               <td class="text-center font-weight-bold">
-                <span
-                  class="badge badge-md badge-pill badge-success"
-                  v-if="report.payment_date > now"
-                  >{{ report.payment_date }}</span
-                >
-                <span
-                  class="badge badge-md badge-pill badge-warning"
-                  v-if="report.payment_date == now"
-                  >{{ report.payment_date }}</span
-                >
-                <span
-                  class="badge badge-md badge-pill badge-danger"
-                  v-if="report.payment_date < now"
-                  >{{ report.payment_date }}</span
-                >
+                <span class="badge badge-md badge-pill badge-success" v-if="report.payment_date > now">{{
+                report.payment_date }}</span>
+                <span class="badge badge-md badge-pill badge-warning" v-if="report.payment_date == now">{{
+                report.payment_date }}</span>
+                <span class="badge badge-md badge-pill badge-danger" v-if="report.payment_date < now">{{
+                report.payment_date }}</span>
               </td>
               <td class="text-center">
-                <span
-                  class="
+                <span class="
                     badge badge-md
                     font-weight-bold
                     badge-pill badge-success
-                  "
-                  v-if="report.payment_date > now"
-                  >Próximo a vencer</span
-                >
-                <span
-                  class="
+                  " v-if="report.payment_date > now">Próximo a vencer</span>
+                <span class="
                     badge badge-md
                     font-weight-bold
                     badge-pill badge-warning
-                  "
-                  v-if="report.payment_date == now"
-                  >Vence hoy</span
-                >
-                <span
-                  class="
+                  " v-if="report.payment_date == now">Vence hoy</span>
+                <span class="
                     badge badge-md
                     font-weight-bold
                     badge-pill badge-danger
-                  "
-                  v-if="report.payment_date < now"
-                  >En mora</span
-                >
+                  " v-if="report.payment_date < now">En mora</span>
               </td>
               <td>
                 {{ report.installment_number }}
@@ -127,16 +95,10 @@
             </tr>
           </tbody>
         </table>
-        <pagination
-          :align="'center'"
-          :data="ReportPortfolioList"
-          :limit="2"
-          @pagination-change-page="listReportPortfolio"
-        >
+        <pagination :align="'center'" :data="ReportPortfolioList" :limit="2"
+          @pagination-change-page="listReportPortfolio">
           <span slot="prev-nav"><i class="bi bi-chevron-double-left"></i></span>
-          <span slot="next-nav"
-            ><i class="bi bi-chevron-double-right"></i
-          ></span>
+          <span slot="next-nav"><i class="bi bi-chevron-double-right"></i></span>
         </pagination>
       </section>
     </div>
@@ -148,16 +110,28 @@ export default {
   data() {
     return {
       ReportPortfolioList: {},
-      now: new Date().toISOString().slice(0, 10),
+      now: moment().format('YYYY-MM-DD'),
       infoCompany: {},
       search_from: "",
       search_to: "",
+      search_status: "all",
     };
   },
   methods: {
     listReportPortfolio(page = 1) {
+
+      let data = {
+        page: page,
+        from: this.search_from,
+        to: this.search_to,
+        status: this.search_status
+      };
+
       axios
-        .get(`api/reports/portfolio?page=${page}&from=${this.search_from}&to=${this.search_to}`, this.$root.config)
+        .get(`api/reports/portfolio`, {
+          params: data,
+          headers: this.$root.config.headers,
+        })
         .then((response) => {
           this.ReportPortfolioList = response.data;
         });

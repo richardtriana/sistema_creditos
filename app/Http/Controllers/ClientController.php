@@ -59,6 +59,7 @@ class ClientController extends Controller
 	{
 
 		$validate = Validator::make($request->all(), [
+			'headquarter_id' => 'required|integer|exists:headquarters,id',
 			'name' => 'required|string|max:255',
 			'last_name' => 'required|string|max:255',
 			'type_document' => 'required|in:CC,CE,NIT,PP,TI',
@@ -87,6 +88,7 @@ class ClientController extends Controller
 
 
 		$client = new Client();
+		$client->headquarter_id = $request['headquarter_id'];
 		$client->name = $request['name'];
 		$client->last_name = $request['last_name'];
 		$client->type_document = $request['type_document'];
@@ -146,6 +148,7 @@ class ClientController extends Controller
 	public function update(Request $request, Client $client)
 	{
 		$validate = Validator::make($request->all(), [
+			'headquarter_id' => 'required|integer|exists:headquarters,id',
 			'name' => 'required|string|max:255',
 			'last_name' => 'required|string|max:255',
 			'type_document' => 'required|in:CC,CE,NIT,PP,TI',
@@ -184,6 +187,7 @@ class ClientController extends Controller
 		}
 
 		$client = Client::find($request->id);
+		// $client->headquarter_id = $request['headquarter_id'];
 		$client->name = $request['name'];
 		$client->last_name = $request['last_name'];
 		$client->type_document = $request['type_document'];
@@ -201,6 +205,8 @@ class ClientController extends Controller
 		$client->maximum_credit_allowed = $request['maximum_credit_allowed'];
 		$client->photo = 'undefined';
 		$client->update();
+
+		$client->credits()->update(['headquarter_id' => $request['headquarter_id']]);
 
 		return response()->json([
 			'status' => 'success',
@@ -242,6 +248,7 @@ class ClientController extends Controller
 		if (!$request->client || $request->client == '') {
 			$clients = Client::select()
 				->where('status', 1)
+				->limit(10)
 				->get();
 		} else {
 			$clients = Client::select()

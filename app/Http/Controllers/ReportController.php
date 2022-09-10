@@ -14,10 +14,17 @@ class ReportController extends Controller
 {
 	public function ReportPortfolio(Request $request)
 	{
-		//var_dump($request->to);
-		$from = $request->from;
-		$to = $request->to;
 		$now = date("Y-m-d");
+		$status = $request->status;
+		if ($status != 'all') {
+			$from = null;
+			$to = null;
+		} else {
+			$from = $request->from;
+			$to = $request->to;
+		}
+
+
 		$payment_date_add_days = date("Y-m-d", strtotime($now . "+ 5 days"));
 
 		$installments = Installment::select(
@@ -30,13 +37,24 @@ class ReportController extends Controller
 			'credits.credit_value',
 			'credits.status',
 		)
-			->where(function ($query) use ($payment_date_add_days, $from, $to) {
+			->where(function ($query) use ($payment_date_add_days, $from, $to, $now, $status) {
 				$query->whereDate('payment_date', '<=', $payment_date_add_days);
 				if ($from != '' && $from != 'undefined' && $from != null) {
 					$query->whereDate('payment_date', '>=', $from);
 				}
 				if ($to != '' && $to != 'undefined' && $to != null) {
 					$query->whereDate('payment_date', '<=', $to);
+				}
+				if ($status) {
+					if ($status == 'now') {
+						$query->whereDate('payment_date', '=', $now);
+					}
+					if ($status == 'expired') {
+						$query->whereDate('payment_date', '<', $now);
+					}
+					if ($status == 'dueSoon') {
+						$query->whereDate('payment_date', '>', $now);
+					}
 				}
 			})
 			->whereNull('payment_register')
@@ -185,9 +203,8 @@ class ReportController extends Controller
 			DB::raw('SUM(capital_value) as capital_value'),
 			'headquarters.headquarter as headquarter',
 			'clients.name',
-			'clients.last_name'
-
-
+			'clients.last_name',
+			'clients.document'
 		)
 			->selectRaw('count(credits.id) as number_of_credits')
 			->selectRaw("count(case when credits.status = '0' then 1 end) as pending")
@@ -196,10 +213,12 @@ class ReportController extends Controller
 			->selectRaw("count(case when credits.status = '3' then 1 end) as pending_provider")
 			->selectRaw("count(case when credits.status = '4' then 1 end) as completed")
 			->groupBy('headquarter')
-			->groupBy('clients.name', 'clients.last_name')
+			->groupBy('clients.name', 'clients.last_name', 'clients.document')
 			->leftJoin('headquarters', 'headquarters.id', 'credits.headquarter_id')
 			->leftJoin('clients', 'clients.id', 'credits.client_id')
 			->where('clients.document',  'LIKE', "%$request->document%")
+			->orWhere('clients.name', 'LIKE', "%$request->document%")
+			->orWhere('clients.last_name', 'LIKE', "%$request->document%")
 			->get();
 
 		return $credits;

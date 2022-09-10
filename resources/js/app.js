@@ -6,6 +6,10 @@
 
 require("./bootstrap");
 
+//Services
+import utils from './services/utils.js';
+import moment from "moment";
+
 // window.Vue = require('vue').default;
 import Vue from "vue";
 import VueRouter from "vue-router";
@@ -39,9 +43,7 @@ Vue.use(CKEditor);
 
 // Vue.use(Swal);
 window.Swal = Swal;
-
-//Services
-import utils from './services/utils.js';
+window.moment = moment;
 
 const routes = [
 
@@ -59,6 +61,16 @@ const routes = [
 		path: "/clients",
 		component: require("./components/clients/Clients.vue").default,
 		alias: "client-index"
+	},
+	{
+		path: "/guarantees",
+		component: require("./components/guarantees/Guarantees.vue").default,
+		alias: "guarantee-index"
+	},
+	{
+		path: "/products",
+		component: require("./components/products/Products.vue").default,
+		alias: "product-index"
 	},
 	{
 		path: '/roles',
@@ -112,7 +124,6 @@ const routes = [
 			},
 		],
 	},
-
 	{
 		path: "/headquarters",
 		component: require("./components/headquarters/Headquarters.vue").default,

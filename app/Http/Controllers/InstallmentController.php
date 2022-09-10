@@ -245,7 +245,7 @@ class InstallmentController extends Controller
 
         $days_past_due = $installment->days_past_due ? $installment->days_past_due :  $now->diffInDays($payment_date);
         $day_value_default = $installment->interest_value / 30;
-        $late_interests_value =  $days_past_due > 30 ?  $day_value_default * 30 : $day_value_default * $days_past_due;
+        $late_interests_value = $day_value_default * $days_past_due;
         $installment->days_past_due  = $days_past_due > 30 ? 30 : $days_past_due;
         $installment->late_interests_value  = $late_interests_value;
         $interest = $installment->interest_value + $late_interests_value;

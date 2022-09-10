@@ -106,7 +106,7 @@ export default {
     listClients() {
       let me = this;
       axios
-        .post("api/clients/filter-client-list", null, me.$root.config)
+        .get("api/clients/filter-client-list", me.$root.config)
         .then(function (response) {
           me.ClientList = response;
         });
@@ -119,7 +119,7 @@ export default {
       var url = `api/clients/filter-client-list?client=${me.filters.client}`;
       if (me.filters.client.length >= 3) {
         axios
-          .post(url, null, me.$root.config)
+          .get(url, me.$root.config)
           .then(function (response) {
             me.ClientList = response;
           })

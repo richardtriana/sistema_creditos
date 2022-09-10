@@ -40,7 +40,7 @@
     <h2>
       {{ $company->name}}
     </h2>
-    <h6>
+    <h6 class="font-weight-bold">
       Cupo de crédito: {{$client->maximum_credit_allowed}}
     </h6>
     <h3>
