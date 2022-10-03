@@ -11,6 +11,6 @@ class Product extends Model
 
     public function credits()
     {
-        return $this->belongsToMany(Credit::class);
+        return $this->hasMany(Credit::class);
     }
 }

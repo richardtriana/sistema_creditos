@@ -57,7 +57,7 @@ class CreditController extends Controller
 		}
 		$credits = $credits
 			->orderBy('id', 'desc')
-			->with('headquarter:id,headquarter')
+			->with('headquarter:id,headquarter', 'product:id,product')
 			->paginate(10);
 
 		return $credits;
@@ -85,6 +85,10 @@ class CreditController extends Controller
 			'client_id' => 'required|integer|exists:clients,id',
 			'provider' => 'nullable|boolean',
 			'debtor' => 'nullable|boolean',
+			'product_id' => [
+				'nullable',
+				'exists:products,id'
+			],
 			'provider_id' => [
 				'nullable',
 				Rule::requiredIf($request->provider == 1),
@@ -107,7 +111,6 @@ class CreditController extends Controller
 			'interest_value' => 'nullable|numeric',
 			'description' => 'nullable|string',
 			'disbursement_date' => 'nullable|date',
-			'products' => 'nullable|array',
 			'guarantees' => 'nullable|array'
 		]);
 
@@ -126,7 +129,7 @@ class CreditController extends Controller
 		$credit = new Credit();
 		$credit->client_id = $request['client_id'];
 		$credit->provider_id = $request['provider_id'];
-		// $credit->debtor_id = $request['debtor_id'];
+		$credit->product_id = $request['product_id'];
 		$credit->user_id = $request->user()->id;
 		$credit->debtor = $request['debtor'] ?  $request['debtor'] : false;
 		$credit->provider = $request['provider'] ?  $request['provider'] : false;
@@ -157,12 +160,7 @@ class CreditController extends Controller
 					$credit_debtor_controller->store($credit->id, $debtor['id']);
 				}
 			}
-			if (!empty($request->products)) {
-				foreach ($request->products as $product) {
-					$credit_product_controller = new CreditProductController();
-					$credit_product_controller->store($credit->id, $product['id']);
-				}
-			}
+
 			if (!empty($request->guarantees)) {
 				foreach ($request->guarantees as $guarantee) {
 					$credit_guarantee_controller = new CreditGuaranteeController();
@@ -211,6 +209,10 @@ class CreditController extends Controller
 			'client_id' => 'required|integer|exists:clients,id',
 			'provider' => 'nullable|boolean',
 			'debtor' => 'nullable|boolean',
+			'product_id' => [
+				'nullable',
+				'exists:products,id'
+			],
 			'provider_id' => [
 				'nullable',
 				Rule::requiredIf($request->provider == 1),
@@ -234,7 +236,6 @@ class CreditController extends Controller
 			'description' => 'nullable|string',
 			'disbursement_date' => 'nullable|date',
 			'installment_value' => 'required|numeric',
-			'products' => 'nullable|array',
 			'guarantees' => 'nullable|array'
 		]);
 
@@ -250,6 +251,7 @@ class CreditController extends Controller
 		$credit = Credit::find($request->id);
 		$credit->client_id = $request['client_id'];
 		$credit->provider_id = $request['provider_id'];
+		$credit->product_id = $request['product_id'];
 		$credit->debtor = $request['debtor'];
 		$credit->provider = $request['provider'];
 		$credit->headquarter_id = $request['headquarter_id'];
@@ -268,11 +270,6 @@ class CreditController extends Controller
 			foreach ($request->debtors as $debtor) {
 				$credit_debtor_controller = new CreditDebtorController();
 				$credit_debtor_controller->store($credit->id, $debtor);
-			}
-
-			foreach ($request->products as $product) {
-				$credit_product_controller = new CreditProductController();
-				$credit_product_controller->store($credit->id, $product);
 			}
 
 			foreach ($request->guarantees as $guarantee) {
@@ -315,7 +312,7 @@ class CreditController extends Controller
 				if ($credit_provider->pending_value <= 0) {
 					if ($request->status  == 1) {
 						$update_main_box = new MainBoxController();
-						$update_main_box->subAmountMainBox($credit->credit_value);
+						$update_main_box->subAmountMainBox($request, $credit->credit_value);
 						$credit->disbursement_date = date('Y-m-d');
 						$credit->approved_by = $request->user()->id;
 
@@ -325,7 +322,7 @@ class CreditController extends Controller
 
 					if ($request->status  == 2 && $credit->status == 1) {
 						$update_main_box = new MainBoxController();
-						$update_main_box->addAmountMainBox($credit->credit_value);
+						$update_main_box->addAmountMainBox($request, $credit->credit_value);
 					}
 				}
 				$credit->status = $request->status;
@@ -337,7 +334,7 @@ class CreditController extends Controller
 		if ($credit->provider_id == null || $credit->provider_id == 0) {
 			if ($request->status  == 1) {
 				$update_main_box = new MainBoxController();
-				$update_main_box->subAmountMainBox($credit->credit_value);
+				$update_main_box->subAmountMainBox($request, $credit->credit_value);
 				$credit->disbursement_date = date('Y-m-d');
 				$credit->approved_by = $request->user()->id;
 
@@ -346,7 +343,7 @@ class CreditController extends Controller
 			}
 			if ($request->status  == 2 && $credit->status == 1) {
 				$update_main_box = new MainBoxController();
-				$update_main_box->addAmountMainBox($credit->credit_value);
+				$update_main_box->addAmountMainBox($request, $credit->credit_value);
 			}
 			$credit->status = $request->status;
 		}
@@ -384,7 +381,7 @@ class CreditController extends Controller
 		return $installments;
 	}
 
-	public function updateValuesCredit($id, $total_amount, $capital, $interest)
+	public function updateValuesCredit(Request $request, $id, $total_amount, $capital, $interest)
 	{
 		$credit_id = $id;
 		$credit = Credit::findOrFail($credit_id);
@@ -393,7 +390,7 @@ class CreditController extends Controller
 		$box = Box::where('headquarter_id', $headquarter_id)->firstOrFail();
 
 		$add_amount_box = new BoxController();
-		$add_amount_box->addAmountBox($box->id, $total_amount);
+		$add_amount_box->addAmountBox($request, $box->id, $total_amount);
 
 		$credit->paid_value = $credit->paid_value + $total_amount;
 		$credit->capital_value = $credit->capital_value + $capital;
@@ -453,9 +450,13 @@ class CreditController extends Controller
 			$provider = $credit->provider()->firstOrFail();
 			$data['provider'] = $provider;
 		}
-		if ($credit->debtor_id != null && $credit->debtor_id != 0) {
-			$debtor = $credit->debtor()->firstOrFail();
-			$data['debtor'] = $debtor;
+		if ($credit->debtors()) {
+			$debtor = $credit->debtors()->get();
+			$data['debtors'] = $debtor;
+		}
+		if ($credit->guarantees()) {
+			$debtor = $credit->guarantees()->get();
+			$data['guarantees'] = $debtor;
 		}
 		return $data;
 	}

@@ -6,122 +6,81 @@
 		<div class="card-body">
 			<form class="form-row">
 				<div class="form-group row col-md-6">
-					<label for="saldo_inicial" class="col-sm-4 col-form-label"
-						>Saldo inicial</label
-					>
+					<label for="saldo_inicial" class="col-sm-4 col-form-label">Saldo inicial</label>
 					<div class="col-sm-8">
-						<input
-							type="text"
-							readonly
-							class="form-control"
-							id="saldo_inicial"
-							placeholder="$"
-							:value="formMainBox.initial_balance | currency"
-						/>
+						<input type="text" readonly class="form-control" id="saldo_inicial" placeholder="$"
+							:value="formMainBox.initial_balance | currency" />
 					</div>
 				</div>
 
 				<div class="form-group row col-md-6">
-					<label for="saldo_inicial" class="col-sm-4 col-form-label"
-						>Saldo actual</label
-					>
+					<label for="saldo_inicial" class="col-sm-4 col-form-label">Saldo actual</label>
 					<div class="col-sm-8">
-						<input
-							type="text"
-							readonly
-							class="form-control"
-							id="saldo_inicial"
-							placeholder="$"
-							:value="formMainBox.current_balance | currency"
-						/>
+						<input type="text" readonly class="form-control" id="saldo_inicial" placeholder="$"
+							:value="formMainBox.current_balance | currency" />
 					</div>
 				</div>
 
 				<div class="form-group row col-md-6">
 					<label for="input" class="col-sm-4 col-form-label">Entradas</label>
 					<div class="col-sm-8">
-						<input
-							type="text"
-							readonly
-							class="form-control"
-							id="input"
-							placeholder="$"
-							:value="formMainBox.input | currency"
-						/>
+						<input type="text" readonly class="form-control" id="input" placeholder="$"
+							:value="formMainBox.input | currency" />
 					</div>
 				</div>
 				<div class="form-group row col-md-6">
 					<label for="output" class="col-sm-4 col-form-label">Salidas</label>
 					<div class="col-sm-8">
-						<input
-							type="text"
-							readonly
-							class="form-control"
-							id="output"
-							placeholder="$"
-							:value="formMainBox.output | currency"
-						/>
+						<input type="text" readonly class="form-control" id="output" placeholder="$"
+							:value="formMainBox.output | currency" />
 					</div>
 				</div>
 				<div class="form-group row col-md-6">
-					<label for="last_update" class="col-sm-4 col-form-label"
-						>Última modificacion</label
-					>
+					<label for="last_update" class="col-sm-4 col-form-label">Última modificacion</label>
 					<div class="col-sm-8">
-						<input
-							type="text"
-							class="form-control"
-							readonly
-							disabled
-							id="last_update"
-							v-model="formMainBox.last_update"
-							v-if="formMainBox.last_editor"
-						/>
+						<input type="text" class="form-control" readonly disabled id="last_update" v-model="formMainBox.last_update"
+							v-if="formMainBox.last_editor" />
 					</div>
 				</div>
 
 				<div class="form-group row col-md-6" v-if="formMainBox.last_editor">
-					<label for="last_update" class="col-sm-4 col-form-label"
-						>Último editor</label
-					>
+					<label for="last_update" class="col-sm-4 col-form-label">Último editor</label>
 					<div class="col-sm-8">
 						{{ lastEditor.name }} {{ lastEditor.last_name }}
 					</div>
 				</div>
+				<div class="text-right">
+					<button class="btn btn-primary" type="button" data-toggle="modal" data-target="#historyBoxModal"
+						@click="showHistoryBox(formMainBox.history)">
+						<i class="bi bi-clock-history"></i>
+					</button>
+				</div>
 				<div class="form-group row col-md-6 h5">
-					<label for="saldo_inicial" class="col-sm-4 col-form-label"
-						>Añadir saldo: <b>{{ add_amount | currency}}</b></label
-					>
+					<label for="saldo_inicial" class="col-sm-4 col-form-label">Añadir saldo: <b>{{ add_amount |
+					currency}}</b></label>
 					<div class="col-sm-8">
-						<input
-							type="text"
-							class="form-control form-control-lg"
-							id="saldo_inicial"
-							placeholder="$"
-							v-model="add_amount"
-						/>
+						<input type="text" class="form-control form-control-lg" id="saldo_inicial" placeholder="$"
+							v-model="add_amount" />
 						<small class="form-text text-danger">
 							{{ formErrors.amount}}
 						</small>
 					</div>
 				</div>
 				<div class="w-100 text-center mt-5" v-if="$root.validatePermission('box-update')">
-					<button
-						class="btn btn-primary"
-						type="button"
-						style="min-width: 30%"
-						@click="updateBox()"
-					>
+					<button class="btn btn-primary" type="button" style="min-width: 30%" @click="updateBox()">
 						Guardar
 					</button>
 				</div>
 			</form>
 		</div>
+		<show-history-box ref="ShowHistoryBox"></show-history-box>
 	</div>
 </template>
 
 <script>
+import ShowHistoryBox from './ShowHistoryBox.vue';
 export default {
+  components: { ShowHistoryBox },
 	data() {
 		return {
 			formMainBox: {},
@@ -158,6 +117,9 @@ export default {
 					})
 			}
 		},
+		showHistoryBox(history) {
+      this.$refs.ShowHistoryBox.convertStringToJson(history);
+    },
 	},
 };
 </script>

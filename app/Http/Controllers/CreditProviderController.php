@@ -46,11 +46,10 @@ class CreditProviderController extends Controller
 		} else {
 			$history = array();
 		}
-		$credit_provider->last_editor = 1;
+		$credit_provider->last_editor = $request->user()->id;
 		$credit_provider->credit_id = $credit_id;
 		$credit_provider->provider_id = $request['provider_id'];
 		$credit_provider->headquarter_id = $request['headquarter_id'];
-		$credit_provider->last_editor = 1;
 		$credit_provider->credit_value = $request['credit_value'];
 		$credit_provider->paid_value = 0;
 		$credit_provider->pending_value = $request['credit_value'];

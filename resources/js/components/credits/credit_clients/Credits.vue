@@ -117,6 +117,7 @@
                 <button v-if="credit.status == 5" class="btn btn-success" @click="changeStatus(credit.id, 1)">
                   <i class="bi bi-check"></i> Deshacer cobro jurídico
                 </button>
+
               </td>
 
               <td class="text-right" v-if="
@@ -132,13 +133,20 @@
                   </button>
                 </div>
                 <div v-if="$root.validatePermission('credit-status')" class="d-inline">
-                  <button v-if="credit.status == 0 || credit.status == 3" class="btn btn-danger"
+                  <!-- <button v-if="credit.status == 0 || credit.status == 3" class="btn btn-danger"
                     @click="changeStatus(credit.id, 2)">
                     <i class="bi bi-x-circle"></i>
                   </button>
                   <button v-if="credit.status == 0 || credit.status == 3" class="btn btn-success"
                     @click="changeStatus(credit.id, 1)">
                     <i class="bi bi-check2-circle"></i>
+                  </button> -->
+
+                  <button v-if="credit.status == 0 || credit.status == 3" type="button" class="btn btn-success"
+                    data-toggle="modal" data-target="#creditInformationModal" @click="showInformation(credit)">
+                    <i class="bi bi-check2-circle"></i>
+
+                    Aprobación de crédito
                   </button>
                 </div>
               </td>
@@ -173,19 +181,25 @@
     <create-edit-credit ref="CreateEditCredit" @list-credits="listCredits(1)" />
 
     <modal-installment ref="ModalInstallment" />
+    <credit-information
+      ref="CreditInformation"
+      @list-credits="listCredits(1)"
+    />
   </div>
 </template>
 <script>
 import CreateEditCredit from "./CreateEditCredit.vue";
 import ModalCreateEditClient from "../../clients/ModalCreateEditClient.vue";
 import ModalInstallment from "../credit_helpers/ModalInstallment.vue";
+import CreditInformation from "../outstanding_credits/CreditInformation.vue";
 
 export default {
   components: {
     CreateEditCredit,
     ModalCreateEditClient,
     ModalInstallment,
-  },
+    CreditInformation
+},
 
   data() {
     return {
@@ -367,6 +381,9 @@ export default {
         }
       });
     },
+    showInformation(credit) {
+      this.$refs.CreditInformation.showInformation(credit, 0);
+    }
   },
 };
 </script>

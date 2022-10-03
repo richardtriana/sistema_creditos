@@ -1,35 +1,22 @@
 <template>
-  <div
-    class="modal fade"
-    id="creditInformationModal"
-    tabindex="-1"
-    aria-labelledby="creditInformationModalLabel"
-    aria-hidden="true"
-  >
+  <div class="modal fade" id="creditInformationModal" tabindex="-1" aria-labelledby="creditInformationModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="creditInformationModalLabel">
             Información general crédito
           </h5>
-          <button
-            type="button"
-            class="close"
-            data-dismiss="modal"
-            aria-label="Close"
-          >
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
           <section class="table-responsive">
-            <table
-              class="table table-bordered table-condensed"
-              v-if="
-                CreditInformation != null && CreditInformation.client_id != null
-              "
-            >
-              <tr class="text-center">
+            <table class="table table-bordered table-condensed" v-if="
+              CreditInformation != null && CreditInformation.client_id != null
+            ">
+              <tr class="text-left">
                 <td>
                   <strong>Cliente:</strong> <br />
                   {{ CreditInformation.name }}
@@ -46,7 +33,7 @@
                   {{ CreditInformation.phone_2 }}
                 </td>
               </tr>
-              <tr class="text-center">
+              <tr class="text-left">
                 <td>
                   <strong># Crédito: </strong>
                   {{ CreditInformation.id }}
@@ -60,8 +47,8 @@
                   {{ CreditInformation.number_installments }}
                 </td>
               </tr>
-              <tr class="text-center">
-                 <td>
+              <tr class="text-left">
+                <td>
                   <strong>Sede: </strong>
 
                   {{ CreditInformation.headquarter.headquarter }}
@@ -72,36 +59,44 @@
                   {{ CreditInformation.description }}
                 </td>
               </tr>
-              <tr
-                v-if="
-                  CreditInformation.debtor_id != null &&
-                  CreditInformation.debtor_id != 0 &&
-                  debtor_info != 'undefined'
-                "
-              >
-                <td>
-                  <strong>Codeudor: </strong> <br />
-                  {{ debtor_info.name }}
-                  {{ debtor_info.last_name }}
-                </td>
-                <td>
-                  <strong>Identificación: </strong><br />
-                  {{ debtor_info.type_document }}
-                  {{ debtor_info.document }}
-                </td>
-                <td>
-                  <strong>Contacto:</strong> <br />
-                  {{ debtor_info.phone_1 }} -
-                  {{ debtor_info.phone_2 }}
-                </td>
+              <tr>
+                <template v-if="CreditInformation.product">
+                  <td>
+                    <strong>Producto: </strong> <br />
+                    {{ CreditInformation.product.product }}
+                  </td>
+                </template>
+                <template v-if="guarantees_info">
+                  <td v-for="(guarantee, index) in guarantees_info" :key="index">
+                    <strong>Garantía {{index + 1}}: </strong> <br />
+                    {{ guarantee.guarantee }}
+                  </td>
+                </template>
               </tr>
-              <tr
-                v-if="
-                  CreditInformation.provider_id != null &&
-                  CreditInformation.provider_id != 0 &&
-                  provider_info != 'undefined'
-                "
-              >
+              <template v-if="debtors_info">
+                <tr v-for="(debtor, index) in debtors_info" :key="index">
+                  <td>
+                    <strong>Codeudor: </strong> <br />
+                    {{ debtor.name }}
+                    {{ debtor.last_name }}
+                  </td>
+                  <td>
+                    <strong>Identificación: </strong><br />
+                    {{ debtor.type_document }}
+                    {{ debtor.document }}
+                  </td>
+                  <td>
+                    <strong>Contacto:</strong> <br />
+                    {{ debtor.phone_1 }} -
+                    {{ debtor.phone_2 }}
+                  </td>
+                </tr>
+              </template>
+              <tr v-if="
+                CreditInformation.provider_id != null &&
+                CreditInformation.provider_id != 0 &&
+                provider_info != 'undefined'
+              ">
                 <td>
                   <strong>Proveedor :</strong> <br />
                   {{ provider_info.business_name }}
@@ -127,18 +122,10 @@
           <button type="button" class="btn btn-secondary" data-dismiss="modal">
             Cerrar
           </button>
-          <button
-            type="button"
-            class="btn btn-success"
-            @click="changeStatus(CreditInformation.id, 1)"
-          >
+          <button type="button" class="btn btn-success" @click="changeStatus(CreditInformation.id, 1)">
             Aprobar
           </button>
-          <button
-            type="button"
-            class="btn btn-danger"
-            @click="changeStatus(CreditInformation.id, 2)"
-          >
+          <button type="button" class="btn btn-danger" @click="changeStatus(CreditInformation.id, 2)">
             Rechazar
           </button>
         </div>
@@ -156,17 +143,16 @@ export default {
   data() {
     return {
       CreditInformation: {},
-      debtor_info: {},
+      debtors_info: {},
       provider_info: {},
+      guarantees_info: {}
     };
   },
   methods: {
     showInformation(credit) {
       this.CreditInformation = credit;
       this.showInstallments(credit.id);
-      if (credit.provider_id != null || credit.debtor_id != null) {
-        this.consultAdditionalInfoCredit(credit.id);
-      }
+      this.consultAdditionalInfoCredit(credit.id);
     },
     showInstallments(credit_id) {
       this.$refs.Installment.listCreditInstallments(credit_id, 0);
@@ -176,10 +162,15 @@ export default {
         .get(`api/credits/general-information/${credit_id}`, this.$root.config)
         .then((response) => {
           this.provider_info = response.data.provider;
-          this.debtor_info = response.data.debtor;
+          this.debtors_info = response.data.debtors;
+          this.guarantees_info = response.data.guarantees;
         });
     },
     changeStatus: function (id, status) {
+      var data = {
+        status: status,
+        // description: response.value,
+      };
       Swal.fire({
         title: "¿Quieres cambiar el status del credito?",
         showCancelButton: true,
@@ -243,7 +234,8 @@ export default {
       axios
         .post(`api/credits/${id}/change-status`, data, this.$root.config)
         .then(function () {
-          me.listCredits(1);
+          // me.listCredits(1);
+          me.$emit('list-credits')
         });
     },
   },
