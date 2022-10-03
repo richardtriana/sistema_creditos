@@ -265,7 +265,7 @@ class InstallmentController extends Controller
         return false;
       }
       $credit_paid = new CreditController;
-      $credit_paid->updateValuesCredit($credit->id, $amount, $amount_capital, $interest);
+      $credit_paid->updateValuesCredit($request, $credit->id, $amount, $amount_capital, $interest);
       $entry_id =  $this->saveEntryInstallment($credit, $amount_receipt, $amount_capital + $interest, $no_installment, $balance, $user_id, $quote);
     }
     if (!$quote) {
@@ -438,7 +438,7 @@ class InstallmentController extends Controller
 
     //Restar valores en el crédito
     $credit_paid = new CreditController;
-    $credit_paid->updateValuesCredit($credit->id, $paid_balance * -1,  $paid_capital * -1, $interest * -1);
+    $credit_paid->updateValuesCredit($request, $credit->id, $paid_balance * -1,  $paid_capital * -1, $interest * -1);
 
     //Actualizar valores de cuotas
     $this->updateInstallments($credit->id);

@@ -68,19 +68,18 @@ class Credit extends Model
         return $this->hasOne(CreditProvider::class);
     }
 
-    public function products()
+    public function product()
     {
-        return $this->belongsToMany(Product::class);
+        return $this->belongsTo(Product::class);
     }
 
     public function guarantees()
     {
-        return $this->belongsToMany(Guarantee::class);
+        return $this->belongsToMany(Guarantee::class, );
     }
 
     public function debtors()
     {
-        return $this->belongsToMany(Client::class, 'credit_debtor', 'id', 'debtor_id');
+        return $this->belongsToMany(Client::class, 'credit_debtor', 'credit_id', 'debtor_id');
     }
-
 }

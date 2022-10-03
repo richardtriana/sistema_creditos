@@ -94,29 +94,18 @@
                   }}</small>
                 </div>
 
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-4">
                   <div class="">
-                    <label for="products" class="col-form-label">Productos</label>
+                    <label for="client_id" class="col-form-label">Producto</label>
                     <button class="btn btn-primary mb-2" type="button" data-toggle="modal"
                       data-target="#addProductModal">
                       <i class="bi bi-card-checklist"></i> Añadir producto
                     </button>
                   </div>
-                  <ul>
-                    <li class="
-                        list-group-item
-                        d-flex
-                        justify-content-between
-                        align-items-center
-                      " v-for="(product, index) in formCredit.products" :key="product.id">
-                      <span>{{ product.product }}</span>
-                      <button class="btn btn-danger text-white rounded" type="button" @click="removeProduct(index)">
-                        <i class="bi bi-trash"></i>
-                      </button>
-                    </li>
-                  </ul>
-                  <small id="products_help" class="form-text text-danger">{{
-                  formErrors.products
+                  <input type="text" class="form-control" disabled readonly v-model="product_name"
+                    :class="[formErrors.product_id ? 'is-invalid' : '']" />
+                  <small id="product_id_help" class="form-text text-danger">{{
+                  formErrors.product_id
                   }}</small>
                 </div>
 
@@ -264,6 +253,7 @@ export default {
       headquarterList: [],
       formCredit: {
         client_id: "",
+        product_id: "",
         debtors: [],
         headquarter_id: "",
         user_id: "",
@@ -285,16 +275,17 @@ export default {
         interest_value: "",
         description: "",
         disbursement_date: "",
-        products: [],
         guarantees: [],
       },
       client_name: "Agregar con el botón",
       debtor_name: "Agregar con el botón",
       provider_name: "Agregar con el botón",
+      product_name: "Agregar con el botón",
       maximum_credit_allowed: -1,
       root_data: this.$root.$data,
       formErrors: {
         client_id: "",
+        product_id: "",
         debtors: "",
         headquarter_id: "",
         user_id: "",
@@ -393,8 +384,14 @@ export default {
       this.client_name = `${client.name} ${client.last_name}`;
       this.maximum_credit_allowed = client.maximum_credit_allowed;
     },
+    receiveProduct(product) {
+      this.formCredit.product_id = product.id;
+      this.product_name = `${product.product}`;
+    },
     receiveDebtor(debtor) {
-      let findId = this.formCredit.debtors.find(element => element.id == debtor.id);
+      let findId = this.formCredit.debtors.find(
+        (element) => element.id == debtor.id
+      );
       if (!findId) {
         this.formCredit.debtors.push(debtor);
       }
@@ -402,17 +399,10 @@ export default {
     removeDebtor(index) {
       this.formCredit.debtors.splice(index, 1);
     },
-    receiveProduct(product) {
-      let findId = this.formCredit.products.find(element => element.id == product.id);
-      if (!findId) {
-        this.formCredit.products.push(product);
-      }
-    },
-    removeProduct(index) {
-      this.formCredit.products.splice(index, 1);
-    },
     receiveGuarantee(guarantee) {
-      let findId = this.formCredit.guarantees.find(element => element.id == guarantee.id);
+      let findId = this.formCredit.guarantees.find(
+        (element) => element.id == guarantee.id
+      );
       if (!findId) {
         this.formCredit.guarantees.push(guarantee);
       }

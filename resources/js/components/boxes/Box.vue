@@ -13,6 +13,7 @@
               <th scope="col">Saldo disponible</th>
               <th scope="col">Última modificación</th>
               <th>ültimo editor</th>
+              <th>Historial</th>
               <th v-if="$root.validatePermission('box-update')">Opciones</th>
               <!-- <th>Eliminar</th> -->
             </tr>
@@ -28,14 +29,15 @@
                   {{ box.last_editor.name }} {{ box.last_editor.last_name }}
                 </span>
               </td>
+              <td class="text-right">
+                <button class="btn btn-primary" data-toggle="modal" data-target="#historyBoxModal"
+                  @click="showHistoryBox(box.history)">
+                  <i class="bi bi-clock-history"></i>
+                </button>
+              </td>
               <td v-if="$root.validatePermission('box-update')" class="text-right">
-                <button
-                  type="button"
-                  class="btn btn-primary"
-                  data-toggle="modal"
-                  data-target="#boxModal"
-                  @click="showEditBox(box)"
-                >
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#boxModal"
+                  @click="showEditBox(box)">
                   <i class="bi bi-pencil"></i>
                 </button>
               </td>
@@ -50,13 +52,15 @@
       </section>
     </div>
     <create-edit-box ref="CreateEditBox" @list-boxes="listBoxes()" />
+    <show-history-box ref="ShowHistoryBox"></show-history-box>
   </div>
 </template>
 
 <script>
 import CreateEditBox from "./CreateEditBox.vue";
+import ShowHistoryBox from "./ShowHistoryBox.vue";
 export default {
-  components: { CreateEditBox },
+  components: { CreateEditBox, ShowHistoryBox },
   data() {
     return {
       boxList: {},
@@ -75,6 +79,9 @@ export default {
 
     showEditBox(box) {
       this.$refs.CreateEditBox.showEditBox(box);
+    },
+    showHistoryBox(history) {
+      this.$refs.ShowHistoryBox.convertStringToJson(history);
     },
   },
 };

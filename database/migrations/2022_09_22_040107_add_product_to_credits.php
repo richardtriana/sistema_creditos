@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddApprobedByToCredits extends Migration
+class AddProductToCredits extends Migration
 {
     /**
      * Run the migrations.
@@ -14,13 +14,11 @@ class AddApprobedByToCredits extends Migration
     public function up()
     {
         Schema::table('credits', function (Blueprint $table) {
-            $table->foreignId('approved_by')->nullable()->after('user_id');
-            $table->dropForeign(['debtor_id']);
-            $table->dropColumn('debtor_id');
-
-            $table->foreign('approved_by')
+            $table->foreignId('product_id')->nullable();
+            
+            $table->foreign('product_id')
                 ->references('id')
-                ->on('users');
+                ->on('products');
         });
     }
 
@@ -32,7 +30,7 @@ class AddApprobedByToCredits extends Migration
     public function down()
     {
         Schema::table('credits', function (Blueprint $table) {
-            $table->dropColumn('approved_by');
+            $table->dropColumn('product_id');
         });
     }
 }
