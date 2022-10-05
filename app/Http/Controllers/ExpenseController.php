@@ -104,7 +104,7 @@ class ExpenseController extends Controller
 
 		$box = Box::where('headquarter_id', $expense->headquarter_id)->firstOrFail();
 		$sub_amount_box = new BoxController();
-		$sub_amount_box->subAmountBox($box->id, $request['price']);
+		$sub_amount_box->subAmountBox($request,$box->id, $request['price']);
 
 		return response()->json([
 			'status' => 'success',

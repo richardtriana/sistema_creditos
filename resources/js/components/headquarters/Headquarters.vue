@@ -54,7 +54,7 @@
               <td>{{ headquarter.phone }}</td>
               <td class="text-right" v-if="$root.validatePermission('headquarter-status')">
                 <button
-                  v-if="!headquarter.status"
+                  v-if="headquarter.status"
                   class="btn btn-danger"
                   @click="changeStatus(headquarter.id)"
                 >

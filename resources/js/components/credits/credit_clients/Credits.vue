@@ -181,10 +181,7 @@
     <create-edit-credit ref="CreateEditCredit" @list-credits="listCredits(1)" />
 
     <modal-installment ref="ModalInstallment" />
-    <credit-information
-      ref="CreditInformation"
-      @list-credits="listCredits(1)"
-    />
+    <credit-information ref="CreditInformation" @list-credits="listCredits(1)" />
   </div>
 </template>
 <script>
@@ -199,7 +196,7 @@ export default {
     ModalCreateEditClient,
     ModalInstallment,
     CreditInformation
-},
+  },
 
   data() {
     return {

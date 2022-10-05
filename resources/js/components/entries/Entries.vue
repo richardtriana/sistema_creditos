@@ -9,84 +9,42 @@
         <div class="form-row">
           <div class="form-group col-md-4 ml-md-auto">
             <label for="search_client">Cliente:</label>
-            <input
-              type="text"
-              id="search_client"
-              name="search_client"
-              class="form-control"
-              placeholder="Nombre cliente"
-              v-model="search_client"
-            />
+            <input type="text" id="search_client" name="search_client" class="form-control" placeholder="Nombre cliente"
+              v-model="search_client" />
           </div>
           <div class="form-group col-md-4 mr-md-auto">
             <label for="search_document">Documento:</label>
-            <input
-              type="text"
-              id="search_document"
-              name="search_document"
-              class="form-control"
-              placeholder="Documento del cliente"
-              v-model="search_document"
-            />
+            <input type="text" id="search_document" name="search_document" class="form-control"
+              placeholder="Documento del cliente" v-model="search_document" />
           </div>
         </div>
         <div class="form-row">
           <div class="form-group col-md-4 ml-md-auto">
             <label for="search_type_input">Tipo de ingreso:</label>
-            <input
-              type="text"
-              id="search_type_input"
-              name="search_type_input"
-              class="form-control"
-              placeholder="Escribir el tipo de ingreso"
-              v-model="search_type_input"
-            />
+            <input type="text" id="search_type_input" name="search_type_input" class="form-control"
+              placeholder="Escribir el tipo de ingreso" v-model="search_type_input" />
           </div>
           <div class="form-group col-md-4 mr-md-auto">
             <label for="search_description">Descripción:</label>
-            <input
-              type="text"
-              id="search_description"
-              name="search_description"
-              class="form-control"
-              placeholder="Escribir el motivo o descripción"
-              v-model="search_description"
-            />
+            <input type="text" id="search_description" name="search_description" class="form-control"
+              placeholder="Escribir el motivo o descripción" v-model="search_description" />
           </div>
         </div>
         <div class="form-row">
           <div class="form-group col-md-4 ml-auto">
             <label for="">Desde:</label>
-            <input
-              type="date"
-              id="search_from"
-              name="search_from"
-              class="form-control"
-              placeholder="Desde"
-              v-model="search_from"
-              :max="now"
-            />
+            <input type="date" id="search_from" name="search_from" class="form-control" placeholder="Desde"
+              v-model="search_from" :max="now" />
           </div>
           <div class="form-group col-md-4 mr-auto">
             <label for="">Hasta:</label>
-            <input
-              type="date"
-              id="search_to"
-              name="search_to"
-              class="form-control"
-              placeholder="Desde"
-              v-model="search_to"
-              :max="now"
-            />
+            <input type="date" id="search_to" name="search_to" class="form-control" placeholder="Desde"
+              v-model="search_to" :max="now" />
           </div>
         </div>
         <div class="form-row text-right m-auto">
           <div class="form-group m-md-auto col-md-4">
-            <button
-              class="btn btn-success w-100"
-              type="button"
-              @click="listEntries(1)"
-            >
+            <button class="btn btn-success w-100" type="button" @click="listEntries(1)">
               <i class="bi bi-search"></i> Buscar
             </button>
           </div>
@@ -113,40 +71,26 @@
               <td class="text-right">{{ e.price | currency }}</td>
               <td>{{ e.type_entry }}</td>
               <td class="h6 font-weight-normal">
-                <textarea
-                  name=""
-                  class="form-control-plaintext"
-                  readonly
-                  id=""
-                  cols="10"
-                  rows="8"
-                  v-model="e.description"
-                >
+                <textarea name="" class="form-control-plaintext" readonly id="" cols="10" rows="8"
+                  v-model="e.description">
                 </textarea>
               </td>
 
-              <td class="text-right">
-                <button
-                  class="btn btn-info"
-                  type="button"
-                  @click="printEntryPdf(e.id)"
-                >
-                  <i class="bi bi-eye"></i>
+              <td class="text-right" >
+                <button class="btn btn-danger btn-block" type="button" @click="printEntryPdf(e.id)">
+                  <i class="bi bi-file-pdf-fill"></i> PDF
+                </button>
+                <br>
+                <button class="btn btn-success btn-block" type="button" @click="printEntryTicket(e.id)">
+                  <i class="bi bi-receipt-cutoff"></i> Ticket
                 </button>
               </td>
             </tr>
           </tbody>
         </table>
-        <pagination
-          :align="'center'"
-          :data="entryList"
-          :limit="2"
-          @pagination-change-page="listEntries"
-        >
+        <pagination :align="'center'" :data="entryList" :limit="2" @pagination-change-page="listEntries">
           <span slot="prev-nav"><i class="bi bi-chevron-double-left"></i></span>
-          <span slot="next-nav"
-            ><i class="bi bi-chevron-double-right"></i
-          ></span>
+          <span slot="next-nav"><i class="bi bi-chevron-double-right"></i></span>
         </pagination>
       </section>
     </div>
@@ -194,7 +138,7 @@ export default {
         });
     },
     printEntryTicket(id) {
-      axios.get(`api/print-entry/${id}`);
+      axios.get(`api/print-entry/${id}`,  this.$root.config);
     },
   },
 };

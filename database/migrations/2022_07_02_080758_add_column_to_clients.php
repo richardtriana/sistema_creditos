@@ -14,7 +14,7 @@ class AddColumnToClients extends Migration
     public function up()
     {
         Schema::table('clients', function (Blueprint $table) {
-            $table->float('maximum_credit_allowed', 20, 2)->nullable()->default('-1');
+            // $table->float('maximum_credit_allowed', 20, 2)->nullable()->default('-1');
         });
     }
 
@@ -26,7 +26,7 @@ class AddColumnToClients extends Migration
     public function down()
     {
         Schema::table('clients', function (Blueprint $table) {
-            $table->dropColumn('maximum_credit_allowed');
+            // $table->dropColumn('maximum_credit_allowed');
         });
     }
 }

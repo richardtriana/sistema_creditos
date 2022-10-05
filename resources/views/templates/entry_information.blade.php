@@ -26,6 +26,10 @@
   </header>
   <section>
     <table class="table">
+      <tr border=0>
+        <td>Nro. Ingreso: </td>
+        <td> #{{ $entry->id}}</td>
+      </tr>
       <tr>
         <td>Cliente: </td>
         <td>{{$client->name}} {{$client->last_name}}</td>
@@ -57,7 +61,7 @@
       <tr>
         <td colspan="3"></td>
       </tr>
-      <tr  class="font-weight-bold">
+      <tr class="font-weight-bold">
         <td>Cupo de crédito </td>
         <td>{{$client->maximum_credit_allowed}}</td>
       </tr>

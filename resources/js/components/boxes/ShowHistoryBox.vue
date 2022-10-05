@@ -52,10 +52,11 @@ export default {
   data() {
     return {
       listItems: {},
-    };
+    }
   },
   methods: {
     convertStringToJson(string) {
+      $('#historyBoxModal').modal('show')
       if (string) {
         const arrHistory = JSON.parse(string);
         this.listItems = arrHistory;

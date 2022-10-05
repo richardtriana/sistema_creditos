@@ -177,7 +177,7 @@ class BoxController extends Controller
 
 	public function subAmountBox(Request $request, $id, $amount)
 	{
-		$user =  $request->user()->id;
+		$user =  $request->user();
 
 		$box_id = $id;
 		$box = Box::findOrFail($box_id);

@@ -362,11 +362,11 @@ class InstallmentController extends Controller
       $entry->credit_id = $credit->id;
       $entry->description =
         "Cliente: {$client->name} {$client->last_name}\n"
-        . " Documento: {$client->type_document} {$client->document}"
-        . "# crédito: {$credit->id} \n"
-        . "# cuota: {$no_installment}\n"
-        . "Efectivo: {$amount_receipt}\n"
-        . "Valor pagado: {$amount_paid}\n"
+        . "Documento: {$client->type_document} {$client->document}\n"
+        . "#crédito: {$credit->id} \n"
+        . "#cuota: {$no_installment}\n"
+        // . "Efectivo: {$amount_receipt}\n"
+        . "Valor cancelado: {$amount_paid}\n"
         . "Regreso: {$balance} \n" .
         "Cupo crédito: {$client->maximum_credit_allowed}";
       $entry->date = date('Y-m-d');

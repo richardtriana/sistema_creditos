@@ -2,13 +2,8 @@
   <div>
     <div class="page-header d-flex justify-content-between p-4 border my-2">
       <h3>Egresos</h3>
-      <button
-        type="button"
-        class="btn btn-primary"
-        data-toggle="modal"
-        data-target="#expenseModal"
-        v-if="$root.validatePermission('expense-store')"
-      >
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#expenseModal"
+        v-if="$root.validatePermission('expense-store')">
         Crear Egreso
       </button>
     </div>
@@ -18,60 +13,30 @@
         <div class="form-row">
           <div class="form-group col-md-4 ml-md-auto">
             <label for="search_type_output">Tipo de salida:</label>
-            <input
-              type="text"
-              id="search_type_output"
-              name="search_type_output"
-              class="form-control"
-              placeholder="Escribir el tipo de salida"
-              v-model="search_type_output"
-            />
+            <input type="text" id="search_type_output" name="search_type_output" class="form-control"
+              placeholder="Escribir el tipo de salida" v-model="search_type_output" />
           </div>
           <div class="form-group col-md-4 mr-md-auto">
             <label for="search_description">Descripción:</label>
-            <input
-              type="text"
-              id="search_description"
-              name="search_description"
-              class="form-control"
-              placeholder="Escribir el motivo o descripción"
-              v-model="search_description"
-            />
+            <input type="text" id="search_description" name="search_description" class="form-control"
+              placeholder="Escribir el motivo o descripción" v-model="search_description" />
           </div>
         </div>
         <div class="form-row">
           <div class="form-group col-md-4 ml-auto">
             <label for="">Desde:</label>
-            <input
-              type="date"
-              id="search_from"
-              name="search_from"
-              class="form-control"
-              placeholder="Desde"
-              v-model="search_from"
-              :max="now"
-            />
+            <input type="date" id="search_from" name="search_from" class="form-control" placeholder="Desde"
+              v-model="search_from" :max="now" />
           </div>
           <div class="form-group col-md-4 mr-auto">
             <label for="">Hasta:</label>
-            <input
-              type="date"
-              id="search_to"
-              name="search_to"
-              class="form-control"
-              placeholder="Desde"
-              v-model="search_to"
-              :max="now"
-            />
+            <input type="date" id="search_to" name="search_to" class="form-control" placeholder="Desde"
+              v-model="search_to" :max="now" />
           </div>
         </div>
         <div class="form-row text-right m-auto">
           <div class="form-group m-md-auto col-md-4">
-            <button
-              class="btn btn-success w-100"
-              type="button"
-              @click="listExpenses(1)"
-            >
+            <button class="btn btn-success w-100" type="button" @click="listExpenses(1)">
               <i class="bi bi-search"></i> Buscar
             </button>
           </div>
@@ -103,55 +68,30 @@
               <td>{{ e.date }}</td>
               <td>{{ e.type_output }}</td>
               <td class="wrap">
-                <textarea
-                  name=""
-                  class="form-control-plaintext"
-                  readonly
-                  id=""
-                  cols="7"
-                  rows="4"
-                  v-model="e.description"
-                >
+                <textarea name="" class="form-control-plaintext" readonly id="" cols="7" rows="4"
+                  v-model="e.description">
                 </textarea>
-                </td>
+              </td>
               <td class="text-right">{{ e.price | currency }}</td>
-              <td
-                class="text-right"
-                v-if="$root.validatePermission('expense-status')"
-              >
-                <button
-                  v-if="e.status == 0"
-                  class="btn btn-danger"
-                  @click="changeStatus(e.id)"
-                >
+              <td class="text-right" v-if="$root.validatePermission('expense-status')">
+                <button v-if="e.status == 0" class="btn btn-danger" @click="changeStatus(e.id)">
                   <i class="bi bi-x-circle"></i>
                 </button>
-                <button
-                  v-if="e.status == 1"
-                  class="btn btn-success"
-                  @click="changeStatus(e.id)"
-                >
+                <button v-if="e.status == 1" class="btn btn-success" @click="changeStatus(e.id)">
                   <i class="bi bi-check2-circle"></i>
                 </button>
               </td>
               <td class="text-right">
-                <button
-                  class="btn btn-info"
-                  type="button"
-                  @click="printExpendePdf(e.id)"
-                >
-                  <i class="bi bi-eye"></i>
+                <button class="btn btn-danger btn-block" type="button" @click="printExpensePdf(e.id)">
+                  <i class="bi bi-file-pdf-fill"></i> PDF
+                </button>
+                <br>
+                <button class="btn btn-success btn-block" type="button" @click="printExpenseTicket(e.id)">
+                  <i class="bi bi-receipt-cutoff"></i> Ticket
                 </button>
               </td>
-              <td
-                class="text-right"
-                v-if="$root.validatePermission('expense-update')"
-              >
-                <button
-                  v-if="e.status == 1"
-                  class="btn btn-success"
-                  @click="showData(e)"
-                >
+              <td class="text-right" v-if="$root.validatePermission('expense-update')">
+                <button v-if="e.status == 1" class="btn btn-success" @click="showData(e)">
                   <i class="bi bi-pen"></i>
                 </button>
                 <button v-else class="btn btn-secondary" disabled>
@@ -161,16 +101,9 @@
             </tr>
           </tbody>
         </table>
-        <pagination
-          :align="'center'"
-          :data="expenseList"
-          :limit="2"
-          @pagination-change-page="listExpenses"
-        >
+        <pagination :align="'center'" :data="expenseList" :limit="2" @pagination-change-page="listExpenses">
           <span slot="prev-nav"><i class="bi bi-chevron-double-left"></i></span>
-          <span slot="next-nav"
-            ><i class="bi bi-chevron-double-right"></i
-          ></span>
+          <span slot="next-nav"><i class="bi bi-chevron-double-right"></i></span>
         </pagination>
       </section>
     </div>
@@ -242,6 +175,9 @@ export default {
           a.download = `egreso_${expense_id}-${Date.now()}.pdf`;
           a.click();
         });
+    },
+    printExpenseTicket(id) {
+      axios.get(`api/print-expense/${id}`,  this.$root.config);
     },
   },
 };

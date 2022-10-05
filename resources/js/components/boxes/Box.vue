@@ -30,7 +30,8 @@
                 </span>
               </td>
               <td class="text-right">
-                <button class="btn btn-primary" data-toggle="modal" data-target="#historyBoxModal"
+                <!-- data-toggle="modal" data-target="#historyBoxModal" -->
+                <button class="btn btn-primary" 
                   @click="showHistoryBox(box.history)">
                   <i class="bi bi-clock-history"></i>
                 </button>
@@ -52,15 +53,13 @@
       </section>
     </div>
     <create-edit-box ref="CreateEditBox" @list-boxes="listBoxes()" />
-    <show-history-box ref="ShowHistoryBox"></show-history-box>
   </div>
 </template>
 
 <script>
 import CreateEditBox from "./CreateEditBox.vue";
-import ShowHistoryBox from "./ShowHistoryBox.vue";
 export default {
-  components: { CreateEditBox, ShowHistoryBox },
+  components: { CreateEditBox },
   data() {
     return {
       boxList: {},
@@ -81,7 +80,7 @@ export default {
       this.$refs.CreateEditBox.showEditBox(box);
     },
     showHistoryBox(history) {
-      this.$refs.ShowHistoryBox.convertStringToJson(history);
+			this.$emit('show-history', history)
     },
   },
 };
