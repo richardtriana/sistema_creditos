@@ -135,8 +135,8 @@ Route::group(['middleware' => ['auth:api']], function () {
 	Route::post('/installment/reverse-payment/{id}', [InstallmentController::class, 'reversePaymentInstallment'])->middleware('permission:installment.reverse');
 
 	//Print tickets
-	Route::get('/print-installment', [PrintTicketController::class, 'printInstallment']);
 	Route::get('/print-entry/{entry}', [PrintTicketController::class, 'printEntry']);
+	Route::get('/print-expense/{expense}', [PrintTicketController::class, 'printExpense']);
 	
 	//Reports
 	Route::get('/reports/credits', [ReportController::class, 'ReportCredits'])->middleware('permission:report');

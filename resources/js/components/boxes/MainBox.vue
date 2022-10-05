@@ -50,7 +50,8 @@
 					</div>
 				</div>
 				<div class="text-right">
-					<button class="btn btn-primary" type="button" data-toggle="modal" data-target="#historyBoxModal"
+					<!-- data-toggle="modal" data-target="#historyBoxModal" -->
+					<button class="btn btn-primary" type="button" 
 						@click="showHistoryBox(formMainBox.history)">
 						<i class="bi bi-clock-history"></i>
 					</button>
@@ -73,14 +74,13 @@
 				</div>
 			</form>
 		</div>
-		<show-history-box ref="ShowHistoryBox"></show-history-box>
 	</div>
 </template>
 
 <script>
-import ShowHistoryBox from './ShowHistoryBox.vue';
+
 export default {
-  components: { ShowHistoryBox },
+  
 	data() {
 		return {
 			formMainBox: {},
@@ -118,7 +118,7 @@ export default {
 			}
 		},
 		showHistoryBox(history) {
-      this.$refs.ShowHistoryBox.convertStringToJson(history);
+			this.$emit('show-history', history)
     },
 	},
 };

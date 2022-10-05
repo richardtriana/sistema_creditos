@@ -99,7 +99,7 @@ class CreditProviderController extends Controller
 		$expense->save();
 
 		$update_main_box = new MainBoxController();
-		$update_main_box->subAmountMainBox($request['amount']);
+		$update_main_box->subAmountMainBox($request, $request['amount']);
 
 		if ($credit_provider->pending_value <= 0) {
 			$credit = $credit_provider->credit()->first();

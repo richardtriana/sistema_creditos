@@ -26,6 +26,10 @@
     </header>
     <section>
         <table class="table">
+            <tr border=0>
+                <td>Nro. Egreso: </td>
+                <td> #{{ $expense->id}}</td>
+            </tr>
             <tr>
                 <td>Usuario responsable: </td>
                 <td>{{$user->name}} {{$user->last_name}}</td>
@@ -34,11 +38,6 @@
                 <td>Nro. Documento </td>
                 <td>{{$user->type_document}} {{$user->document}}</td>
             </tr>
-            <tr>
-                <td>Nro. Egreso: </td>
-                <td> {{ $expense->id}}</td>
-            </tr>
-
             <tr>
                 <td>Monto cancelado: </td>
                 <td>$ {{$expense->price}}</td>
