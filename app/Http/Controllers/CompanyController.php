@@ -52,6 +52,7 @@ class CompanyController extends Controller
       'condition_order' => 'nullable|string',
       'condition_quotation' => 'nullable|string',
       'whatsapp_msg' => 'nullable|string',
+      'method' => 'string',
     ]);
 
     if (!$validate->fails()) {

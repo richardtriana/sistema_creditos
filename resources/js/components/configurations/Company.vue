@@ -24,6 +24,17 @@
               }}</small>
             </div>
             <div class="form-group col-12 col-md-6">
+              <label for="method">Método de amortización</label>
+              <select name="method" id="method" class="custom-select" :value="formConfiguration.method">
+                <option value="FRANCHISE">Sistema de amortización Francés</option>
+                <option value="GENERAL">Sistema de amortización general</option>
+              </select>
+            
+              <small id="methodHelp" class="form-text text-danger">{{
+                formErrors.method
+                }}</small>
+            </div>
+            <div class="form-group col-12 col-md-6">
               <label for="legal_representative">Representante legal</label>
               <input
                 type="text"
@@ -222,6 +233,7 @@ export default {
         condition_order: "",
         condition_quotation: "",
         whatsapp_msg: "",
+        method:'FRANCHISE'
       },
       formErrors: {
         name: "",
@@ -235,6 +247,7 @@ export default {
         condition_order: "",
         condition_quotation: "",
         whatsapp_msg: "",
+        method: ""
       },
       editor: ClassicEditor,
       editorConfig: {
@@ -282,8 +295,11 @@ export default {
       axios
         .post("api/configurations", form, me.$root.config)
         .then((response) => {
-          me.formConfiguration = response.data.configuration;
+          console.log(response.data);
+          me.formConfiguration = response.data.company;
           me.$root.assignErrors(false, me.formErrors);
+          console.log( me.formConfiguration);
+
         })
         .catch((response) => {
           me.$root.assignErrors(response, me.formErrors);

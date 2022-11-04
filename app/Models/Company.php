@@ -20,6 +20,7 @@ class Company extends Model
         'logo',
         'condition_order',
         'condition_quotation',
-        'whatsapp_msg'
+        'whatsapp_msg',
+        'method'
     ];
 }

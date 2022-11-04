@@ -11,6 +11,7 @@ use App\Http\Controllers\GuaranteeController;
 use App\Http\Controllers\HeadquarterController;
 use App\Http\Controllers\InstallmentController;
 use App\Http\Controllers\MainBoxController;
+use App\Http\Controllers\MethodCreditController;
 use App\Http\Controllers\PrintTicketController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProviderController;
@@ -66,7 +67,7 @@ Route::get('/entries/show-entry/{entry}', [EntryController::class, 'showEntry'])
 
 Route::get('/expenses/show-expense/{expense}', [ExpenseController::class, 'showExpense']);
 
-Route::get('/installments/calculate-installments', [InstallmentController::class, 'calculateInstallments']);
+Route::get('/installments/calculate-installments', [MethodCreditController::class, 'calculateInstallments']);
 
 Route::get('/reports/headquarters', [ReportController::class, 'ReportHeadquarters']);
 Route::get('/reports/general-client', [ReportController::class, 'ReportGeneralClient']);
@@ -131,8 +132,8 @@ Route::group(['middleware' => ['auth:api']], function () {
 	//Installments
 	Route::resource('/installments', InstallmentController::class);
 	Route::post('/installments/correct-status-installments', [InstallmentController::class, 'correctStatusInstallments']);
-	Route::post('/installment/{credit}/pay-installment', [InstallmentController::class, 'payInstallment']);
-	Route::post('/installment/reverse-payment/{id}', [InstallmentController::class, 'reversePaymentInstallment'])->middleware('permission:installment.reverse');
+	Route::post('/installment/{credit}/pay-installment', [MethodCreditController::class, 'payInstallment']);
+	Route::post('/installment/reverse-payment/{id}', [MethodCreditController::class, 'reversePaymentInstallment'])->middleware('permission:installment.reverse');
 
 	//Print tickets
 	Route::get('/print-entry/{entry}', [PrintTicketController::class, 'printEntry']);
