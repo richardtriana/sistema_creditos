@@ -14,11 +14,11 @@ class GeneralMethodController extends InstallmentController
   public function calculateInstallments(Request $request)
   {
     $capital = $request->credit_value;
-    $interest = ($request->interest / 100);
+    $interest = ($request->interest);
     $number_installments = $request->number_installments;
     $general_tax = $number_installments * $interest;
-    $valor_pago_interes =  $capital * $general_tax;
-    $total_credit = $capital + $valor_pago_interes;
+    $total_credit = $capital * $general_tax;
+    $valor_pago_interes = $total_credit - $capital;
 
     $fechaInicio = date('Y-m-d');
 
@@ -35,7 +35,7 @@ class GeneralMethodController extends InstallmentController
     $pagoInteres = [];
     $pagoCapital = [];
 
-    $installment = $total_credit / $number_installments;
+    $installment = $capital * $interest;
 
     for ($i = 0; $i < $number_installments; $i++) {
 
@@ -190,7 +190,7 @@ class GeneralMethodController extends InstallmentController
       ->where('status', 0)
       ->get();
 
-    $interest = ($credit->interest/100);
+    $interest = ($credit->interest);
     $number_installments = count($installments);
     $start_date = date('Y-m-d');
 
@@ -200,7 +200,8 @@ class GeneralMethodController extends InstallmentController
 
     $value = $capital;
     $general_tax = $number_installments * $interest;
-    $valor_pago_interes =  $capital * $general_tax;
+    $total_credit = $capital * $general_tax;
+    $valor_pago_interes = $total_credit - $capital;
 
     $payment_date = [];
     $fechaInicio = $start_date;
@@ -211,7 +212,7 @@ class GeneralMethodController extends InstallmentController
     $pagoCapital = [];
 
     if ($number_installments) {
-      $installment = $capital / $number_installments;
+      $installment = $capital * $interest;
 
       for ($i = 0; $i < $number_installments; $i++) {
         $id_installment = $installments[$i]->id;
