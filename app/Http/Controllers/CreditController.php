@@ -35,9 +35,8 @@ class CreditController extends Controller
 	 */
 	public function index(Request $request)
 	{
-
-		$installment_controller = new InstallmentController();
-		$installment_controller->correctStatusInstallments();
+		// $installment_controller = new InstallmentController();
+		// $installment_controller->correctStatusInstallments();
 
 		$credits = Credit::select();
 		$status = $request->status != null ? $request->status : 1;
@@ -123,7 +122,7 @@ class CreditController extends Controller
 			], 400);
 		}
 
-		$listInstallments = new InstallmentController();
+		$listInstallments = new MethodCreditController();
 		$listInstallments = $listInstallments->calculateInstallments($request);
 
 		$credit = new Credit();
