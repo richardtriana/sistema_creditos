@@ -7,12 +7,17 @@
       <h6 class="text-primary text-uppercase">Filtrar:</h6>
       <form>
         <div class="form-row">
-          <div class="form-group col-4 ml-auto">
+          <div class="form-group col-4 ">
+            <label for="search_client">Cliente...</label>
+            <input type="text" id="search_client" name="search_client" class="form-control"
+              placeholder="Nombres | Documento" v-model="search_client" />
+          </div>
+          <div class="form-group col-4 ">
             <label for="">Fecha de inicio:</label>
             <input type="date" id="search_start_date" name="search_start_date" class="form-control" placeholder="Desde"
               v-model="search_start_date" />
           </div>
-          <div class="form-group col-4 mr-auto">
+          <div class="form-group col-4">
             <label for="">Fecha de finalización:</label>
             <input type="date" id="search_end_date" name="search_end_date" class="form-control" placeholder="Desde"
               v-model="search_end_date" />
@@ -145,15 +150,28 @@ export default {
       search_to: "",
       search_status: "all",
       search_start_date: '',
-      search_end_date: ''
+      search_end_date: '',
+      search_client:''
     };
   },
   methods: {
     listReportGeneralCredits(page = 1) {
+      let data = {
+        page: page,
+        from: this.search_from,
+        to: this.search_to,
+        status: this.search_status,
+        start_date: this.search_start_date,
+        end_date: this.search_end_date,
+        search_client: this.search_client
+      }
       axios
         .get(
-          `api/reports/general-credits?page=${page}&from=${this.search_from}&to=${this.search_to}&status=${this.search_status}&start_date=${this.search_start_date}&end_date=${this.search_end_date}`,
-          this.$root.config
+          `api/reports/general-credits?`,
+          {
+            params: data,
+            headers: this.$root.config.headers,
+          }
         )
         .then((response) => {
           this.ReportGeneralCreditsList = response.data.credits;
@@ -176,4 +194,5 @@ export default {
 </script>
 
 <style>
+
 </style>

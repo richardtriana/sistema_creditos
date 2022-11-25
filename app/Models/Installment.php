@@ -9,7 +9,6 @@ class Installment extends Model
 {
   use HasFactory;
 
-
   protected $fillable = [
     'credit_id',
     'installment_number',
@@ -26,13 +25,18 @@ class Installment extends Model
     'capital_balance'
   ];
 
+  protected $appends = [
+    'headquarter'
+  ];
+
   public function credit()
   {
     return $this->belongsTo(Credit::class, 'credit_id');
   }
 
-  public function headquarter()
+  public function getHeadquarterAttribute()
   {
-      return $this->credit()->with('headquarter:id,headquarter');
+    // $headquarter = Installment::where('bill_number','LIKE','%'.$this->prefix.'%')->count();
+    return $this->credit->headquarter;
   }
 }

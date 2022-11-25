@@ -89,6 +89,7 @@ export default {
       headquartersExpenseList: {},
       search_from: "",
       search_to: "",
+      now: moment().format('YYYY-MM-DD'),
     };
   },
   mounted() {

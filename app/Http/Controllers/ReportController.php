@@ -12,6 +12,7 @@ use PhpParser\Node\Stmt\Echo_;
 
 class ReportController extends Controller
 {
+	/* @Route api/reports/portfolio */
 	public function ReportPortfolio(Request $request)
 	{
 		$now = date("Y-m-d");
@@ -23,7 +24,7 @@ class ReportController extends Controller
 			$from = $request->from;
 			$to = $request->to;
 		}
-
+		$headquarter_id = $request->headquarter_id ?? 'all';
 
 		$payment_date_add_days = date("Y-m-d", strtotime($now . "+ 5 days"));
 
@@ -37,7 +38,7 @@ class ReportController extends Controller
 			'credits.credit_value',
 			'credits.status',
 		)
-			->where(function ($query) use ($payment_date_add_days, $from, $to, $now, $status) {
+			->where(function ($query) use ($payment_date_add_days, $from, $to, $now, $status, $headquarter_id) {
 				$query->whereDate('payment_date', '<=', $payment_date_add_days);
 				if ($from != '' && $from != 'undefined' && $from != null) {
 					$query->whereDate('payment_date', '>=', $from);
@@ -55,18 +56,20 @@ class ReportController extends Controller
 					if ($status == 'dueSoon') {
 						$query->whereDate('payment_date', '>', $now);
 					}
+					if ($headquarter_id != 'all') {
+						$query->whereDate('credits.headquarter_id', $headquarter_id);
+					}
 				}
 			})
 			->whereNull('payment_register')
 			->where('credits.status', 1)
 			->leftJoin('credits', 'installments.credit_id', 'credits.id')
 			->leftJoin('clients', 'credits.client_id', 'clients.id')
-			->with('headquarter')
+			// ->with('headquarter')
 			->paginate(15);
 
 		return $installments;
 	}
-
 
 	public function ReportGeneralCredits(Request $request)
 	{
@@ -76,6 +79,7 @@ class ReportController extends Controller
 		$status = $request->status;
 		$start_date = $request->start_date;
 		$end_date = $request->end_date;
+		$search_client = $request->search_client;
 
 		switch ($status) {
 			case 'all':
@@ -129,6 +133,14 @@ class ReportController extends Controller
 						$query->whereRaw("DATE_ADD(`start_date`, INTERVAL `number_installments` MONTH) <= '$end_date'");
 					}
 				});
+		}
+
+		if ($search_client) {
+			$credits = $credits->whereHas('client', function ($query) use ($search_client) {
+				$query->where('name', 'LIKE', "%$search_client%")
+					->orWhere('last_name', 'LIKE', "%$search_client%")
+					->orWhere('document', 'LIKE', "%$search_client%");
+			});
 		}
 
 		$credits = $credits

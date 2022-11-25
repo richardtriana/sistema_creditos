@@ -191,6 +191,7 @@ class HeadquarterController extends Controller
 		return $headquarters;
 	}
 
+	/* @Route api/headquarters/list-all-headquarters */
 	public function listAllHeadquarters()
 	{
 		$headquarters = Headquarter::select()->get();

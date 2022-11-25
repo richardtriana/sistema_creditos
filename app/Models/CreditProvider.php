@@ -45,4 +45,8 @@ class CreditProvider extends Model
 	{
 		return $this->belongsTo(Headquarter::class, 'headquarter_id');
 	}
+
+	public function client(){
+		// return $this->hasOneThrough()
+	}
 }

@@ -19,6 +19,7 @@ class EntryController extends Controller
 	 */
 	public function index(Request $request)
 	{
+		$id = $request->id;
 		$client = $request->client;
 		$document = $request->document;
 		$from = $request->from;
@@ -62,6 +63,10 @@ class EntryController extends Controller
 		}
 		if ($description != null) {
 			$entries =	$entries->where('description', 'LIKE', "%$description%");
+		}
+
+		if ($id != null) {
+			$entries =	$entries->where('id', "$id");
 		}
 		$entries = $entries->paginate(15);
 		return $entries;
