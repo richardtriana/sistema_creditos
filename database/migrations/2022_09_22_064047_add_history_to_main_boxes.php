@@ -14,7 +14,11 @@ class AddHistoryToMainBoxes extends Migration
     public function up()
     {
         Schema::table('main_boxes', function (Blueprint $table) {
-            $table->json('history')->nullable();
+            if (Schema::hasColumn('main_boxes', 'history')) {
+                $table->json('history')->nullable()->change();
+            } else {
+                $table->json('history')->nullable();
+            }
         });
     }
 
