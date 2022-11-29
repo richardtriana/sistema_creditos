@@ -165,7 +165,7 @@ export default {
       });
     },
 
-    printExpendePdf(expense_id) {
+    printExpensePdf(expense_id) {
       axios
         .get(`api/expenses/show-expense/${expense_id}`, this.$root.config)
         .then((response) => {
