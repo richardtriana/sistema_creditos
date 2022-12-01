@@ -8,6 +8,13 @@
       <form>
         <div class="form-row">
           <div class="form-group col-4">
+            <label for="headquarter_id">Sede</label>
+            <v-select :options="headquarterList" label="headquarter" aria-logname="{}"
+              :reduce="(headquarter) => headquarter.id" v-model="search_headquarter_id"
+               placeholder="Seleccionar sede">
+            </v-select>
+          </div>
+          <div class="form-group col-4">
             <label for="search_status">Estado vencimiento:</label>
             <select name="search_status" id="search_status" v-model="search_status" class="custom-select">
               <option value="all">Todos</option>
@@ -43,6 +50,7 @@
             <tr class="text-center">
               <th>#</th>
               <th>Cliente</th>
+              <th>Sede</th>
               <th>Contacto <i class="bi bi-telephone"></i></th>
               <th>Valor cuota</th>
               <th>Fecha de pago cuota</th>
@@ -54,6 +62,7 @@
             <tr v-for="report in ReportPortfolioList.data" :key="report.id">
               <td>{{ report.credit_id }}</td>
               <td>{{ report.name }} {{ report.last_name }}</td>
+              <td class="text-uppercase">{{ report.headquarter.headquarter }}</td>
               <td>
                 <a v-if="report.phone_1 != null" target="_blank"
                   :href="`https://wa.me/57${report.phone_1}?text=${infoCompany.whatsapp_msg}`"><i
@@ -66,11 +75,14 @@
               <td class="text-right">{{ report.value | currency }}</td>
               <td class="text-center font-weight-bold">
                 <span class="badge badge-md badge-pill badge-success" v-if="report.payment_date > now">{{
-                report.payment_date }}</span>
+                    report.payment_date
+                }}</span>
                 <span class="badge badge-md badge-pill badge-warning" v-if="report.payment_date == now">{{
-                report.payment_date }}</span>
+                    report.payment_date
+                }}</span>
                 <span class="badge badge-md badge-pill badge-danger" v-if="report.payment_date < now">{{
-                report.payment_date }}</span>
+                    report.payment_date
+                }}</span>
               </td>
               <td class="text-center">
                 <span class="
@@ -110,11 +122,13 @@ export default {
   data() {
     return {
       ReportPortfolioList: {},
+      headquarterList: [],
       now: moment().format('YYYY-MM-DD'),
       infoCompany: {},
       search_from: "",
       search_to: "",
       search_status: "all",
+      search_headquarter_id:'all'
     };
   },
   methods: {
@@ -124,7 +138,8 @@ export default {
         page: page,
         from: this.search_from,
         to: this.search_to,
-        status: this.search_status
+        status: this.search_status,
+        headquarted_id:this.search_headquarter_id
       };
 
       axios
@@ -136,6 +151,16 @@ export default {
           this.ReportPortfolioList = response.data;
         });
     },
+
+    listHeadquarters() {
+      let me = this;
+      axios
+        .get(`api/headquarters/list-all-headquarters`, me.$root.config)
+        .then(function (response) {
+          me.headquarterList = response.data;
+        });
+    },
+
     getCompanyInformation() {
       axios.get("api/configurations", this.$root.config).then((response) => {
         if (response.data.company) {
@@ -147,6 +172,7 @@ export default {
 
   mounted() {
     this.listReportPortfolio();
+    this.listHeadquarters();
     this.getCompanyInformation();
   },
 };

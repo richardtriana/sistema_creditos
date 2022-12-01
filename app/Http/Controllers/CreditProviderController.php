@@ -27,10 +27,25 @@ class CreditProviderController extends Controller
 	 */
 	public function index(Request $request)
 	{
-		$credit_providers = CreditProvider::select()
-			->where('status', 1)
-			->with('creditProviderPayments')
-			->paginate(10);
+		$search_status = $request->search_status ?? -1;
+		$search_from = $request->search_from ?? NULL;
+		$search_to = $request->search_to ?? NULL;
+
+		$credit_providers = CreditProvider::select();
+
+		if ($search_status != '-1') {
+			$credit_providers = $credit_providers->where('status', $search_status);
+		}
+
+		if ($search_from) {
+			$credit_providers = $credit_providers->where('created_at', '>=', $search_from);
+		}
+
+		if ($search_to) {
+			$credit_providers = $credit_providers->where('created_at', '<=', $search_to);
+		}
+
+		$credit_providers = $credit_providers->orderBy('created_at', 'desc')->with('creditProviderPayments')->paginate(10);
 		return $credit_providers;
 	}
 

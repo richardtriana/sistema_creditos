@@ -12,6 +12,12 @@
       <form>
         <div class="form-row">
           <div class="form-group col-md-4 ml-md-auto">
+            <label for="headquarter_id">Sede</label>
+            <v-select :options="headquarterList" label="headquarter" aria-logname="{}"
+              :reduce="(headquarter) => headquarter.id" v-model="search_headquarter_id" placeholder="Seleccionar sede">
+            </v-select>
+          </div>
+          <div class="form-group col-md-4 ml-md-auto">
             <label for="search_type_output">Tipo de salida:</label>
             <input type="text" id="search_type_output" name="search_type_output" class="form-control"
               placeholder="Escribir el tipo de salida" v-model="search_type_output" />
@@ -118,26 +124,50 @@ export default {
   data() {
     return {
       expenseList: {},
+      headquarterList: [],
       search_from: "",
       search_to: "",
       search_description: "",
       search_type_output: "",
+      search_headquarter_id: 'all',
       now: new Date().toISOString().slice(0, 10),
     };
   },
   mounted() {
     this.listExpenses(1);
+    this.listHeadquarters();
   },
+
   methods: {
     listExpenses(page = 1) {
+
+      let data = {
+        page: page,
+        from: this.search_from,
+        to: this.search_to,
+        type_output: this.search_type_output,
+        description: this.search_description,
+        headquarter_id: this.search_headquarter_id
+      };
+
       let me = this;
+
       axios
         .get(
-          `api/expenses?page=${page}&from=${this.search_from}&to=${this.search_to}&type_output=${this.search_type_output}&description=${this.search_description}`,
-          me.$root.config
-        )
+          `api/expenses`, {
+          params: data,
+          headers: this.$root.config.headers,
+        })
         .then(function (response) {
           me.expenseList = response.data;
+        });
+    },
+    listHeadquarters() {
+      let me = this;
+      axios
+        .get(`api/headquarters/list-all-headquarters`, me.$root.config)
+        .then(function (response) {
+          me.headquarterList = response.data;
         });
     },
     showData: function (expense) {
@@ -165,7 +195,7 @@ export default {
       });
     },
 
-    printExpendePdf(expense_id) {
+    printExpensePdf(expense_id) {
       axios
         .get(`api/expenses/show-expense/${expense_id}`, this.$root.config)
         .then((response) => {
@@ -177,7 +207,7 @@ export default {
         });
     },
     printExpenseTicket(id) {
-      axios.get(`api/print-expense/${id}`,  this.$root.config);
+      axios.get(`api/print-expense/${id}`, this.$root.config);
     },
   },
 };
