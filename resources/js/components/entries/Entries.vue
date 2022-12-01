@@ -7,12 +7,17 @@
       <h6 class="text-primary text-uppercase">Filtrar:</h6>
       <form>
         <div class="form-row">
-          <div class="form-group col-md-4 ml-md-auto">
+          <div class="form-group col-md-4">
+            <label for="search_id">Nro. de ingreso:</label>
+            <input type="text" id="search_id" name="search_id" class="form-control"
+              placeholder="Nro de ingreso" v-model="search_id" />
+          </div>
+          <div class="form-group col-md-4">
             <label for="search_client">Cliente:</label>
             <input type="text" id="search_client" name="search_client" class="form-control" placeholder="Nombre cliente"
               v-model="search_client" />
           </div>
-          <div class="form-group col-md-4 mr-md-auto">
+          <div class="form-group col-md-4">
             <label for="search_document">Documento:</label>
             <input type="text" id="search_document" name="search_document" class="form-control"
               placeholder="Documento del cliente" v-model="search_document" />
@@ -76,7 +81,7 @@
                 </textarea>
               </td>
 
-              <td class="text-right" >
+              <td class="text-right">
                 <button class="btn btn-danger btn-block" type="button" @click="printEntryPdf(e.id)">
                   <i class="bi bi-file-pdf-fill"></i> PDF
                 </button>
@@ -102,6 +107,7 @@ export default {
   data() {
     return {
       entryList: {},
+      search_id: "",
       search_client: "",
       search_document: "",
       search_from: "",
@@ -116,12 +122,25 @@ export default {
   },
   methods: {
     listEntries(page = 1) {
+
+      let data = {
+        page: page,
+        client: this.search_client,
+        document: this.search_document,
+        from: this.search_from,
+        to: this.search_to,
+        type_input: this.search_type_input,
+        description: this.search_description,
+        id: this.search_id,
+      }
+      
       let me = this;
       axios
         .get(
-          `api/entries?page=${page}&client=${this.search_client}&document=${this.search_document}&from=${this.search_from}&to=${this.search_to}&type_input=${this.search_type_input}&description=${this.search_description}`,
-          me.$root.config
-        )
+          `api/entries`, {
+          params: data,
+          headers: me.$root.config.headers,
+        })
         .then(function (response) {
           me.entryList = response.data;
         });
@@ -138,7 +157,7 @@ export default {
         });
     },
     printEntryTicket(id) {
-      axios.get(`api/print-entry/${id}`,  this.$root.config);
+      axios.get(`api/print-entry/${id}`, this.$root.config);
     },
   },
 };

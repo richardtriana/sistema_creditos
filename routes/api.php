@@ -62,9 +62,6 @@ Route::post('/credits/{credit}/change-status',  [CreditController::class, 'chang
 Route::get('/credits/{credit}/installments', [CreditController::class, 'installments']);
 Route::resource('/credits', CreditController::class);
 
-
-Route::get('/entries/show-entry/{entry}', [EntryController::class, 'showEntry']);
-
 Route::get('/expenses/show-expense/{expense}', [ExpenseController::class, 'showExpense']);
 
 Route::get('/installments/calculate-installments', [MethodCreditController::class, 'calculateInstallments']);
@@ -104,6 +101,7 @@ Route::group(['middleware' => ['auth:api']], function () {
 	Route::resource('/configurations', CompanyController::class)->middleware('permission:configuration');
 	
 	//Entries
+	Route::get('/entries/show-entry/{entry}', [EntryController::class, 'showEntry']);
 	Route::resource('/entries',  EntryController::class);
 
 	//Expenses

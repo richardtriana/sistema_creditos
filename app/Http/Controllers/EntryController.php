@@ -94,13 +94,15 @@ class EntryController extends Controller
 		//$entry->save();
 	}
 
-	public function showEntry(Entry $entry)
+	public function showEntry(Request $request, Entry $entry)
 	{
 		$company = Company::first();
 
 		$headquarter = $entry->headquarter()->first();
 		$credit = $entry->credit()->first();
 		$client = $credit->client()->first();
+		$product = $credit->product()->first();
+		$user = $request->user();
 
 		$details = [
 			'company' => $company,
@@ -108,10 +110,17 @@ class EntryController extends Controller
 			'client' => $client,
 			'entry' => $entry,
 			'headquarter' => $headquarter,
+			'product' => $product,
+			'user' => $user,
 			'url' => URL::to('/')
 		];
 
-		$pdf = PDF::loadView('templates.entry_information', $details);
+		if ($company->method == 'FRANCHISE') {
+			$pdf = PDF::loadView('templates.entry_information', $details);
+		} else {
+			$pdf = PDF::loadView('templates.entry_information_general_method', $details);
+		}
+
 		$pdf = $pdf->download('entry_information.pdf');
 
 		$data = [
@@ -120,6 +129,7 @@ class EntryController extends Controller
 			'message' => 'Tabla generada en pdf'
 		];
 
+		// return $details;
 		return response()->json($data);
 	}
 }

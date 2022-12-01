@@ -49,7 +49,7 @@ class ExpenseController extends Controller
 				}
 			});
 			
-		if ($headquarter_id != null) {
+		if ($headquarter_id != 'all') {
 			$expenses =	$expenses->where('headquarter_id', "$headquarter_id");
 		}
 		if ($type_output != null) {

@@ -138,7 +138,8 @@ export default {
         page: page,
         from: this.search_from,
         to: this.search_to,
-        status: this.search_status
+        status: this.search_status,
+        headquarted_id:this.search_headquarter_id
       };
 
       axios
