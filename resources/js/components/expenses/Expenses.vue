@@ -137,6 +137,7 @@ export default {
     this.listExpenses(1);
     this.listHeadquarters();
   },
+
   methods: {
     listExpenses(page = 1) {
 
@@ -146,18 +147,19 @@ export default {
         to: this.search_to,
         type_output: this.search_type_output,
         description: this.search_description,
-        headquarted_id: this.search_headquarter_id
+        headquarter_id: this.search_headquarter_id
       };
+
+      let me = this;
 
       axios
         .get(
           `api/expenses`, {
           params: data,
           headers: this.$root.config.headers,
-        }
-        )
+        })
         .then(function (response) {
-          this.expenseList = response.data;
+          me.expenseList = response.data;
         });
     },
     listHeadquarters() {

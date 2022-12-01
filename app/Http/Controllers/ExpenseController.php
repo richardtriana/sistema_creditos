@@ -34,7 +34,7 @@ class ExpenseController extends Controller
 		$this_month = Carbon::now()->month;
 		$type_output = $request->type_output;
 		$description = $request->description;
-		$headquarter_id = $request->headquarter_id;
+		$headquarter_id  = $request->headquarter_id;
 
 		$expenses = Expense::with('user:id,name,last_name', 'headquarter:id,headquarter')
 			->where(function ($query) use ($this_month, $from, $to) {
@@ -49,8 +49,8 @@ class ExpenseController extends Controller
 				}
 			});
 			
-		if ($headquarter_id != 'all') {
-			$expenses =	$expenses->where('headquarter_id', "$headquarter_id");
+		if ($headquarter_id && $headquarter_id != 'all') {
+			$expenses =	$expenses->where('headquarter_id', $headquarter_id);
 		}
 		if ($type_output != null) {
 			$expenses =	$expenses->where('type_output', 'LIKE', "%$type_output%");
