@@ -80,6 +80,10 @@ class CreditController extends Controller
 	 */
 	public function store(Request $request)
 	{
+		$company = Company::first();
+		$validateMethod = $company ? ($company->method  == "GENERAL") : false;
+
+
 		$validate = Validator::make($request->all(), [
 			'client_id' => 'required|integer|exists:clients,id',
 			'provider' => 'nullable|boolean',
@@ -110,7 +114,19 @@ class CreditController extends Controller
 			'interest_value' => 'nullable|numeric',
 			'description' => 'nullable|string',
 			'disbursement_date' => 'nullable|date',
-			'guarantees' => 'nullable|array'
+			'guarantees' => 'nullable|array',
+			'credit_requested' => [
+				Rule::requiredIf($validateMethod),
+				'numeric'
+			],
+			'doc_acc_imp' => [
+				Rule::requiredIf($validateMethod),
+				'numeric'
+			],
+			'initial_quota' => [
+				Rule::requiredIf($validateMethod),
+				'numeric'
+			]
 		]);
 
 		if ($validate->fails()) {
@@ -150,6 +166,13 @@ class CreditController extends Controller
 		$credit->interest_value = $request['interest_value'];
 		$credit->description = $request['description'];
 		$credit->installment_value = $listInstallments['installment'];
+		
+		if($validateMethod)
+		{
+			$credit->credit_requested = $request['credit_requested'];
+			$credit->doc_acc_imp = $request['doc_acc_imp'];
+			$credit->initial_quota = $request['initial_quota'];
+		}
 
 		if ($credit->save()) {
 
@@ -555,7 +578,7 @@ class CreditController extends Controller
 			);
 
 			$update_main_box = new MainBoxController();
-			$update_main_box->addAmountMainBox($pending_value);
+			$update_main_box->addAmountMainBox($request, $pending_value);
 
 			$entry =  new Entry();
 			$entry->headquarter_id = $credit->headquarter_id;

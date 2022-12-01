@@ -34,7 +34,10 @@ class Credit extends Model
         'disbursement_date',
         'finish_date',
         'description',
-        'provider'
+        'provider',
+        'credit_requested',
+        'doc_acc_imp',
+        'initial_quota'
     ];
 
     protected $with = [];

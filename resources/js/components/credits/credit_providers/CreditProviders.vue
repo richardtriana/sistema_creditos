@@ -37,7 +37,7 @@
                   class="btn btn-primary"
                   data-toggle="modal"
                   data-target="#historyCreditProviderModal"
-                  @click="showHistoryCredit(c.history)"
+                  @click="showHistoryCredit(c.history, c.credit_provider_payments)"
                 >
                   <i class="bi bi-clock-history"></i>
                 </button>
@@ -79,7 +79,8 @@ export default {
         this.creditProvidersList = response.data;
       });
     },
-    showHistoryCredit(history) {
+    showHistoryCredit(history,payments) {
+      this.$refs.ShowHistoryCreditProvider.listPayments(payments);
       this.$refs.ShowHistoryCreditProvider.convertStringToJson(history);
     },
     payCreditProvider(credit_provider) {

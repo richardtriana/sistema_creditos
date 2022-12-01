@@ -148,13 +148,13 @@ class BoxController extends Controller
 
 	public function addAmountBox(Request $request, $id, $amount)
 	{
-		$user =  $request->user()->id;
+		$user =  $request->user();
 
 		$box_id = $id;
 		$box = Box::findOrFail($box_id);
 		$box->current_balance = $box->current_balance + $amount;
 		$box->input = $box->input + $amount;
-		$box->last_editor = $request->user()->id;
+		$box->last_editor = $user->id;
 		$box->last_update = date("Y-m-d");
 
 		$data = ([

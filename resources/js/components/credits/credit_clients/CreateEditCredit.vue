@@ -25,7 +25,7 @@
                   <input type="text" class="form-control" disabled readonly v-model="client_name"
                     :class="[formErrors.client_id ? 'is-invalid' : '']" />
                   <small id="client_id_help" class="form-text text-danger">{{
-                  formErrors.client_id
+                      formErrors.client_id
                   }}</small>
                 </div>
 
@@ -52,7 +52,7 @@
                   <input type="text" class="form-control" disabled readonly v-model="provider_name"
                     :class="[formErrors.provider_id ? 'is-invalid' : '']" />
                   <small id="provider_id_help" class="form-text text-danger">{{
-                  formErrors.provider_id
+                      formErrors.provider_id
                   }}</small>
                 </div>
                 <div class="col-md-4"></div>
@@ -90,7 +90,7 @@
                     </li>
                   </ul>
                   <small id="debtors_help" class="form-text text-danger">{{
-                  formErrors.debtors
+                      formErrors.debtors
                   }}</small>
                 </div>
 
@@ -105,7 +105,7 @@
                   <input type="text" class="form-control" disabled readonly v-model="product_name"
                     :class="[formErrors.product_id ? 'is-invalid' : '']" />
                   <small id="product_id_help" class="form-text text-danger">{{
-                  formErrors.product_id
+                      formErrors.product_id
                   }}</small>
                 </div>
 
@@ -131,7 +131,7 @@
                     </li>
                   </ul>
                   <small id="guarantees_help" class="form-text text-danger">{{
-                  formErrors.guarantees
+                      formErrors.guarantees
                   }}</small>
                 </div>
 
@@ -141,7 +141,7 @@
                     :class="[formErrors.description ? 'is-invalid' : '']"
                     placeholder="Ingresar descripción "></textarea>
                   <small id="description_help" class="form-text text-danger">{{
-                  formErrors.description
+                      formErrors.description
                   }}</small>
                 </div>
 
@@ -155,12 +155,12 @@
                 </div>
                 <div class="form-group col-md-4">
                   <label for="credit_value">Valor Credito:
-                    <b>{{ formCredit.credit_value | currency }}</b></label>
-                  <input v-if="edit" type="text" class="form-control" id="credit_value" step="any"
-                    :value="formCredit.credit_value | currency" :disabled="edit"
+                    <b>{{ activateNewMethod ? value_credit_validate :formCredit.credit_value | currency}}</b></label>
+                  <input v-if="(edit || activateNewMethod)" type="text" class="form-control" id="credit_value" step="any"
+                    :value="activateNewMethod ?value_credit_validate :formCredit.credit_value | currency" :disabled="edit || activateNewMethod"
                     :class="[formErrors.credit_value ? 'is-invalid' : '']" />
 
-                  <input v-if="!edit" type="number" class="form-control" id="credit_value" step="any"
+                  <input v-if="(!edit && !activateNewMethod)" type="number" class="form-control" id="credit_value" step="any"
                     v-model="formCredit.credit_value" :max="max_amount_credit" @keyup="
                       formCredit.credit_value > max_amount_credit
                         ? (formCredit.credit_value = max_amount_credit)
@@ -172,8 +172,51 @@
                     {{ max_amount_credit | currency }}
                   </small>
                   <small id="credit_value_help" class="form-text text-danger">{{
-                  formErrors.credit_value
+                      formErrors.credit_value
                   }}</small>
+                </div>
+                <div v-if="activateNewMethod" class="col-12">
+                  <div class="row">
+                    <div class="form-group col-md-4">
+                      <label for="credit_requested">Credito solicitado: <b>{{ formCredit.credit_requested | currency }}</b></label>
+                      <input type="number" class="form-control" id="credit_requested"
+                        v-model="formCredit.credit_requested" :disabled="edit" min="0" :max="max_amount_credit" @keyup="
+                          formCredit.credit_requested > max_amount_credit
+                            ? (formCredit.credit_requested = max_amount_credit)
+                            : (formCredit.credit_requested = formCredit.credit_requested)
+                        "
+                        :class="[formErrors.credit_requested ? 'is-invalid' : '']" placeholder="Ingresar valor de credito"
+                        value="3" />
+                        <small id="addAmountHelpBlock" class="form-text text-muted">
+                          Monto máximo
+                          {{ max_amount_credit | currency }}
+                        </small>
+                      <small id="credit_requested_help" class="form-text text-danger">{{
+                          formErrors.credit_requested
+                      }}</small>
+                    </div>
+                    <div class="form-group col-md-4">
+                      <label for="doc_acc_imp">Otros gastos</label>
+                      <input type="number" class="form-control" id="doc_acc_imp"
+                        v-model="formCredit.doc_acc_imp" min="0" :disabled="edit"
+                        :class="[formErrors.doc_acc_imp ? 'is-invalid' : '']" placeholder="Ingresar valor de gastos adicionales"
+                        value="3" />
+                      <small id="doc_acc_imp_help" class="form-text text-danger">{{
+                          formErrors.doc_acc_imp
+                      }}</small>
+                    </div>
+                    <div class="form-group col-md-4">
+                      <label for="initial_quota">Cuota inicial</label>
+                      <input type="number" class="form-control" id="initial_quota"
+                        v-model="formCredit.initial_quota"  min="0" step="any" :disabled="edit"
+                        :class="[formErrors.initial_quota ? 'is-invalid' : '']" placeholder="Ingresar cuota inicial"
+                        value="3" />
+                      <small id="initial_quota_help" class="form-text text-danger">{{
+                          formErrors.initial_quota
+                      }}</small>
+                    </div>
+                  </div>
+
                 </div>
                 <div class="form-group col-md-4">
                   <label for="interest">Interés (%)</label>
@@ -181,7 +224,7 @@
                     :disabled="edit" :class="[formErrors.interest ? 'is-invalid' : '']" placeholder="Ingresar interés"
                     value="3" />
                   <small id="interest_help" class="form-text text-danger">{{
-                  formErrors.interest
+                      formErrors.interest
                   }}</small>
                 </div>
 
@@ -200,7 +243,7 @@
                   <input type="date" class="form-control" id="start_date" v-model="formCredit.start_date"
                     :disabled="edit" :class="[formErrors.start_date ? 'is-invalid' : '']" />
                   <small id="start_date_help" class="form-text text-danger">{{
-                  formErrors.start_date
+                      formErrors.start_date
                   }}</small>
                 </div>
               </div>
@@ -276,6 +319,10 @@ export default {
         description: "",
         disbursement_date: "",
         guarantees: [],
+        credit_requested: "",
+        doc_acc_imp: "",
+        initial_quota: ""
+
       },
       client_name: "Agregar con el botón",
       debtor_name: "Agregar con el botón",
@@ -307,6 +354,9 @@ export default {
         interest_value: "",
         description: "",
         disbursement_date: "",
+        credit_requested: "",
+        doc_acc_imp: "",
+        initial_quota: ""
       },
     };
   },
@@ -326,6 +376,11 @@ export default {
 
       return value;
     },
+    value_credit_validate(){
+      this.formCredit.credit_value = (this.resetNumber(this.formCredit.credit_requested) - this.resetNumber(this.formCredit.initial_quota)) + this.resetNumber(this.formCredit.doc_acc_imp);
+      return this.formCredit.credit_value;
+    }
+
   },
   created() {
     this.listHeadquarters(1);
@@ -421,6 +476,12 @@ export default {
       });
       me.$root.assignErrors(false, me.formErrors);
     },
+    activateNewMethod(){
+      return this.$root.configuration.method == "GENERAL";
+    },
+    resetNumber(value){
+      return isNaN(value) ? 0: Number(value);
+    }
   },
 };
 </script>

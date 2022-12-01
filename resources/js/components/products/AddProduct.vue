@@ -10,12 +10,12 @@
         </div>
         <div class="modal-body">
           <div class="input-group">
-            <input type="text" class="form-control" placeholder="Documento | Nombre de producte"
+            <input type="text" class="form-control" placeholder="Documento | Nombre de producto"
               aria-label=" with two button addons" aria-describedby="button-addon4" v-model="filters.product"
               @keyup="listProducts()" />
             <div class="input-group-append" id="button-addon4">
               <button class="btn btn-secondary" type="button" @click="listProducts()">
-                Buscar Proveedor
+                Buscar Producto
               </button>
             </div>
           </div>

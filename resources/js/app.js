@@ -256,6 +256,7 @@ const app = new Vue({
 				Authorization: "",
 			},
 		}),
+		configuration: Object,
 
 	},
 	watch: {
@@ -265,7 +266,7 @@ const app = new Vue({
 	},
 	computed: {
 		validateAuth() {
-			return !$.isEmptyObject(this.user) && this.token
+			return !$.isEmptyObject(this.user) && this.token;
 		}
 	},
 	methods: {
@@ -310,9 +311,18 @@ const app = new Vue({
 				});
 			}
 		},
+		getConfiguration()
+		{
+			axios.get("api/configurations", this.$root.config).then((response) => {
+				if (response.data.company) {
+				  this.configuration = response.data.company;
+				}
+			  });
+		}
 	},
 	created() {
 		this.authUser();
+		this.getConfiguration();
 	},
 	mounted() {
 		this.getCurrentBalanceMainBox();

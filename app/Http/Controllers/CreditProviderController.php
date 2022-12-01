@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Box;
 use App\Models\CreditProvider;
+use App\Models\CreditProviderPayment;
 use App\Models\Expense;
 use App\Models\MainBox;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class CreditProviderController extends Controller
 {
@@ -27,6 +29,7 @@ class CreditProviderController extends Controller
 	{
 		$credit_providers = CreditProvider::select()
 			->where('status', 1)
+			->with('creditProviderPayments')
 			->paginate(10);
 		return $credit_providers;
 	}
@@ -60,6 +63,20 @@ class CreditProviderController extends Controller
 
 	public function payCreditProvider(CreditProvider $credit_provider, Request $request)
 	{
+		$validate = Validator::make($request->all(), [
+			'amount' => 'required|numeric|min:1',
+			'description' => 'nullable|string',
+			'evidence' => 'nullable|file|mimes:jpeg,jpg,png,pdf',
+		]);
+
+		if($validate->fails()){
+			return response()->json([
+				'status' => 'error',
+				'code' =>  400,
+				'message' => 'Validación de datos incorrecta',
+				'errors' =>  $validate->errors()
+			], 400);
+		}
 
 		$user = $request->user();
 		$data = ([
@@ -78,6 +95,21 @@ class CreditProviderController extends Controller
 		$credit_provider->pending_value = $credit_provider->pending_value - $request['amount'];
 		$credit_provider->history = json_encode($history);
 		$credit_provider->save();
+
+
+		$creditProviderPayment = new CreditProviderPayment();
+		$creditProviderPayment->credit_provider_id = $credit_provider->id;
+		$creditProviderPayment->adviser = "$user->name $user->last_name";
+		$creditProviderPayment->paid_value = $request['amount'];
+		$creditProviderPayment->description = $request['description'];
+
+		if($request->hasFile('evidence')){
+			$name = uniqid(). $request->file('evidence')->getClientOriginalName();
+			$request->evidence->move(public_path('storage/evidences'), $name);
+			$creditProviderPayment->evidence = 'storage/evidences/' . $name;
+		}
+
+		$creditProviderPayment->save();
 
 		$credit = $credit_provider->credit()->first();
 		$client = $credit->client()->first();
