@@ -407,7 +407,7 @@ class CreditController extends Controller
 	{
 		$credit_id = $id;
 		$credit = Credit::findOrFail($credit_id);
-		$headquarter_id = $credit->headquarter->id;
+		$headquarter_id = $request->user()->headquarter_id;
 
 		$box = Box::where('headquarter_id', $headquarter_id)->firstOrFail();
 
