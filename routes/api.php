@@ -68,6 +68,8 @@ Route::get('/installments/calculate-installments', [MethodCreditController::clas
 
 Route::get('/reports/headquarters', [ReportController::class, 'ReportHeadquarters']);
 Route::get('/reports/general-client', [ReportController::class, 'ReportGeneralClient']);
+Route::get('/reports/profitability', [ReportController::class, 'ReportProfitability']);
+Route::get('/reports/cash-flow', [ReportController::class, 'ReportCashFlow']);
 
 Route::group(['middleware' => ['auth:api']], function () {
 

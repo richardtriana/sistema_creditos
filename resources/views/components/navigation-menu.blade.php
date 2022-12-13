@@ -41,6 +41,10 @@
             </router-link>
             <router-link class="dropdown-item" :to="{ name: 'report-headquarters-expenses' }"> Reporte egresos sedes
             </router-link>
+            <router-link class="dropdown-item" :to="{ name: 'report-profitability' }"> Reporte de Rentabilidad
+            </router-link>
+            <router-link class="dropdown-item" :to="{ name: 'report-cash-flow' }"> Reporte de flujo de caja
+            </router-link>
           </div>
         </li>
         <li class="nav-item dropdown" v-if="validatePermission('provider-index') || validatePermission('client-index')">

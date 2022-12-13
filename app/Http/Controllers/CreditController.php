@@ -378,9 +378,9 @@ class CreditController extends Controller
 
 	public function installments(Request $request, $id)
 	{
-
 		$credit = Credit::findOrFail($id);
 		$installments =  $credit->installments()->get();
+
 		foreach ($installments as $installment) {
 			$now = now();
 			$payment_date = Carbon::createFromFormat('Y-m-d', $installment->payment_date);
@@ -390,7 +390,7 @@ class CreditController extends Controller
 				$day_value_default = $installment->interest_value / 30;
 				$late_interest_value =  $day_value_default * $days_past_due;
 
-				$installment->days_past_due  = $days_past_due > 30 ? 30 : $days_past_due;
+				$installment->days_past_due  = $days_past_due;
 				$installment->late_interests_value  =  $late_interest_value;
 				if ($installment->paid_capital > 0 && $installment->paid_capital < $installment->capital_value) {
 					$installment->value = $installment->capital_value - $installment->paid_capital;

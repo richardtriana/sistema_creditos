@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Credit;
+use App\Models\Entry;
 use App\Models\Expense;
 use App\Models\Installment;
 use Carbon\Carbon;
@@ -234,5 +235,71 @@ class ReportController extends Controller
 			->get();
 
 		return $credits;
+	}
+
+	/* @Route api/reports/profitability */
+	public function ReportProfitability(Request $request)
+	{
+		$from = $request->from ?? '';
+		$to = $request->to ?? '';
+		$data = [];
+
+		$total_expense = Expense::selectRaw('SUM(price) as total_expense')->where(function ($query) use ($from, $to) {
+			if ($from) {
+				$query->where('created_at', '>=', $from);
+			}
+			if ($to) {
+				$query->where('created_at', '>=', $to);
+			}
+		})->first();
+		$total_credit_interest = Installment::selectRaw('SUM(paid_balance - paid_capital) as total_credit_interest')->where('status', 1)->where(function ($query) use ($from, $to) {
+			if ($from) {
+				$query->whereDate('payment_register', '>=', $from);
+			}
+			if ($to) {
+				$query->whereDate('payment_register', '>=', $to);
+			}
+		})->first();
+
+		// return $total_expense;
+		$data['total_credit_interest'] = $total_credit_interest->total_credit_interest;
+		$data['total_expense'] = $total_expense->total_expense;
+		$data['total_gross'] = $data['total_credit_interest'] - $data['total_expense'];
+
+		return $data;
+	}
+
+
+	/* @Route api/reports/cash-flow */
+	public function ReportCashFlow(Request $request)
+	{
+		$from = $request->from ?? '';
+		$to = $request->to ?? '';
+
+		$data = [];
+
+		$total_expense = Expense::selectRaw('SUM(price) as total_expense')->where(function ($query) use ($from, $to) {
+			if ($from) {
+				$query->where('created_at', '>=', $from);
+			}
+			if ($to) {
+				$query->where('created_at', '>=', $to);
+			}
+		})->first();
+		$total_payment = Installment::selectRaw('SUM(paid_balance) as total_payment')->where('status', 1)->where(function ($query) use ($from, $to) {
+			if ($from) {
+				$query->whereDate('payment_register', '>=', $from);
+			}
+			if ($to) {
+				$query->whereDate('payment_register', '>=', $to);
+			}
+		})->first();
+
+		// return $total_expense;
+		$data['total_payment'] = $total_payment->total_payment;
+		$data['total_expense'] = $total_expense->total_expense;
+		$data['total_cash_flow'] = $data['total_payment'] - $data['total_expense'];
+
+		return $data;
 	}
 }
