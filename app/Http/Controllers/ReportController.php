@@ -3,13 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Credit;
-use App\Models\Entry;
 use App\Models\Expense;
 use App\Models\Installment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use PhpParser\Node\Stmt\Echo_;
 
 class ReportController extends Controller
 {
@@ -18,6 +16,8 @@ class ReportController extends Controller
 	{
 		$now = date("Y-m-d");
 		$status = $request->status;
+		$results = $request->results ?? 15;
+
 		if ($status != 'all') {
 			$from = null;
 			$to = null;
@@ -67,7 +67,7 @@ class ReportController extends Controller
 			->leftJoin('credits', 'installments.credit_id', 'credits.id')
 			->leftJoin('clients', 'credits.client_id', 'clients.id')
 			// ->with('headquarter')
-			->paginate(15);
+			->paginate($results);
 
 		return $installments;
 	}
@@ -81,6 +81,7 @@ class ReportController extends Controller
 		$start_date = $request->start_date;
 		$end_date = $request->end_date;
 		$search_client = $request->search_client;
+		$results = $request->results ?? 15;
 
 		switch ($status) {
 			case 'all':
@@ -145,15 +146,17 @@ class ReportController extends Controller
 		}
 
 		$credits = $credits
-			->with('client:id,name,last_name,phone_1,phone_2', 'headquarter:id,headquarter')->paginate(15);
+			->with('client:id,name,last_name,phone_1,phone_2', 'headquarter:id,headquarter')->paginate($results);
 		$total_credits = new CreditController;
 		$total_credits = $total_credits->getTotalValueCredits($request);
 
 		return ['credits' => $credits, 'total_credits' => $total_credits];
 	}
 
-	public function ReportHeadquarters()
+	public function ReportHeadquarters(Request $request)
 	{
+		$results = $request->results ?? 15;
+		
 		$credits = Credit::select(
 			DB::raw('SUM(credit_value) as credit_value '),
 			DB::raw('SUM(paid_value) as paid_value'),
@@ -171,7 +174,7 @@ class ReportController extends Controller
 			->groupBy('headquarter_id')
 			->groupBy('headquarter')
 			->leftJoin('headquarters', 'headquarters.id', 'credits.headquarter_id')
-			->paginate(15);
+			->paginate($results);
 
 		return $credits;
 	}

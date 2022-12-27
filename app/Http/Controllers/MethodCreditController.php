@@ -26,19 +26,6 @@ class MethodCreditController
     }
   }
 
-  public function payInstallment(Credit $credit, $amount = null, Request $request)
-  {
-    $configurations = Company::first();
-
-    if ($configurations->method &&  $configurations->method == "GENERAL") {
-
-      $generalMethod = new GeneralMethodController();
-      return $generalMethod->payInstallment($credit, $amount,  $request);
-    } else {
-      $franchiseMethod = new FranchiseMethodController();
-      return  $franchiseMethod->payInstallment($credit, $amount,  $request);
-    }
-  }
 
   public function updateInstallments($credit_id)
   {
@@ -54,18 +41,4 @@ class MethodCreditController
     }
   }
 
-  public function reversePaymentInstallment(Request $request, $id)
-  {
-    $configurations = Company::first();
-
-    if ($configurations->method &&  $configurations->method == "GENERAL") {
-
-      $generalMethod = new GeneralMethodController();
-      return $generalMethod->reversePaymentInstallment($request, $id);
-    } else {
-
-      $franchiseMethod = new FranchiseMethodController();
-      return $franchiseMethod->reversePaymentInstallment($request, $id);
-    }
-  }
 }

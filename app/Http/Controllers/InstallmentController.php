@@ -6,9 +6,9 @@ use App\Models\Company;
 use App\Models\Credit;
 use App\Models\Entry;
 use App\Models\Installment;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
-
 use PDF;
 
 class InstallmentController extends Controller
@@ -99,8 +99,303 @@ class InstallmentController extends Controller
     $installment->save();
   }
 
- 
-  public function saveEntryInstallment(Credit $credit, $amount_receipt, $amount_paid, $no_installment, $balance,  $user_id, $quote)
+  // Pagar cuota por abono o individual 
+  public function payInstallment(Credit $credit, $amount = null, Request $request)
+  {
+    $quote = $request->quote_id != null || $request->quote_id != 0 ? true : false;
+    $user_id = $request->user()->id;
+
+    //Valor de la cuota o abono
+    $now = now();
+    $late_interest_pending = $request->late_interest_pending;
+    $amount = $request->amount;
+    $capital = 0;
+    $interest = 0;
+    $late_interest = 0;
+    $balance = $amount;
+    $step = 0;
+
+    // DB::enableQueryLog(); // Enable query log
+    $installment = $credit->installments()
+      ->where(function ($query) use ($late_interest_pending) {
+        $query
+          ->whereRaw("((paid_balance - paid_capital)+0.1) < (interest_value+$late_interest_pending)")
+          ->orWhereNull('paid_balance');
+      })->first();
+
+    if (!$installment) {
+      $installment = $credit->installments()
+        ->where(function ($query) {
+          $query
+            ->whereRaw('((paid_capital) +0.1) < ((capital_value))');
+        })->first();
+    }
+
+    if (!$installment) {
+      $installment = $credit->installments()
+        ->where(function ($query) {
+          $query
+            ->whereRaw('(paid_balance-paid_capital-interest_value)>0.1');
+        })->first();
+    }
+
+    $no_installment = $installment->installment_number;
+    $payment_date = Carbon::createFromFormat('Y-m-d', $installment->payment_date);
+
+    if ($credit->credit_value > $credit->capital_value) {
+      //Cuando el cliente paga a tiempo
+      if ($payment_date >= $now) {
+        // Primer pago
+        if (!$installment->paid_balance) {
+          if ($amount > $installment->capital_value) {
+            $capital = $installment->paid_capital;
+            $interest = $amount - $capital;
+          } else {
+            $capital = $amount;
+          }
+        } else {
+          if ($installment->paid_capital > $installment->capital_value) {
+            $interest = $amount;
+          } else {
+            $capital = $installment->capital_value - $installment->paid_capital;
+            $interest = $amount - $capital;
+          }
+        }
+      }
+
+      //Cuando el cliente paga después de la fecha programada interest
+      if ($payment_date < $now) {
+
+        $days_past_due = $installment->days_past_due ? $installment->days_past_due :  $now->diffInDays($payment_date);
+        $day_value_default = $installment->interest_value / 30;
+        $late_interests_value = $day_value_default * $days_past_due;
+        $installment->days_past_due  = $days_past_due;
+
+        if (!$installment->paid_balance) {
+          if ($amount > ($installment->capital_value + 0.1)) {
+            $capital = $installment->capital_value;
+            $balance = $balance - $capital;
+            if (($balance) > $installment->interest_value) {
+
+              $interest = $installment->interest_value;
+              $balance = $balance - $interest;
+              if (($balance) >= $late_interests_value) {
+                $late_interest  = $late_interests_value;
+                $balance = $balance - $late_interest;
+              } else {
+                $late_interest = $interest - $installment->interest_value;
+                $balance = $balance - $late_interest;
+              }
+            } else {
+              $interest = $amount - $capital;
+            }
+          } else {
+            $capital = $amount;
+          }
+        } else {
+          if ($installment->paid_capital >= $installment->capital_value) {
+
+            $paidInterest = ($installment->paid_balance - $installment->paid_capital);
+            if ($paidInterest > $installment->interest_value) {
+              if (($paidInterest - $installment->interest_value) > 0) {
+                $helpPaidLateIint =  $late_interests_value - ($paidInterest - $installment->interest_value);
+                if ($balance > $helpPaidLateIint) {
+                  $late_interest = $helpPaidLateIint;
+                  $balance = $balance - $late_interest;
+                } else {
+                  $late_interest = $balance;
+                  $balance = $balance - $late_interest;
+                }
+              }
+            } else {
+
+              if ($paidInterest > $amount) {
+                $interest = $amount;
+                $balance = $balance - $interest;
+              } else {
+                $interest = $paidInterest;
+                $balance = $balance - $interest;
+                if ($balance > $late_interests_value) {
+                  $late_interest = $late_interests_value;
+                  $balance = $balance - $late_interest;
+                } else {
+                  $late_interest = $balance;
+                  $balance = $balance - $late_interest;
+                }
+              }
+            }
+          } else {
+            $paidInterest = ($installment->paid_balance - $installment->paid_capital);
+            $step = 1;
+            if ($amount < ($installment->capital_value - $installment->paid_capital)) {
+              $capital = $amount;
+              $balance = $balance - $capital;
+              $step = 2;
+            } else {
+              $step = 3;
+              $capital =  ($installment->capital_value - $installment->paid_capital);
+              $balance = $balance - $capital;
+              if (($paidInterest) < $installment->interest_value) {
+                $step = 4;
+                if ($balance > $installment->interest_value) {
+                  $step = 5;
+                  $interest = $installment->interest_value - $paidInterest;
+                  $balance = $balance - $interest;
+
+                  $helpPaidLateIint =  $late_interests_value - ($paidInterest - $installment->interest_value);
+                  if ($balance > $helpPaidLateIint) {
+                    $late_interest = $helpPaidLateIint;
+                    $balance = $balance - $late_interest;
+                  } else {
+                    $late_interest = $balance;
+                    $balance = $balance - $late_interest;
+                  }
+                } else {
+                  $step = 6;
+                  $interest = $balance;
+                  $balance = $balance - $interest;
+                }
+              }
+            }
+          }
+        }
+      }
+
+
+      $installment->payment_register = date('Y-m-d');
+      $installment->paid_balance +=  ($capital + $interest);
+      $installment->paid_capital += $capital;
+      // $installment->late_interests_value += $late_interest;
+      if (($installment->paid_balance + 0.1) > $request['late_interest_pending']) {
+        $installment->status = 1;
+      }
+      // if (!$installment->save()) {
+      //   return false;
+      // }
+      // $balance = $amount - $capital - $interest;
+      // $credit_paid = new CreditController;
+      // $credit_paid->updateValuesCredit($request, $credit->id, $amount, $capital, $interest);
+      // $entry_id =  $this->saveEntryInstallment($credit, $amount_receipt, $capital + $interest, $no_installment, $balance, $user_id, $quote);
+    }
+    return [
+      '$installment' => $installment,
+      'balance' => $balance,
+      'amount' => $amount,
+      'capital' => $capital,
+      'interest' => $interest,
+      'step' => $step,
+      'late_interest' => $late_interest,
+      'late_interests_value' => $late_interests_value,
+      'helpPaidLateIint' => $helpPaidLateIint ?? 0
+    ];
+    // return ['balance' => $balance, 'no_installment' => $no_installment, 'entry_id' => $entry_id];
+  }
+
+  public function payCredit(Credit $credit, Request $request)
+  {
+    $configurations = Company::first();
+    $generalMethod = new GeneralMethodController();
+    $franchiseMethod = new FranchiseMethodController();
+    $user_id = $request->user()->id;
+
+    //Valor de la cuota o abono
+    $amount = $request->amount;
+    $amount_receipt = $amount;
+    $now = now();
+    $status = 0;
+
+    // DB::enableQueryLog(); // Enable query log
+    $installment = $credit->installments()->whereDate('payment_date', '<=', $now)
+      ->where(function ($query) {
+        $query
+          ->whereRaw('((paid_capital) +0.1) < ((capital_value))')
+          ->orWhereNull('paid_balance');
+      })->first();
+
+    // dd(DB::getQueryLog()); // Show results of log
+
+    if (($installment) == null) {
+      $installment = $credit->installments()
+        ->where('payment_date', '>=', $now)
+        ->first();
+    }
+
+    $amount_capital = 0;
+    $interest = 0;
+    $balance = 0;
+    $days_past_due = 0;
+    $no_installment = $installment->installment_number;
+
+    //Se verifica el saldo restante del crédito
+    $balance_credit = ($credit->credit_value - $credit->capital_value);
+    $balance_credit  = $installment->paid_capital > 0 ? $balance_credit : $balance_credit + $installment->interest_value;
+
+    if ($balance_credit <= $amount) {
+      $amount = $balance_credit;
+      $balance = $amount_receipt - $amount;
+    }
+
+    $payment_date = Carbon::createFromFormat('Y-m-d', $installment->payment_date);
+
+    if ($credit->credit_value > $credit->capital_value) {
+      //Cuando el cliente paga a tiempo
+      if ($payment_date >= $now) {
+        //primer pago
+        $status = 1;
+        $amount_capital = $amount -  $installment->interest_value; //ok
+        $interest = $installment->interest_value;
+        if ($installment->paid_balance == null || $installment->paid_balance == 0) {
+          if ($amount_capital < $installment->capital_value) {
+            $status = 0;
+          }
+        }
+        //cuando se ha realizado abono
+        if ($installment->paid_balance > 0) {
+          $amount_capital = $amount;
+          $interest = 0;
+        }
+      }
+
+      //Cuando el cliente paga después de la fecha programada
+      if ($payment_date < $now) {
+        $days_past_due = $installment->days_past_due ? $installment->days_past_due :  $now->diffInDays($payment_date);
+        $day_value_default = $installment->interest_value / 30;
+        $late_interests_value = $day_value_default * $days_past_due;
+        $installment->days_past_due  = $days_past_due;
+        $installment->late_interests_value  = $late_interests_value;
+        $interest = $installment->interest_value + $late_interests_value;
+
+        $amount_capital = $amount -  $interest; //ok
+        $status = $amount + 1 < ($installment->value + $late_interests_value) ? 0 : 1;
+        $balance -= $late_interests_value;
+        $balance = $balance < 0 ?? (int) 0;
+      }
+
+      $installment->paid_balance +=  ($amount_capital + $interest);
+      $installment->paid_capital += $amount_capital;
+      $installment->status  = $status;
+      $installment->payment_register = date('Y-m-d');
+
+
+      if (!$installment->save()) {
+        return false;
+      }
+      $credit_paid = new CreditController;
+      $credit_paid->updateValuesCredit($request, $credit->id, $amount, $amount_capital, $interest);
+      $entry_id =  $this->saveEntryInstallment($credit, $amount_receipt, $amount_capital + $interest, $no_installment, $balance, $user_id);
+    }
+
+    if ($configurations->method &&  $configurations->method == "GENERAL") {
+      $generalMethod->updateInstallments($credit->id);
+    } else {
+      $franchiseMethod->updateInstallments($credit->id);
+    }
+
+    return ['balance' => $balance, 'no_installment' => $no_installment, 'entry_id' => $entry_id];
+  }
+
+
+  public function saveEntryInstallment(Credit $credit, $amount_receipt, $amount_paid, $no_installment, $balance,  $user_id, $quote = null)
   {
     $amount = $amount_paid;
     $amount_receipt = '$' . number_format($amount_receipt, 0, ',', '.');
@@ -130,7 +425,6 @@ class InstallmentController extends Controller
       return  $entry->id;
     }
   }
-
 
   public function printTable(Request $request)
   {

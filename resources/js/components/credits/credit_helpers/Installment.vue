@@ -14,8 +14,9 @@
           <th>Valor abonado</th>
           <th>Capital abonado</th>
           <th v-if="allow_payment">Estado</th>
-          <th v-if="allow_payment"></th>
-          <th  v-if="$root.validatePermission('installment-reverse')">Reversar <br /> Pago</th>
+          <th v-if="allow_payment">Pago a cuota</th>
+          <th v-if="allow_payment">Abono a cuota</th>
+          <th v-if="$root.validatePermission('installment-reverse')">Reversar <br /> Pago</th>
         </tr>
       </thead>
       <tbody>
@@ -23,19 +24,23 @@
           <th>{{ quote.payment_date }}</th>
           <td>{{ quote.installment_number }}</td>
           <th class="text-right font-weight-bold">
-            {{ quote.value | currency }}
+            <span class="text-danger">{{ quote.value_pending | currency }}</span> <br>
+            <span class="text-dark small">{{ quote.value | currency }}</span>
           </th>
           <td class="text-right">
-            {{ quote.capital_value | currency }}
+            <span class="text-danger">{{ quote.capital_value_pending | currency }}</span> <br>
+            <span class="text-dark small">{{ quote.capital_value | currency }}</span>
           </td>
           <td class="text-right">
-            {{ quote.interest_value | currency }}
+            <span class="text-danger">{{ quote.interest_value_pending | currency }}</span> <br>
+            <span class="text-dark small">{{ quote.interest_value | currency }}</span>
           </td>
           <td class="text-right">
             {{ quote.capital_balance | currency }}
           </td>
           <td v-if="allow_payment" class="text-right">
-            {{ quote.late_interests_value | currency }}
+            <span class="text-danger" >{{ quote.late_interests_value_pending | currency }}<br></span> 
+            <span class="text-dark small"  v-if="quote.days_past_due">{{ quote.late_interests_value | currency }}</span>
           </td>
           <td v-if="allow_payment" class="text-danger">
             {{ quote.days_past_due }}
@@ -55,12 +60,22 @@
               v-if="quote.status == 0">
               Pagar
             </button>
-
             <button v-else class="btn btn-sm btn-secondary" disabled>
               Pagar
             </button>
           </td>
-          <td  v-if="$root.validatePermission('installment-reverse')">
+          <td>
+            <div class="input-group mb-3" v-if="quote.status == 0">
+              <input type="number" :min="0" v-model="quote.add_payment" :max="quote.value" step="any"
+                class="form-control form-control-sm" placeholder="Valor" aria-label="Valor"
+                aria-describedby="pay-button">
+              <div class="input-group-append">
+                <button class="btn btn-outline-success btn-sm" @click="payInstallment(quote, quote.add_payment)"
+                  type="button" id="pay-button">Abonar</button>
+              </div>
+            </div>
+          </td>
+          <td v-if="$root.validatePermission('installment-reverse')">
             <button class="btn btn-warning" @click="reversePayment(quote)">
               <i class="bi bi-arrow-counterclockwise"></i>
             </button>
@@ -96,12 +111,17 @@ export default {
         });
     },
 
-    payInstallment(quote) {
+    payInstallment(quote, amount = null) {
+
+      let late_interests_value = this.listInstallments.map(x => { if (x.late_interests_value > 0) { return x } })
+
       let me = this;
       var data = {
-        amount: quote.value,
+        amount: amount ? amount : quote.value_pending,
         quote_id: quote.id,
-      };
+        late_interest_pending: late_interests_value[0]['late_interests_value_pending']
+      }
+
       if (quote.value > 0) {
         axios
           .post(

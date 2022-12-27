@@ -132,8 +132,9 @@ Route::group(['middleware' => ['auth:api']], function () {
 	//Installments
 	Route::resource('/installments', InstallmentController::class);
 	Route::post('/installments/correct-status-installments', [InstallmentController::class, 'correctStatusInstallments']);
-	Route::post('/installment/{credit}/pay-installment', [MethodCreditController::class, 'payInstallment']);
-	Route::post('/installment/reverse-payment/{id}', [MethodCreditController::class, 'reversePaymentInstallment'])->middleware('permission:installment.reverse');
+	Route::post('/installment/{credit}/pay-installment', [InstallmentController::class, 'payInstallment']);
+	Route::post('/installment/{credit}/pay-credit', [InstallmentController::class, 'payCredit']);
+	Route::post('/installment/reverse-payment/{id}', [InstallmentController::class, 'reversePaymentInstallment'])->middleware('permission:installment.reverse');
 
 	//Print tickets
 	Route::get('/print-entry/{entry}', [PrintTicketController::class, 'printEntry']);

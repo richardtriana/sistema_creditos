@@ -16,6 +16,7 @@ import VueRouter from "vue-router";
 import Swal from "sweetalert2";
 import vSelect from "vue-select";
 import { dollarFilter } from "./filters";
+import JsonExcel from "vue-json-excel";
 
 import "vue-select/dist/vue-select.css";
 
@@ -37,9 +38,11 @@ Vue.filter("currency", dollarFilter);
 // Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Vue.component("pagination", require("laravel-vue-pagination"));
 Vue.component("v-select", vSelect);
+Vue.component("downloadExcel", JsonExcel);
 
 Vue.use(VueRouter);
 Vue.use(CKEditor);
+
 
 // Vue.use(Swal);
 window.Swal = Swal;
