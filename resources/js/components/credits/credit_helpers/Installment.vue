@@ -114,12 +114,13 @@ export default {
     payInstallment(quote, amount = null) {
 
       let late_interests_value = this.listInstallments.map(x => { if (x.late_interests_value > 0) { return x } })
+      late_interests_value = late_interests_value[0] ? late_interests_value[0]['late_interests_value_pending'] : 0
 
       let me = this;
       var data = {
         amount: amount ? amount : quote.value_pending,
         quote_id: quote.id,
-        late_interest_pending: late_interests_value[0]['late_interests_value_pending']
+        late_interest_pending: late_interests_value
       }
 
       if (quote.value > 0) {

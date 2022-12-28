@@ -100,7 +100,7 @@ class InstallmentController extends Controller
   }
 
   // Pagar cuota por abono o individual 
-  public function payInstallment(Credit $credit, $amount = null, Request $request)
+  public function payInstallment(Credit $credit, Request $request)
   {
     $quote = $request->quote_id != null || $request->quote_id != 0 ? true : false;
     $user_id = $request->user()->id;
@@ -109,10 +109,10 @@ class InstallmentController extends Controller
     $now = now();
     $late_interest_pending = $request->late_interest_pending;
     $amount = $request->amount;
-    $capital = 0;
-    $interest = 0;
-    $late_interest = 0;
-    $balance = $amount;
+    $capital = (float)0;
+    $interest = (float) 0;
+    $late_interest = (float) 0;
+    $balance = (float) $amount;
     $step = 0;
 
     // DB::enableQueryLog(); // Enable query log
@@ -130,7 +130,6 @@ class InstallmentController extends Controller
             ->whereRaw('((paid_capital) +0.1) < ((capital_value))');
         })->first();
     }
-
     if (!$installment) {
       $installment = $credit->installments()
         ->where(function ($query) {
@@ -146,26 +145,29 @@ class InstallmentController extends Controller
       //Cuando el cliente paga a tiempo
       if ($payment_date >= $now) {
         // Primer pago
-        if (!$installment->paid_balance) {
-          if ($amount > $installment->capital_value) {
-            $capital = $installment->paid_capital;
-            $interest = $amount - $capital;
+        if ($installment->capital_value >= (float)$installment->paid_capital) {
+          $helpPendingCapital = $installment->capital_value - (float)$installment->paid_capital;
+          if ($balance > $helpPendingCapital) {
+            $capital = $helpPendingCapital;
+            $balance = $balance - $capital;
+            $helpPendingInterest = $installment->interest_value - ($installment->paid_balance - $installment->paid_capital);
+            if ($balance >= $helpPendingInterest) {
+              $interest =  $helpPendingInterest;
+              $balance = $balance - $interest;
+              $status = 1;
+            } else {
+              $interest = $balance;
+              $balance = $balance - $interest;
+            }
           } else {
-            $capital = $amount;
-          }
-        } else {
-          if ($installment->paid_capital > $installment->capital_value) {
-            $interest = $amount;
-          } else {
-            $capital = $installment->capital_value - $installment->paid_capital;
-            $interest = $amount - $capital;
+            $capital = $balance;
+            $balance = $balance - $capital;
           }
         }
       }
 
-      //Cuando el cliente paga después de la fecha programada interest
+      //Cuando el cliente paga después de la fecha programada
       if ($payment_date < $now) {
-
         $days_past_due = $installment->days_past_due ? $installment->days_past_due :  $now->diffInDays($payment_date);
         $day_value_default = $installment->interest_value / 30;
         $late_interests_value = $day_value_default * $days_past_due;
@@ -182,6 +184,7 @@ class InstallmentController extends Controller
               if (($balance) >= $late_interests_value) {
                 $late_interest  = $late_interests_value;
                 $balance = $balance - $late_interest;
+                $status=1;
               } else {
                 $late_interest = $interest - $installment->interest_value;
                 $balance = $balance - $late_interest;
@@ -202,6 +205,7 @@ class InstallmentController extends Controller
                 if ($balance > $helpPaidLateIint) {
                   $late_interest = $helpPaidLateIint;
                   $balance = $balance - $late_interest;
+                  $status=1;
                 } else {
                   $late_interest = $balance;
                   $balance = $balance - $late_interest;
@@ -215,9 +219,10 @@ class InstallmentController extends Controller
               } else {
                 $interest = $paidInterest;
                 $balance = $balance - $interest;
-                if ($balance > $late_interests_value) {
+                if ($balance >= $late_interests_value) {
                   $late_interest = $late_interests_value;
                   $balance = $balance - $late_interest;
+                  $status=1;
                 } else {
                   $late_interest = $balance;
                   $balance = $balance - $late_interest;
@@ -226,32 +231,25 @@ class InstallmentController extends Controller
             }
           } else {
             $paidInterest = ($installment->paid_balance - $installment->paid_capital);
-            $step = 1;
             if ($amount < ($installment->capital_value - $installment->paid_capital)) {
               $capital = $amount;
               $balance = $balance - $capital;
-              $step = 2;
             } else {
-              $step = 3;
               $capital =  ($installment->capital_value - $installment->paid_capital);
               $balance = $balance - $capital;
               if (($paidInterest) < $installment->interest_value) {
-                $step = 4;
                 if ($balance > $installment->interest_value) {
-                  $step = 5;
                   $interest = $installment->interest_value - $paidInterest;
                   $balance = $balance - $interest;
 
-                  $helpPaidLateIint =  $late_interests_value - ($paidInterest - $installment->interest_value);
-                  if ($balance > $helpPaidLateIint) {
-                    $late_interest = $helpPaidLateIint;
+                  if ($balance > $late_interests_value) {
+                    $late_interest = $late_interests_value;
                     $balance = $balance - $late_interest;
                   } else {
                     $late_interest = $balance;
                     $balance = $balance - $late_interest;
                   }
                 } else {
-                  $step = 6;
                   $interest = $balance;
                   $balance = $balance - $interest;
                 }
@@ -260,7 +258,6 @@ class InstallmentController extends Controller
           }
         }
       }
-
 
       $installment->payment_register = date('Y-m-d');
       $installment->paid_balance +=  ($capital + $interest);
@@ -284,9 +281,10 @@ class InstallmentController extends Controller
       'capital' => $capital,
       'interest' => $interest,
       'step' => $step,
-      'late_interest' => $late_interest,
-      'late_interests_value' => $late_interests_value,
-      'helpPaidLateIint' => $helpPaidLateIint ?? 0
+      'late_interest' => $late_interest ?? 0,
+      'late_interests_value' => $late_interests_value ?? 0,
+      'helpPaidLateIint' => $helpPaidLateIint ?? 0,
+      'paidInterest' => $paidInterest ?? 0
     ];
     // return ['balance' => $balance, 'no_installment' => $no_installment, 'entry_id' => $entry_id];
   }
