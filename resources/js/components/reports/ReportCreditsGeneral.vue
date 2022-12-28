@@ -3,12 +3,12 @@
     <div class="page-header">
       <h3>Reporte general de créditos</h3>
     </div>
-    <div class="page-search p-4 border my-2">
+    <div class="page-search border my-2">
       <h6 class="text-primary text-uppercase">Filtrar:</h6>
-      <form>
+      <form class="">
         <div class="form-row">
           <div class="form-group col-4 ">
-            <label for="search_client">Cliente...</label>
+            <label for="search_client">Cliente: </label>
             <input type="text" id="search_client" name="search_client" class="form-control"
               placeholder="Nombres | Documento" v-model="search_client" />
           </div>
@@ -44,11 +44,22 @@
               v-model="search_to" :max="now" />
           </div>
         </div>
-        <div class="form-row text-right m-auto">
-          <div class="form-group ml-md-auto col-md-4">
-            <button class="btn btn-success w-100" type="button" @click="listReportGeneralCredits(1)">
+        <div class="form-row m-auto">
+          <div class="form-group col-md-4 col-sm-6 col-xs-6 ">
+            <label for="">Mostrar {{ search_results }} resultados por página:</label>
+            <input type="number" id="search_results" name="search_results" class="form-control" placeholder="Desde"
+              v-model="search_results" max="1000" />
+          </div>          
+          <div class="form-group col-md-4 col-sm-6 col-xs-6">
+            <button class="btn btn-success w-100 mt-5" type="button" @click="listReportGeneralCredits(1)">
               <i class="bi bi-search"></i> Buscar
             </button>
+          </div>
+          <div class="form-group col-md-4 col-sm-6 col-xs-6">
+            <download-excel class="btn btn-primary w-100 mt-5" :fields="json_fields" :data="ReportGeneralCreditsList.data"
+              name="report-general-credits.xls" type="xls">
+              <i class="bi bi-file-earmark-arrow-down-fill"></i> Descargar .xls
+            </download-excel>
           </div>
         </div>
       </form>
@@ -151,7 +162,102 @@ export default {
       search_status: "all",
       search_start_date: '',
       search_end_date: '',
-      search_client:''
+      search_client: '',
+      search_results: 15,
+
+      json_fields: {
+        'Cliente': {
+          callback: (value) => {
+            let name = value.client.name;
+            let last_name = value.client.last_name
+            return `${last_name} ${name}`;
+          }
+        },
+
+        'Sede': {
+          field: 'headquarter.headquarter',
+          callback: (value) => {
+            return value;
+          }
+        },
+        'Contacto 1': {
+          field: 'client.phone_1',
+          callback: (value) => {
+            return value;
+          }
+        },
+        'Contacto 2': {
+          field: 'client.phone_2',
+          callback: (value) => {
+            return value;
+          }
+        },
+        'Valor crédito': {
+          field: 'credit_value',
+          callback: (value) => {
+            return value;
+          }
+        },
+        'Nro. Cuotas': {
+          field: 'number_installments',
+          callback: (value) => {
+            return value;
+          }
+        },
+        'Fecha de inicio': {
+          field: 'start_date',
+          callback: (value) => {
+            return value;
+          }
+        },
+        'Fecha de finalizacion': {
+          field: 'end_date',
+          callback: (value) => {
+            return value;
+          }
+        },
+        'Estado': {
+          field: 'status',
+          callback: (value) => {
+            if (value == 0) {
+              return 'Pendiente'
+            }
+            if (value == 1) {
+              return 'Aprobado'
+            }
+            if (value == 2) {
+              return 'Rechazado'
+            }
+            if (value == 3) {
+              return 'Pendiente pago a proveedor'
+            }
+            if (value == 4) {
+              return 'Completado'
+            }
+            if (value == 5) {
+              return 'Cobro jurídico'
+            }
+          }
+        },
+        'Total abonado': {
+          field: 'paid_value',
+          callback: (value) => {
+            return value;
+          }
+        },
+        'Abono a capital': {
+          field: 'capital_value',
+          callback: (value) => {
+            return value;
+          }
+        },
+        'Abono a intereses': {
+          field: 'interest_value',
+          callback: (value) => {
+            return value;
+          }
+        },
+      }
     };
   },
   methods: {
@@ -163,7 +269,8 @@ export default {
         status: this.search_status,
         start_date: this.search_start_date,
         end_date: this.search_end_date,
-        search_client: this.search_client
+        search_client: this.search_client,
+        results: this.search_results
       }
       axios
         .get(

@@ -7,7 +7,7 @@
     aria-labelledby="cuotasModalLabel"
     aria-hidden="true"
   >
-    <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="cuotasModalLabel">Listado de Cuotas</h5>
@@ -104,7 +104,7 @@ export default {
       if (this.amount_value > 0) {
         axios
           .post(
-            `api/installment/${this.id_credit}/pay-installment`,
+            `api/installment/${this.id_credit}/pay-credit`,
             data,
             this.$root.config
           )

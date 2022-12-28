@@ -7,14 +7,13 @@
       <h6 class="text-primary text-uppercase">Filtrar:</h6>
       <form>
         <div class="form-row">
-          <div class="form-group col-4">
+          <div class="form-group col-md-4 col-sm-6 col-xs-6">
             <label for="headquarter_id">Sede</label>
             <v-select :options="headquarterList" label="headquarter" aria-logname="{}"
-              :reduce="(headquarter) => headquarter.id" v-model="search_headquarter_id"
-               placeholder="Seleccionar sede">
+              :reduce="(headquarter) => headquarter.id" v-model="search_headquarter_id" placeholder="Seleccionar sede">
             </v-select>
           </div>
-          <div class="form-group col-4">
+          <div class="form-group col-md-4 col-sm-6 col-xs-6 ">
             <label for="search_status">Estado vencimiento:</label>
             <select name="search_status" id="search_status" v-model="search_status" class="custom-select">
               <option value="all">Todos</option>
@@ -23,22 +22,33 @@
               <option value="dueSoon">Próximos a vencer</option>
             </select>
           </div>
-          <div class="form-group col-4">
+          <div class="form-group col-md-4 col-sm-6 col-xs-6 ">
             <label for="">Desde:</label>
             <input type="date" id="search_from" name="search_from" class="form-control" placeholder="Desde"
               v-model="search_from" :max="now" />
           </div>
-          <div class="form-group col-4">
+          <div class="form-group col-md-4 col-sm-6 col-xs-6 ">
             <label for="">Hasta:</label>
             <input type="date" id="search_to" name="search_to" class="form-control" placeholder="Desde"
               v-model="search_to" :max="now" />
           </div>
-        </div>
-        <div class="form-row text-right m-auto">
-          <div class="form-group m-md-auto col-md-4">
-            <button class="btn btn-success w-100" type="button" @click="listReportPortfolio(1)">
+          <div class="form-group col-md-4 col-sm-6 col-xs-6 ">
+            <label for="">Mostrar {{ search_results }} resultados por página:</label>
+            <input type="number" id="search_results" name="search_results" class="form-control" placeholder="Desde"
+              v-model="search_results" max="1000" />
+          </div>
+          <div class="form-group col-md-4 col-sm-6 col-xs-6 ">
+            <button class="btn btn-success w-100 mt-5" type="button" @click="listReportPortfolio(1)">
               <i class="bi bi-search"></i> Buscar
             </button>
+          </div>
+        </div>
+        <div class="form-row text-right m-auto">
+          <div class="form-group offset-md-8 col-md-4">
+            <download-excel class="btn btn-primary w-100" :fields="json_fields" :data="ReportPortfolioList.data"
+              name="report-portfolio.xls" type="xls">
+              <i class="bi bi-file-earmark-arrow-down-fill"></i> Descargar .xls
+            </download-excel>
           </div>
         </div>
       </form>
@@ -128,18 +138,87 @@ export default {
       search_from: "",
       search_to: "",
       search_status: "all",
-      search_headquarter_id:'all'
+      search_headquarter_id: 'all',
+      search_results: 15,
+
+      json_fields: {
+        'ID crédito': {
+          field: 'credit_id',
+          callback: (value) => {
+            return value;
+          }
+        },
+        'Cliente': {
+          callback: (value) => {
+            let name = value.name;
+            let last_name = value.last_name
+            return `${last_name} ${name}`;
+          }
+        },
+        'Sede': {
+          field: 'headquarter.headquarter',
+          callback: (value) => {
+            return value;
+          }
+        },
+        'Contacto 1': {
+          field: 'phone_1',
+          callback: (value) => {
+            return value;
+          }
+        },
+        'Contacto 2': {
+          field: 'phone_2',
+          callback: (value) => {
+            return value;
+          }
+        },
+        'Valor cuota': {
+          field: 'value',
+          callback: (value) => {
+            return value;
+          }
+        },
+        'Nro. Cuota': {
+          field: 'installment_number',
+          callback: (value) => {
+            return value;
+          }
+        },
+        'Fecha de pago': {
+          field: 'payment_date',
+          callback: (value) => {
+            return value;
+          }
+        },
+        'Estado': {
+          field: 'payment_date',
+          callback: (value) => {
+            let now = moment().format('YYYY-MM-DD')
+
+            if (value > now) {
+              return 'Próximo a vencer'
+            }
+            if (value == now) {
+              return 'Vence hoy'
+            }
+            if (value < now) {
+              return 'En mora'
+            }
+          }
+        },
+      }
     };
   },
   methods: {
     listReportPortfolio(page = 1) {
-
       let data = {
         page: page,
         from: this.search_from,
         to: this.search_to,
         status: this.search_status,
-        headquarted_id:this.search_headquarter_id
+        headquarter_id: this.search_headquarter_id,
+        results: this.search_results
       };
 
       axios
