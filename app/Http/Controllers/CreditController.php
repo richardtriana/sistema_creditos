@@ -384,7 +384,6 @@ class CreditController extends Controller
 			$now = now();
 			$payment_date = Carbon::createFromFormat('Y-m-d', $installment->payment_date);
 
-
 			if (($payment_date < $now) &&  $installment->status != '1') {
 				$installment->capital_value_pending = $installment->capital_value - $installment->paid_capital;
 				$installment->interest_value_pending = $installment->interest_value;
@@ -400,21 +399,14 @@ class CreditController extends Controller
 				if (($installment->paid_balance)) {
 					$paidInterest = $installment->paid_balance - $installment->paid_capital;
 					if ($paidInterest > ($installment->interest_value)) {
-						// $installment->late_interests_value_pending = $late_interest_value - ($paidInterest - $installment->interest_value);
 						$installment->late_interests_value_pending =  $late_interest_value - ($paidInterest - $installment->interest_value) ;
 						$installment->interest_value_pending = 0;
 					}
 				}
-
-				// if ($installment->paid_balance) {
-				// $installment->value_pending = $installment->interest_value_pending + $installment->capital_value_pending + $installment->late_interests_value_pending;
-				// } else {
-				// 	$installment->value_pending  = $installment->value;
-				// }
 				$installment->value_pending = $installment->interest_value_pending + $installment->capital_value_pending + $installment->late_interests_value_pending;
 			} else {
 				$installment->capital_value_pending = $installment->capital_value - $installment->paid_capital;
-				$installment->interest_value_pending = $installment->interest_value - ((int)$installment->paid_balance - (int)$installment->paid_capital);
+				$installment->interest_value_pending = ((int)$installment->paid_balance - (int)$installment->paid_capital) >   $installment->interest_value ? 0 : $installment->interest_value-((int)$installment->paid_balance - (int)$installment->paid_capital) ;
 				$installment->value_pending = $installment->interest_value_pending + $installment->capital_value_pending + $installment->late_interests_value_pending;
 			}
 		}
