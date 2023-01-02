@@ -25,9 +25,9 @@ class Installment extends Model
     'capital_balance'
   ];
 
-  protected $appends = [
-    'headquarter'
-  ];
+  // protected $appends = [
+  //   'headquarter'
+  // ];
 
   public function credit()
   {

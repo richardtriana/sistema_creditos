@@ -385,7 +385,7 @@ class CreditController extends Controller
 			$payment_date = Carbon::createFromFormat('Y-m-d', $installment->payment_date);
 
 			if (($payment_date < $now) &&  $installment->status != '1') {
-				$installment->capital_value_pending = $installment->capital_value - $installment->paid_capital;
+				$installment->capital_value_pending = $installment->capital_value - $installment->paid_capital < 0 ? 0 : $installment->capital_value - $installment->paid_capital;
 				$installment->interest_value_pending = $installment->interest_value;
 
 				$days_past_due = $installment->days_past_due ? $installment->days_past_due :  $now->diffInDays($payment_date);
@@ -399,14 +399,17 @@ class CreditController extends Controller
 				if (($installment->paid_balance)) {
 					$paidInterest = $installment->paid_balance - $installment->paid_capital;
 					if ($paidInterest > ($installment->interest_value)) {
-						$installment->late_interests_value_pending =  $late_interest_value - ($paidInterest - $installment->interest_value) ;
+						$installment->late_interests_value_pending =  $late_interest_value - ($paidInterest - $installment->interest_value);
 						$installment->interest_value_pending = 0;
+					} else {
+						$installment->late_interests_value_pending =  $late_interest_value;
+						$installment->interest_value_pending = $installment->interest_value - $paidInterest;
 					}
 				}
 				$installment->value_pending = $installment->interest_value_pending + $installment->capital_value_pending + $installment->late_interests_value_pending;
 			} else {
-				$installment->capital_value_pending = $installment->capital_value - $installment->paid_capital;
-				$installment->interest_value_pending = ((int)$installment->paid_balance - (int)$installment->paid_capital) >   $installment->interest_value ? 0 : $installment->interest_value-((int)$installment->paid_balance - (int)$installment->paid_capital) ;
+				$installment->capital_value_pending = $installment->capital_value - $installment->paid_capital < 0 ? 0 : $installment->capital_value - $installment->paid_capital;
+				$installment->interest_value_pending = ((int)$installment->paid_balance - (int)$installment->paid_capital) >   $installment->interest_value ? 0 : $installment->interest_value - ((int)$installment->paid_balance - (int)$installment->paid_capital);
 				$installment->value_pending = $installment->interest_value_pending + $installment->capital_value_pending + $installment->late_interests_value_pending;
 			}
 		}
@@ -425,9 +428,9 @@ class CreditController extends Controller
 		$add_amount_box = new BoxController();
 		$add_amount_box->addAmountBox($request, $box->id, $total_amount);
 
-		$credit->paid_value = $credit->paid_value + $total_amount;
-		$credit->capital_value = $credit->capital_value + $capital;
-		$credit->interest_value = $credit->interest_value + $interest;
+		$credit->paid_value +=  $total_amount;
+		$credit->capital_value += $capital;
+		$credit->interest_value +=  $interest;
 		if ($credit->capital_value >= $credit->credit_value) {
 			$credit->status = 4;
 			$credit->finish_date = date('Y-m-d');

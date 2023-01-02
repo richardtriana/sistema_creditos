@@ -45,10 +45,12 @@
         <td>Fecha: </td>
         <td>{{ $entry->date}}</td>
       </tr>
+      @if ($credit->product)          
       <tr>
         <td>Producto: </td>
         <td>{{ $credit->product->product}}</td>
       </tr>
+      @endif
       <tr>
         <td colspan="3"></td>
       </tr>
