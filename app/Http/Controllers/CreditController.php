@@ -16,6 +16,8 @@ use PDF;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
+use function PHPUnit\Framework\isEmpty;
+
 class CreditController extends Controller
 {
 
@@ -432,8 +434,11 @@ class CreditController extends Controller
 		$credit->capital_value += $capital;
 		$credit->interest_value +=  $interest;
 		if ($credit->capital_value >= $credit->credit_value) {
-			$credit->status = 4;
-			$credit->finish_date = date('Y-m-d');
+			$checkLastInstallment = $credit->installments()->where('status', 0)->get();
+			if (isEmpty($checkLastInstallment)) {
+				$credit->status = 4;
+				$credit->finish_date = date('Y-m-d');
+			}
 		}
 		$credit->save();
 

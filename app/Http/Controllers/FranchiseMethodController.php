@@ -66,13 +66,20 @@ class FranchiseMethodController extends InstallmentController
     return ['listInstallments' => $listInstallments, 'installment' => (float) number_format($installment, 2, '.', '')];
   }
 
- 
+
 
   // Actualizar valor de todas las cuotas de un credito
   public function updateInstallments($credit_id)
   {
     $credit = Credit::findOrFail($credit_id);
-    $capital = $credit->credit_value - $credit->capital_value;
+    $paidTotalCredit =  $credit->installments()->selectRaw("
+    SUM(interest_value) AS interest_value,
+      SUM(paid_capital) AS paid_capital,
+      SUM(paid_balance) AS paid_balance
+    ")->where('paid_balance', '>', 0)->first();
+
+    $capital = $credit->credit_value - $paidTotalCredit->paid_capital;
+
     $installments = $credit->installments()
       ->where('status', 0)
       ->get();
@@ -139,5 +146,4 @@ class FranchiseMethodController extends InstallmentController
       );
     }
   }
-
 }

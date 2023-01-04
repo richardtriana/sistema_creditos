@@ -256,7 +256,7 @@ class InstallmentController extends Controller
     $amount = $request->amount;
 
     $late_interest_pending = $request->late_interest_pending ?? 0;
-    $balance = (float) $request->amount + 1;
+    $balance = (float) $request->amount + (0.4);
     $capital = 0;
     $interest = 0;
     $days_past_due = 0;
@@ -395,33 +395,33 @@ class InstallmentController extends Controller
       $entry_id =  $this->saveEntryInstallment($credit, $amount, $capital + $interest, $no_installment, $balance, $user_id, 'Abono a crédito');
     }
 
-    // if ($configurations->method &&  $configurations->method == "GENERAL") {
-    //   $generalMethod->updateInstallments($credit->id);
-    // } else {
-    //   $franchiseMethod->updateInstallments($credit->id);
-    // }
-
-    // return [
-    //   'balance' => $balance,
-    //   'no_installment' => $no_installment,
-    //   // 'entry_id' => $entry_id,
-    //   'installment' => $installment
-    // ];
+    if ($configurations->method &&  $configurations->method == "GENERAL") {
+      $generalMethod->updateInstallments($credit->id);
+    } else {
+      $franchiseMethod->updateInstallments($credit->id);
+    }
 
     return [
-      '$installment' => $installment,
       'balance' => $balance,
-      'amount' => $amount,
-      'capital' => $capital,
-      'interest' => $interest,
-      'step' => $step,
-      'status' => $status,
-      'late_interest' => $late_interest ?? 0,
-      'late_interests_value' => $late_interests_value ?? 0,
-      'helpPendingLateIint' => $helpPendingLateIint ?? 0,
-      'paidInterest' => $paidInterest ?? 0,
-      'balance_credit' => $balance_credit ?? 0
+      'no_installment' => $no_installment,
+      'entry_id' => $entry_id,
+      'installment' => $installment
     ];
+
+    // return [
+    //   '$installment' => $installment,
+    //   'balance' => $balance,
+    //   'amount' => $amount,
+    //   'capital' => $capital,
+    //   'interest' => $interest,
+    //   'step' => $step,
+    //   'status' => $status,
+    //   'late_interest' => $late_interest ?? 0,
+    //   'late_interests_value' => $late_interests_value ?? 0,
+    //   'helpPendingLateIint' => $helpPendingLateIint ?? 0,
+    //   'paidInterest' => $paidInterest ?? 0,
+    //   'balance_credit' => $balance_credit ?? 0
+    // ];
   }
 
 
@@ -494,6 +494,52 @@ class InstallmentController extends Controller
       $installment = Installment::find($installment->id);
       $installment->status = 1;
       $installment->save();
+    }
+  }
+
+  // Reversar pago de cuota individual
+  public function reversePaymentInstallment(Request $request, $id)
+  {
+    $configurations = Company::first();
+    $generalMethod = new GeneralMethodController();
+    $franchiseMethod = new FranchiseMethodController();
+
+    date_default_timezone_set('America/Bogota');
+    $headquarter_id = $request->user()->headquarter_id;
+    $user_id = $request->user()->id;
+
+    $installment = Installment::find($request->id);
+    $paid_balance = $installment->paid_balance;
+    $paid_capital =  $installment->paid_capital;
+    $interest =  $installment->paid_balance - $installment->paid_capital;
+    $credit = $installment->credit;
+
+    $type_output = 'Reversar pago';
+    $description = "Reversar pago \n" .
+      "#Credito:  $credit->id \n" .
+      "#Cuota Nro:  $installment->installment_number \n" .
+      "#Cliente:  {$credit->client->name} {$credit->client->last_name}  \n" .
+      "Fecha y hora: " . date('Y-m-d h:i:s A');
+
+    // Certificar egreso
+    $expense  = new ExpenseController();
+    $expense->addExpense($user_id, $headquarter_id, $description, date('Y-m-d'), $type_output, $paid_balance);
+
+    //Resetar valores de la cuota
+    $installment->paid_balance = 0;
+    $installment->paid_capital = 0;
+    $installment->status = 0;
+    $installment->save();
+
+    //Restar valores en el crédito
+    $credit_paid = new CreditController;
+    $credit_paid->updateValuesCredit($request, $credit->id, $paid_balance * -1,  $paid_capital * -1, $interest * -1);
+
+    //Actualizar valores de cuotas
+    if ($configurations->method &&  $configurations->method == "GENERAL") {
+      $generalMethod->updateInstallments($credit->id);
+    } else {
+      $franchiseMethod->updateInstallments($credit->id);
     }
   }
 }

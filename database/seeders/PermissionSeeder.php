@@ -15,8 +15,6 @@ class PermissionSeeder extends Seeder
    */
   public function run()
   {
-    // $admin = Role::create(['guard_name' => 'api', 'name' => 'Admin']);
-
     Permission::create(['guard_name' => 'api', 'name' => 'installment.reverse', 'description' => 'Rerversar pago de cuota', 'component' => 'Cuotas']);
   }
 }

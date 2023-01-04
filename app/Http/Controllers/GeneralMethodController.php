@@ -66,7 +66,15 @@ class GeneralMethodController extends InstallmentController
   public function updateInstallments($credit_id)
   {
     $credit = Credit::findOrFail($credit_id);
-    $capital = $credit->credit_value - $credit->capital_value;
+
+    $paidTotalCredit =  $credit->installments()->selectRaw("
+    SUM(interest_value) AS interest_value,
+      SUM(paid_capital) AS paid_capital,
+      SUM(paid_balance) AS paid_balance
+    ")->where('paid_balance', '>', 0)->first();
+
+    $capital = $credit->credit_value - $paidTotalCredit->paid_capital;
+    
     $installments = $credit->installments()
       ->where('status', 0)
       ->get();
@@ -129,5 +137,4 @@ class GeneralMethodController extends InstallmentController
       );
     }
   }
-
 }
