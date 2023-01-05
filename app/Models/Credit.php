@@ -56,6 +56,7 @@ class Credit extends Model
     {
         return $this->belongsTo(Headquarter::class, 'headquarter_id');
     }
+    
     public function installments()
     {
         return $this->hasMany(Installment::class);

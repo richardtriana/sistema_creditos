@@ -25,18 +25,8 @@ class Installment extends Model
     'capital_balance'
   ];
 
-  // protected $appends = [
-  //   'headquarter'
-  // ];
-
   public function credit()
   {
     return $this->belongsTo(Credit::class, 'credit_id');
-  }
-
-  public function getHeadquarterAttribute()
-  {
-    // $headquarter = Installment::where('bill_number','LIKE','%'.$this->prefix.'%')->count();
-    return $this->credit->headquarter;
   }
 }

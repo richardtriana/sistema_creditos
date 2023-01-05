@@ -72,7 +72,7 @@
             <tr v-for="report in ReportPortfolioList.data" :key="report.id">
               <td>{{ report.credit_id }}</td>
               <td>{{ report.name }} {{ report.last_name }}</td>
-              <td class="text-uppercase">{{ report.headquarter.headquarter }}</td>
+              <td class="text-uppercase">{{ report.headquarter }}</td>
               <td>
                 <a v-if="report.phone_1 != null" target="_blank"
                   :href="`https://wa.me/57${report.phone_1}?text=${infoCompany.whatsapp_msg}`"><i
@@ -156,7 +156,7 @@ export default {
           }
         },
         'Sede': {
-          field: 'headquarter.headquarter',
+          field: 'headquarter',
           callback: (value) => {
             return value;
           }

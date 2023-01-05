@@ -38,6 +38,7 @@ class ReportController extends Controller
 			'clients.phone_2',
 			'credits.credit_value',
 			'credits.status',
+			'headquarters.headquarter as headquarter'
 		)
 			->where(function ($query) use ($payment_date_add_days, $from, $to, $now, $status, $headquarter_id) {
 				$query->whereDate('payment_date', '<=', $payment_date_add_days);
@@ -58,7 +59,7 @@ class ReportController extends Controller
 						$query->whereDate('payment_date', '>', $now);
 					}
 					if ($headquarter_id != 'all') {
-						$query->whereDate('credits.headquarter_id', $headquarter_id);
+						$query->where('credits.headquarter_id', $headquarter_id);
 					}
 				}
 			})
@@ -66,7 +67,7 @@ class ReportController extends Controller
 			->where('credits.status', 1)
 			->leftJoin('credits', 'installments.credit_id', 'credits.id')
 			->leftJoin('clients', 'credits.client_id', 'clients.id')
-			// ->with('headquarter')
+			->leftJoin('headquarters', 'credits.headquarter_id', 'headquarters.id')
 			->paginate($results);
 
 		return $installments;
