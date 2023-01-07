@@ -150,6 +150,9 @@ export default {
   },
   methods: {
     showInformation(credit) {
+      $('#creditInformationModal').on('shown.bs.modal', function() {
+        $(document).off('focusin.modal');
+      });
       this.CreditInformation = credit;
       this.showInstallments(credit.id);
       this.consultAdditionalInfoCredit(credit.id);
@@ -169,7 +172,7 @@ export default {
     changeStatus: function (id, status) {
       var data = {
         status: status,
-        // description: response.value,
+        // description: response.value
       };
       Swal.fire({
         title: "¿Quieres cambiar el status del credito?",

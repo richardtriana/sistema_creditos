@@ -81,7 +81,7 @@ class CreditProviderController extends Controller
 		$validate = Validator::make($request->all(), [
 			'amount' => 'required|numeric|min:1',
 			'description' => 'nullable|string',
-			'evidence' => 'nullable|file|mimes:jpeg,jpg,png,pdf',
+			'evidence.*' => 'nullable|file|mimes:jpeg,jpg,png,pdf',
 		]);
 
 		if($validate->fails()){
