@@ -32,6 +32,7 @@ class AddApprobedByToCredits extends Migration
     public function down()
     {
         Schema::table('credits', function (Blueprint $table) {
+            $table->dropForeign('credits_approved_by_foreign');
             $table->dropColumn('approved_by');
         });
     }

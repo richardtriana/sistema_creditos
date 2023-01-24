@@ -30,6 +30,7 @@ class AddProductToCredits extends Migration
     public function down()
     {
         Schema::table('credits', function (Blueprint $table) {
+            $table->dropForeign('credits_product_id_foreign');
             $table->dropColumn('product_id');
         });
     }

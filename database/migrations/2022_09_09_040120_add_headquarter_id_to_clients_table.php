@@ -29,6 +29,7 @@ class AddHeadquarterIdToClientsTable extends Migration
     public function down()
     {
         Schema::table('clients', function (Blueprint $table) {
+            $table->dropForeign('clients_headquarter_id_foreign');
             $table->dropColumn('headquarter_id');
         });
     }

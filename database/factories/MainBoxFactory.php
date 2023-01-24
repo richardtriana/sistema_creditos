@@ -18,7 +18,7 @@ class MainBoxFactory extends Factory
       'current_balance' => 0,
       'input' => 0,
       'output' => 0,
-      'history' => $this->faker->text(200),
+      'history' => json_encode(["key" => "value"] ),
       'last_update' => $this->faker->date('Y-m-d'),
       'last_editor'  => 1
     ];
