@@ -26,6 +26,7 @@ class ClientFactory extends Factory
 			'last_name' => $this->faker->lastName(),
 			'type_document' => 'CC',
 			'document' => $this->faker->randomNumber(),
+			'profession' => $this->faker->text(15),
 			'birth_date' => $this->faker->date(),
 			'email' => $this->faker->email(),
 			'gender' => $this->faker->randomElement($array = ['f', 'm']),

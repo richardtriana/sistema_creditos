@@ -64,13 +64,22 @@
               </small>
             </select>
           </div>
+
           <div class="form-group col-md-4">
             <label for="Apellidos">Nro. Documento</label>
-
             <input type="text" class="form-control" id="Documento" v-model="formClient.document"
               placeholder="Ingresar identificación" :class="[formErrors.document ? 'is-invalid' : '']" />
             <small id="document_help" class="form-text text-danger">
               {{ formErrors.document }}
+            </small>
+          </div>
+
+          <div class="form-group col-md-4">
+            <label for="profession">Profesión</label>
+            <input type="date" class="form-control" id="profession" v-model="formClient.profession"
+              :class="[formErrors.profession ? 'is-invalid' : '']" />
+            <small id="profession_help" class="form-text text-danger">
+              {{ formErrors.profession }}
             </small>
           </div>
 
@@ -200,6 +209,7 @@ export default {
         type_document: "CC",
         document: 0,
         birth_date: "",
+        profession:"",
         email: "",
         phone_1: "",
         phone_2: "",
@@ -218,6 +228,7 @@ export default {
         type_document: "",
         document: "",
         birth_date: "",
+        profession:"",
         email: "",
         phone_1: "",
         phone_2: "",

@@ -64,6 +64,7 @@ class ClientController extends Controller
 			'last_name' => 'required|string|max:255',
 			'type_document' => 'required|in:CC,CE,NIT,PP,TI',
 			'document' => 'required|numeric|min:999999|max:999999999999|unique:clients',
+			'profession' => 'nullable|string|max:255',
 			'phone_1' => 'nullable|string',
 			'phone_2' => 'nullable|string',
 			'address' => 'nullable|string',
@@ -93,6 +94,7 @@ class ClientController extends Controller
 		$client->last_name = $request['last_name'];
 		$client->type_document = $request['type_document'];
 		$client->document = $request['document'];
+		$client->profession = $request['profession'];
 		$client->email = $request['email'];
 		$client->birth_date = $request['birth_date'];
 		$client->gender = $request['gender'];
@@ -158,6 +160,7 @@ class ClientController extends Controller
 				'between:9999,999999999999',
 				Rule::unique('clients')->ignore($client->id)
 			],
+			'profession' => 'nullable|string|max:255',
 			'phone_1' => 'nullable|string',
 			'phone_2' => 'nullable|string',
 			'address' => 'nullable|string',
@@ -192,6 +195,7 @@ class ClientController extends Controller
 		$client->last_name = $request['last_name'];
 		$client->type_document = $request['type_document'];
 		$client->document = $request['document'];
+		$client->profession = $request['profession'];
 		$client->email = $request['email'];
 		$client->birth_date = $request['birth_date'];
 		$client->gender = $request['gender'];
