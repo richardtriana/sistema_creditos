@@ -68,9 +68,9 @@ class CreditProviderController extends Controller
 		$credit_provider->credit_id = $credit_id;
 		$credit_provider->provider_id = $request['provider_id'];
 		$credit_provider->headquarter_id = $request['headquarter_id'];
-		$credit_provider->credit_value = $request['credit_value'];
+		$credit_provider->credit_value = $request['credit_requested'] ? $request['credit_requested'] : $request['credit_value'];
 		$credit_provider->paid_value = 0;
-		$credit_provider->pending_value = $request['credit_value'];
+		$credit_provider->pending_value =  $request['credit_requested'] ? $request['credit_requested'] : $request['credit_value'];
 		$credit_provider->last_paid = date('Y-m-d');
 		$credit_provider->history = json_encode($history);
 		$credit_provider->save();
@@ -84,7 +84,7 @@ class CreditProviderController extends Controller
 			'evidence.*' => 'nullable|file|mimes:jpeg,jpg,png,pdf',
 		]);
 
-		if($validate->fails()){
+		if ($validate->fails()) {
 			return response()->json([
 				'status' => 'error',
 				'code' =>  400,
@@ -118,8 +118,8 @@ class CreditProviderController extends Controller
 		$creditProviderPayment->paid_value = $request['amount'];
 		$creditProviderPayment->description = $request['description'];
 
-		if($request->hasFile('evidence')){
-			$name = uniqid(). $request->file('evidence')->getClientOriginalName();
+		if ($request->hasFile('evidence')) {
+			$name = uniqid() . $request->file('evidence')->getClientOriginalName();
 			$request->evidence->move(public_path('storage/evidences'), $name);
 			$creditProviderPayment->evidence = 'storage/evidences/' . $name;
 		}

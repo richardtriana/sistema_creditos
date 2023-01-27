@@ -76,7 +76,7 @@
 
           <div class="form-group col-md-4">
             <label for="profession">Profesión</label>
-            <input type="date" class="form-control" id="profession" v-model="formClient.profession"
+            <input type="text" class="form-control" id="profession" v-model="formClient.profession"
               :class="[formErrors.profession ? 'is-invalid' : '']" />
             <small id="profession_help" class="form-text text-danger">
               {{ formErrors.profession }}
