@@ -247,7 +247,7 @@ export default {
     listHeadquarters() {
       let me = this;
       axios
-        .get(`api/headquarters/list-all-headquarters`, me.$root.config)
+        .get(`api/headquarters/list-headquarter`, me.$root.config)
         .then(function (response) {
           me.headquarterList = response.data;
         });

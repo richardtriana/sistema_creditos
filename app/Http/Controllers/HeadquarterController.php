@@ -30,7 +30,7 @@ class HeadquarterController extends Controller
 				->orWhere('legal_representative', 'LIKE', "%$request->headquarter%")
 				->orWhere('email', 'LIKE', "%$request->headquarter%");
 		}
-		$headquarters = $headquarters->paginate(5);
+		$headquarters = $headquarters->orderBy('headquarter','asc')->paginate(5);
 
 		return $headquarters;
 	}
@@ -187,7 +187,7 @@ class HeadquarterController extends Controller
 
 	public function listHeadquarter()
 	{
-		$headquarters = Headquarter::select()->where('status', 1)->get();
+		$headquarters = Headquarter::select()->where('status', 1)->orderBy('headquarter','asc')->get();
 		return $headquarters;
 	}
 

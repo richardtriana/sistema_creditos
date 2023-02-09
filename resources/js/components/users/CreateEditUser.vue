@@ -144,7 +144,7 @@
                 <div class="form-group col-md-4">
                   <label for="headquarter_id">Sede</label>
                   <v-select
-                    :options="headquarterList.data"
+                    :options="headquarterList"
                     :label="'headquarter'"
                     :reduce="(headquarter) => headquarter.id"
                     v-model="formUser.headquarter_id"
@@ -277,7 +277,7 @@ export default {
   },
   // Function createUsers
   created() {
-    this.listHeadquarters(1);
+    this.listHeadquarters();
     this.getRoles();
   },
   methods: {
@@ -333,10 +333,10 @@ export default {
       me.$root.assignErrors(false, me.formErrors);
     },
 
-    listHeadquarters(page = 1) {
+    listHeadquarters() {
       let me = this;
       axios
-        .get(`api/headquarters?page=${page}`, me.$root.config)
+        .get(`api/headquarters/list-headquarter`, me.$root.config)
         .then(function (response) {
           me.headquarterList = response.data;
         });
