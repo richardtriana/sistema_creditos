@@ -36,7 +36,7 @@ class TypeExpenseController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Client  $client
+     * @param  \App\Models\TypeExpense  $type_expense
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, TypeExpense $type_expense)

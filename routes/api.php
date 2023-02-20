@@ -18,6 +18,7 @@ use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TypeExpenseController;
+use App\Http\Controllers\TypeEntryController;
 use App\Http\Controllers\UserController;
 use App\Models\Company;
 use Illuminate\Http\Request;
@@ -105,6 +106,7 @@ Route::group(['middleware' => ['auth:api']], function () {
 	//Entries
 	Route::get('/entries/show-entry/{entry}', [EntryController::class, 'showEntry']);
 	Route::resource('/entries',  EntryController::class);
+	Route::resource('/type-entries',  TypeEntryController::class)->middleware('permission:entry.index');
 
 	//Expenses
 	Route::resource('/expenses',  ExpenseController::class);

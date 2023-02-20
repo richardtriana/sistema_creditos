@@ -419,7 +419,7 @@ class CreditController extends Controller
 		return $installments;
 	}
 
-	public function updateValuesCredit(Request $request, $id, $total_amount, $capital, $interest)
+	public function updateValuesCredit(Request $request, $id, $total_amount, $capital, $interest, $is_reverse = false)
 	{
 		$credit_id = $id;
 		$credit = Credit::findOrFail($credit_id);
@@ -428,8 +428,10 @@ class CreditController extends Controller
 		$box = Box::where('headquarter_id', $headquarter_id)->firstOrFail();
 
 		$add_amount_box = new BoxController();
-		$add_amount_box->addAmountBox($request, $box->id, $total_amount);
-
+		if (!$is_reverse) {
+			$add_amount_box->addAmountBox($request, $box->id, $total_amount);
+		}
+		
 		$credit->paid_value +=  $total_amount;
 		$credit->capital_value += $capital;
 		$credit->interest_value +=  $interest;

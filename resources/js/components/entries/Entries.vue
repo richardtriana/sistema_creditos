@@ -2,6 +2,10 @@
   <div>
     <div class="page-header d-flex justify-content-between p-4 border my-2">
       <h3>Ingresos</h3>
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#entryModal"
+        v-if="$root.validatePermission('entry-store')">
+        Crear Ingreso
+      </button>
     </div>
     <div class="page-search p-4 border my-2">
       <h6 class="text-primary text-uppercase">Filtrar:</h6>
@@ -9,8 +13,8 @@
         <div class="form-row">
           <div class="form-group col-md-4">
             <label for="search_id">Nro. de ingreso:</label>
-            <input type="text" id="search_id" name="search_id" class="form-control"
-              placeholder="Nro de ingreso" v-model="search_id" />
+            <input type="text" id="search_id" name="search_id" class="form-control" placeholder="Nro de ingreso"
+              v-model="search_id" />
           </div>
           <div class="form-group col-md-4">
             <label for="search_client">Cliente:</label>
@@ -61,26 +65,31 @@
         <table class="table table-bordered table-sm">
           <thead>
             <tr class="text-center">
+              <th>Sede</th>
               <th>Responsable</th>
               <th>Fecha</th>
-              <th>Valor</th>
               <th>Tipo de entrada</th>
               <th>Descripción</th>
+              <th>Valor</th>
               <th>Ver Factura</th>
+              <th v-if="$root.validatePermission('entry-update')">
+                Opciones
+              </th>
             </tr>
           </thead>
           <tbody v-if="entryList.data && entryList.data.length > 0">
             <tr v-for="e in entryList.data" :key="e.id">
+              <td>{{ e.headquarter.headquarter }}</td>
               <td class="wrap">{{ e.user.name }} {{ e.user.last_name }}</td>
               <td>{{ e.date }}</td>
-              <td class="text-right">{{ e.price | currency }}</td>
+
               <td>{{ e.type_entry }}</td>
               <td class="h6 font-weight-normal">
                 <textarea name="" class="form-control-plaintext" readonly id="" cols="10" rows="8"
                   v-model="e.description">
-                </textarea>
+                  </textarea>
               </td>
-
+              <td class="text-right">{{ e.price | currency }}</td>
               <td class="text-right">
                 <button class="btn btn-danger btn-block" type="button" @click="printEntryPdf(e.id)">
                   <i class="bi bi-file-pdf-fill"></i> PDF
@@ -88,6 +97,15 @@
                 <br>
                 <button class="btn btn-success btn-block" type="button" @click="printEntryTicket(e.id)">
                   <i class="bi bi-receipt-cutoff"></i> Ticket
+                </button>
+              </td>
+              <td class="text-right" v-if="$root.validatePermission('entry-update')">
+                <button v-if="!e.credit_id" class="btn btn-success" @click="showData(e)">
+                  <i class="bi bi-pen"></i>
+                </button>
+                <button v-else class="btn btn-secondary" data-toggle="tooltip" data-placement="top" 
+                  title="No se pueden editar las entradas asociadas a créditos" disabled>
+                  <i class="bi bi-pen"></i>
                 </button>
               </td>
             </tr>
@@ -99,11 +117,15 @@
         </pagination>
       </section>
     </div>
+    <modal-entry ref="ModalEntry" @list-entries="listEntries(1)" />
+
   </div>
 </template>
 
 <script>
+import ModalEntry from './ModalEntry.vue';
 export default {
+  components: { ModalEntry },
   data() {
     return {
       entryList: {},
@@ -133,7 +155,7 @@ export default {
         description: this.search_description,
         id: this.search_id,
       }
-      
+
       let me = this;
       axios
         .get(
@@ -144,6 +166,9 @@ export default {
         .then(function (response) {
           me.entryList = response.data;
         });
+    },
+    showData: function (entry) {
+      this.$refs.ModalEntry.showEditEntry(entry);
     },
     printEntryPdf(entry_id) {
       axios

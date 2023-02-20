@@ -533,7 +533,7 @@ class InstallmentController extends Controller
 
     //Restar valores en el crédito
     $credit_paid = new CreditController;
-    $credit_paid->updateValuesCredit($request, $credit->id, $paid_balance * -1,  $paid_capital * -1, $interest * -1);
+    $credit_paid->updateValuesCredit($request, $credit->id, $paid_balance * -1,  $paid_capital * -1, $interest * -1, true);
 
     //Actualizar valores de cuotas
     if ($configurations->method &&  $configurations->method == "GENERAL") {

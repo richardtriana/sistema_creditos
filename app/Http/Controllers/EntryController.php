@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Credit;
-use App\Models\Entry;
-use App\Models\Company;
-use Carbon\Carbon;
 use PDF;
-use Illuminate\Support\Facades\URL;
+use Carbon\Carbon;
+use App\Models\Box;
+use App\Models\Entry;
+use App\Models\Credit;
+use App\Models\Company;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Validator;
 
 class EntryController extends Controller
 {
@@ -30,7 +32,7 @@ class EntryController extends Controller
 
 		$entries = Entry::select()
 			->orderBy('id', 'desc')
-			->with(['user:id,name,last_name']);
+			->with(['user:id,name,last_name','headquarter']);
 
 		if ($client != null || $document != null) {
 			$entries = $entries->select('entries.*', 'clients.name', 'clients.last_name', 'clients.document')
@@ -79,19 +81,87 @@ class EntryController extends Controller
 	 */
 	public function store(Request $request)
 	{
+		// $credit = Credit::findOrFail($request->data['credit_id']);
 
+		$validate = Validator::make($request->all(), [
+			'description' => 'required|string|max:255',
+			'date' => 'required|date',
+			'type_entry' => 'required|string',
+			'price' => 'required|numeric',
+		]);
+
+
+		if ($validate->fails()) {
+			return response()->json([
+				'status' => 'error',
+				'code' =>  400,
+				'message' => 'Validación de datos incorrecta',
+				'errors' =>  $validate->errors()
+			], 400);
+		}
+
+		$entry =  new Entry();
+		$entry->headquarter_id = $request->user()->headquarter_id;
+		$entry->user_id = $request->user()->id;
+		$entry->credit_id = $credit->id ?? NULL;
+		$entry->description = $request['description'];
+		$entry->date = date('Y-m-d');
+		$entry->type_entry = $request['type_entry'];
+		$entry->price =  $request['price'];
+
+
+		if ($entry->save()) {
+			$box = Box::where('headquarter_id', $entry->headquarter_id)->firstOrFail();
+			$add_amount_box = new BoxController();
+			$add_amount_box->addAmountBox($request, $box->id, $request['price']);
+		}
+		
+		return response()->json([
+			'status' => 'success',
+			'code' =>  200,
+			'message' => 'Registro exitoso',
+			'entry' =>  $entry
+		], 200);
+	}
+
+	/**
+	 * Update the specified resource in storage.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @param  \App\Models\Entry  $entry
+	 * @return \Illuminate\Http\Response
+	 */
+	public function update(Request $request, Entry $entry)
+	{
 		$credit = Credit::findOrFail($request->data['credit_id']);
 		$client = $credit->client()->first();
 
-		$entry =  new Entry();
-		$entry->headquarter_id = $credit->headquarter_id;
-		$entry->user_id = $request->user()->id;
-		$entry->credit_id = $credit->id;
-		$entry->description = "Cliente: {$client->name} {$client->last_name}";
-		$entry->date = date('Y-m-d');
-		$entry->type_entry = 'Pago de cuota';
-		$entry->price = $request->data['value'] - $request['value'];
-		//$entry->save();
+		$validate = Validator::make($request->all(), [
+			'description' => 'required|string|max:255',
+			'date' => 'required|date',
+			'type_entry' => 'required|string',
+		]);
+
+		if ($validate->fails()) {
+			return response()->json([
+				'status' => 'error',
+				'code' =>  400,
+				'message' => 'Validación de datos incorrecta',
+				'errors' =>  $validate->errors()
+			], 400);
+		}
+
+		$entry->description = $request['description'];
+		$entry->date = $request['date'];
+		$entry->type_entry = $request['type_output'];
+		$entry->update();
+
+		return response()->json([
+			'status' => 'success',
+			'code' =>  200,
+			'message' => 'Registro exitoso',
+			'entry' =>  $entry
+		], 200);
 	}
 
 	public function showEntry(Request $request, Entry $entry)
