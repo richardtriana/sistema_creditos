@@ -17,7 +17,12 @@ class Box extends Model
 		'output',
 		'history',
 		'last_update',
-		'last_editor'
+		'last_editor',
+		'cash',
+		'consignment_to_client',
+		'payment_to_provider',
+		'status',
+		'observations'
 	];
 
 	protected $with = [
@@ -34,4 +39,9 @@ class Box extends Model
 	{
 		return $this->belongsTo(User::class, 'last_editor');
 	}
+
+	public function boxHistory()
+    {
+        return $this->hasMany(BoxHistory::class);
+    }
 }

@@ -170,8 +170,8 @@ class EntryController extends Controller
 
 		$headquarter = $entry->headquarter()->first();
 		$credit = $entry->credit()->first();
-		$client = $credit->client()->first();
-		$product = $credit->product()->first();
+		$client = $credit ? $credit->client()->first():NULL;
+		$product = $credit ?  $credit->product()->first():NULL;
 		$user = $request->user();
 
 		$details = [

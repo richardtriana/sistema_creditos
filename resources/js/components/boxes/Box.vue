@@ -32,7 +32,7 @@
               <td class="text-right">
                 <!-- data-toggle="modal" data-target="#historyBoxModal" -->
                 <button class="btn btn-primary" 
-                  @click="showHistoryBox(box.history)">
+                  @click="showHistoryBox(box)">
                   <i class="bi bi-clock-history"></i>
                 </button>
               </td>
@@ -79,8 +79,8 @@ export default {
     showEditBox(box) {
       this.$refs.CreateEditBox.showEditBox(box);
     },
-    showHistoryBox(history) {
-			this.$emit('show-history', history)
+    showHistoryBox(box) {
+			this.$emit('show-history',box)
     },
   },
 };

@@ -30,10 +30,11 @@
         <td>Nro. Ingreso: </td>
         <td> #{{ $entry->id}}</td>
       </tr>
+      @if ($credit)
       <tr>
         <td>Cliente: </td>
         <td>{{$client->name}} {{$client->last_name}}</td>
-      </tr>
+      </tr>     
       <tr>
         <td>Nro. Documento </td>
         <td>{{$client->type_document}} {{$client->document}}</td>
@@ -46,6 +47,7 @@
         <td>Monto Crédito: </td>
         <td> $ {{ $credit->credit_value}}</td>
       </tr>
+      @endif     
       <tr>
         <td>Monto cancelado: </td>
         <td>$ {{$entry->price}}</td>
@@ -54,6 +56,7 @@
         <td>Fecha: </td>
         <td>{{ $entry->date}}</td>
       </tr>
+      @if ($credit)
       <tr>
         <td>Producto: </td>
         <td>{{ $credit->description}}</td>
@@ -65,6 +68,7 @@
         <td>Cupo de crédito </td>
         <td>{{$client->maximum_credit_allowed}}</td>
       </tr>
+      @endif
     </table>
   </section>
   <br><br>

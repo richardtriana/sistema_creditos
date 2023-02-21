@@ -598,8 +598,10 @@ class CreditController extends Controller
 				]
 			);
 
-			$update_main_box = new MainBoxController();
-			$update_main_box->addAmountMainBox($request, $pending_value);
+			$box = Box::where('headquarter_id', $credit->headquarter_id)->firstOrFail();
+
+			$update_box = new BoxController();
+			$update_box->addAmountBox($request, $box->id, $pending_value, false);
 
 			$entry =  new Entry();
 			$entry->headquarter_id = $credit->headquarter_id;

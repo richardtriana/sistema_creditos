@@ -4,7 +4,7 @@
       <h3>Cajas</h3>
     </div>
     <div class="page-content">
-      <main-box  @show-history="showHistoryBox($event)" />
+      <main-box  @show-history="showHistoryMainBox($event)" />
       <box v-if="root_data.current_balance_main_box > 0"  @show-history="showHistoryBox($event)" />
       <div v-if="root_data.current_balance_main_box <= 0" class="card w-100 mt-5 bg-warning text-white">
         <div class="card-body">
@@ -17,6 +17,7 @@
       </div>
     </div>
     <show-history-box ref="ShowHistoryBox"></show-history-box>
+    <show-history-main-box ref="ShowHistoryMainBox"></show-history-main-box>
   </div>
 </template>
 
@@ -24,6 +25,7 @@
 import Box from "./Box.vue";
 import MainBox from "./MainBox.vue";
 import ShowHistoryBox from './ShowHistoryBox.vue';
+import ShowHistoryMainBox from './ShowHistoryMainBox.vue';
 
 export default {
   data() {
@@ -31,10 +33,13 @@ export default {
       root_data: this.$root.$data,
     };
   },
-  components: { MainBox, Box, ShowHistoryBox },
+  components: { MainBox, Box, ShowHistoryBox, ShowHistoryMainBox },
   methods: {
-    showHistoryBox(history) {
-      this.$refs.ShowHistoryBox.convertStringToJson(history);
+    showHistoryBox(box) {
+      this.$refs.ShowHistoryBox.getHistoryBox(box.id);
+    },
+    showHistoryMainBox(history) {
+      this.$refs.ShowHistoryMainBox.convertStringToJson(history);
     },
   }
 };

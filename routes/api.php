@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BoxController;
+use App\Http\Controllers\BoxHistoryController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CreditController;
@@ -119,8 +120,12 @@ Route::group(['middleware' => ['auth:api']], function () {
 
 	//Main Box
 	Route::post('/main-box/cash-register/{box}', [MainBoxController::class, 'cashRegister']);
+	Route::post('/main-box/collect-amount/{box}', [MainBoxController::class, 'collectAmount']);
 	Route::get('/main-box/current-balance', [MainBoxController::class, 'currentBalance']);
 	Route::resource('/main-box',  MainBoxController::class);
+
+	Route::get('/box-history/{box}',[ BoxHistoryController::class,'index']);
+	Route::resource('/box-history',  BoxHistoryController::class);
 	
 	// Products
 	Route::get('/products/filter-product-list',  [ProductController::class, 'filterProductList']);

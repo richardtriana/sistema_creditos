@@ -25,6 +25,8 @@
         <td>Nro. Ingreso: </td>
         <td> #{{ $entry->id}}</td>
       </tr>
+      @if ($credit)
+
       <tr>
         <td>Cliente: </td>
         <td>{{$client->name}} {{$client->last_name}}</td>
@@ -37,6 +39,7 @@
         <td>Nro. Crédito: </td>
         <td> {{ $credit->id}}</td>
       </tr>
+      @endif
       <tr>
         <td>Monto cancelado: </td>
         <td>$ {{$entry->price}}</td>
@@ -45,7 +48,7 @@
         <td>Fecha: </td>
         <td>{{ $entry->date}}</td>
       </tr>
-      @if ($credit->product)          
+      @if ($credit && $credit->product)          
       <tr>
         <td>Producto: </td>
         <td>{{ $credit->product->product}}</td>

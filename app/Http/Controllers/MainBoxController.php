@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Box;
 use App\Models\MainBox;
 use Illuminate\Http\Request;
+use App\Models\MainBoxHistory;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -80,7 +81,7 @@ class MainBoxController extends Controller
 	/**
 	 * Update the specified resource in storage.
 	 *
-	 * @param  \App\Http\Requests\Request  $request
+	 * @param  \Illuminate\Http\Request  $request
 	 * @param  \App\Models\MainBox  $mainBox
 	 * @return \Illuminate\Http\Response
 	 */
@@ -113,23 +114,10 @@ class MainBoxController extends Controller
 		}
 		$mainBox->last_editor = $request->user()->id;
 		$mainBox->last_update = date("Y-m-d");
-
-		$data = ([
-			'user' => "$user->name $user->last_name",
-			'date' => date('Y-m-d h:i:s A'),
-			'value' => $amount,
-			'description' => 'Valor añadido'
-		]);
-
-		if ($mainBox->history != null) {
-			$history = (array) json_decode($mainBox->history);
-		} else {
-			$history = array();
-		}
-		array_push($history, $data);
-		$mainBox->history = json_encode($history);
-
 		$mainBox->save();
+
+		$mainBoxHistory = new MainBoxHistoryController();
+		$mainBoxHistory->store($request, $mainBox, 'Valor añadido');
 
 		return response()->json([
 			'status' => 'success',
@@ -167,21 +155,10 @@ class MainBoxController extends Controller
 		}
 		$main_box->input = $main_box->input + $amount;
 		$main_box->current_balance = $main_box->current_balance + $amount;
-		$data = ([
-			'user' => "$user->name $user->last_name",
-			'date' => date('Y-m-d h:i:s A'),
-			'value' => $amount,
-			'description' => 'Valor añadido'
-		]);
-
-		if ($main_box->history != null) {
-			$history = (array) json_decode($main_box->history);
-		} else {
-			$history = array();
-		}
-		array_push($history, $data);
-		$main_box->history = json_encode($history);
 		$main_box->save();
+
+		$mainBoxHistory = new MainBoxHistoryController();
+		$mainBoxHistory->store($request, $main_box, 'Valor añadido');
 	}
 
 	public function subAmountMainBox(Request $request, $amount)
@@ -190,26 +167,15 @@ class MainBoxController extends Controller
 		$main_box = MainBox::first();
 		$main_box->current_balance = $main_box->current_balance - $amount;
 		$main_box->output = $main_box->output + $amount;
-
-		$data = ([
-			'user' => "$user->name $user->last_name",
-			'date' => date('Y-m-d'),
-			'value' => $amount,
-			'description' => 'Valor retirado'
-		]);
-
-		if ($main_box->history != null) {
-			$history = (array) json_decode($main_box->history);
-		} else {
-			$history = array();
-		}
-		array_push($history, $data);
-		$main_box->history = json_encode($history);
 		$main_box->save();
+
+		$mainBoxHistory = new MainBoxHistoryController();
+		$mainBoxHistory->store($request, $main_box, 'Valor añadido');
 	}
 
 	public function cashRegister(Box $box, Request $request)
 	{
+		//Se recoge caja
 		$validate = Validator::make($request->all(), [
 			'add_amount' => 'required|numeric',
 			'current_balance' => 'required|numeric',
@@ -224,16 +190,54 @@ class MainBoxController extends Controller
 			], 400);
 		}
 
-		if ($request->add_amount <= 0) {
-			$this->addAmountMainBox($request, $request->current_balance);
-			$box->current_balance = 0;
-		} else {
-			$this->addAmountMainBox($request, $request->add_amount);
-			$box->current_balance = $box->current_balance - $request->add_amount;
-		}
+		$this->addAmountMainBox($request, $request->current_balance);
+		$box->current_balance = 0;
+
 		$box->initial_balance = 0;
 		$box->input = 0;
 		$box->output = 0;
+		$box->cash = $request->cash ?: $box->cash;
+		$box->consignment_to_client = $request->consignment_to_client ?: $box->consignment_to_client;
+		$box->payment_to_provider = $request->payment_to_provider ?: $box->payment_to_provider;
+		$box->status = $request->status ?: $box->status;
+		$box->observations = $request->observations ?: $box->observations;
+		$box->save();
+
+		return response()->json([
+			'status' => 'success',
+			'code' =>  200,
+			'message' => 'Registro exitoso',
+			'box' =>  $box
+		], 200);
+	}
+
+	public function collectAmount(Box $box, Request $request)
+	{
+		//Se añade saldo
+		$validate = Validator::make($request->all(), [
+			'add_amount' => 'required|numeric',
+			'current_balance' => 'required|numeric',
+		]);
+
+		if ($validate->fails()) {
+			return response()->json([
+				'status' => 'error',
+				'code' =>  400,
+				'message' => 'Validación de datos incorrecta',
+				'errors' =>  $validate->errors()
+			], 400);
+		}
+
+		$this->addAmountMainBox($request, $request->add_amount);
+		$box->current_balance = $box->current_balance - $request->add_amount;
+		$box->initial_balance = 0;
+		$box->input = 0;
+		$box->output = 0;
+		$box->cash = $request->cash ?: $box->cash;
+		$box->consignment_to_client = $request->consignment_to_client ?: $box->consignment_to_client;
+		$box->payment_to_provider = $request->payment_to_provider ?: $box->payment_to_provider;
+		$box->status = $request->status ?: $box->status;
+		$box->observations = $request->observations ?: $box->observations;
 		$box->save();
 
 		return response()->json([

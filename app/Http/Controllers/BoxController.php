@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Box;
 use App\Models\MainBox;
+use App\Models\BoxHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -84,7 +85,7 @@ class BoxController extends Controller
 	public function update(Request $request, Box $box)
 	{
 		$user =  $request->user();
-		
+
 		$validate = Validator::make($request->all(), [
 			'amount' => 'required|numeric'
 		]);
@@ -106,23 +107,10 @@ class BoxController extends Controller
 		$box->current_balance = $box->current_balance + $amount;
 		$box->last_editor = $request->user()->id;
 		$box->last_update = date("Y-m-d");
-
-		$data = ([
-			'user' => "$user->name $user->last_name",
-			'date' => date('Y-m-d h:i:s A'),
-			'value' => $amount,
-			'description' => 'Valor añadido'
-		]);
-
-		if ($box->history != null) {
-			$history = (array) json_decode($box->history);
-		} else {
-			$history = array();
-		}
-		array_push($history, $data);
-		$box->history = json_encode($history);
-
 		$box->save();
+
+		$boxHistory = new BoxHistoryController();
+		$boxHistory->store($request, $box, 'Valor añadido');
 
 		$update_main_box = new MainBoxController();
 		$update_main_box->subAmountMainBox($request, $amount);
@@ -146,7 +134,7 @@ class BoxController extends Controller
 		//
 	}
 
-	public function addAmountBox(Request $request, $id, $amount)
+	public function addAmountBox(Request $request, $id, $amount, bool $sendMainBox = true)
 	{
 		$user =  $request->user();
 
@@ -156,23 +144,12 @@ class BoxController extends Controller
 		$box->input = $box->input + $amount;
 		$box->last_editor = $user->id;
 		$box->last_update = date("Y-m-d");
-
-		$data = ([
-			'user' => "$user->name $user->last_name",
-			'date' => date('Y-m-d h:i:s A'),
-			'value' => $amount,
-			'description' => 'Añadir añadido'
-		]);
-
-		if ($box->history != null) {
-			$history = (array) json_decode($box->history);
-		} else {
-			$history = array();
-		}
-		array_push($history, $data);
-
-		$box->history = json_encode($history);
 		$box->save();
+
+		if ($sendMainBox) {
+			$boxHistory = new BoxHistoryController();
+			$boxHistory->store($request, $box, 'Valor añadido');
+		}
 	}
 
 	public function subAmountBox(Request $request, $id, $amount)
@@ -183,22 +160,9 @@ class BoxController extends Controller
 		$box = Box::findOrFail($box_id);
 		$box->current_balance = $box->current_balance - $amount;
 		$box->output = $box->output + $amount;
-
-		$data = ([
-			'user' => "$user->name $user->last_name",
-			'date' => date('Y-m-d'),
-			'value' => $amount,
-			'description' => 'Valor retirado'
-		]);
-
-		if ($box->history != null) {
-			$history = (array) json_decode($box->history);
-		} else {
-			$history = array();
-		}
-		array_push($history, $data);
-
-		$box->history = json_encode($history);
 		$box->save();
+
+		$boxHistory = new BoxHistoryController();
+		$boxHistory->store($request, $box, 'Valor retirado');
 	}
 }

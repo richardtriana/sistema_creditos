@@ -27,11 +27,8 @@ class PrintTicketController extends Controller
 			return false;
 		}
 
-		$credit = Credit::findOrFail($entry->credit_id);
-		$client = $credit->client()->first();
-// var_dump($credit);
-
-		// exit;
+		$credit = $entry->credit_id ? Credit::findOrFail($entry->credit_id) : NULL;
+		$client = $entry->credit_id ?  $credit->client()->first() : NULL;
 
 		// Config de impresora
 		$connector = new WindowsPrintConnector($headquarter->pos_printer);
@@ -66,27 +63,33 @@ class PrintTicketController extends Controller
 			$printer->text("\n");
 			$printer->setJustification(Printer::JUSTIFY_LEFT);
 			$printer->setEmphasis(false);
-			$printer->text('No. Ingreso: '. $entry->id);
+			$printer->text('No. Ingreso: ' . $entry->id);
 			$printer->text("\n");
-			$printer->text('Cliente: '. $client->name . ' ' . $client->last_name);
-			$printer->text("\n");
-			$printer->text( 'Fecha: '. date('Y-m-d h:i:s A'));
-			$printer->text("\n");
-			$printer->text(sprintf('%-20s %-20s', 'Valor Crédito: ', ' $ ' . $credit->credit_value));
-			$printer->text("\n");
+			if ($credit) {
+				$printer->text('Cliente: ' . $client->name . ' ' . $client->last_name);
+				$printer->text("\n");
+				$printer->text('Fecha: ' . date('Y-m-d h:i:s A'));
+				$printer->text("\n");
+				$printer->text(sprintf('%-20s %-20s', 'Valor Crédito: ', ' $ ' . $credit->credit_value));
+				$printer->text("\n");
+			}
 			$printer->text(sprintf('%-20s %-20s', 'Monto Cancelado: ', '$ ' .  $entry->price));
 			$printer->text("\n");
-			$printer->text('Motivo de crédito: ' . $credit->description);
-			$printer->text("\n");
+			if ($credit) {
+				$printer->text('Motivo de crédito: ' . $credit->description);
+				$printer->text("\n");
+			}
 			$printer->setEmphasis(true);
 			$printer->text("Descripcion: \n");
 			$printer->setEmphasis(false);
 			$printer->text($entry->description);
 			$printer->text("\n");
-			$printer->setTextSize(1, 2);
-			$printer->setEmphasis(true);
-			$printer->text(sprintf('%-20s %-20s', 'Cupo crédito', ' $ ' .$client->maximum_credit_allowed));
-			$printer->setTextSize(1, 1);
+			if ($credit) {
+				$printer->setTextSize(1, 2);
+				$printer->setEmphasis(true);
+				$printer->text(sprintf('%-20s %-20s', 'Cupo crédito', ' $ ' . $client->maximum_credit_allowed));
+				$printer->setTextSize(1, 1);
+			}
 			$printer->text("\n");
 			$printer->setLineSpacing(2);
 			$printer->setEmphasis(false);
