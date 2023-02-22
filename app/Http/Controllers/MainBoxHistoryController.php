@@ -10,12 +10,13 @@ class MainBoxHistoryController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
+     * @param  \App\Models\MainBox  $mainBox
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(MainBox $mainBox)
     {
-        //
+        $mainBoxHistory = $mainBox->mainBoxHistory()->get();
+        return $mainBoxHistory;
     }
 
     /**

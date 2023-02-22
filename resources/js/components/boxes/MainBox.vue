@@ -52,7 +52,7 @@
 				<div class="text-right">
 					<!-- data-toggle="modal" data-target="#historyBoxModal" -->
 					<button class="btn btn-primary" type="button" 
-						@click="showHistoryBox(formMainBox.history)">
+						@click="showHistoryBox(formMainBox)">
 						<i class="bi bi-clock-history"></i>
 					</button>
 				</div>
@@ -117,8 +117,8 @@ export default {
 					})
 			}
 		},
-		showHistoryBox(history) {
-			this.$emit('show-history', history)
+		showHistoryBox(mainBox) {
+			this.$emit('show-history', mainBox)
     },
 	},
 };

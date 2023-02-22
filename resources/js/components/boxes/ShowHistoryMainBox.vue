@@ -64,7 +64,18 @@ export default {
         this.listItems = {};
       }
     },
-  },
+    getHistoryMainBox(mainBoxId){
+      axios.get(`api/main-box-history/${mainBoxId}`, this.$root.config)
+      .then(response => {        
+        console.log(response);
+        this.listItems = response.data
+        $('#historyMainBoxModal').modal('show')
+
+      }).catch(error =>{
+        console.log(error);
+      })
+    }
+  }
 };
 </script>
 

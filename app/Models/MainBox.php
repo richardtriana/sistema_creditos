@@ -23,4 +23,9 @@ class MainBox extends Model
 	{
 		return $this->belongsTo(User::class, 'last_editor');
 	}
+
+	public function mainBoxHistory()
+	{
+		return $this->hasMany(MainBoxHistory::class);
+	}
 }

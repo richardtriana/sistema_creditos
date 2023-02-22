@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class MainBoxHistory extends Model
 {
     use HasFactory;
+
+    public function mainBox()
+	{
+		return $this->belongsTo(Main::class, 'main_box_id');
+	}
 }

@@ -38,8 +38,8 @@ export default {
     showHistoryBox(box) {
       this.$refs.ShowHistoryBox.getHistoryBox(box.id);
     },
-    showHistoryMainBox(history) {
-      this.$refs.ShowHistoryMainBox.convertStringToJson(history);
+    showHistoryMainBox(box) {
+      this.$refs.ShowHistoryMainBox.getHistoryMainBox(box.id);
     },
   }
 };

@@ -1,30 +1,31 @@
 <?php
 
-use App\Http\Controllers\BoxController;
-use App\Http\Controllers\BoxHistoryController;
-use App\Http\Controllers\ClientController;
-use App\Http\Controllers\CompanyController;
-use App\Http\Controllers\CreditController;
-use App\Http\Controllers\CreditProviderController;
-use App\Http\Controllers\EntryController;
-use App\Http\Controllers\ExpenseController;
-use App\Http\Controllers\GuaranteeController;
-use App\Http\Controllers\HeadquarterController;
-use App\Http\Controllers\InstallmentController;
-use App\Http\Controllers\MainBoxController;
-use App\Http\Controllers\MethodCreditController;
-use App\Http\Controllers\PrintTicketController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\ProviderController;
-use App\Http\Controllers\ReportController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\TypeExpenseController;
-use App\Http\Controllers\TypeEntryController;
-use App\Http\Controllers\UserController;
 use App\Models\Company;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BoxController;
+use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\EntryController;
+use App\Http\Controllers\ClientController;
+use App\Http\Controllers\CreditController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\MainBoxController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProviderController;
+use App\Http\Controllers\GuaranteeController;
+use App\Http\Controllers\TypeEntryController;
+use App\Http\Controllers\BoxHistoryController;
+use App\Http\Controllers\HeadquarterController;
+use App\Http\Controllers\InstallmentController;
+use App\Http\Controllers\PrintTicketController;
+use App\Http\Controllers\TypeExpenseController;
+use App\Http\Controllers\MethodCreditController;
+use App\Http\Controllers\CreditProviderController;
+use App\Http\Controllers\MainBoxHistoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -126,6 +127,9 @@ Route::group(['middleware' => ['auth:api']], function () {
 
 	Route::get('/box-history/{box}',[ BoxHistoryController::class,'index']);
 	Route::resource('/box-history',  BoxHistoryController::class);
+
+	Route::get('/main-box-history/{main_box}',[ MainBoxHistoryController::class,'index']);
+	Route::resource('/main-box-history',  MainBoxHistoryController::class);
 	
 	// Products
 	Route::get('/products/filter-product-list',  [ProductController::class, 'filterProductList']);
