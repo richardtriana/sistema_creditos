@@ -1,35 +1,47 @@
 <template>
-  <div
-    class="modal fade"
-    id="historyBoxModal"
-    tabindex="-1"
-    aria-labelledby="historyBoxModalLabel"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog">
+  <div class="modal fade" id="historyBoxModal" tabindex="-1" aria-labelledby="historyBoxModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="historyBoxModalLabel">
             Historial del crédito
           </h5>
-          <button
-            type="button"
-            class="close"
-            data-dismiss="modal"
-            aria-label="Close"
-          >
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          <div v-if="listItems.length > 0">
+          <div v-if="listItems.length > 0" class="table-responsive">
             <table class="table table-sm table-bordered">
-              <tr v-for="(l, key) in listItems" :key="key">
-                <td>Responsable: <b>{{ l.user }}</b></td>
-                <td>Fecha: {{ l.date }}</td>
-                <td>Descripción: {{ l.description }}</td>
-                <td>Monto: {{ l.value | currency }}</td>
-              </tr>
+              <thead>
+                <th>Responsable</th>
+                <th>Fecha</th>
+                <th>Descripción</th>
+                <th>Monto</th>
+                <th>Efectivo</th>
+                <th>Consignación cliente</th>
+                <th>Pago a proveedor</th>
+                <th>Estado</th>
+                <th>Observaciones</th>
+              </thead>
+              <tbody>
+                <tr v-for="(l, key) in listItems" :key="key">
+                  <td> <b>{{ l.user }}</b></td>
+                  <td>{{ l.date }}</td>
+                  <td>{{ l.description }}</td>
+                  <td> {{ l.value | currency }}</td>
+                  <td>{{ l.cash | currency }}</td>
+                  <td>{{ l.consignment_to_client | currency }}</td>
+                  <td>{{ l.payment_to_provider | currency }}</td>
+                  <td>
+                    <span v-if="l.status == 'Correct'" class="text-success font-weight-bold uppercase">Correcto</span>
+                    <span v-if="l.status == 'Incorrect'" class="text-danger font-weight-bold text-uppercase">Incorrecto</span>
+                  </td>
+                  <td>
+                    {{ l.observations }}
+                  </td>
+                </tr>
+              </tbody>
             </table>
           </div>
 
@@ -64,21 +76,20 @@ export default {
         this.listItems = {};
       }
     },
-    getHistoryBox(boxId){
+    getHistoryBox(boxId) {
       axios.get(`api/box-history/${boxId}`, this.$root.config)
-      .then(response => {
-        
-        console.log(response);
-        this.listItems = response.data
-        $('#historyBoxModal').modal('show')
+        .then(response => {
 
-      }).catch(error =>{
-        console.log(error);
-      })
+          console.log(response);
+          this.listItems = response.data
+          $('#historyBoxModal').modal('show')
+
+        }).catch(error => {
+          console.log(error);
+        })
     }
   },
 };
 </script>
 
-<style>
-</style>
+<style></style>

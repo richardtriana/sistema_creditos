@@ -192,7 +192,6 @@ class MainBoxController extends Controller
 
 		$this->addAmountMainBox($request, $request->current_balance);
 		$box->current_balance = 0;
-
 		$box->initial_balance = 0;
 		$box->input = 0;
 		$box->output = 0;
@@ -202,6 +201,9 @@ class MainBoxController extends Controller
 		$box->status = $request->status ?: $box->status;
 		$box->observations = $request->observations ?: $box->observations;
 		$box->save();
+
+		$boxHistory = new BoxHistoryController();
+		$boxHistory->store($request, $box, 'Arqueo de Caja');
 
 		return response()->json([
 			'status' => 'success',
@@ -213,7 +215,7 @@ class MainBoxController extends Controller
 
 	public function collectAmount(Box $box, Request $request)
 	{
-		//Se añade saldo
+		//Se recolecta solo una cantidad determinada
 		$validate = Validator::make($request->all(), [
 			'add_amount' => 'required|numeric',
 			'current_balance' => 'required|numeric',
@@ -239,6 +241,9 @@ class MainBoxController extends Controller
 		$box->status = $request->status ?: $box->status;
 		$box->observations = $request->observations ?: $box->observations;
 		$box->save();
+
+		$boxHistory = new BoxHistoryController();
+		$boxHistory->store($request, $box, 'Arqueo de Caja');
 
 		return response()->json([
 			'status' => 'success',

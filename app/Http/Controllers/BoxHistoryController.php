@@ -9,9 +9,9 @@ use Illuminate\Http\Request;
 class BoxHistoryController extends Controller
 {
     public function __construct()
-	{
-		$this->middleware('permission:box.index', ['only' => ['index', 'show']]);
-	}
+    {
+        $this->middleware('permission:box.index', ['only' => ['index', 'show']]);
+    }
     /**
      * Display a listing of the resource.
      * @param  \App\Models\Box  $box
@@ -19,7 +19,7 @@ class BoxHistoryController extends Controller
      */
     public function index(Box $box)
     {
-        $boxHistory = $box->boxHistory()->get();
+        $boxHistory = $box->boxHistory()->orderBy('id', 'desc')->get();
         return $boxHistory;
     }
 
@@ -51,11 +51,11 @@ class BoxHistoryController extends Controller
         $boxHistory->date       =  date('Y-m-d h:i:s A');
         $boxHistory->value      = $amount;
         $boxHistory->description = $message;
-        $boxHistory->cash       = $request->cash ?:NULL;
-		$boxHistory->consignment_to_client = $request->consignment_to_client ?:NULL;
-		$boxHistory->payment_to_provider = $request->payment_to_provider ?:NULL;
-		$boxHistory->status     = $request->status ?:NULL;
-		$boxHistory->observations = $request->observations ?:NULL;
+        $boxHistory->cash       = $request->cash ?: NULL;
+        $boxHistory->consignment_to_client = $request->consignment_to_client ?: NULL;
+        $boxHistory->payment_to_provider = $request->payment_to_provider ?: NULL;
+        $boxHistory->status     = $request->status ?: NULL;
+        $boxHistory->observations = $request->observations ?: NULL;
         $boxHistory->save();
     }
 

@@ -47,6 +47,11 @@ class MainBoxHistoryController extends Controller
         $mainBoxHistory->date       =  date('Y-m-d h:i:s A');
         $mainBoxHistory->value      = $amount;
         $mainBoxHistory->description = $message;
+        $mainBoxHistory->cash       = $request->cash ?: NULL;
+        $mainBoxHistory->consignment_to_client = $request->consignment_to_client ?: NULL;
+        $mainBoxHistory->payment_to_provider = $request->payment_to_provider ?: NULL;
+        $mainBoxHistory->status     = $request->status ?: NULL;
+        $mainBoxHistory->observations = $request->observations ?: NULL;
         $mainBoxHistory->save();
     }
 
