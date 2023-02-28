@@ -15,7 +15,7 @@ class MainBoxHistoryController extends Controller
      */
     public function index(MainBox $mainBox)
     {
-        $mainBoxHistory = $mainBox->mainBoxHistory()->get();
+        $mainBoxHistory = $mainBox->mainBoxHistory()->orderBy('id', 'desc')->get();
         return $mainBoxHistory;
     }
 

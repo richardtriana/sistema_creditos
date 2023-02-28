@@ -15,37 +15,40 @@ class CreateBoxHistoriesTable extends Migration
      */
     public function up()
     {
-        Schema::create('box_histories', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('box_id')->nullable();
-            $table->string('user')->nullable();
-            $table->string('date')->nullable();
-            $table->float('value')->nullable();
-            $table->string('description')->nullable();
-            $table->float('cash')->nullable();
-            $table->float('consignment_to_client')->nullable();
-            $table->float('payment_to_provider')->nullable();
-            $table->string('status')->nullable();
-            $table->string('observations')->nullable();
-            $table->timestamps();
+        if (!Schema::hasTable('box_histories')) {
 
-            $table->foreign('box_id')
-                ->references('id')
-                ->on('boxes');
-        });
+            Schema::create('box_histories', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('box_id')->nullable();
+                $table->string('user')->nullable();
+                $table->string('date')->nullable();
+                $table->float('value', 25, 2)->nullable();
+                $table->string('description')->nullable();
+                $table->float('cash', 25, 2)->nullable();
+                $table->float('consignment_to_client', 25, 2)->nullable();
+                $table->float('payment_to_provider', 25, 2)->nullable();
+                $table->string('status')->nullable();
+                $table->string('observations')->nullable();
+                $table->timestamps();
 
-        $boxes = Box::all();
+                $table->foreign('box_id')
+                    ->references('id')
+                    ->on('boxes');
+            });
 
-        foreach ($boxes as $box) {
-            $history = (array) json_decode($box->history);
-            foreach ($history as $h) {
-                $boxHistory = new BoxHistory();
-                $boxHistory->box_id       = $box->id;
-                $boxHistory->user       = $h->user;
-                $boxHistory->date       = $h->date;
-                $boxHistory->value      = $h->value;
-                $boxHistory->description = $h->description;
-                $boxHistory->save();
+            $boxes = Box::all();
+
+            foreach ($boxes as $box) {
+                $history = (array) json_decode($box->history);
+                foreach ($history as $h) {
+                    $boxHistory = new BoxHistory();
+                    $boxHistory->box_id       = $box->id;
+                    $boxHistory->user       = $h->user;
+                    $boxHistory->date       = $h->date;
+                    $boxHistory->value      = $h->value;
+                    $boxHistory->description = $h->description;
+                    $boxHistory->save();
+                }
             }
         }
     }
