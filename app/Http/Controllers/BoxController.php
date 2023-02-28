@@ -109,11 +109,11 @@ class BoxController extends Controller
 		$box->last_update = date("Y-m-d");
 		$box->save();
 
-		$boxHistory = new BoxHistoryController();
-		$boxHistory->store($request, $box, 'Valor añadido');
-
 		$update_main_box = new MainBoxController();
 		$update_main_box->subAmountMainBox($request, $amount);
+
+		$boxHistory = new BoxHistoryController();
+		$boxHistory->store($request, $box, 'Valor añadido');
 
 		return response()->json([
 			'status' => 'success',
