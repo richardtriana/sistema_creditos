@@ -39,7 +39,7 @@ class MainBoxHistoryController extends Controller
     public function store(Request $request, MainBox $mainBox, string $message)
     {
         $user =  $request->user();
-        $amount =  $request->amount;
+        $amount =  $request->add_amount != 0 ? $request->add_amount : $request->current_balance;
 
         $mainBoxHistory = new MainBoxHistory();
         $mainBoxHistory->main_box_id       = $mainBox->id;

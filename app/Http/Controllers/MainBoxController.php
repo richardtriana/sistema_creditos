@@ -102,6 +102,7 @@ class MainBoxController extends Controller
 		}
 
 		$amount =  $request->amount;
+		$request['add_amount'] = $amount;
 
 		if ($mainBox->initial_balance <= 0) {
 			$mainBox->initial_balance =  $amount;
@@ -170,15 +171,15 @@ class MainBoxController extends Controller
 		$main_box->save();
 
 		$mainBoxHistory = new MainBoxHistoryController();
-		$mainBoxHistory->store($request, $main_box, 'Valor añadido');
+		$mainBoxHistory->store($request, $main_box, 'Valor retirado');
 	}
 
 	public function cashRegister(Box $box, Request $request)
 	{
 		//Se recoge caja
 		$validate = Validator::make($request->all(), [
-			'add_amount' => 'required|numeric',
-			'current_balance' => 'required|numeric',
+			'add_amount' => 'nullable|numeric',
+			'current_balance' => 'nullable|numeric',
 		]);
 
 		if ($validate->fails()) {
@@ -190,7 +191,6 @@ class MainBoxController extends Controller
 			], 400);
 		}
 
-		$this->addAmountMainBox($request, $request->current_balance);
 		$box->current_balance = 0;
 		$box->initial_balance = 0;
 		$box->input = 0;
@@ -200,7 +200,10 @@ class MainBoxController extends Controller
 		$box->payment_to_provider = $request->payment_to_provider ?: $box->payment_to_provider;
 		$box->status = $request->status ?: $box->status;
 		$box->observations = $request->observations ?: $box->observations;
-		$box->save();
+		
+		if($box->save()){
+			$this->addAmountMainBox($request, $request->current_balance);
+		}
 
 		$boxHistory = new BoxHistoryController();
 		$boxHistory->store($request, $box, 'Arqueo de Caja');

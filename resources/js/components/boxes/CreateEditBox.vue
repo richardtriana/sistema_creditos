@@ -20,11 +20,11 @@
 								</div>
 							</div>
 							<ul class="nav nav-tabs nav-pills">
-								<li class="nav-item">
+								<li class="nav-item w-50 text-center border text-uppercase font-weight-bold">
 									<a class="btn-operations  nav-link active" id="btnAddCash" role="button"
 										@click="changeOperation('btnAddCash', 1)" type="button">Añadir saldo</a>
 								</li>
-								<li class="nav-item">
+								<li class="nav-item w-50 text-center border text-uppercase font-weight-bold">
 									<a class="btn-operations nav-link" id="btnUpdateBox" role="button"
 										@click="changeOperation('btnUpdateBox', 2)" type="button">Realizar arqueo</a>
 								</li>
@@ -58,7 +58,7 @@
 								</select>
 							</div>
 							<div class="form-group">
-								<label for="add_amount">Añadir saldo: <b>{{ add_amount | currency }}</b></label>
+								<label for="add_amount">Cantidad: <b>{{ add_amount | currency }}</b></label>
 								<input type="number" step="any" class="form-control" id="add_amount" v-model="add_amount"
 									:max="root_data.current_balance_main_box" @keyup="
 										add_amount > root_data.current_balance_main_box
@@ -98,14 +98,14 @@
 								</div>
 								<div class="form-group">
 									<label for="observations">Observaciones</label>
-									<textarea name="observations" id="observations" class="form-control" cols="30" rows="10"
+									<textarea name="observations" id="observations" class="form-control" cols="30" rows="3"
 										aria-describedby="observationslHelp" v-model="formBox.observations"></textarea>
 								</div>
 							</template>
 						</div>
 						<div class="modal-footer">
 							<template v-if="operationId == 1">
-								<button type="button" class="btn btn-success" @click="updateBox()">
+								<button type="button" :disabled="add_amount<=0" class="btn btn-success" @click="updateBox()">
 									Guardar
 								</button>
 							</template>
@@ -189,8 +189,10 @@ export default {
 					.then(function () {
 						$("#boxModal").modal("hide");
 						me.$emit("list-boxes");
+						Swal.fire("Cambios realizados!", "", "success");
 					}).catch(response => {
 						me.$root.assignErrors(response, me.formErrors);
+						Swal.fire("Operación no realizada", "", "info");
 					});
 			}
 		},
@@ -209,9 +211,11 @@ export default {
 				.then(() => {
 					this.$emit("list-boxes");
 					$("#boxModal").modal("hide");
+					Swal.fire("Cambios realizados!", "", "success");
 				})
 				.catch(response => {
-					this.errorCashRegister = "Error al realizar arqueo de caja"
+					this.errorCashRegister = `Error al realizar arqueo de caja \n ${response}`
+					Swal.fire("Operación no realizada", "", "info");
 				})
 		},
 		collectAmount(box) {
@@ -222,9 +226,12 @@ export default {
 				.then(() => {
 					this.$emit("list-boxes");
 					$("#boxModal").modal("hide");
+					Swal.fire("Cambios realizados!", "", "success");
+
 				})
 				.catch(response => {
-					this.errorCashRegister = "Error al realizar arqueo de caja"
+					this.errorCashRegister = `Error al realizar arqueo de caja \n ${response}`
+					Swal.fire("Operación no realizada", "", "info");
 				})
 		},
 		changeOperation(buttonId, operationId) {

@@ -100,6 +100,7 @@ class BoxController extends Controller
 		}
 
 		$amount =  $request->amount;
+		$request['add_amount'] = $amount;
 
 		if ($box->initial_balance == 0) {
 			$box->initial_balance =  $amount;

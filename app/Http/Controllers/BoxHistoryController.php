@@ -43,7 +43,7 @@ class BoxHistoryController extends Controller
     public function store(Request $request, Box $box, string $message)
     {
         $user =  $request->user();
-        $amount =  $request->amount;
+        $amount =  ($request->add_amount) != 0 ? $request->add_amount : $request->current_balance;
 
         $boxHistory = new BoxHistory();
         $boxHistory->box_id       = $box->id;

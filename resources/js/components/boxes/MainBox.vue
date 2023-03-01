@@ -112,8 +112,10 @@ export default {
 					}, me.$root.config)
 					.then(function () {
 						me.getMainBox();
+						Swal.fire("Cambios realizados!", "", "success");
 					}).catch(response => {
 						me.$root.assignErrors(response, me.formErrors);
+						Swal.fire("Operación no realizada", "", "info");
 					})
 			}
 		},
