@@ -15535,6 +15535,10 @@ h3 {
   color: #0BB783;
 }
 
+.mw-200 {
+  min-width: 200px;
+}
+
 .btn {
   border-radius: 2rem;
 }

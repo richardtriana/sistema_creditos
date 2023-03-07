@@ -9,17 +9,20 @@
           <th>Valor Capital</th>
           <th>Valor Interés</th>
           <th>Saldo capital</th>
-          <th v-if="allow_payment">Mora</th>
-          <th v-if="allow_payment">Dias de mora</th>
-          <th>Valor abonado</th>
-          <th>Capital abonado</th>
-          <th v-if="allow_payment">Estado</th>
-          <th v-if="allow_payment">Pago a cuota</th>
-          <th v-if="allow_payment">Abono a cuota</th>
-          <th v-if="$root.validatePermission('installment-reverse')">
-            Reversar <br />
-            Pago
-          </th>
+          <template v-if="allow_payment">
+            <th>Mora</th>
+            <th>Dias de mora</th>
+            <th>Valor abonado</th>
+            <th>Capital abonado</th>
+            <th>Estado</th>
+            <th>Pago a cuota</th>
+            <th>Abono a cuota</th>
+            <th v-if="$root.validatePermission('installment-reverse')">
+              Reversar <br />
+              Pago
+            </th>
+          </template>
+
         </tr>
       </thead>
       <tbody>
@@ -54,78 +57,59 @@
           <td class="text-right">
             {{ quote.capital_balance | currency }}
           </td>
-          <td v-if="allow_payment" class="text-right">
-            <span class="text-danger"
-              >{{ quote.late_interests_value_pending | currency }}<br
-            /></span>
-            <span class="text-dark small" v-if="quote.days_past_due">{{
-              quote.late_interests_value | currency
-            }}</span>
-          </td>
-          <td v-if="allow_payment" class="text-danger">
-            {{ quote.days_past_due }}
-          </td>
-          <td class="text-right">
-            {{ quote.paid_balance | currency }}
-          </td>
-          <td class="text-right">
-            {{ quote.paid_capital | currency }}
-          </td>
-          <td v-if="allow_payment">
-            <span
-              v-if="quote.status == 0"
-              class="badge badge-pill badge-warning"
-              >Pendiente</span
-            >
-            <span
-              v-if="quote.status == 1"
-              class="badge badge-pill badge-success"
-              >Pagado</span
-            >
-          </td>
-          <td v-if="allow_payment">
-            <button
-              @click="payInstallment(quote)"
-              type="button"
-              class="btn btn-sm btn-success"
-              v-if="quote.status == 0"
-            >
-              Pagar
-            </button>
-            <button v-else class="btn btn-sm btn-secondary" disabled>
-              Pagar
-            </button>
-          </td>
-          <td>
-            <div class="input-group mb-3" v-if="quote.status == 0">
-              <input
-                type="number"
-                :min="0"
-                v-model="quote.add_payment"
-                :max="quote.value"
-                step="any"
-                class="form-control form-control-sm"
-                placeholder="Valor"
-                aria-label="Valor"
-                aria-describedby="pay-button"
-              />
-              <div class="input-group-append">
-                <button
-                  class="btn btn-outline-success btn-sm"
-                  @click="payInstallment(quote, quote.add_payment)"
-                  type="button"
-                  id="pay-button"
-                >
-                  Abonar
-                </button>
+          <template v-if="allow_payment">
+            <td class="text-right">
+              <span class="text-danger">{{ quote.late_interests_value_pending | currency }}<br /></span>
+              <span class="text-dark small" v-if="quote.days_past_due">{{
+                quote.late_interests_value | currency
+              }}</span>
+            </td>
+            <td class="text-danger">
+              {{ quote.days_past_due }}
+            </td>
+            <td class="text-right">
+              {{ quote.paid_balance | currency }}
+            </td>
+            <td class="text-right">
+              {{ quote.paid_capital | currency }}
+            </td>
+
+            <td>
+              <span v-if="quote.status == 0" class="badge badge-pill badge-warning">Pendiente</span>
+              <span v-if="quote.status == 1" class="badge badge-pill badge-success">Pagado</span>
+            </td>
+            <td>
+              <button @click="payInstallment(quote)" type="button" class="btn btn-sm btn-success"
+                v-if="quote.status == 0">
+                Pagar
+              </button>
+              <button v-else class="btn btn-sm btn-secondary" disabled>
+                Pagar
+              </button>
+            </td>
+            <td>
+              <div class="input-group mb-3 mw-200" v-if="quote.status == 0">
+                <input type="number" :min="0" v-model="quote.add_payment" :max="quote.value" step="any"
+                  class="form-control form-control-sm" placeholder="Valor" aria-label="Valor"
+                  aria-describedby="pay-button" />
+                <div class="input-group-append">
+                  <button class="btn btn-outline-success btn-sm" @click="payInstallment(quote, quote.add_payment)"
+                    type="button" id="pay-button">
+                    Abonar
+                  </button>
+                </div>
               </div>
-            </div>
-          </td>
-          <td v-if="$root.validatePermission('installment-reverse')">
-            <button class="btn btn-warning" @click="reversePayment(quote)">
-              <i class="bi bi-arrow-counterclockwise"></i>
-            </button>
-          </td>
+              <template v-if="quote.add_payment">
+                  {{ quote.add_payment | currency }}
+              </template>
+            </td>
+            <td v-if="$root.validatePermission('installment-reverse')">
+              <button class="btn btn-warning" @click="reversePayment(quote)">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </button>
+            </td>
+          </template>
+
         </tr>
       </tbody>
     </table>
