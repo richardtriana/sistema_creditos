@@ -301,13 +301,15 @@ class CreditController extends Controller
 				$credit_guarantee_controller->store($credit->id, $guarantee['id']);
 			}
 
-			$credit->credit_provider()->updateOrCreate(
-				['credit_id' => $credit->id],
-				[
-					'provider_id' => $request['provider_id'],
-					'headquarter_id' => $request['headquarter_id']
-				]
-			);
+			if ($request['provider_id']) {
+				$credit->credit_provider()->updateOrCreate(
+					['credit_id' => $credit->id],
+					[
+						'provider_id' => $request['provider_id'],
+						'headquarter_id' => $request['headquarter_id']
+					]
+				);
+			}
 		}
 
 		return response()->json([

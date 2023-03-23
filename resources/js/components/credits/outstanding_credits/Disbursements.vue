@@ -46,6 +46,7 @@
               </th>
 
               <th v-if="$root.validatePermission('credit-status')">Opciones</th>
+              <th>Editar</th>
             </tr>
           </thead>
           <!-- <tbody> -->
@@ -89,6 +90,16 @@
                     @click="changeStatus(credit.id, 2)"
                   >
                     <i class="bi bi-x-circle"></i> Rechazar
+                  </button>
+                </div>
+              </td>
+              <td>
+                <div v-if="$root.validatePermission('credit-update')" class="d-inline">
+                  <button v-if="(credit.status == 0 || credit.status == 1) && credit.paid_value <=1" class="btn btn-primary" @click="showData(credit)">
+                    <i class="bi bi-pen"></i> Editar
+                  </button>
+                  <button v-else class="btn btn-secondary" disabled>
+                    <i class="bi bi-pen"></i> Editar
                   </button>
                 </div>
               </td>
