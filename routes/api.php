@@ -19,6 +19,8 @@ use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\GuaranteeController;
 use App\Http\Controllers\TypeEntryController;
 use App\Http\Controllers\BoxHistoryController;
+use App\Http\Controllers\CreditDebtorController;
+use App\Http\Controllers\CreditGuaranteeController;
 use App\Http\Controllers\HeadquarterController;
 use App\Http\Controllers\InstallmentController;
 use App\Http\Controllers\PrintTicketController;
@@ -65,8 +67,10 @@ Route::post('/credits/{credit}/change-status',  [CreditController::class, 'chang
 Route::get('/credits/{credit}/installments', [CreditController::class, 'installments']);
 Route::resource('/credits', CreditController::class);
 
-Route::get('/expenses/show-expense/{expense}', [ExpenseController::class, 'showExpense']);
+Route::resource('/credit-debtor', CreditDebtorController::class);
+Route::resource('/credit-guarantee', CreditGuaranteeController::class);
 
+Route::get('/expenses/show-expense/{expense}', [ExpenseController::class, 'showExpense']);
 Route::get('/installments/calculate-installments', [MethodCreditController::class, 'calculateInstallments']);
 
 Route::get('/reports/headquarters', [ReportController::class, 'ReportHeadquarters']);

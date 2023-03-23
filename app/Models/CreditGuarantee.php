@@ -10,4 +10,10 @@ class CreditGuarantee extends Model
     use HasFactory;
     
     protected $table = 'credit_guarantee';
+    
+    protected $fillable = [
+        'credit_id',
+        'guarantee_id',
+        'date_add'
+    ];
 }

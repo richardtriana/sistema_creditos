@@ -36,10 +36,16 @@ class CreditGuaranteeController extends Controller
      */
     public function store($credit_id, $guarantee_id)
     {
-        $creditGuarantee = new CreditGuarantee();
-        $creditGuarantee->credit_id = $credit_id;
-        $creditGuarantee->guarantee_id = $guarantee_id;
-        $creditGuarantee->date_add = date('Y-m-d');
+        // $creditGuarantee = new CreditGuarantee();
+        // $creditGuarantee->credit_id = $credit_id;
+        // $creditGuarantee->guarantee_id = $guarantee_id;
+        // $creditGuarantee->date_add = date('Y-m-d');
+
+        $creditGuarantee = CreditGuarantee::firstOrNew(
+            ['credit_id' => $credit_id, 'guarantee_id' => $guarantee_id],
+            ['date_add' =>  date('Y-m-d')]
+        );
+
 
         if ($creditGuarantee->save()) {
             $data = [
@@ -101,6 +107,19 @@ class CreditGuaranteeController extends Controller
      */
     public function destroy(CreditGuarantee $creditGuarantee)
     {
-        //
+        if ($creditGuarantee->delete()) {
+            $data = [
+                'status' => 'success',
+                'code' => 200,
+                'guarantee' => $creditGuarantee
+            ];
+        } else {
+            $data = [
+                'status' => 'error',
+                'code' => 400,
+                'message' => 'Registro no encontrado'
+            ];
+        }
+        return response()->json($data, $data['code']);
     }
 }

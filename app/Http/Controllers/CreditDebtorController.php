@@ -35,9 +35,13 @@ class CreditDebtorController extends Controller
      */
     public function store($credit_id, $debtor_id)
     {
-        $creditDebtor = new CreditDebtor();
-        $creditDebtor->credit_id = $credit_id;
-        $creditDebtor->debtor_id = $debtor_id;
+        // $creditDebtor = new CreditDebtor();
+        // $creditDebtor->credit_id = $credit_id;
+        // $creditDebtor->debtor_id = $debtor_id;
+
+        $creditDebtor = CreditDebtor::firstOrNew(
+            ['credit_id' => $credit_id, 'debtor_id' => $debtor_id]
+        );
 
         if ($creditDebtor->save()) {
             $data = [
@@ -99,6 +103,19 @@ class CreditDebtorController extends Controller
      */
     public function destroy(CreditDebtor $creditDebtor)
     {
-        //
+        if ($creditDebtor->delete()) {
+            $data = [
+                'status' => 'success',
+                'code' => 200,
+                'debtor' => $creditDebtor
+            ];
+        } else {
+            $data = [
+                'status' => 'error',
+                'code' => 400,
+                'message' => 'Registro no encontrado'
+            ];
+        }
+        return response()->json($data, $data['code']);
     }
 }

@@ -79,11 +79,11 @@ class Credit extends Model
 
     public function guarantees()
     {
-        return $this->belongsToMany(Guarantee::class, );
+        return $this->belongsToMany(Guarantee::class, 'credit_guarantee','credit_id','guarantee_id')->withPivot('id','credit_id','guarantee_id');
     }
 
     public function debtors()
     {
-        return $this->belongsToMany(Client::class, 'credit_debtor', 'credit_id', 'debtor_id');
+        return $this->belongsToMany(Client::class, 'credit_debtor', 'credit_id', 'debtor_id')->withPivot('id','credit_id','debtor_id');
     }
 }

@@ -58,7 +58,8 @@ class CreditController extends Controller
 		}
 		$credits = $credits
 			->orderBy('id', 'desc')
-			->with('headquarter:id,headquarter', 'product:id,product')
+			// ->from('guarantees as d')
+			->with('headquarter:id,headquarter', 'client:id,name,last_name', 'product:id,product', 'guarantees:id,guarantee', 'debtors:id,name,last_name')
 			->paginate(10);
 
 		return $credits;
@@ -246,19 +247,19 @@ class CreditController extends Controller
 				Rule::requiredIf($request->debtor == 1)
 			],
 			'headquarter_id' => 'required|integer|exists:headquarters,id',
-			'number_installments' => 'required|integer',
-			'number_paid_installments' => 'nullable|integer',
-			'day_limit' => 'nullable|integer',
-			'start_date' => 'required|date',
-			'interest' => 'required|numeric',
-			'annual_interest_percentage' => 'nullable|numeric',
-			'credit_value' =>  'required|numeric',
-			'paid_value' => 'nullable|numeric',
-			'capital_value' => 'nullable|numeric',
-			'interest_value' => 'nullable|numeric',
+			// 'number_installments' => 'required|integer',
+			// 'number_paid_installments' => 'nullable|integer',
+			// 'day_limit' => 'nullable|integer',
+			// 'start_date' => 'required|date',
+			// 'interest' => 'required|numeric',
+			// 'annual_interest_percentage' => 'nullable|numeric',
+			// 'credit_value' =>  'required|numeric',
+			// 'paid_value' => 'nullable|numeric',
+			// 'capital_value' => 'nullable|numeric',
+			// 'interest_value' => 'nullable|numeric',
 			'description' => 'nullable|string',
-			'disbursement_date' => 'nullable|date',
-			'installment_value' => 'required|numeric',
+			// 'disbursement_date' => 'nullable|date',
+			// 'installment_value' => 'required|numeric',
 			'guarantees' => 'nullable|array'
 		]);
 
@@ -292,13 +293,21 @@ class CreditController extends Controller
 
 			foreach ($request->debtors as $debtor) {
 				$credit_debtor_controller = new CreditDebtorController();
-				$credit_debtor_controller->store($credit->id, $debtor);
+				$credit_debtor_controller->store($credit->id, $debtor['id']);
 			}
 
 			foreach ($request->guarantees as $guarantee) {
 				$credit_guarantee_controller = new CreditGuaranteeController();
-				$credit_guarantee_controller->store($credit->id, $guarantee);
+				$credit_guarantee_controller->store($credit->id, $guarantee['id']);
 			}
+
+			$credit->credit_provider()->updateOrCreate(
+				['credit_id' => $credit->id],
+				[
+					'provider_id' => $request['provider_id'],
+					'headquarter_id' => $request['headquarter_id']
+				]
+			);
 		}
 
 		return response()->json([
@@ -431,7 +440,7 @@ class CreditController extends Controller
 		if (!$is_reverse) {
 			$add_amount_box->addAmountBox($request, $box->id, $total_amount);
 		}
-		
+
 		$credit->paid_value +=  $total_amount;
 		$credit->capital_value += $capital;
 		$credit->interest_value +=  $interest;
