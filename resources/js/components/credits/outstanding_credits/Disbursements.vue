@@ -95,7 +95,7 @@
               </td>
               <td>
                 <div v-if="$root.validatePermission('credit-update')" class="d-inline">
-                  <button v-if="(credit.status == 0 || credit.status == 1) && credit.paid_value <=1" class="btn btn-primary" @click="showData(credit)">
+                  <button v-if="(credit.status == 0 || credit.status == 1 || credit.status == 3) && credit.paid_value <=1" class="btn btn-primary" @click="showData(credit)">
                     <i class="bi bi-pen"></i> Editar
                   </button>
                   <button v-else class="btn btn-secondary" disabled>
