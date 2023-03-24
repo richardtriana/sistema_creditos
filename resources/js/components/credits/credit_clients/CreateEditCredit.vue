@@ -305,6 +305,7 @@ export default {
     return {
       edit: false,
       headquarterList: [],
+      activateNewMethod:false,
       formCredit: {
         client_id: "",
         product_id: "",
@@ -394,6 +395,9 @@ export default {
   },
   created() {
     this.listHeadquarters(1);
+  },
+  mounted() {
+    this.activateNewMethod = this.$root.configuration.method == "GENERAL" ? true : false;
   },
   methods: {
     listHeadquarters() {
@@ -556,9 +560,9 @@ export default {
       });
       me.$root.assignErrors(false, me.formErrors);
     },
-    activateNewMethod(){
-      return this.$root.configuration.method == "GENERAL";
-    },
+    // activateNewMethod(){
+    //   return this.$root.configuration.method == "GENERAL";
+    // },
     resetNumber(value){
       return isNaN(value) ? 0: Number(value);
     }

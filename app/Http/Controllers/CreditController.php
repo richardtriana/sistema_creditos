@@ -168,11 +168,11 @@ class CreditController extends Controller
 		$credit->description = $request['description'];
 		$credit->installment_value = $listInstallments['installment'];
 
-		// if ($validateMethod) {
+		if ($validateMethod) {
 			$credit->credit_requested = $request['credit_requested'];
 			$credit->doc_acc_imp = $request['doc_acc_imp'];
 			$credit->initial_quota = $request['initial_quota'];
-		// }
+		}
 
 		if ($credit->save()) {
 
