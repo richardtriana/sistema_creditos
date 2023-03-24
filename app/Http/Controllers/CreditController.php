@@ -169,9 +169,9 @@ class CreditController extends Controller
 		$credit->installment_value = $listInstallments['installment'];
 
 		// if ($validateMethod) {
-			$credit->credit_requested = $request['credit_requested'];
-			$credit->doc_acc_imp = $request['doc_acc_imp'];
-			$credit->initial_quota = $request['initial_quota'];
+		$credit->credit_requested = $request['credit_requested'];
+		$credit->doc_acc_imp = $request['doc_acc_imp'];
+		$credit->initial_quota = $request['initial_quota'];
 		// }
 
 		if ($credit->save()) {
@@ -339,15 +339,18 @@ class CreditController extends Controller
 		$client_id = $credit->client->id;
 		$user_id = $request->user()->id;
 		$status = $credit->status;
+		$headquarter_id = $credit->headquarter_id;
+
+		$box = Box::where('headquarter_id', $headquarter_id)->firstOrFail();
 
 		if ($credit->provider_id != null && $credit->provider_id != 0) {
 			$credit_provider = CreditProvider::where('credit_id', $credit->id)->first();
-			
+
 			if ($credit_provider != null) {
 				if ($credit_provider->pending_value <= 0) {
 
 					if ($request->status  == 1 || $request['status']  == 1) {
-					
+
 						$update_main_box = new MainBoxController();
 						$update_main_box->subAmountMainBox($request, $credit->credit_value);
 						$credit->disbursement_date = date('Y-m-d');
@@ -390,6 +393,10 @@ class CreditController extends Controller
 			if ($credit->initial_quota) {
 				$entry = new InstallmentController;
 				$entry->saveEntryInstallment($credit, $credit->initial_quota, $credit->initial_quota, 1, 0, $user_id, 'Cuota inicial');
+
+				$add_amount_box = new BoxController();
+				$request['add_amount']=$credit->initial_quota;
+				$add_amount_box->addAmountBox((object)$request, $box->id, $credit->initial_quota);
 			}
 		}
 
