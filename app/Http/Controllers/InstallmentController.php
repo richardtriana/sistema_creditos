@@ -124,10 +124,6 @@ class InstallmentController extends Controller
           ->whereRaw("((paid_balance - paid_capital)) < ((interest_value)+$late_interest_pending)")
           ->orWhereNull('paid_balance');
       })->first();
-    // return $installment;
-
-    //       exit;
-
 
     if (!$installment) {
       $installment = $credit->installments()
@@ -432,7 +428,6 @@ class InstallmentController extends Controller
     $amount_paid = '$' . number_format($amount_paid, 0, ',', '.');
     $balance = '$' . number_format($balance, 0, ',', '.');
     $type_entry = $quote ? $quote : 'Pago de cuota';
-
     $client = $credit->client()->first();
 
     try {
