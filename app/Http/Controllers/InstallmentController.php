@@ -434,25 +434,34 @@ class InstallmentController extends Controller
     $type_entry = $quote ? $quote : 'Pago de cuota';
 
     $client = $credit->client()->first();
-    if ($amount > 0) {
-      $entry =  new Entry();
-      $entry->headquarter_id = $credit->headquarter_id;
-      $entry->user_id = $user_id;
-      $entry->credit_id = $credit->id;
-      $entry->description =
-        "Cliente: {$client->name} {$client->last_name}\n"
-        . "Documento: {$client->type_document} {$client->document}\n"
-        . "#crédito: {$credit->id} \n"
-        . "#cuota: {$no_installment}\n"
-        . "Efectivo: {$amount_receipt}\n"
-        . "Valor cancelado: {$amount_paid}\n"
-        . "Regreso: {$balance} \n" .
-        "Cupo crédito: {$client->maximum_credit_allowed}";
-      $entry->date = date('Y-m-d');
-      $entry->type_entry = $type_entry;
-      $entry->price = $amount;
-      $entry->save();
-      return  $entry->id;
+
+    try {
+      if ($amount > 0) {
+        $entry =  new Entry();
+        $entry->headquarter_id = $credit->headquarter_id;
+        $entry->user_id = $user_id;
+        $entry->credit_id = $credit->id;
+        $entry->description =
+          "Cliente: {$client->name} {$client->last_name}\n"
+          . "Documento: {$client->type_document} {$client->document}\n"
+          . "#crédito: {$credit->id} \n"
+          . "#cuota: {$no_installment}\n"
+          . "Efectivo: {$amount_receipt}\n"
+          . "Valor cancelado: {$amount_paid}\n"
+          . "Regreso: {$balance} \n" .
+          "Cupo crédito: {$client->maximum_credit_allowed}";
+        $entry->date = date('Y-m-d');
+        $entry->type_entry = $type_entry;
+        $entry->price = $amount;
+        $entry->save();
+        return  $entry->id;
+      }
+    } catch (\Throwable $th) {
+      return response()->json([
+        'status' => 'error',
+        'code' =>  500,
+        'message' => 'No se ha guardado',
+      ], 200);
     }
   }
 

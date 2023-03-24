@@ -177,13 +177,13 @@
     </div>
 
     <modal-create-edit-client ref="ModalCreateEditClient" @list-clients="listCredits(1)" />
-
     <create-edit-credit ref="CreateEditCredit" @list-credits="listCredits(1)" />
-
     <modal-installment ref="ModalInstallment" />
     <credit-information ref="CreditInformation" @list-credits="listCredits(1)" />
+
   </div>
 </template>
+
 <script>
 import CreateEditCredit from "./CreateEditCredit.vue";
 import ModalCreateEditClient from "../../clients/ModalCreateEditClient.vue";

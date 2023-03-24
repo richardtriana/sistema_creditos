@@ -109,9 +109,10 @@ export default {
     };
   },
   methods: {
-    listCreditProviders() {
+    listCreditProviders(page=1) {
 
       let data = {
+        'page': page,
         'search_status': this.search_status,
         'search_from': this.search_from,
         'search_to': this.search_to

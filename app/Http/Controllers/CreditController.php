@@ -58,7 +58,6 @@ class CreditController extends Controller
 		}
 		$credits = $credits
 			->orderBy('id', 'desc')
-			// ->from('guarantees as d')
 			->with('headquarter:id,headquarter', 'client:id,name,last_name', 'product:id,product', 'guarantees:id,guarantee', 'debtors:id,name,last_name')
 			->paginate(10);
 
@@ -85,7 +84,6 @@ class CreditController extends Controller
 	{
 		$company = Company::first();
 		$validateMethod = $company ? ($company->method  == "GENERAL") : false;
-
 
 		$validate = Validator::make($request->all(), [
 			'client_id' => 'required|integer|exists:clients,id',
@@ -206,6 +204,7 @@ class CreditController extends Controller
 					return false;
 				}
 			}
+
 			if ($request['provider_id'] != NULL && $request['provider_id'] != 0) {
 				$credit_provider = new CreditProviderController();
 				$credit_provider->store($request, $credit->id);
@@ -338,13 +337,17 @@ class CreditController extends Controller
 	{
 		$credit_provider = '';
 		$client_id = $credit->client->id;
+		$user_id = $request->user()->id;
+		$status = $credit->status;
 
 		if ($credit->provider_id != null && $credit->provider_id != 0) {
 			$credit_provider = CreditProvider::where('credit_id', $credit->id)->first();
-
+			
 			if ($credit_provider != null) {
 				if ($credit_provider->pending_value <= 0) {
-					if ($request->status  == 1) {
+
+					if ($request->status  == 1 || $request['status']  == 1) {
+					
 						$update_main_box = new MainBoxController();
 						$update_main_box->subAmountMainBox($request, $credit->credit_value);
 						$credit->disbursement_date = date('Y-m-d');
@@ -366,7 +369,7 @@ class CreditController extends Controller
 		}
 
 		if ($credit->provider_id == null || $credit->provider_id == 0) {
-			if ($request->status  == 1) {
+			if ($request->status  == 1 || $request['status']  == 1) {
 				$update_main_box = new MainBoxController();
 				$update_main_box->subAmountMainBox($request, $credit->credit_value);
 				$credit->disbursement_date = date('Y-m-d');
@@ -382,9 +385,18 @@ class CreditController extends Controller
 			$credit->status = $request->status;
 		}
 
+		if ($status != 1 && $request->status == 1) {
+
+			if ($credit->initial_quota) {
+				$entry = new InstallmentController;
+				$entry->saveEntryInstallment($credit, $credit->initial_quota, $credit->initial_quota, 1, 0, $user_id, 'Cuota inicial');
+			}
+		}
+
 		if ($request->status == 2 && $request->description != null) {
 			$credit->description  = "$credit->description \n Rechazado por: $request->description";
 		}
+
 		$credit->save();
 	}
 
