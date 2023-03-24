@@ -1,7 +1,6 @@
 <template>
   <div>
-    <div class="modal fade" id="formCreditModal" tabindex="-1" aria-labelledby="formCreditModalLabel"
-      aria-hidden="true">
+    <div class="modal fade" id="formCreditModal" tabindex="-1" aria-labelledby="formCreditModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">
@@ -17,27 +16,25 @@
                 <div class="form-group col-12  col-lg-4">
                   <div class="d-flex justify-content-between">
                     <label for="client_id" class="col-form-label">Cliente</label>
-                    <button class="btn btn-primary mb-2" type="button" data-toggle="modal"
-                      data-target="#addClientModal">
+                    <button class="btn btn-primary mb-2" type="button" data-toggle="modal" data-target="#addClientModal">
                       <i class="bi bi-card-checklist"></i> Añadir cliente
                     </button>
                   </div>
                   <input type="text" class="form-control" disabled readonly v-model="client_name"
                     :class="[formErrors.client_id ? 'is-invalid' : '']" />
                   <small id="client_id_help" class="form-text text-danger">{{
-                      formErrors.client_id
+                    formErrors.client_id
                   }}</small>
                 </div>
                 <hr class="d-block d-lg-none col-12">
                 <div class="
-                    form-group col-12 
-                    col-lg-3
-                    form-check
-                    d-flex
-                    align-items-center
-                    pl-md-5
-                  "
-                  >
+                        form-group col-12 
+                        col-lg-3
+                        form-check
+                        d-flex
+                        align-items-center
+                        pl-md-5
+                      ">
                   <input type="checkbox" class="form-check-input" id="provider" v-model="formCredit.provider" />
                   <label class="form-check-label" for="provider">¿Usa Proveedor?</label>
                 </div>
@@ -45,27 +42,27 @@
                 <div class="form-group col-12  col-lg-5" :class="[formCredit.provider ? '' : 'opacity-50']">
                   <div class="d-flex justify-content-between">
                     <label for="provider_id" class="col-form-label">Proveedor</label>
-                    <button class="btn btn-primary mb-2" type="button" data-toggle="modal"
-                      data-target="#addProviderModal" :disabled="!formCredit.provider">
+                    <button class="btn btn-primary mb-2" type="button" data-toggle="modal" data-target="#addProviderModal"
+                      :disabled="!formCredit.provider">
                       <i class="bi bi-card-checklist"></i> Añadir Proveedor
                     </button>
                   </div>
                   <input type="text" class="form-control" disabled readonly v-model="provider_name"
                     :class="[formErrors.provider_id ? 'is-invalid' : '']" />
                   <small id="provider_id_help" class="form-text text-danger">{{
-                      formErrors.provider_id
+                    formErrors.provider_id
                   }}</small>
                 </div>
                 <hr class="d-block d-lg-none col-12">
                 <div class="col-lg-4"></div>
                 <div class="
-                    form-group col-12 
-                    col-lg-3
-                    form-check
-                    d-flex
-                    align-items-center
-                    pl-md-5
-                  ">
+                        form-group col-12 
+                        col-lg-3
+                        form-check
+                        d-flex
+                        align-items-center
+                        pl-md-5
+                      ">
                   <input type="checkbox" class="form-check-input" id="debtor" v-model="formCredit.debtor" value="0" />
                   <label class="form-check-label" for="debtor">¿Usa codeudor?</label>
                 </div>
@@ -80,19 +77,20 @@
                   </div>
                   <ul class="p-1">
                     <li class="
-                        list-group-item
-                        d-flex
-                        justify-content-between
-                        align-items-center
-                      " v-for="(debtor, index) in formCredit.debtors" :key="debtor.id">
+                            list-group-item
+                            d-flex
+                            justify-content-between
+                            align-items-center
+                          " v-for="(debtor, index) in formCredit.debtors" :key="debtor.id">
                       <span>{{ debtor.name }} {{ debtor.last_name }}</span>
-                      <button class="btn btn-danger text-white rounded" type="button" @click="removeDebtor(index, debtor)">
+                      <button class="btn btn-danger text-white rounded" type="button"
+                        @click="removeDebtor(index, debtor)">
                         <i class="bi bi-trash"></i>
                       </button>
                     </li>
                   </ul>
                   <small id="debtors_help" class="form-text text-danger">{{
-                      formErrors.debtors
+                    formErrors.debtors
                   }}</small>
                 </div>
                 <hr class="d-block d-lg-none col-12">
@@ -100,15 +98,14 @@
                 <div class="form-group col-12  col-lg-6">
                   <div class="d-flex justify-content-between">
                     <label for="client_id" class="col-form-label">Producto</label>
-                    <button class="btn btn-primary mb-2" type="button" data-toggle="modal"
-                      data-target="#addProductModal">
+                    <button class="btn btn-primary mb-2" type="button" data-toggle="modal" data-target="#addProductModal">
                       <i class="bi bi-card-checklist"></i> Añadir producto
                     </button>
                   </div>
                   <input type="text" class="form-control" disabled readonly v-model="product_name"
                     :class="[formErrors.product_id ? 'is-invalid' : '']" />
                   <small id="product_id_help" class="form-text text-danger">{{
-                      formErrors.product_id
+                    formErrors.product_id
                   }}</small>
                 </div>
                 <hr class="d-block d-lg-none col-12">
@@ -123,29 +120,29 @@
                   </div>
                   <ul class="p-0">
                     <li class="
-                        list-group-item
-                        d-flex
-                        justify-content-between
-                        align-items-center
-                      " v-for="(guarantee, index) in formCredit.guarantees" :key="guarantee.id">
+                            list-group-item
+                            d-flex
+                            justify-content-between
+                            align-items-center
+                          " v-for="(guarantee, index) in formCredit.guarantees" :key="guarantee.id">
                       <span>{{ guarantee.guarantee }}</span>
-                      <button class="btn btn-danger text-white rounded" type="button" @click="removeGuarantee(index, guarantee)">
+                      <button class="btn btn-danger text-white rounded" type="button"
+                        @click="removeGuarantee(index, guarantee)">
                         <i class="bi bi-trash"></i>
                       </button>
                     </li>
                   </ul>
                   <small id="guarantees_help" class="form-text text-danger">{{
-                      formErrors.guarantees
+                    formErrors.guarantees
                   }}</small>
                 </div>
                 <hr class="d-block d-lg-none col-12">
                 <div class="form-group col-12  col-lg-4">
                   <label for="description">Descripción</label>
                   <textarea type="text" class="form-control" id="description" v-model="formCredit.description"
-                    :class="[formErrors.description ? 'is-invalid' : '']"
-                    placeholder="Ingresar descripción "></textarea>
+                    :class="[formErrors.description ? 'is-invalid' : '']" placeholder="Ingresar descripción "></textarea>
                   <small id="description_help" class="form-text text-danger">{{
-                      formErrors.description
+                    formErrors.description
                   }}</small>
                 </div>
 
@@ -157,21 +154,26 @@
                   </v-select>
                   <small id="headquarter_id_help" class="form-text text-danger">{{ formErrors.headquarter_id }}</small>
                 </div>
-                <template v-if="!edit">               
-                
-                  <div class="form-group col-12  col-lg-4">
-                    <label for="credit_value">Valor Credito:
-                      <b>{{ activateNewMethod ? value_credit_validate : formCredit.credit_value | currency }}</b></label>
-                    <input v-if="(edit || activateNewMethod)" type="text" class="form-control" id="credit_value" step="any"
-                      :value="activateNewMethod ? value_credit_validate : formCredit.credit_value | currency" :disabled="edit || activateNewMethod"
-                      :class="[formErrors.credit_value ? 'is-invalid' : '']" />
 
-                    <input v-if="(!edit && !activateNewMethod)" type="number" class="form-control" id="credit_value" step="any"
+                <hr class="d-block d-lg-none col-12">
+
+                <div  v-if="edit" class="form-group col-12  col-lg-4">
+                  <label for="credit_value" class="w-100 text-center h5">Valor Credito:
+                    <b>{{ formCredit.credit_value | currency }}</b></label>
+                </div>
+
+                <template v-if="!edit">
+                  <div class="form-group col-12  col-lg-4">
+                    <label for="credit_value" class="w-100 text-center h5">Valor Credito:
+                      <b>{{ value_credit_validate | currency }}</b></label>
+
+                    <input v-if="(!edit)" type="hidden" class="form-control" id="credit_value" step="any"
                       v-model="formCredit.credit_value" :max="max_amount_credit" @keyup="
                         formCredit.credit_value > max_amount_credit
                           ? (formCredit.credit_value = max_amount_credit)
                           : (formCredit.credit_value = formCredit.credit_value)
-                      " :class="[formErrors.credit_value ? 'is-invalid' : '']" placeholder="Ingresar valor de crédito" />
+                      " disabled readonly :class="[formErrors.credit_value ? 'is-invalid' : '']"
+                      placeholder="Ingresar valor de crédito" />
 
                     <small id="addAmountHelpBlock" class="form-text text-muted">
                       Monto máximo
@@ -181,42 +183,40 @@
                       formErrors.credit_value
                     }}</small>
                   </div>
-                  <div v-if="activateNewMethod" class="col-12">
+                  <div class="col-12">
                     <div class="row">
                       <div class="form-group col-12  col-lg-4">
-                        <label for="credit_requested">Credito solicitado: <b>{{ formCredit.credit_requested | currency }}</b></label>
+                        <label for="credit_requested">Credito solicitado: <b>{{ formCredit.credit_requested | currency
+                        }}</b></label>
                         <input type="number" class="form-control" id="credit_requested"
                           v-model="formCredit.credit_requested" :disabled="edit" min="0" :max="max_amount_credit" @keyup="
                             formCredit.credit_requested > max_amount_credit
                               ? (formCredit.credit_requested = max_amount_credit)
                               : (formCredit.credit_requested = formCredit.credit_requested)
-                          "
-                          :class="[formErrors.credit_requested ? 'is-invalid' : '']" placeholder="Ingresar valor de credito"
-                          value="3" />
-                          <small id="addAmountHelpBlock" class="form-text text-muted">
-                            Monto máximo
-                            {{ max_amount_credit | currency }}
-                          </small>
+                          " :class="[formErrors.credit_requested ? 'is-invalid' : '']"
+                          placeholder="Ingresar valor de credito" value="3" />
+                        <small id="addAmountHelpBlock" class="form-text text-muted">
+                          Monto máximo
+                          {{ max_amount_credit | currency }}
+                        </small>
                         <small id="credit_requested_help" class="form-text text-danger">{{
                           formErrors.credit_requested
                         }}</small>
                       </div>
                       <div class="form-group col-12  col-lg-4">
                         <label for="doc_acc_imp">Otros gastos</label>
-                        <input type="number" class="form-control" id="doc_acc_imp"
-                          v-model="formCredit.doc_acc_imp" min="0" :disabled="edit"
-                          :class="[formErrors.doc_acc_imp ? 'is-invalid' : '']" placeholder="Ingresar valor de gastos adicionales"
-                          value="3" />
+                        <input type="number" class="form-control" id="doc_acc_imp" v-model="formCredit.doc_acc_imp"
+                          min="0" :disabled="edit" :class="[formErrors.doc_acc_imp ? 'is-invalid' : '']"
+                          placeholder="Ingresar valor de gastos adicionales" value="3" />
                         <small id="doc_acc_imp_help" class="form-text text-danger">{{
                           formErrors.doc_acc_imp
                         }}</small>
                       </div>
                       <div class="form-group col-12  col-lg-4">
                         <label for="initial_quota">Cuota inicial</label>
-                        <input type="number" class="form-control" id="initial_quota"
-                          v-model="formCredit.initial_quota"  min="0" step="any" :disabled="edit"
-                          :class="[formErrors.initial_quota ? 'is-invalid' : '']" placeholder="Ingresar cuota inicial"
-                          value="3" />
+                        <input type="number" class="form-control" id="initial_quota" v-model="formCredit.initial_quota"
+                          min="0" step="any" :disabled="edit" :class="[formErrors.initial_quota ? 'is-invalid' : '']"
+                          placeholder="Ingresar cuota inicial" value="3" />
                         <small id="initial_quota_help" class="form-text text-danger">{{
                           formErrors.initial_quota
                         }}</small>
@@ -255,21 +255,21 @@
                 </template>
               </div>
               <simulator :capital="formCredit.credit_value" :interest="formCredit.interest"
-                :number_installments="formCredit.number_installments" :start_date="formCredit.start_date"
-                ref="Simulator" v-if="!edit"></simulator>
+                :number_installments="formCredit.number_installments" :start_date="formCredit.start_date" ref="Simulator"
+                v-if="!edit"></simulator>
               <div class="modal-footer">
-                  <div class="col-6 col-lg-4 m-0 p-1">
-                    <button type="button" class="btn-block btn btn-secondary" data-dismiss="modal"
+                <div class="col-6 col-lg-4 m-0 p-1">
+                  <button type="button" class="btn-block btn btn-secondary" data-dismiss="modal"
                     @click="(edit = false), resetData()">
                     Cerrar
                   </button>
-                  </div>
-                  <div class="col-6 col-lg-4 m-0 p-1">
-                    <button type="button" class="btn-block btn btn-success" @click="edit ? editCredit() : createCredit()">
-                      Guardar
-                    </button>
-                  </div>
                 </div>
+                <div class="col-6 col-lg-4 m-0 p-1">
+                  <button type="button" class="btn-block btn btn-success" @click="edit ? editCredit() : createCredit()">
+                    Guardar
+                  </button>
+                </div>
+              </div>
             </form>
           </div>
           <div class="modal-footer"></div>
@@ -305,7 +305,6 @@ export default {
     return {
       edit: false,
       headquarterList: [],
-      activateNewMethod:false,
       formCredit: {
         client_id: "",
         product_id: "",
@@ -387,7 +386,7 @@ export default {
 
       return value;
     },
-    value_credit_validate(){
+    value_credit_validate() {
       this.formCredit.credit_value = (this.resetNumber(this.formCredit.credit_requested) - this.resetNumber(this.formCredit.initial_quota)) + this.resetNumber(this.formCredit.doc_acc_imp);
       return this.formCredit.credit_value;
     }
@@ -397,7 +396,6 @@ export default {
     this.listHeadquarters(1);
   },
   mounted() {
-    this.activateNewMethod = this.$root.configuration.method == "GENERAL" ? true : false;
   },
   methods: {
     listHeadquarters() {
@@ -430,9 +428,9 @@ export default {
       me.formCredit.client_id = credit.client_id
       me.client_name = `${credit.client.name} ${credit.client.last_name}`
       me.formCredit.provider_id = credit.provider_id
-      if(credit.product){
+      if (credit.product) {
         me.formCredit.product_id = credit.product.id
-      me.product_name = credit.product.product
+        me.product_name = credit.product.product
       }
       me.provider_name = `ID de proveedor: ${credit.provider_id}`
     },
@@ -498,7 +496,7 @@ export default {
               }).catch((error) => {
                 Swal.fire(
                   'Lo sentimos',
-                  "Hubo un error al eliminar el registro. \n". error.message,
+                  "Hubo un error al eliminar el registro. \n".error.message,
                   'danger'
                 )
               })
@@ -516,7 +514,7 @@ export default {
         this.formCredit.guarantees.push(guarantee);
       }
     },
-    removeGuarantee(index, guarantee) {      
+    removeGuarantee(index, guarantee) {
       if (guarantee.pivot) {
         Swal.fire({
           title: '¿Está seguro de realizar esta operación?',
@@ -539,7 +537,7 @@ export default {
               }).catch((error) => {
                 Swal.fire(
                   'Lo sentimos',
-                  "Hubo un error al eliminar el registro. \n". error.message,
+                  "Hubo un error al eliminar el registro. \n".error.message,
                   'danger'
                 )
               })
@@ -560,11 +558,9 @@ export default {
       });
       me.$root.assignErrors(false, me.formErrors);
     },
-    // activateNewMethod(){
-    //   return this.$root.configuration.method == "GENERAL";
-    // },
-    resetNumber(value){
-      return isNaN(value) ? 0: Number(value);
+
+    resetNumber(value) {
+      return isNaN(value) ? 0 : Number(value);
     }
   },
 };
