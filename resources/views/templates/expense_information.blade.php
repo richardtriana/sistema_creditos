@@ -40,7 +40,7 @@
             </tr>
             <tr>
                 <td>Monto cancelado: </td>
-                <td>$ {{$expense->price}}</td>
+                <td>$ {{ number_format($expense->price, 0, '', '.') }}</td>
             </tr>
             <tr>
                 <td>Fecha: </td>

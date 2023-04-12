@@ -45,12 +45,12 @@
       </tr>
       <tr>
         <td>Monto Crédito: </td>
-        <td> $ {{ $credit->credit_value}}</td>
+        <td> $ {{number_format($credit->credit_value, 0, '', '.')  }}</td>
       </tr>
       @endif     
       <tr>
         <td>Monto cancelado: </td>
-        <td>$ {{$entry->price}}</td>
+        <td>$ {{ number_format($entry->price, 0, '', '.') }}</td>
       </tr>
       <tr>
         <td>Fecha: </td>
@@ -66,7 +66,7 @@
       </tr>
       <tr class="font-weight-bold">
         <td>Cupo de crédito </td>
-        <td>{{$client->maximum_credit_allowed}}</td>
+        <td>{{ number_format($client->maximum_credit_allowed, 0, '', '.')  }}</td>
       </tr>
       @endif
     </table>

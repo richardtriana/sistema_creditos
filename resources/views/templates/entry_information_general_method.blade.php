@@ -42,7 +42,7 @@
       @endif
       <tr>
         <td>Monto cancelado: </td>
-        <td>$ {{$entry->price}}</td>
+        <td>$ {{ number_format($entry->price, 0, '', '.') }}</td>
       </tr>
       <tr>
         <td>Fecha: </td>
