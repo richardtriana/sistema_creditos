@@ -70,10 +70,13 @@ class PrintTicketController extends Controller
 				$printer->text("\n");
 				$printer->text('Fecha: ' . date('Y-m-d h:i:s A'));
 				$printer->text("\n");
-				$printer->text(sprintf('%-20s %-20s', 'Valor Crédito: ', ' $ ' . $credit->credit_value));
+				$printer->text(sprintf('%-20s %-20s', 'Valor Crédito: ', ' $ ' . number_format($credit->credit_value, 0, '', '.') ));
 				$printer->text("\n");
 			}
-			$printer->text(sprintf('%-20s %-20s', 'Monto Cancelado: ', '$ ' .  $entry->price));
+			$printer->text(sprintf('%-20s %-20s', 'Monto Cancelado: ', '$ ' . number_format($entry->price, 0, '', '.')));
+
+			$printer->text(sprintf('%-20s %-20s', 'Saldo pendiente: ', '$ ' . number_format($credit->credit_to_pay - $credit->credit_paid, 0, '', '.')));
+
 			$printer->text("\n");
 			if ($credit) {
 				$printer->text('Motivo de crédito: ' . $credit->description);

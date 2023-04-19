@@ -40,7 +40,10 @@ class Credit extends Model
         'initial_quota'
     ];
 
-    protected $with = [];
+    protected $appends = [
+        'credit_to_pay',
+        'credit_paid'
+    ];
 
     public function client()
     {
@@ -85,5 +88,17 @@ class Credit extends Model
     public function debtors()
     {
         return $this->belongsToMany(Client::class, 'credit_debtor', 'credit_id', 'debtor_id')->withPivot('id','credit_id','debtor_id');
+    }
+
+    public function getCreditToPayAttribute()
+    {
+        $value = $this->installments->sum("value");
+        $interest=$this->installments->sum("late_interests_value");
+        return $value+$interest;
+    }
+
+    public function getCreditPaidAttribute()
+    {
+        return $this->installments->sum("paid_balance");
     }
 }
