@@ -71,7 +71,14 @@ class EntryController extends Controller
 			$entries =	$entries->where('id', "$id");
 		}
 		$entries = $entries->paginate(15);
-		return $entries;
+
+		$getTotalReportsController = new GetTotalReportsController;
+		$totals = $getTotalReportsController->getTotalReportHeadquartersEntries($entries);
+
+		return [
+			'entries' => $entries,
+			'totals' => $totals,
+		];
 	}
 	/**
 	 * Store a newly created resource in storage.

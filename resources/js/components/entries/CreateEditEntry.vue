@@ -1,7 +1,7 @@
 <template>
   <div class="modal-content">
     <div class="modal-header">
-      <h5 class="modal-title" id="entryModalLabel">Egresos</h5>
+      <h5 class="modal-title" id="entryModalLabel">Ingresos</h5>
       <button
         type="button"
         class="close"

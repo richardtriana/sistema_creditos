@@ -60,9 +60,14 @@ class ExpenseController extends Controller
 		}
 		$expenses =	$expenses->paginate(15);
 
-		return $expenses;
-	}
+		$getTotalReportsController = new GetTotalReportsController;
+		$totals = $getTotalReportsController->getTotalReportHeadquartersExpenses($expenses);
 
+		return [
+			'expenses' => $expenses,
+			'totals' => $totals,
+		];
+	}
 
 	public function changeStatus(Expense $expense)
 	{

@@ -1,8 +1,11 @@
 <template>
   <div>
     <div class="page-header d-flex justify-content-between p-4 border my-2">
-      <h3>Egresos</h3>
-      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#expenseModal"
+      <h3 class="col-4">Egresos</h3>
+      <ul class="list-group col-4">
+        <li class="list-group-item"><h5 class="text-dark font-weight-bold">Total egresos: {{expensesTotal.price | currency}}</h5></li>
+      </ul>
+      <button type="button" class="btn btn-primary col-4" data-toggle="modal" data-target="#expenseModal"
         v-if="$root.validatePermission('expense-store')">
         Crear Egreso
       </button>
@@ -124,6 +127,7 @@ export default {
   data() {
     return {
       expenseList: {},
+      expensesTotal: {},
       headquarterList: [],
       search_from: "",
       search_to: "",
@@ -159,7 +163,8 @@ export default {
           headers: this.$root.config.headers,
         })
         .then(function (response) {
-          me.expenseList = response.data;
+          me.expenseList = response.data.expenses;
+          me.expensesTotal = response.data.totals;
         });
     },
     listHeadquarters() {

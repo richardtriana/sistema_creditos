@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Credit;
+use App\Models\Entry;
 use App\Models\Expense;
 use App\Models\Installment;
 use Carbon\Carbon;
@@ -17,6 +18,7 @@ class ReportController extends Controller
 		$now = date("Y-m-d");
 		$status = $request->status;
 		$results = $request->results ?? 15;
+		$search_client = $request->search_client;
 
 		if ($status != 'all') {
 			$from = null;
@@ -67,10 +69,22 @@ class ReportController extends Controller
 			->where('credits.status', 1)
 			->leftJoin('credits', 'installments.credit_id', 'credits.id')
 			->leftJoin('clients', 'credits.client_id', 'clients.id')
-			->leftJoin('headquarters', 'credits.headquarter_id', 'headquarters.id')
-			->paginate($results);
+			->leftJoin('headquarters', 'credits.headquarter_id', 'headquarters.id');
 
-		return $installments;
+			if ($search_client) {
+				$installments = $installments->whereHas('credit.client', function ($query) use ($search_client) {
+					$query->where('name', 'LIKE', "%$search_client%")
+						->orWhere('last_name', 'LIKE', "%$search_client%")
+						->orWhere('document', 'LIKE', "%$search_client%");
+				});
+			}
+
+			$installments = $installments->paginate($results);
+
+		$getTotalReportsController = new GetTotalReportsController;
+		$totals = $getTotalReportsController->getTotalReportPortfolio($installments);
+
+		return ['installments'=>$installments, 'totals'=> $totals];
 	}
 
 	public function ReportGeneralCredits(Request $request)
@@ -184,6 +198,7 @@ class ReportController extends Controller
 	{
 		$from = $request->from;
 		$to = $request->to;
+		$type_output = $request->type_output;
 		$this_month = Carbon::now()->month;
 
 		$expenses = Expense::select(
@@ -201,11 +216,62 @@ class ReportController extends Controller
 					$query->whereDate('date', '<=', $to);
 				}
 			})
+			->where(function ($query) use ($type_output) {
+				if ($type_output != '' && $type_output != 'undefined' && $type_output != null) {
+					$query->where('type_output', 'LIKE', "%$type_output%");
+				}
+			})
 			->groupBy('headquarter')
 			->leftJoin('headquarters', 'headquarters.id', 'expenses.headquarter_id')
 			->paginate(15);
 
-		return $expenses;
+		$getTotalReportsController = new GetTotalReportsController;
+		$totals = $getTotalReportsController->getTotalReportHeadquartersExpenses($expenses);
+
+		return [
+			'expenses' => $expenses,
+			'totals' => $totals,
+		];
+	}
+
+	public function ReportHeadquartersEntries(Request $request)
+	{
+		$from = $request->from;
+		$to = $request->to;
+		$type_entry = $request->type_entry;
+		$this_month = Carbon::now()->month;
+
+		$entries = Entry::select(
+			DB::raw('SUM(price) as price '),
+			'headquarters.headquarter as headquarter',
+		)
+			->where(function ($query) use ($this_month, $from, $to) {
+
+				$query->whereMonth('date', '<=', $this_month);
+
+				if ($from != '' && $from != 'undefined' && $from != null) {
+					$query->whereDate('date', '>=', $from);
+				}
+				if ($to != '' && $to != 'undefined' && $to != null) {
+					$query->whereDate('date', '<=', $to);
+				}
+			})
+			->where(function ($query) use ($type_entry) {
+				if ($type_entry != '' && $type_entry != 'undefined' && $type_entry != null) {
+					$query->where('type_entry', 'LIKE', "%$type_entry%");
+				}
+			})
+			->groupBy('headquarter')
+			->leftJoin('headquarters', 'headquarters.id', 'entries.headquarter_id')
+			->paginate(15);
+
+		$getTotalReportsController = new GetTotalReportsController;
+		$totals = $getTotalReportsController->getTotalReportHeadquartersEntries($entries);
+
+		return [
+			'entries' => $entries,
+			'totals' => $totals,
+		];
 	}
 
 	public function ReportGeneralClient(Request $request)
@@ -272,7 +338,6 @@ class ReportController extends Controller
 
 		return $data;
 	}
-
 
 	/* @Route api/reports/cash-flow */
 	public function ReportCashFlow(Request $request)

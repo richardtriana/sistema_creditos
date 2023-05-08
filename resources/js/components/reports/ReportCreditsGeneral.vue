@@ -274,7 +274,7 @@ export default {
       }
       axios
         .get(
-          `api/reports/general-credits?`,
+          `api/reports/general-credits`,
           {
             params: data,
             headers: this.$root.config.headers,

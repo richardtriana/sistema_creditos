@@ -41,6 +41,8 @@
             </router-link>
             <router-link class="dropdown-item" :to="{ name: 'report-headquarters-expenses' }"> Reporte egresos sedes
             </router-link>
+              <router-link class="dropdown-item" :to="{ name: 'report-headquarters-entries' }"> Reporte ingresos sedes
+            </router-link>
             <router-link class="dropdown-item" :to="{ name: 'report-profitability' }"> Reporte de Rentabilidad
             </router-link>
             <router-link class="dropdown-item" :to="{ name: 'report-cash-flow' }"> Reporte de flujo de caja

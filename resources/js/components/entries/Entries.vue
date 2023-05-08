@@ -1,8 +1,11 @@
 <template>
   <div>
     <div class="page-header d-flex justify-content-between p-4 border my-2">
-      <h3>Ingresos</h3>
-      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#entryModal"
+      <h3 class="col-4">Ingresos</h3>
+      <ul class="list-group col-4">
+        <li class="list-group-item"><h5 class="text-dark font-weight-bold">Total ingresos: {{entriesTotal.price | currency}}</h5></li>
+      </ul>
+      <button type="button" class="btn btn-primary col-4" data-toggle="modal" data-target="#entryModal"
         v-if="$root.validatePermission('entry-store')">
         Crear Ingreso
       </button>
@@ -129,6 +132,7 @@ export default {
   data() {
     return {
       entryList: {},
+      entriesTotal: {},
       search_id: "",
       search_client: "",
       search_document: "",
@@ -164,7 +168,8 @@ export default {
           headers: me.$root.config.headers,
         })
         .then(function (response) {
-          me.entryList = response.data;
+          me.entryList = response.data.entries;
+          me.entriesTotal = response.data.totals;
         });
     },
     showData: function (entry) {

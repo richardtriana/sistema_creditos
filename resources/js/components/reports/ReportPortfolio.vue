@@ -1,12 +1,29 @@
 <template>
   <div class="page">
-    <div class="page-header">
-      <h3>Reporte de cartera</h3>
+    <div class="page-header row">
+      <h3 class="col-6">Reporte de cartera</h3>
+      <ul class="list-group col-6">
+        <li class="list-group-item"><h5 class="text-dark font-weight-bold">Total cuotas: {{ReportPortfolioTotal.value | currency}}</h5></li>
+        <li class="list-group-item"><h5 class="text-dark font-weight-bold">Total interés: {{ReportPortfolioTotal.interest_value | currency}}</h5></li>
+        <li class="list-group-item"><h5 class="text-dark font-weight-bold">Total capital: {{ReportPortfolioTotal.capital_value | currency}}</h5></li>
+      </ul>
     </div>
     <div class="page-search p-4 border my-2">
       <h6 class="text-primary text-uppercase">Filtrar:</h6>
       <form>
         <div class="form-row">
+          <div class="form-group col-md-4 col-sm-6 col-xs-6">
+            <label for="search_client">Buscar...</label>
+            <input
+              type="text"
+              id="search_client"
+              name="search_client"
+              class="form-control"
+              placeholder="Nombres | Documento"
+              @keypress="listReportPortfolio(1)"
+              v-model="search_client"
+            />
+          </div>
           <div class="form-group col-md-4 col-sm-6 col-xs-6">
             <label for="headquarter_id">Sede</label>
             <v-select :options="headquarterList" label="headquarter" aria-logname="{}"
@@ -132,6 +149,7 @@ export default {
   data() {
     return {
       ReportPortfolioList: {},
+      ReportPortfolioTotal:{},
       headquarterList: [],
       now: moment().format('YYYY-MM-DD'),
       infoCompany: {},
@@ -140,6 +158,7 @@ export default {
       search_status: "all",
       search_headquarter_id: 'all',
       search_results: 15,
+      search_client:"",
 
       json_fields: {
         'ID crédito': {
@@ -218,7 +237,9 @@ export default {
         to: this.search_to,
         status: this.search_status,
         headquarter_id: this.search_headquarter_id,
-        results: this.search_results
+        results: this.search_results,
+        search_client: this.search_client
+
       };
 
       axios
@@ -227,7 +248,8 @@ export default {
           headers: this.$root.config.headers,
         })
         .then((response) => {
-          this.ReportPortfolioList = response.data;
+          this.ReportPortfolioList = response.data.installments;
+          this.ReportPortfolioTotal = response.data.totals;
         });
     },
 

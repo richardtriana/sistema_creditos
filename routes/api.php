@@ -160,6 +160,7 @@ Route::group(['middleware' => ['auth:api']], function () {
 	Route::get('/reports/portfolio', [ReportController::class, 'ReportPortfolio']);
 	Route::get('/reports/general-credits', [ReportController::class, 'ReportGeneralCredits']);
 	Route::get('/reports/headquarters-expenses', [ReportController::class, 'ReportHeadquartersExpenses']);
+	Route::get('/reports/headquarters-entries', [ReportController::class, 'ReportHeadquartersEntries']);
 
 	//Roles
 	Route::get('/roles/getAllRoles', [RoleController::class, 'getAllRoles']);

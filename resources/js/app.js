@@ -186,6 +186,12 @@ const routes = [
 				name: "report-headquarters-expenses",
 			},
 			{
+				path: "headquarters-entries",
+				component: require("./components/reports/ReportHeadquartersEntries.vue")
+					.default,
+				name: "report-headquarters-entries",
+			},
+			{
 				path: "profitability",
 				component: require("./components/reports/ReportProfitability.vue").default,
 				name: "report-profitability",

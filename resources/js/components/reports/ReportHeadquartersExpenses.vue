@@ -1,14 +1,17 @@
 <template>
   <div>
     <div class="page-header d-flex justify-content-between p-4 border my-2">
-      <h3>Reporte de egresos por sede</h3>
+      <h3 class="col-6">Reporte de egresos por sede</h3>
+      <ul class="list-group col-6">
+        <li class="list-group-item"><h5 class="text-dark font-weight-bold">Total egresos: {{headquartersExpenseTotal.price | currency}}</h5></li>
+      </ul>
     </div>
     <div class="page-search p-4 border my-2">
       <h6 class="text-primary text-uppercase">Filtrar:</h6>
       <form>
         <div class="form-row">
           <div class="form-group col-4 ml-auto">
-            <label for="">Desde:</label>
+            <label for="search_from">Desde:</label>
             <input
               type="date"
               id="search_from"
@@ -20,20 +23,31 @@
             />
           </div>
           <div class="form-group col-4 mr-auto">
-            <label for="">Hasta:</label>
+            <label for="search_to">Hasta:</label>
             <input
               type="date"
               id="search_to"
               name="search_to"
               class="form-control"
-              placeholder="Desde"
+              placeholder="Hasta"
               v-model="search_to"
               :max="now"
             />
           </div>
+          <div class="form-group col-4 mr-auto">
+            <label for="search_type_output">Tipo de salida:</label>
+            <input
+              type="text"
+              id="search_type_output"
+              name="search_type_output"
+              class="form-control"
+              placeholder="Tipo de salida"
+              v-model="search_type_output"
+            />
+          </div>
         </div>
         <div class="form-row text-right m-auto">
-          <div class="form-group m-md-auto col-md-4">
+          <div class="form-group ofsset-md-4 col-md-4">
             <button
               class="btn btn-success w-100"
               type="button"
@@ -41,6 +55,12 @@
             >
               <i class="bi bi-search"></i> Buscar
             </button>
+          </div>
+          <div class="form-group col-md-4 ">
+            <download-excel class="btn btn-primary w-100" :fields="json_fields" :data="headquartersExpenseList.data"
+              name="report-headquarters-expenses.xls" type="xls">
+              <i class="bi bi-file-earmark-arrow-down-fill"></i> Descargar .xls
+            </download-excel>
           </div>
         </div>
       </form>
@@ -83,13 +103,30 @@
 </template>
 
 <script>
+import {dollarFilter} from '../../filters'
 export default {
   data() {
     return {
       headquartersExpenseList: {},
+      headquartersExpenseTotal: {},
       search_from: "",
       search_to: "",
+      search_type_output: "",
       now: moment().format('YYYY-MM-DD'),
+      json_fields: {
+        'Sede': {
+          field: 'headquarter',
+          callback: (value) => {
+            return value;
+          }
+        },
+        'Valor egresos': {
+          field: 'price',
+          callback: (value) => {
+            return dollarFilter(value);
+          }
+        }
+      }
     };
   },
   mounted() {
@@ -98,13 +135,25 @@ export default {
   methods: {
     listHeadquartersExpenses(page = 1) {
       let me = this;
+
+      let data = {
+        page: page,
+        from: this.search_from,
+        to: this.search_to,
+        type_output: this.search_type_output
+      }
+
       axios
         .get(
-          `api/reports/headquarters-expenses?page=${page}&from=${this.search_from}&to=${this.search_to}`,
-          this.$root.config
+          `api/reports/headquarters-expenses`,
+          {
+            params: data,
+            headers: this.$root.config.headers,
+          }
         )
         .then(function (response) {
-          me.headquartersExpenseList = response.data;
+          me.headquartersExpenseList = response.data.expenses;
+          me.headquartersExpenseTotal = response.data.totals;
         });
     },
   },
