@@ -59,7 +59,7 @@ class Credit extends Model
     {
         return $this->belongsTo(Headquarter::class, 'headquarter_id');
     }
-    
+
     public function installments()
     {
         return $this->hasMany(Installment::class);
@@ -92,13 +92,13 @@ class Credit extends Model
 
     public function getCreditToPayAttribute()
     {
-        $value = $this->installments->sum("value");
-        $interest=$this->installments->sum("late_interests_value");
+        $value = $this->installments()->sum("value");
+        $interest=$this->installments()->sum("late_interests_value");
         return $value+$interest;
     }
 
     public function getCreditPaidAttribute()
     {
-        return $this->installments->sum("paid_balance");
+        return $this->installments()->sum("paid_balance");
     }
 }

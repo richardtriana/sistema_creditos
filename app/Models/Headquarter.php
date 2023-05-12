@@ -34,4 +34,14 @@ class Headquarter extends Model
 	{
 		return $this->hasMany(Box::class);
 	}
+
+	public function expense()
+	{
+		return $this->hasMany(Expense::class);
+	}
+
+	public function entry()
+	{
+		return $this->hasMany(Entry::class);
+	}
 }

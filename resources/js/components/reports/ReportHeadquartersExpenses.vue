@@ -71,6 +71,7 @@
           <thead>
             <tr class="text-center">
               <th>Sede</th>
+							<th>Detalle</th>
               <th>Valor</th>
             </tr>
           </thead>
@@ -82,6 +83,11 @@
           >
             <tr v-for="r in headquartersExpenseList.data" :key="r.id">
               <td>{{ r.headquarter }}</td>
+							<td>
+								<ul>
+									<li v-for="item in r.expense" :key="item.id"> {{  item.description }}</li>
+								</ul>
+							</td>
               <td class="text-right">{{ r.price | currency }}</td>
             </tr>
           </tbody>

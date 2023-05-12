@@ -49,7 +49,7 @@
             <label for="">Mostrar {{ search_results }} resultados por página:</label>
             <input type="number" id="search_results" name="search_results" class="form-control" placeholder="Desde"
               v-model="search_results" max="1000" />
-          </div>          
+          </div>
           <div class="form-group col-md-4 col-sm-6 col-xs-6">
             <button class="btn btn-success w-100 mt-5" type="button" @click="listReportGeneralCredits(1)">
               <i class="bi bi-search"></i> Buscar
@@ -134,6 +134,10 @@
           <tr class="text-right">
             <th>Total abonado a intereses</th>
             <td>{{ ReportTotalValues.interest_value | currency }}</td>
+          </tr>
+          <tr class="text-right">
+            <th class="font-weight-bold h4">Total saldo actual</th>
+            <td class="h4">{{ (ReportTotalValues.credit_value - ReportTotalValues.paid_value) | currency }}</td>
           </tr>
         </table>
       </section>
