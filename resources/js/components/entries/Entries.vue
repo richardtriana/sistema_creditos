@@ -31,16 +31,21 @@
           </div>
         </div>
         <div class="form-row">
-          <div class="form-group col-md-4 ml-md-auto">
+          <div class="form-group col-md-4 col-sm-6 col-xs-6  ml-md-auto">
             <label for="search_type_input">Tipo de ingreso:</label>
             <input type="text" id="search_type_input" name="search_type_input" class="form-control"
               placeholder="Escribir el tipo de ingreso" v-model="search_type_input" />
           </div>
-          <div class="form-group col-md-4 mr-md-auto">
+          <div class="form-group col-md-4 col-sm-6 col-xs-6 ">
             <label for="search_description">Descripción:</label>
             <input type="text" id="search_description" name="search_description" class="form-control"
               placeholder="Escribir el motivo o descripción" v-model="search_description" />
           </div>
+          <div class="form-group col-md-4 col-sm-6 col-xs-6  mr-md-auto">
+            <label for="">Mostrar {{ search_results }} resultados por página:</label>
+            <input type="number" id="search_results" name="search_results" class="form-control" placeholder="Desde"
+              v-model="search_results" max="1000" />
+          </div>         
         </div>
         <div class="form-row">
           <div class="form-group col-md-4 ml-auto">
@@ -140,6 +145,7 @@ export default {
       search_to: "",
       search_description: "",
       search_type_input: "",
+      search_results: 15,
       now: new Date().toISOString().slice(0, 10),
     };
   },
@@ -157,6 +163,7 @@ export default {
         to: this.search_to,
         type_input: this.search_type_input,
         description: this.search_description,
+        results: this.search_results,
         id: this.search_id,
       }
 
