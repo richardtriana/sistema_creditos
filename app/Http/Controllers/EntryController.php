@@ -29,6 +29,7 @@ class EntryController extends Controller
 		$this_month = Carbon::now()->month;
 		$type_input = $request->type_input;
 		$description = $request->description;
+		$results = $request->results ?? 15;
 
 		$entries = Entry::select()
 			->orderBy('id', 'desc')
@@ -70,7 +71,7 @@ class EntryController extends Controller
 		if ($id != null) {
 			$entries =	$entries->where('id', "$id");
 		}
-		$entries = $entries->paginate(15);
+		$entries = $entries->paginate($results);
 
 		$getTotalReportsController = new GetTotalReportsController;
 		$totals = $getTotalReportsController->getTotalReportHeadquartersEntries($entries);

@@ -32,16 +32,21 @@
           </div>
         </div>
         <div class="form-row">
-          <div class="form-group col-md-4 ml-auto">
+          <div class="form-group col-md-4 col-sm-6 col-xs-6 ml-auto">
             <label for="">Desde:</label>
             <input type="date" id="search_from" name="search_from" class="form-control" placeholder="Desde"
               v-model="search_from" :max="now" />
           </div>
-          <div class="form-group col-md-4 mr-auto">
+          <div class="form-group col-md-4 col-sm-6 col-xs-6">
             <label for="">Hasta:</label>
             <input type="date" id="search_to" name="search_to" class="form-control" placeholder="Desde"
               v-model="search_to" :max="now" />
           </div>
+          <div class="form-group col-md-4 col-sm-6 col-xs-6 col-sm-6 col-xs-6  mr-md-auto">
+            <label for="">Mostrar {{ search_results }} resultados por página:</label>
+            <input type="number" id="search_results" name="search_results" class="form-control" placeholder="Desde"
+              v-model="search_results" max="1000" />
+          </div>   
         </div>
         <div class="form-row text-right m-auto">
           <div class="form-group m-md-auto col-md-4">
@@ -134,6 +139,7 @@ export default {
       search_description: "",
       search_type_output: "",
       search_headquarter_id: 'all',
+      search_results: 15,
       now: new Date().toISOString().slice(0, 10),
     };
   },
@@ -151,6 +157,7 @@ export default {
         to: this.search_to,
         type_output: this.search_type_output,
         description: this.search_description,
+        results: this.search_results,
         headquarter_id: this.search_headquarter_id
       };
 
