@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Credit;
 use App\Models\Entry;
 use App\Models\Expense;
-use App\Models\Headquarter;
 use App\Models\Installment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -198,65 +197,38 @@ class ReportController extends Controller
 	public function ReportHeadquartersExpenses(Request $request)
 	{
 		$this_month = Carbon::now()->month;
+		$from = $request->from;
+		$to = $request->to;
+		$type_output = $request->type_output;
+		$headquarterId = $request->headquarter_id;
 
-			$expenses = Headquarter::with([
-				'expense' => function($query) use ($request, $this_month){
+		$expenses = Expense::where(function ($query) use ($this_month, $from, $to, $headquarterId) {
 
-					$from = $request->from;
-					$to = $request->to;
-					$type_output = $request->type_output;
+			$query->whereMonth('date', '<=', $this_month);
 
+			if ($from != '' && $from != 'undefined' && $from != null) {
+				$query->whereDate('date', '>=', $from);
+			}
+			if ($to != '' && $to != 'undefined' && $to != null) {
+				$query->whereDate('date', '<=', $to);
+			}
 
-					$query->where(function ($sub) use ($this_month, $from, $to) {
+			if(!is_null($headquarterId) && $headquarterId != ''){
+				$query->where('headquarter_id', $headquarterId);
+			}
 
-						$sub->whereMonth('date', '<=', $this_month);
+		})->where(function ($query) use ($type_output) {
+			if ($type_output != '' && $type_output != 'undefined' && $type_output != null) {
+				$query->where('type_output', 'LIKE', "%$type_output%");
+			}
+		})->with('headquarter');
 
-						if ($from != '' && $from != 'undefined' && $from != null) {
-							$sub->whereDate('date', '>=', $from);
-						}
-						if ($to != '' && $to != 'undefined' && $to != null) {
-							$sub->whereDate('date', '<=', $to);
-						}
-					})->where(function ($sub) use ($type_output) {
-						if ($type_output != '' && $type_output != 'undefined' && $type_output != null) {
-							$sub->where('type_output', 'LIKE', "%$type_output%");
-						}
-					});
-				}
-			])
-			->select('headquarters.*', DB::raw('SUM(expenses.price) as price '))
-			->leftJoin('expenses', 'expenses.headquarter_id', 'headquarters.id')
-			->where(function($query) use ($request, $this_month){
-
-				$from = $request->from;
-				$to = $request->to;
-				$type_output = $request->type_output;
-
-
-				$query->where(function ($sub) use ($this_month, $from, $to) {
-
-					$sub->whereMonth('expenses.date', '<=', $this_month);
-
-					if ($from != '' && $from != 'undefined' && $from != null) {
-						$sub->whereDate('expenses.date', '>=', $from);
-					}
-					if ($to != '' && $to != 'undefined' && $to != null) {
-						$sub->whereDate('expenses.date', '<=', $to);
-					}
-				})->where(function ($sub) use ($type_output) {
-					if ($type_output != '' && $type_output != 'undefined' && $type_output != null) {
-						$sub->where('expenses.type_output', 'LIKE', "%$type_output%");
-					}
-				});
-			})
-			->groupBy('headquarters.id')
-			->paginate(15);
 
 		$getTotalReportsController = new GetTotalReportsController;
-		$totals = $getTotalReportsController->getTotalReportHeadquartersExpenses($expenses);
+		$totals = $getTotalReportsController->getTotalReportHeadquartersExpenses($expenses->get());
 
 		return [
-			'expenses' => $expenses,
+			'expenses' => $expenses->paginate(15),
 			'totals' => $totals,
 		];
 	}
@@ -264,66 +236,38 @@ class ReportController extends Controller
 	public function ReportHeadquartersEntries(Request $request)
 	{
 		$this_month = Carbon::now()->month;
+		$from = $request->from;
+		$to = $request->to;
+		$type_output = $request->type_output;
+		$headquarterId = $request->headquarter_id;
 
-		$entries = Headquarter::with([
-			'entry' => function($query) use ($request, $this_month){
+		$entries = Entry::where(function ($query) use ($this_month, $from, $to, $headquarterId) {
 
-				$from = $request->from;
-				$to = $request->to;
-				$type_output = $request->type_output;
+			$query->whereMonth('date', '<=', $this_month);
 
-
-				$query->where(function ($sub) use ($this_month, $from, $to) {
-
-					$sub->whereMonth('date', '<=', $this_month);
-
-					if ($from != '' && $from != 'undefined' && $from != null) {
-						$sub->whereDate('date', '>=', $from);
-					}
-					if ($to != '' && $to != 'undefined' && $to != null) {
-						$sub->whereDate('date', '<=', $to);
-					}
-				})->where(function ($sub) use ($type_output) {
-					if ($type_output != '' && $type_output != 'undefined' && $type_output != null) {
-						$sub->where('type_output', 'LIKE', "%$type_output%");
-					}
-				});
+			if ($from != '' && $from != 'undefined' && $from != null) {
+				$query->whereDate('date', '>=', $from);
 			}
-		])
-		->select('headquarters.*', DB::raw('SUM(entries.price) as price '))
-		->leftJoin('entries', 'entries.headquarter_id', 'headquarters.id')
-		->where(function($query) use ($request, $this_month){
+			if ($to != '' && $to != 'undefined' && $to != null) {
+				$query->whereDate('date', '<=', $to);
+			}
 
-			$from = $request->from;
-			$to = $request->to;
-			$type_output = $request->type_output;
+			if(!is_null($headquarterId) && $headquarterId != ''){
+				$query->where('headquarter_id', $headquarterId);
+			}
 
-
-			$query->where(function ($sub) use ($this_month, $from, $to) {
-
-				$sub->whereMonth('entries.date', '<=', $this_month);
-
-				if ($from != '' && $from != 'undefined' && $from != null) {
-					$sub->whereDate('entries.date', '>=', $from);
-				}
-				if ($to != '' && $to != 'undefined' && $to != null) {
-					$sub->whereDate('entries.date', '<=', $to);
-				}
-			})->where(function ($sub) use ($type_output) {
-				if ($type_output != '' && $type_output != 'undefined' && $type_output != null) {
-					$sub->where('entries.type_output', 'LIKE', "%$type_output%");
-				}
-			});
-		})
-		->groupBy('headquarters.id')
-		->paginate(15);
+		})->where(function ($query) use ($type_output) {
+			if ($type_output != '' && $type_output != 'undefined' && $type_output != null) {
+				$query->where('type_output', 'LIKE', "%$type_output%");
+			}
+		})->with('headquarter');
 
 
 		$getTotalReportsController = new GetTotalReportsController;
-		$totals = $getTotalReportsController->getTotalReportHeadquartersEntries($entries);
+		$totals = $getTotalReportsController->getTotalReportHeadquartersEntries($entries->get());
 
 		return [
-			'entries' => $entries,
+			'entries' => $entries->paginate(15),
 			'totals' => $totals,
 		];
 	}

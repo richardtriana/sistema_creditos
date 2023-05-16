@@ -10,7 +10,7 @@
       <h6 class="text-primary text-uppercase">Filtrar:</h6>
       <form>
         <div class="form-row">
-          <div class="form-group col-4 ml-auto">
+          <div class="form-group col-12 col-md-3 ml-auto">
             <label for="search_from">Desde:</label>
             <input
               type="date"
@@ -22,7 +22,7 @@
               :max="now"
             />
           </div>
-          <div class="form-group col-4 mr-auto">
+          <div class="form-group col-12 col-md-3 mr-auto">
             <label for="search_to">Hasta:</label>
             <input
               type="date"
@@ -34,7 +34,7 @@
               :max="now"
             />
           </div>
-          <div class="form-group col-4 mr-auto">
+          <div class="form-group col-12 col-md-3 mr-auto">
             <label for="search_type_output">Tipo de salida:</label>
             <input
               type="text"
@@ -44,6 +44,16 @@
               placeholder="Tipo de salida"
               v-model="search_type_output"
             />
+          </div>
+					<div class="form-group col-12 col-md-3 mr-auto">
+						<label for="headquarter_id">Sede</label>
+								<select class="form-control custom-selec" id="headquarter_id" v-model="search_headquarter_id">
+									<option selected value="">Todas</option>
+									<option v-for="headquarter in headquarterList" :key="headquarter.id"
+										:value="headquarter.id">
+										{{ headquarter.headquarter }}
+									</option>
+								</select>
           </div>
         </div>
         <div class="form-row text-right m-auto">
@@ -71,7 +81,8 @@
           <thead>
             <tr class="text-center">
               <th>Sede</th>
-							<th>Detalle</th>
+							<th>Tipo</th>
+							<th>Afectación</th>
               <th>Valor</th>
             </tr>
           </thead>
@@ -82,12 +93,9 @@
             "
           >
             <tr v-for="r in headquartersExpenseList.data" :key="r.id">
-              <td>{{ r.headquarter }}</td>
-							<td>
-								<ul>
-									<li v-for="item in r.expense" :key="item.id"> {{  item.description }}</li>
-								</ul>
-							</td>
+              <td>{{ r.headquarter.headquarter }}</td>
+							<td>{{ r.type_output }}</td>
+							<td>{{ r.description | affectation('expense') }}</td>
               <td class="text-right">{{ r.price | currency }}</td>
             </tr>
           </tbody>
@@ -118,6 +126,7 @@ export default {
       search_from: "",
       search_to: "",
       search_type_output: "",
+			search_headquarter_id: "",
       now: moment().format('YYYY-MM-DD'),
       json_fields: {
         'Sede': {
@@ -132,11 +141,13 @@ export default {
             return dollarFilter(value);
           }
         }
-      }
+      },
+			headquarterList: []
     };
   },
   mounted() {
     this.listHeadquartersExpenses(1);
+		this.listHeadquarters();
   },
   methods: {
     listHeadquartersExpenses(page = 1) {
@@ -146,7 +157,8 @@ export default {
         page: page,
         from: this.search_from,
         to: this.search_to,
-        type_output: this.search_type_output
+        type_output: this.search_type_output,
+				headquarter_id: this.search_headquarter_id
       }
 
       axios
@@ -160,6 +172,14 @@ export default {
         .then(function (response) {
           me.headquartersExpenseList = response.data.expenses;
           me.headquartersExpenseTotal = response.data.totals;
+        });
+    },
+		listHeadquarters() {
+      let me = this;
+      axios
+        .get(`api/headquarters/list-all-headquarters`, me.$root.config)
+        .then(function (response) {
+          me.headquarterList = response.data;
         });
     },
   },

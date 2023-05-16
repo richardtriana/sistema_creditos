@@ -15,7 +15,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import Swal from "sweetalert2";
 import vSelect from "vue-select";
-import { dollarFilter } from "./filters";
+import { dollarFilter, affectation} from "./filters";
 import JsonExcel from "vue-json-excel";
 
 import "vue-select/dist/vue-select.css";
@@ -24,6 +24,7 @@ import CKEditor from "@ckeditor/ckeditor5-vue2";
 import axios from "axios";
 
 Vue.filter("currency", dollarFilter);
+Vue.filter("affectation", affectation);
 
 /**
  * The following block of code may be used to automatically register your

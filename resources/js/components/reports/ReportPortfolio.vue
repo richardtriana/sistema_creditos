@@ -100,9 +100,7 @@
                   :href="`https://wa.me/57${report.phone_2}?text=${infoCompany.whatsapp_msg}`"><i
                     class="bi bi-whatsapp"></i> {{ report.phone_2 }}</a>
               </td>
-							<th>
-								<textarea name="description" id="description" cols="10" rows="4" class="form-control-plaintext" readonly v-model="report.credit.description"></textarea>
-							</th>
+							<td>{{ report.credit.description }}</td>
               <td class="text-right">{{ report.value | currency }}</td>
               <td class="text-center font-weight-bold">
                 <span class="badge badge-md badge-pill badge-success" v-if="report.payment_date > now">{{

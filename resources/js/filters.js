@@ -11,4 +11,28 @@ const dollarFilter = function (value) {
 	return numeral(value).format('($0,0)')
 }
 
-export { dollarFilter }
+const affectation = function (value, type) {
+		let data = value.split('#');
+		var result = value;
+
+		try{
+			switch(type){
+				case 'expense':
+						if(data[1] !== undefined && data[3] !== undefined)
+								result = `${data[1]} - ${data[3]}`;
+					break;
+				case 'entry':
+					if(data[0] !== undefined)
+							result = `${data[0]}`;
+					break;
+				default:
+					result = value;
+			}
+		}catch(ex){
+			return value;
+		}
+
+		return result;
+}
+
+export { dollarFilter, affectation}

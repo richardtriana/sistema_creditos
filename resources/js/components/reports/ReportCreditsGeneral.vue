@@ -81,6 +81,7 @@
               <th>Total abonado</th>
               <th>Abono a capital</th>
               <th>Abono a intereses</th>
+							<th>Saldo pendiente</th>
             </tr>
           </thead>
           <tbody v-if="ReportGeneralCreditsList.data">
@@ -107,6 +108,7 @@
               <td class="text-right">{{ report.paid_value | currency }}</td>
               <td class="text-right">{{ report.capital_value | currency }}</td>
               <td class="text-right">{{ report.interest_value | currency }}</td>
+							<td class="text-right">{{ calculateBalanceInstallment(report) | currency }}</td>
             </tr>
           </tbody>
         </table>
@@ -134,6 +136,10 @@
           <tr class="text-right">
             <th>Total abonado a intereses</th>
             <td>{{ ReportTotalValues.interest_value | currency }}</td>
+          </tr>
+					<tr class="text-right">
+            <th class="font-weight-bold h4">Total saldo pendiente</th>
+            <td class="h4">{{ calculateBalanceInstallment(ReportTotalValues) | currency }}</td>
           </tr>
           <tr class="text-right">
             <th class="font-weight-bold h4">Total saldo actual</th>
@@ -296,6 +302,10 @@ export default {
         }
       });
     },
+		calculateBalanceInstallment(data)
+		{
+			return (data.credit_value + data.interest_value) - data.paid_value;
+		}
   },
   mounted() {
     this.listReportGeneralCredits();
