@@ -35,6 +35,7 @@ class ExpenseController extends Controller
 		$type_output = $request->type_output;
 		$description = $request->description;
 		$headquarter_id  = $request->headquarter_id;
+		$results = $request->results ?? 15;
 
 		$expenses = Expense::with('user:id,name,last_name', 'headquarter:id,headquarter')
 			->where(function ($query) use ($this_month, $from, $to) {
@@ -58,7 +59,7 @@ class ExpenseController extends Controller
 		if ($description != null) {
 			$expenses =	$expenses->where('description', 'LIKE', "%$description%");
 		}
-		$expenses =	$expenses->paginate(15);
+		$expenses =	$expenses->paginate($results);
 
 		$getTotalReportsController = new GetTotalReportsController;
 		$totals = $getTotalReportsController->getTotalReportHeadquartersExpenses($expenses);
