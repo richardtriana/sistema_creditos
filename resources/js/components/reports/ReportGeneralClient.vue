@@ -141,19 +141,19 @@ export default {
 				'Monto Crédito': {
 					field: 'credit_value',
 					callback: (value) => {
-						return value;
+						return this.$options.filters.currency(value, 'export');
 					}
 				},
 				'Capital Abonado': {
 					field: 'capital_value',
 					callback: (value) => {
-						return value;
+						return this.$options.filters.currency(value, 'export');
 					}
 				},
 				'Interés abonado': {
 					field: 'interest_value',
 					callback: (value) => {
-						return value;
+						return this.$options.filters.currency(value, 'export');
 					}
 				},
 			}

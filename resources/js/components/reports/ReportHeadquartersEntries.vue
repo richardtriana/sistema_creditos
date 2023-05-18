@@ -12,12 +12,12 @@
 			<h6 class="text-primary text-uppercase">Filtrar:</h6>
 			<form>
 				<div class="form-row">
-					<div class="form-group col-12 col-md-3 ml-auto">
+					<div class="form-group col-12 col-md-2 ml-auto">
 						<label for="search_from">Desde:</label>
 						<input type="date" id="search_from" name="search_from" class="form-control" placeholder="Desde"
 							v-model="search_from" :max="now" />
 					</div>
-					<div class="form-group col-12 col-md-3 mr-auto">
+					<div class="form-group col-12 col-md-2 mr-auto">
 						<label for="search_to">Hasta:</label>
 						<input type="date" id="search_to" name="search_to" class="form-control" placeholder="Hasta"
 							v-model="search_to" :max="now" />
@@ -35,6 +35,11 @@
 								{{ headquarter.headquarter }}
 							</option>
 						</select>
+					</div>
+					<div class="form-group col-12 col-md-2 mr-auto">
+						<label for="">Mostrar {{ search_results }} resultados:</label>
+						<input type="number" id="search_results" name="search_results" class="form-control" placeholder="Desde"
+							v-model="search_results"/>
 					</div>
 				</div>
 				<div class="form-row text-right m-auto">
@@ -85,7 +90,7 @@
 </template>
 
 <script>
-import { dollarFilter } from '../../filters'
+
 export default {
 	data() {
 		return {
@@ -96,20 +101,29 @@ export default {
 			search_type_entry: "",
 			now: moment().format('YYYY-MM-DD'),
 			json_fields: {
-				'Sede': {
-					field: 'headquarter',
-					callback: (value) => {
-						return value;
-					}
-				},
-				'Valor ingresos': {
-					field: 'price',
-					callback: (value) => {
-						return dollarFilter(value);
-					}
-				}
+        'Sede': {
+          field: 'headquarter.headquarter',
+          callback: (value) => value
+        },
+				'Tipo': {
+          field: 'type_entry',
+          callback: (value) => value
+        },
+				'Afectación': {
+          field: 'description',
+          callback: (value) => {
+            return this.$options.filters.affectation(value, 'entry');
+          }
+        },
+        'Valor ingreso': {
+          field: 'price',
+          callback: (value) => {
+            return this.$options.filters.currency(value, 'export');
+          }
+        }
 			},
-			search_headquarter_id: ""
+			search_headquarter_id: "",
+			search_results: 15
 		};
 	},
 	mounted() {
@@ -125,7 +139,8 @@ export default {
 				from: this.search_from,
 				to: this.search_to,
 				type_entry: this.search_type_entry,
-				headquarter_id: this.search_headquarter_id
+				headquarter_id: this.search_headquarter_id,
+				results: this.search_results
 			}
 
 			axios

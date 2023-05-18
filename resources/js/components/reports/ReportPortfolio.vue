@@ -182,6 +182,10 @@ export default {
             return value;
           }
         },
+				'Descripción': {
+					field: 'credit.description',
+					callback: (value) => value
+				},
         'Contacto 1': {
           field: 'phone_1',
           callback: (value) => {
@@ -197,7 +201,7 @@ export default {
         'Valor cuota': {
           field: 'value',
           callback: (value) => {
-            return value;
+            return this.$options.filters.currency(value, 'export');
           }
         },
         'Nro. Cuota': {
