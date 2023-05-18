@@ -3,13 +3,35 @@ import moment from 'moment';
 import 'moment/locale/es'  // without this line it didn't work
 moment.locale('es')
 
-const dollarFilter = function (value) {
+
+
+
+const defaultDollarFilter = function (value) {
 	if (!value) {
 		return '$ 0'
 	}
 
 	return numeral(value).format('($0,0)')
 }
+
+const dollarFilter = function (value, type = false) {
+	if(!type)
+	{
+		return defaultDollarFilter(value);
+	}
+
+	switch(type){
+		case 'export':
+				value = numeral(value).format('$0.00').replace('.', ',');
+			break;
+		default:
+			//
+	}
+
+	return value;
+
+}
+
 
 const affectation = function (value, type) {
 		let data = value.split('#');
@@ -19,7 +41,7 @@ const affectation = function (value, type) {
 			switch(type){
 				case 'expense':
 						if(data[1] !== undefined && data[3] !== undefined)
-								result = `${data[1]} - ${data[3]}`;
+								result = `${data[1]} - ${data[4]}`;
 					break;
 				case 'entry':
 					if(data[0] !== undefined)

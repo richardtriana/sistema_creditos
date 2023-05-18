@@ -36,6 +36,7 @@
 							<th>Aprobados</th>
 							<th>Rechazados</th>
 							<th>Completado</th>
+							<th>Cobro jurídico</th>
 							<th>Monto Crédito</th>
 							<th>Capital Abonado</th>
 							<th>Interés abonado</th>
@@ -51,6 +52,7 @@
 							<td>{{ report.approved }}</td>
 							<td>{{ report.rejected }}</td>
 							<td>{{ report.completed }}</td>
+							<td>{{ report.legal_recovery }}</td>
 							<td class="text-right">{{ report.credit_value | currency }}</td>
 							<td class="text-right">{{ report.capital_value | currency }}</td>
 							<td class="text-right">{{ report.interest_value | currency }}</td>
@@ -119,19 +121,19 @@ export default {
 				'Monto Créditos': {
 					field: 'credit_value',
 					callback: (value) => {
-						return value;
+						return this.$options.filters.currency(value, 'export');
 					}
 				},
 				'Capital Abonado': {
 					field: 'capital_value',
 					callback: (value) => {
-						return value;
+						return this.$options.filters.currency(value, 'export');
 					}
 				},
 				'Interés abonado': {
 					field: 'interest_value',
 					callback: (value) => {
-						return value;
+						return this.$options.filters.currency(value, 'export');
 					}
 				},
 			}

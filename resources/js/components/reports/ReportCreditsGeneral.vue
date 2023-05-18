@@ -205,7 +205,7 @@ export default {
         'Valor crédito': {
           field: 'credit_value',
           callback: (value) => {
-            return value;
+            return this.$options.filters.currency(value, 'export');
           }
         },
         'Nro. Cuotas': {
@@ -252,19 +252,24 @@ export default {
         'Total abonado': {
           field: 'paid_value',
           callback: (value) => {
-            return value;
+            return this.$options.filters.currency(value,'export');
           }
         },
         'Abono a capital': {
           field: 'capital_value',
           callback: (value) => {
-            return value;
+            return this.$options.filters.currency(value,'export');
           }
         },
         'Abono a intereses': {
           field: 'interest_value',
           callback: (value) => {
-            return value;
+            return this.$options.filters.currency(value,'export');
+          }
+        },
+        'Saldo pendiente': {
+          callback: (value) => {
+            return this.$options.filters.currency(this.calculateBalanceInstallment(value),'export');
           }
         },
       }
@@ -304,6 +309,7 @@ export default {
     },
 		calculateBalanceInstallment(data)
 		{
+			// console.log("Value saldo: ", (data.credit_value + data.interest_value) - data.paid_value);
 			return (data.credit_value + data.interest_value) - data.paid_value;
 		}
   },

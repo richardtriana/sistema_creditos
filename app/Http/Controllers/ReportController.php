@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
+	const RESULTS = 15;
+
 	/* @Route api/reports/portfolio */
 	public function ReportPortfolio(Request $request)
 	{
@@ -186,6 +188,7 @@ class ReportController extends Controller
 			->selectRaw("count(case when credits.status = '2' then 1 end) as rejected")
 			->selectRaw("count(case when credits.status = '3' then 1 end) as pending_provider")
 			->selectRaw("count(case when credits.status = '4' then 1 end) as completed")
+			->selectRaw("count(case when credits.status = '5' then 1 end) as legal_recovery")
 			->groupBy('headquarter_id')
 			->groupBy('headquarter')
 			->leftJoin('headquarters', 'headquarters.id', 'credits.headquarter_id')
@@ -228,7 +231,7 @@ class ReportController extends Controller
 		$totals = $getTotalReportsController->getTotalReportHeadquartersExpenses($expenses->get());
 
 		return [
-			'expenses' => $expenses->paginate(15),
+			'expenses' => $expenses->paginate(isset($request->results) ? $request->results : self::RESULTS),
 			'totals' => $totals,
 		];
 	}
@@ -267,7 +270,7 @@ class ReportController extends Controller
 		$totals = $getTotalReportsController->getTotalReportHeadquartersEntries($entries->get());
 
 		return [
-			'entries' => $entries->paginate(15),
+			'entries' => $entries->paginate(isset($request->results) ? $request->results : self::RESULTS),
 			'totals' => $totals,
 		];
 	}
