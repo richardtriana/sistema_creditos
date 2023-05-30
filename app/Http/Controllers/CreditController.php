@@ -40,27 +40,39 @@ class CreditController extends Controller
 		// $installment_controller = new InstallmentController();
 		// $installment_controller->correctStatusInstallments();
 
-		$credits = Credit::select();
 		$status = $request->status != null ? $request->status : 1;
 		$status = $status == 0 ? [0, 3] : [$request->status];
+		$client = $request->credit;
+		$headquarter_id = $request->headquarter_id;
 
-		if ($request->credit && ($request->credit != '')) {
-			$credits  =   $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
-				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document', 'c.phone_1', 'c.phone_2', 'c.maximum_credit_allowed')
-				->where('document', 'LIKE', "%$request->credit%")
-				->orWhere('name', 'LIKE', "%$request->credit%")
-				->orWhere('last_name', 'LIKE', "%$request->credit%")
-				->whereIn('credits.status', $status);
-		} else {
-			$credits  =     $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
-				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document', 'c.phone_1', 'c.phone_2', 'c.maximum_credit_allowed')
-				->whereIn('credits.status', $status);
-		}
-		$credits = $credits
-			->orderBy('id', 'desc')
-			// ->getAttributes()
-			->with('headquarter:id,headquarter', 'client:id,name,last_name', 'product:id,product', 'guarantees:id,guarantee', 'debtors:id,name,last_name')
-			->paginate(10);
+		$credits =Credit::leftjoin('clients as c', 'c.id', 'credits.client_id')
+		->select(
+			'credits.*',
+			'credits.id as id',
+			'c.name',
+			'c.last_name',
+			'c.document',
+			'c.type_document',
+			'c.phone_1',
+			'c.phone_2',
+			'c.maximum_credit_allowed'
+		)
+		->whereIn('credits.status', $status)
+		->where(function ($query) use ($client) {
+			if ($client != '' && $client != 'undefined' && $client != null) {
+				$query->where('document', 'LIKE', "%$client%")
+					->orWhere('name', 'LIKE', "%$client%")
+					->orWhere('last_name', 'LIKE', "%$client%");
+			}
+		})
+		->where(function ($query) use ($headquarter_id) {
+			if ($headquarter_id && $headquarter_id != "all") {
+				$query->where('credits.headquarter_id', $headquarter_id);
+			}
+		})
+		->orderBy('id', 'desc')
+		->with('headquarter:id,headquarter', 'client:id,name,last_name', 'product:id,product', 'guarantees:id,guarantee', 'debtors:id,name,last_name')
+		->paginate(10);
 
 		return $credits;
 	}

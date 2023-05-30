@@ -9,11 +9,19 @@
     </div>
     <div class="page-search d-flex justify-content-between p-4 border my-2">
       <div class="form-row col-8 m-auto">
-        <div class="col">
+        <div class="col-md-4 ">
+          <label for="search_client">Cliente</label>
           <input type="text" id="search_client" name="search_client" class="form-control col"
             placeholder="Buscar cliente | Documento" v-model="search_client" />
         </div>
-        <div class="col">
+        <div class="form-group col-md-4">
+          <label for="headquarter_id">Sede</label>
+          <v-select :options="headquarterList" label="headquarter" aria-logname="{}"
+            :reduce="(headquarter) => headquarter.id" v-model="search_headquarter_id" placeholder="Seleccionar sede">
+          </v-select>
+        </div>
+        <div class="col-md-4 ">
+          <label for="status">Estado</label>
           <select name="status" id="status" v-model="status" class="custom-select col">
             <option v-for="(st, index) in creditStatus" :value="index" :key="index">
               {{ st }}
@@ -32,6 +40,7 @@
           <thead>
             <tr class="text-center">
               <th>ID</th>
+              <th>Fecha inicio</th>
               <th>Cliente</th>
               <th>Sede</th>
               <th>Nro. Documento</th>
@@ -63,6 +72,7 @@
           <tbody v-if="creditList.data && creditList.data.length > 0">
             <tr v-for="credit in creditList.data" :key="credit.index">
               <td>{{ credit.id }}</td>
+              <td>{{ credit.start_date }}</td>
               <td>{{ credit.name }} {{ credit.last_name }}</td>
               <td>{{ credit.headquarter.headquarter }}</td>
               <td>{{ credit.type_document }} {{ credit.document }}</td>
@@ -201,9 +211,11 @@ export default {
   data() {
     return {
       search_client: "",
+      search_headquarter_id: 'all',
       status: 1,
       creditList: {},
       clientList: {},
+      headquarterList: [],
       creditStatus: {
         0: "Pendiente",
         1: "Aprobado",
@@ -217,20 +229,32 @@ export default {
   },
   created() {
     this.listCredits(1);
+    this.listHeadquarters();
   },
   methods: {
     listCredits(page = 1) {
       this.$root.getCurrentBalanceMainBox();
       let me = this;
+
+      let data = {
+        page: page,
+        status: this.status,
+        credit: this.search_client,
+        headquarter_id: this.search_headquarter_id
+      }
       axios
         .get(
-          `api/credits?page=${page}&credit=${this.search_client}&status=${this.status}`,
-          me.$root.config
+          `api/credits`,
+          {
+            params: data,
+            headers: this.$root.config.headers,
+          }
         )
         .then(function (response) {
           me.creditList = response.data;
         });
     },
+
     listClients(page = 1) {
       let me = this;
       axios
@@ -242,6 +266,16 @@ export default {
           me.clientList = response.data;
         });
     },
+
+    listHeadquarters() {
+      let me = this;
+      axios
+        .get(`api/headquarters/list-all-headquarters`, me.$root.config)
+        .then(function (response) {
+          me.headquarterList = response.data;
+        });
+    },
+
     showData: function (credit) {
       this.$refs.CreateEditCredit.showEditCredit(credit);
     },
