@@ -57,6 +57,8 @@ class PrintTicketController extends Controller
 			$printer->text($headquarter->nit . "\n");
 			$printer->text("Dirección: ");
 			$printer->text($headquarter->address . "\n");
+			$printer->text("Contacto: ");
+			$printer->text($headquarter->telephone ?? $headquarter->telephone .  $headquarter->mobile ?? $headquarter->mobile ."\n");
 			$printer->text("\n");
 			$printer->setEmphasis(true);
 			$printer->text($entry->type_entry);
@@ -152,6 +154,8 @@ class PrintTicketController extends Controller
 			$printer->text($headquarter->nit . "\n");
 			$printer->text("Dirección: ");
 			$printer->text($headquarter->address . "\n");
+			$printer->text("Contacto: ");
+			$printer->text($headquarter->telephone ?? $headquarter->telephone .  $headquarter->mobile ?? $headquarter->mobile ."\n");
 			$printer->text("\n");
 			$printer->setEmphasis(true);
 			$printer->setJustification(Printer::JUSTIFY_LEFT);

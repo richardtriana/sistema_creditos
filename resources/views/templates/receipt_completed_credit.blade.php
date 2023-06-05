@@ -21,6 +21,8 @@
     </h3>
     <p>NIT:{{$headquarter->nit}} </p>
     <p>Dirección: {{$headquarter->address}}</p>
+    <p>Contacto: {{$headquarter->telephone ?? $headquarter->telephone ." ".  $headquarter->mobile ?? $headquarter->mobile }}</p>
+
     <br>
     <h3><strong> PAZ Y SALVO</strong></h3>
     <br>
