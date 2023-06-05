@@ -99,7 +99,7 @@ class InstallmentController extends Controller
     $installment->save();
   }
 
-  // Pagar cuota por abono o individual 
+  // Pagar cuota por abono o individual
   public function payInstallment(Credit $credit, Request $request)
   {
     $quote = $request->quote_id != null || $request->quote_id != 0 ? true : false;
@@ -112,7 +112,7 @@ class InstallmentController extends Controller
     $capital = (float)0;
     $interest = (float) 0;
     $late_interest = (float) 0;
-    $balance = (float) $amount + 1;
+    $balance = (float) $amount + 0;
     $step = 0;
     $status = 0;
     $late_interests_value = 0;
@@ -123,21 +123,27 @@ class InstallmentController extends Controller
         $query
           ->whereRaw("((paid_balance - paid_capital)) < ((interest_value)+$late_interest_pending)")
           ->orWhereNull('paid_balance');
-      })->first();
+      })
+			->where('status', 0)
+			->first();
 
     if (!$installment) {
       $installment = $credit->installments()
         ->where(function ($query) {
           $query
             ->whereRaw('((paid_capital) +0.1) < ((capital_value))');
-        })->first();
+        })
+				->where('status', 0)
+				->first();
     }
     if (!$installment) {
       $installment = $credit->installments()
         ->where(function ($query) {
           $query
             ->whereRaw('(paid_balance-paid_capital-interest_value)>0.1');
-        })->first();
+        })
+				->where('status', 0)
+				->first();
     }
 
     $no_installment = $installment->installment_number;
@@ -443,8 +449,7 @@ class InstallmentController extends Controller
           . "#cuota: {$no_installment}\n"
           . "Efectivo: {$amount_receipt}\n"
           . "Valor cancelado: {$amount_paid}\n"
-          . "Regreso: {$balance} \n" .
-          "Cupo crédito: {$client->maximum_credit_allowed}";
+          . "Cupo crédito: {$client->maximum_credit_allowed}";
         $entry->date = date('Y-m-d');
         $entry->type_entry = $type_entry;
         $entry->price = $amount;

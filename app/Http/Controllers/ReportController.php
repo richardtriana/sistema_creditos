@@ -163,7 +163,7 @@ class ReportController extends Controller
 		}
 
 		$credits = $credits
-			->with('client:id,name,last_name,phone_1,phone_2', 'headquarter:id,headquarter')->paginate($results);
+		->with('client', 'headquarter:id,headquarter')->paginate($results);
 		$total_credits = new CreditController;
 		$total_credits = $total_credits->getTotalValueCredits($request);
 

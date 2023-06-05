@@ -15,7 +15,7 @@
         <img src="{{ $company->logo }}" alt="" srcset="" width="150">
         <p> Oficina: {{ $headquarter->headquarter }}</p>
         <p>NIT:{{ $headquarter->nit }} </p>
-
+        <p>Contacto: {{$headquarter->telephone ?? $headquarter->telephone ." ".  $headquarter->mobile ?? $headquarter->mobile }}</p>
         <br>
         <h2><strong>{{ $entry->type_entry }}</strong></h2>
     </header>

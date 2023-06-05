@@ -142,11 +142,8 @@ export default {
     },
 
     payInstallment(quote, amount = null) {
-      let late_interests_value = this.listInstallments.filter((x) => {
-        if (x.late_interests_value > 0) {
-          return x;
-        }
-      });
+      let late_interests_value = this.listInstallments.filter((x) => x.late_interests_value > 0 && x.status === 0);
+
       late_interests_value = late_interests_value[0]
         ? late_interests_value[0]["late_interests_value_pending"]
         : 0;
@@ -198,11 +195,7 @@ export default {
     },
 
     payCredit(amount_value) {
-      let late_interests_value = this.listInstallments.filter((x) => {
-        if (x.late_interests_value_pending > 0) {
-          return x;
-        }
-      });
+      let late_interests_value = this.listInstallments.filter((x) => x.late_interests_value_pending > 0 && x.status === 0);
       late_interests_value = late_interests_value[0]
         ? late_interests_value[0]["late_interests_value_pending"]
         : 0;

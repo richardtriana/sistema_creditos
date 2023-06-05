@@ -78,7 +78,7 @@ class CreditController extends Controller
 	}
 
 	/**
-	 * Show the form for creating a new resource. 
+	 * Show the form for creating a new resource.
 	 *
 	 * @return \Illuminate\Http\Response
 	 */
@@ -555,6 +555,8 @@ class CreditController extends Controller
 		$status = $request->status;
 		$start_date = $request->start_date;
 		$end_date = $request->end_date;
+		$search_client = $request->search_client;
+
 
 		switch ($status) {
 			case 'all':
@@ -583,8 +585,10 @@ class CreditController extends Controller
 		$credits = Credit::select(
 			DB::raw('SUM(credit_value) as credit_value '),
 			DB::raw('SUM(paid_value) as paid_value'),
-			DB::raw('SUM(interest_value) as interest_value'),
-			DB::raw('SUM(capital_value) as capital_value')
+			DB::raw('SUM(credits.interest_value) as interest_value'),
+			DB::raw('SUM(credits.capital_value) as capital_value')
+			// DB::raw('SUM(installments.value) as total_credit_to_pay'),
+
 		);
 		if ($status == null) {
 			$credits = $credits->whereMonth('created_at', $this_month);
@@ -592,9 +596,9 @@ class CreditController extends Controller
 			$credits = $credits
 				->where(function ($query) use ($status) {
 					if ($status == 'all') {
-						$query->where('status', '<>', '-1');
+						$query->where('credits.status', '<>', '-1');
 					} else {
-						$query->where('status', $status);
+						$query->where('credits.status', $status);
 					}
 				})
 				->where(function ($query) use ($from, $to, $query_date) {
@@ -614,7 +618,18 @@ class CreditController extends Controller
 					}
 				});
 		}
-		$credits = $credits->first();
+		if ($search_client) {
+			$credits = $credits->whereHas('client', function ($query) use ($search_client) {
+				$query->where('name', 'LIKE', "%$search_client%")
+					->orWhere('last_name', 'LIKE', "%$search_client%")
+					->orWhere('document', 'LIKE', "%$search_client%");
+			});
+		}
+
+		$credits = $credits
+		->first();
+
+
 		return $credits;
 	}
 
