@@ -412,6 +412,7 @@ class CreditController extends Controller
 	{
 		$credit = Credit::findOrFail($id);
 		$installments =  $credit->installments()->get();
+		$configuration = Company::first();
 
 		foreach ($installments as $installment) {
 			$now = now();
@@ -422,7 +423,7 @@ class CreditController extends Controller
 				$installment->interest_value_pending = $installment->interest_value;
 
 				$days_past_due = $installment->days_past_due ? $installment->days_past_due :  $now->diffInDays($payment_date);
-				$day_value_default = $installment->interest_value / 30;
+				$day_value_default = is_object($configuration) && !is_null($configuration->late_interest_day) ? $configuration->late_interest_day : $installment->interest_value / 0;
 				$late_interest_value =  $day_value_default * $days_past_due;
 
 				$installment->days_past_due  = $days_past_due;

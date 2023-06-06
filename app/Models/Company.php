@@ -21,6 +21,7 @@ class Company extends Model
         'condition_order',
         'condition_quotation',
         'whatsapp_msg',
-        'method'
+        'method',
+				'late_interest_day'
     ];
 }
