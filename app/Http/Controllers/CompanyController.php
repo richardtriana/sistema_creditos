@@ -53,6 +53,7 @@ class CompanyController extends Controller
       'condition_quotation' => 'nullable|string',
       'whatsapp_msg' => 'nullable|string',
       'method' => 'string',
+			'late_interest_day' => 'nullable|numeric|between:0,1'
     ]);
 
     if (!$validate->fails()) {
