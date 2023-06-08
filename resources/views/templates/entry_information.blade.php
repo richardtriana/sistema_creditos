@@ -21,6 +21,7 @@
         </h3>
         <p>NIT:{{ $headquarter->nit }} </p>
         <p>Dirección: {{ $headquarter->address }}</p>
+        <p>Contacto: {{$headquarter->telephone ?? $headquarter->telephone ." ".  $headquarter->mobile ?? $headquarter->mobile }}</p>
         <br>
         <h2><strong>{{ $entry->type_entry }}</strong></h2>
     </header>

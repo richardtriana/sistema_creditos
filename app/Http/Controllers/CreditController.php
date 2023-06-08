@@ -40,27 +40,39 @@ class CreditController extends Controller
 		// $installment_controller = new InstallmentController();
 		// $installment_controller->correctStatusInstallments();
 
-		$credits = Credit::select();
 		$status = $request->status != null ? $request->status : 1;
 		$status = $status == 0 ? [0, 3] : [$request->status];
+		$client = $request->credit;
+		$headquarter_id = $request->headquarter_id;
 
-		if ($request->credit && ($request->credit != '')) {
-			$credits  =   $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
-				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document', 'c.phone_1', 'c.phone_2', 'c.maximum_credit_allowed')
-				->where('document', 'LIKE', "%$request->credit%")
-				->orWhere('name', 'LIKE', "%$request->credit%")
-				->orWhere('last_name', 'LIKE', "%$request->credit%")
-				->whereIn('credits.status', $status);
-		} else {
-			$credits  =     $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
-				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document', 'c.phone_1', 'c.phone_2', 'c.maximum_credit_allowed')
-				->whereIn('credits.status', $status);
-		}
-		$credits = $credits
-			->orderBy('id', 'desc')
-			// ->getAttributes()
-			->with('headquarter:id,headquarter', 'client:id,name,last_name', 'product:id,product', 'guarantees:id,guarantee', 'debtors:id,name,last_name')
-			->paginate(10);
+		$credits =Credit::leftjoin('clients as c', 'c.id', 'credits.client_id')
+		->select(
+			'credits.*',
+			'credits.id as id',
+			'c.name',
+			'c.last_name',
+			'c.document',
+			'c.type_document',
+			'c.phone_1',
+			'c.phone_2',
+			'c.maximum_credit_allowed'
+		)
+		->whereIn('credits.status', $status)
+		->where(function ($query) use ($client) {
+			if ($client != '' && $client != 'undefined' && $client != null) {
+				$query->where('document', 'LIKE', "%$client%")
+					->orWhere('name', 'LIKE', "%$client%")
+					->orWhere('last_name', 'LIKE', "%$client%");
+			}
+		})
+		->where(function ($query) use ($headquarter_id) {
+			if ($headquarter_id && $headquarter_id != "all") {
+				$query->where('credits.headquarter_id', $headquarter_id);
+			}
+		})
+		->orderBy('id', 'desc')
+		->with('headquarter:id,headquarter', 'client:id,name,last_name', 'product:id,product', 'guarantees:id,guarantee', 'debtors:id,name,last_name')
+		->paginate(10);
 
 		return $credits;
 	}
@@ -544,6 +556,8 @@ class CreditController extends Controller
 		$status = $request->status;
 		$start_date = $request->start_date;
 		$end_date = $request->end_date;
+		$search_client = $request->search_client;
+
 
 		switch ($status) {
 			case 'all':
@@ -572,8 +586,10 @@ class CreditController extends Controller
 		$credits = Credit::select(
 			DB::raw('SUM(credit_value) as credit_value '),
 			DB::raw('SUM(paid_value) as paid_value'),
-			DB::raw('SUM(interest_value) as interest_value'),
-			DB::raw('SUM(capital_value) as capital_value')
+			DB::raw('SUM(credits.interest_value) as interest_value'),
+			DB::raw('SUM(credits.capital_value) as capital_value')
+			// DB::raw('SUM(installments.value) as total_credit_to_pay'),
+
 		);
 		if ($status == null) {
 			$credits = $credits->whereMonth('created_at', $this_month);
@@ -581,9 +597,9 @@ class CreditController extends Controller
 			$credits = $credits
 				->where(function ($query) use ($status) {
 					if ($status == 'all') {
-						$query->where('status', '<>', '-1');
+						$query->where('credits.status', '<>', '-1');
 					} else {
-						$query->where('status', $status);
+						$query->where('credits.status', $status);
 					}
 				})
 				->where(function ($query) use ($from, $to, $query_date) {
@@ -603,7 +619,18 @@ class CreditController extends Controller
 					}
 				});
 		}
-		$credits = $credits->first();
+		if ($search_client) {
+			$credits = $credits->whereHas('client', function ($query) use ($search_client) {
+				$query->where('name', 'LIKE', "%$search_client%")
+					->orWhere('last_name', 'LIKE', "%$search_client%")
+					->orWhere('document', 'LIKE', "%$search_client%");
+			});
+		}
+
+		$credits = $credits
+		->first();
+
+
 		return $credits;
 	}
 

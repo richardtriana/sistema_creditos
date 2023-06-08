@@ -71,6 +71,7 @@
             <tr class="text-center">
               <th>#</th>
               <th>Cliente</th>
+              <th>Identificación</th>
               <th>Contacto <i class="bi bi-telephone"></i></th>
               <th>Sede</th>
               <th>Valor crédito</th>
@@ -81,6 +82,7 @@
               <th>Total abonado</th>
               <th>Abono a capital</th>
               <th>Abono a intereses</th>
+							<th>Saldo capital</th>
 							<th>Saldo pendiente</th>
             </tr>
           </thead>
@@ -88,6 +90,7 @@
             <tr v-for="report in ReportGeneralCreditsList.data" :key="report.id">
               <td class="text-right">{{ report.id }}</td>
               <td>{{ report.client.name }} {{ report.client.last_name }}</td>
+              <td>{{ report.client.type_document }} {{ report.client.document }}</td>
               <td>
                 <a v-if="report.client.phone_1 != null" target="_blank"
                   :href="`https://wa.me/57${report.client.phone_1}?text=${infoCompany.whatsapp_msg}`"><i
@@ -109,6 +112,8 @@
               <td class="text-right">{{ report.capital_value | currency }}</td>
               <td class="text-right">{{ report.interest_value | currency }}</td>
 							<td class="text-right">{{ calculateBalanceInstallment(report) | currency }}</td>
+              <td class="text-right">{{ report.credit_to_pay | currency }}</td>
+
             </tr>
           </tbody>
         </table>
@@ -138,11 +143,19 @@
             <td>{{ ReportTotalValues.interest_value | currency }}</td>
           </tr>
 					<tr class="text-right">
-            <th class="font-weight-bold h4">Total saldo pendiente</th>
-            <td class="h4">{{ calculateBalanceInstallment(ReportTotalValues) | currency }}</td>
+            <th class="font-weight-bold">Total saldo capital</th>
+            <td>{{ calculateBalanceInstallment(ReportTotalValues) | currency }}</td>
+          </tr>
+          <!-- <tr class="text-right">
+            <th class="font-weight-bold">Total a recaudar </th>
+            <td>{{ ReportTotalValues.total_credit_to_pay | currency }}</td>
           </tr>
           <tr class="text-right">
-            <th class="font-weight-bold h4">Total saldo actual</th>
+            <th class="font-weight-bold">Total interés </th>
+            <td>{{ (ReportTotalValues.total_credit_to_pay -  calculateBalanceInstallment(ReportTotalValues))| currency }}</td>
+          </tr> -->
+          <tr class="text-right">
+            <th class="font-weight-bold">Total saldo actual</th>
             <td class="h4">{{ (ReportTotalValues.credit_value - ReportTotalValues.paid_value) | currency }}</td>
           </tr>
         </table>
@@ -181,6 +194,14 @@ export default {
             let name = value.client.name;
             let last_name = value.client.last_name
             return `${last_name} ${name}`;
+          }
+        },
+
+        'Identificación': {
+          callback: (value) => {
+            let type = value.client.type_document;
+            let doc = value.client.document
+            return `${type} ${doc}`;
           }
         },
 
@@ -267,9 +288,15 @@ export default {
             return this.$options.filters.currency(value,'export');
           }
         },
-        'Saldo pendiente': {
+        'Saldo capital': {
           callback: (value) => {
             return this.$options.filters.currency(this.calculateBalanceInstallment(value),'export');
+          }
+        },
+        'Saldo pendiente': {
+          field: 'credit_to_pay',
+          callback: (value) => {
+            return this.$options.filters.currency(value,'export');
           }
         },
       }

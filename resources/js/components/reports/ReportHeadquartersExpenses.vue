@@ -85,6 +85,7 @@
         <table class="table table-bordered table-sm">
           <thead>
             <tr class="text-center">
+              <th>ID</th>
               <th>Sede</th>
 							<th>Tipo</th>
 							<th>Afectación</th>
@@ -98,6 +99,7 @@
             "
           >
             <tr v-for="r in headquartersExpenseList.data" :key="r.id">
+							<td>{{ r.id }}</td>
               <td>{{ r.headquarter.headquarter }}</td>
 							<td>{{ r.type_output }}</td>
 							<td>{{ r.description | affectation('expense') }}</td>
