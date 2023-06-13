@@ -102,7 +102,7 @@
 						</div>
 						<div class="form-group col-12 col-md-6">
 							<label for="late_interest_day">Porcentaje de interes por día</label>
-							<input type="number" id="late_interest_day"  class="form-control" name="late_interest_day" min="0" step=".1" max="1" :value="formConfiguration.late_interest_day" placeholder="Ingresar interes">
+							<input type="number" id="late_interest_day"  class="form-control" name="late_interest_day" min="0" step="any" :value="formConfiguration.late_interest_day" placeholder="Ingresar interes">
 							<small id="late_interest_dayHelp" class="form-text text-danger">{{
 								formErrors.late_interest_day
 							}}</small>
@@ -155,7 +155,8 @@ export default {
 				condition_order: "",
 				condition_quotation: "",
 				whatsapp_msg: "",
-				method: 'FRANCHISE'
+				method: 'FRANCHISE',
+				late_interest_day:""
 			},
 			formErrors: {
 				name: "",
@@ -169,7 +170,8 @@ export default {
 				condition_order: "",
 				condition_quotation: "",
 				whatsapp_msg: "",
-				method: ""
+				method: "",
+				late_interest_day:""
 			},
 			editor: ClassicEditor,
 			editorConfig: {

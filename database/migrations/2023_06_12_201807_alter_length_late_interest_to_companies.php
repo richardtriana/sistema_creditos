@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddLateInterestDayToCompaniesTable extends Migration
+class AlterLengthLateInterestToCompanies extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class AddLateInterestDayToCompaniesTable extends Migration
     public function up()
     {
         Schema::table('companies', function (Blueprint $table) {
-            $table->float('late_interest_day', 25, 10)->nullable();
+            $table->float('late_interest_day', 25, 10)->nullable()->change();
         });
     }
 
@@ -26,7 +26,7 @@ class AddLateInterestDayToCompaniesTable extends Migration
     public function down()
     {
         Schema::table('companies', function (Blueprint $table) {
-            $table->dropColumn('late_interest_day');
+            //
         });
     }
 }

@@ -56,7 +56,7 @@
             @if ($credit)
                 <tr>
                     <td>Saldo pendiente: </td>
-                    <td>$ {{ number_format($credit->credit_to_pay - $credit->credit_paid, 0, '', '.') }}</td>
+                    <td>$ {{ number_format($credit->credit_to_pay, 0, '', '.') }}</td>
                 </tr>
             @endif
             <tr>

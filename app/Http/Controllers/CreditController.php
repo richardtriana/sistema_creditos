@@ -40,39 +40,27 @@ class CreditController extends Controller
 		// $installment_controller = new InstallmentController();
 		// $installment_controller->correctStatusInstallments();
 
+		$credits = Credit::select();
 		$status = $request->status != null ? $request->status : 1;
 		$status = $status == 0 ? [0, 3] : [$request->status];
-		$client = $request->credit;
-		$headquarter_id = $request->headquarter_id;
 
-		$credits =Credit::leftjoin('clients as c', 'c.id', 'credits.client_id')
-		->select(
-			'credits.*',
-			'credits.id as id',
-			'c.name',
-			'c.last_name',
-			'c.document',
-			'c.type_document',
-			'c.phone_1',
-			'c.phone_2',
-			'c.maximum_credit_allowed'
-		)
-		->whereIn('credits.status', $status)
-		->where(function ($query) use ($client) {
-			if ($client != '' && $client != 'undefined' && $client != null) {
-				$query->where('document', 'LIKE', "%$client%")
-					->orWhere('name', 'LIKE', "%$client%")
-					->orWhere('last_name', 'LIKE', "%$client%");
-			}
-		})
-		->where(function ($query) use ($headquarter_id) {
-			if ($headquarter_id && $headquarter_id != "all") {
-				$query->where('credits.headquarter_id', $headquarter_id);
-			}
-		})
-		->orderBy('id', 'desc')
-		->with('headquarter:id,headquarter', 'client:id,name,last_name', 'product:id,product', 'guarantees:id,guarantee', 'debtors:id,name,last_name')
-		->paginate(10);
+		if ($request->credit && ($request->credit != '')) {
+			$credits  =   $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
+				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document', 'c.phone_1', 'c.phone_2', 'c.maximum_credit_allowed')
+				->where('document', 'LIKE', "%$request->credit%")
+				->orWhere('name', 'LIKE', "%$request->credit%")
+				->orWhere('last_name', 'LIKE', "%$request->credit%")
+				->whereIn('credits.status', $status);
+		} else {
+			$credits  =     $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
+				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document', 'c.phone_1', 'c.phone_2', 'c.maximum_credit_allowed')
+				->whereIn('credits.status', $status);
+		}
+		$credits = $credits
+			->orderBy('id', 'desc')
+			// ->getAttributes()
+			->with('headquarter:id,headquarter', 'client:id,name,last_name', 'product:id,product', 'guarantees:id,guarantee', 'debtors:id,name,last_name')
+			->paginate(10);
 
 		return $credits;
 	}
@@ -435,7 +423,7 @@ class CreditController extends Controller
 				$installment->interest_value_pending = $installment->interest_value;
 
 				$days_past_due = $installment->days_past_due ? $installment->days_past_due :  $now->diffInDays($payment_date);
-				$day_value_default = is_object($configuration) && !is_null($configuration->late_interest_day) ? $configuration->late_interest_day : $installment->interest_value / 0;
+				$day_value_default =($installment->interest_value * $configuration->late_interest_day);
 				$late_interest_value =  $day_value_default * $days_past_due;
 
 				$installment->days_past_due  = $days_past_due;
@@ -558,7 +546,6 @@ class CreditController extends Controller
 		$end_date = $request->end_date;
 		$search_client = $request->search_client;
 
-
 		switch ($status) {
 			case 'all':
 				$query_date = 'created_at';
@@ -586,10 +573,8 @@ class CreditController extends Controller
 		$credits = Credit::select(
 			DB::raw('SUM(credit_value) as credit_value '),
 			DB::raw('SUM(paid_value) as paid_value'),
-			DB::raw('SUM(credits.interest_value) as interest_value'),
-			DB::raw('SUM(credits.capital_value) as capital_value')
-			// DB::raw('SUM(installments.value) as total_credit_to_pay'),
-
+			DB::raw('SUM(interest_value) as interest_value'),
+			DB::raw('SUM(capital_value) as capital_value')
 		);
 		if ($status == null) {
 			$credits = $credits->whereMonth('created_at', $this_month);
@@ -597,9 +582,9 @@ class CreditController extends Controller
 			$credits = $credits
 				->where(function ($query) use ($status) {
 					if ($status == 'all') {
-						$query->where('credits.status', '<>', '-1');
+						$query->where('status', '<>', '-1');
 					} else {
-						$query->where('credits.status', $status);
+						$query->where('status', $status);
 					}
 				})
 				->where(function ($query) use ($from, $to, $query_date) {
@@ -619,6 +604,7 @@ class CreditController extends Controller
 					}
 				});
 		}
+
 		if ($search_client) {
 			$credits = $credits->whereHas('client', function ($query) use ($search_client) {
 				$query->where('name', 'LIKE', "%$search_client%")
@@ -626,11 +612,7 @@ class CreditController extends Controller
 					->orWhere('document', 'LIKE', "%$search_client%");
 			});
 		}
-
-		$credits = $credits
-		->first();
-
-
+		$credits = $credits->first();
 		return $credits;
 	}
 

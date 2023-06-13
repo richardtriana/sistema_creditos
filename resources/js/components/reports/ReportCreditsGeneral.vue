@@ -113,7 +113,6 @@
               <td class="text-right">{{ report.interest_value | currency }}</td>
 							<td class="text-right">{{ calculateBalanceInstallment(report) | currency }}</td>
               <td class="text-right">{{ report.credit_to_pay | currency }}</td>
-
             </tr>
           </tbody>
         </table>
@@ -146,18 +145,18 @@
             <th class="font-weight-bold">Total saldo capital</th>
             <td>{{ calculateBalanceInstallment(ReportTotalValues) | currency }}</td>
           </tr>
-          <!-- <tr class="text-right">
+           <tr class="text-right">
             <th class="font-weight-bold">Total a recaudar </th>
             <td>{{ ReportTotalValues.total_credit_to_pay | currency }}</td>
           </tr>
-          <tr class="text-right">
-            <th class="font-weight-bold">Total interés </th>
+         <tr class="text-right">
+            <th class="font-weight-bold">Total interés a recaudar</th>
             <td>{{ (ReportTotalValues.total_credit_to_pay -  calculateBalanceInstallment(ReportTotalValues))| currency }}</td>
-          </tr> -->
-          <tr class="text-right">
+          </tr>
+          <!-- <tr class="text-right">
             <th class="font-weight-bold">Total saldo actual</th>
             <td class="h4">{{ (ReportTotalValues.credit_value - ReportTotalValues.paid_value) | currency }}</td>
-          </tr>
+          </tr> -->
         </table>
       </section>
     </div>

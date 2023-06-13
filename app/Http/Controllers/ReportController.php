@@ -163,9 +163,12 @@ class ReportController extends Controller
 		}
 
 		$credits = $credits
-		->with('client', 'headquarter:id,headquarter')->paginate($results);
+		->with('client', 'headquarter:id,headquarter')->orderBy('created_at','desc')->paginate($results);
+
 		$total_credits = new CreditController;
 		$total_credits = $total_credits->getTotalValueCredits($request);
+
+		$total_credits->total_credit_to_pay=$this->getTotalInstallmentsForGeneralCredits($request)->total_credit_to_pay;
 
 		return ['credits' => $credits, 'total_credits' => $total_credits];
 	}
@@ -371,5 +374,80 @@ class ReportController extends Controller
 		$data['total_cash_flow'] = $data['total_payment'] - $data['total_expense'];
 
 		return $data;
+	}
+
+	public function getTotalInstallmentsForGeneralCredits(Request $request){
+		$from = $request->from;
+		$to = $request->to;
+		$status = $request->status;
+		$start_date = $request->start_date;
+		$end_date = $request->end_date;
+		$search_client = $request->search_client;
+
+		switch ($status) {
+			case 'all':
+				$query_date = 'created_at';
+				break;
+			case '0':
+				$query_date = 'created_at';
+				break;
+			case '1':
+				$query_date = 'disbursement_date';
+				break;
+			case '2':
+				$query_date = 'updated_at';
+				break;
+			case '3':
+				$query_date = 'created_at';
+				break;
+			case '4':
+				$query_date = 'finish_date';
+				break;
+			case '5':
+				$query_date = 'updated_at';
+				break;
+		}
+
+		$installments = Installment::select(
+			DB::raw('SUM(value) as value'),
+			DB::raw('SUM(paid_balance) as paid_balance ')
+		);
+
+		$installments = $installments = $installments->whereHas('credit.client', function ($query) use ($search_client) {
+			$query->where('name', 'LIKE', "%$search_client%")
+			->orWhere('last_name', 'LIKE', "%$search_client%")
+			->orWhere('document', 'LIKE', "%$search_client%");
+		});
+
+		$installments = $installments = $installments->whereHas('credit', function ($query) use ($status, $from, $to, $query_date, $start_date, $end_date) {
+
+			if ($status == null) {
+				$query->whereMonth('created_at', Carbon::now()->month);
+			}
+
+			if ($status == 'all') {
+				$query->where('status', '<>', '-1');
+			} else {
+				$query->where('status', $status);
+			}
+			if ($from != '' && $from != 'undefined' && $from != null) {
+				$query->whereDate("$query_date", '>=', $from);
+			}
+			if ($to != '' && $to != 'undefined' && $to != null) {
+				$query->whereDate("$query_date", '<=', $to);
+			}
+
+			if ($start_date != '' && $start_date != 'undefined' && $start_date != null) {
+				$query->whereDate("start_date", '>=', $start_date);
+			}
+			if ($end_date != '' && $end_date != 'undefined' && $end_date != null) {
+				$query->whereRaw("DATE_ADD(`start_date`, INTERVAL `number_installments` MONTH) <= '$end_date'");
+			}
+		});
+
+		$installments = $installments->first();
+		$installments->total_credit_to_pay = $installments->value -$installments->paid_balance;
+		
+		return $installments;
 	}
 }
