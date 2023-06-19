@@ -41,6 +41,7 @@ class CreditController extends Controller
 		// $installment_controller->correctStatusInstallments();
 
 		$credits = Credit::select();
+		$headquarterId = $request->headquarter_id ?: 'all' ;
 		$status = $request->status != null ? $request->status : 1;
 		$status = $status == 0 ? [0, 3] : [$request->status];
 
@@ -56,6 +57,11 @@ class CreditController extends Controller
 				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document', 'c.phone_1', 'c.phone_2', 'c.maximum_credit_allowed')
 				->whereIn('credits.status', $status);
 		}
+		$credits = $credits->where(function ($query) use ( $headquarterId){
+			if(!is_null($headquarterId) && $headquarterId != '' && $headquarterId != 'all'){
+				$query->where('credits.headquarter_id', $headquarterId);
+			}
+		});
 		$credits = $credits
 			->orderBy('id', 'desc')
 			// ->getAttributes()
@@ -445,6 +451,8 @@ class CreditController extends Controller
 				$installment->capital_value_pending = $installment->capital_value - $installment->paid_capital < 0 ? 0 : $installment->capital_value - $installment->paid_capital;
 				$installment->interest_value_pending = ((int)$installment->paid_balance - (int)$installment->paid_capital) >   $installment->interest_value ? 0 : $installment->interest_value - ((int)$installment->paid_balance - (int)$installment->paid_capital);
 				$installment->value_pending = $installment->interest_value_pending + $installment->capital_value_pending + $installment->late_interests_value_pending;
+				$installment->paid_capital =$installment->paid_capital+$installment->credit_deposit;
+				$installment->paid_balance =$installment->paid_balance+$installment->credit_deposit;
 			}
 		}
 

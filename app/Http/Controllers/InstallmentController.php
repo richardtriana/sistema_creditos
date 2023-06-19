@@ -329,26 +329,25 @@ class InstallmentController extends Controller
       $balance = $balance_credit > 0 ? $balance_credit : 0;
     }
 
-    $payment_date = Carbon::createFromFormat('Y-m-d', $installment->payment_date);
-
     if ($balance_credit > 0) {
       //Cuando el cliente paga a tiempo
       $step = 10;
 
-      $helpPendingCapital = $installment->paid_capital >= $installment->capital_value ? 0 : $installment->capital_value - $installment->paid_capital;
-      if ($balance >= $helpPendingCapital) {
-        $step = 1;
-        $capital = $balance;
-        $balance = $balance - $capital;
-      } else {
-        $capital = $helpPendingCapital;
-        $balance = $balance - $capital;
-      }
+      // $helpPendingCapital = $installment->paid_capital >= $installment->capital_value ? 0 : $installment->capital_value - $installment->paid_capital;
+      // if ($balance >= $helpPendingCapital) {
+      //   $step = 1;
+      //   $capital = $balance;
+      //   $balance = $balance - $capital;
+      // } else {
+      //   $capital = $helpPendingCapital;
+      //   $balance = $balance - $capital;
+      // }
 
-      $installment->paid_balance +=  ($capital + $interest + $late_interest);
-      $installment->paid_capital += $capital;
-      $installment->capital_value += $adittionalBalance;
-      $installment->status  = $status;
+      // $installment->paid_balance +=  ($capital + $interest + $late_interest);
+      // $installment->paid_capital += $capital;
+      // $installment->capital_value += $adittionalBalance;
+      // $installment->status  = $status;
+      $installment->credit_deposit = $balance;
       $installment->payment_register = date('Y-m-d');
 
 
@@ -356,14 +355,14 @@ class InstallmentController extends Controller
         return false;
       }
       $credit_paid = new CreditController;
-      $credit_paid->updateValuesCredit($request, $credit->id, $amount, $capital, $interest);
-      $entry_id =  $this->saveEntryInstallment($credit, $amount, $capital + $interest, $no_installment, $balance, $user_id, 'Abono a crédito');
+      $credit_paid->updateValuesCredit($request, $credit->id, $amount, $balance, $interest);
+      $entry_id =  $this->saveEntryInstallment($credit, $amount, $balance, $no_installment, $balance, $user_id, 'Abono a crédito');
     }
 
     if ($configurations->method &&  $configurations->method == "GENERAL") {
-      $generalMethod->updateInstallments($credit->id);
+      $generalMethod->updateInstallmentsFromAbonoCredito($credit->id);
     } else {
-      $franchiseMethod->updateInstallments($credit->id);
+      $franchiseMethod->updateInstallmentsFromAbonoCredito($credit->id);
     }
 
     // return [
@@ -390,7 +389,6 @@ class InstallmentController extends Controller
       'balance_credit' => $balance_credit ?? null
     ];
   }
-
 
   public function saveEntryInstallment(Credit $credit, $amount_receipt, $amount_paid, $no_installment, $balance,  $user_id, $quote = null)
   {

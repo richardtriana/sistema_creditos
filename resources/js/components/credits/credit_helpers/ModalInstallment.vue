@@ -57,6 +57,9 @@
                   <i class="bi bi-currency-dollar"></i> Abonar a crédito
                 </button>
               </div>
+              <div class="form-group col-3">
+                <h5>Saldo pendiente: <b>{{credit_to_pay | currency}}</b> </h5>
+              </div>
               <div class="form-group col-12 text-center">
                 <button
                   class="btn btn-danger w-50 font-weight-bold"
@@ -89,6 +92,7 @@ export default {
       amount_value: 0,
       allow_payment: 1,
       min_amount: 0,
+      credit_to_pay:0
     };
   },
   methods: {
@@ -96,6 +100,7 @@ export default {
       this.id_credit = credit_id;
       this.allow_payment = allow_payment;
       this.min_amount = credit.installment_value;
+      this.credit_to_pay = credit.credit_to_pay;
       this.$refs.Installment.listCreditInstallments(credit_id, allow_payment);
     },
 
