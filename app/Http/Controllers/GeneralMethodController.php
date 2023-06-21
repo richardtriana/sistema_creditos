@@ -134,12 +134,12 @@ class GeneralMethodController extends InstallmentController
   public function updateInstallmentsFromAbonoCredito($credit_id)
   {
     $credit = Credit::findOrFail($credit_id);
-    $capital = $credit->credit_value - ($credit->capital_value);
-
+    
     $installments = $credit->installments()
-      ->where('status', 0)
-      ->get();
-
+    ->where('status', 0)
+    ->get();
+    
+    $capital = $credit->credit_value - ($credit->capital_value);
     $interest = ($credit->interest);
     $number_installments = count($installments);
     $start_date = date('Y-m-d');
