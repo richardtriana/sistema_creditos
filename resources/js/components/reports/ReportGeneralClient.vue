@@ -41,7 +41,7 @@
 							<th>Nro. Creditos</th>
 							<th>Pendientes</th>
 							<th>Pendientes con proveedor</th>
-							<th>Aprobados</th>
+							<th>Activos</th>
 							<th>Rechazados</th>
 							<th>Completado</th>
 							<th>Monto Crédito</th>
@@ -120,7 +120,7 @@ export default {
 						return value;
 					}
 				},
-				'Aprobados': {
+				'Activos': {
 					field: 'approved',
 					callback: (value) => {
 						return value;

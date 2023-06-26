@@ -162,7 +162,7 @@ export default {
       clientList: {},
       creditStatus: {
         0: "Pendiente",
-        1: "Aprobado",
+        1: "Activo",
         2: "Rechazado",
         3: "Pendiente pago a proveedor",
         4: "Completado",

@@ -244,7 +244,7 @@ class ReportController extends Controller
 		$this_month = Carbon::now()->month;
 		$from = $request->from;
 		$to = $request->to;
-		$type_output = $request->type_output;
+		$type_entry = $request->type_entry;
 		$headquarterId = $request->headquarter_id;
 
 		$entries = Entry::where(function ($query) use ($this_month, $from, $to, $headquarterId) {
@@ -262,9 +262,9 @@ class ReportController extends Controller
 				$query->where('headquarter_id', $headquarterId);
 			}
 
-		})->where(function ($query) use ($type_output) {
-			if ($type_output != '' && $type_output != 'undefined' && $type_output != null) {
-				$query->where('type_output', 'LIKE', "%$type_output%");
+		})->where(function ($query) use ($type_entry) {
+			if ($type_entry != '' && $type_entry != 'undefined' && $type_entry != null) {
+				$query->where('type_entry', 'LIKE', "%$type_entry%");
 			}
 		})->with('headquarter');
 

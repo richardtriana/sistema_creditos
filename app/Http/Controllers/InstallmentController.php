@@ -125,8 +125,8 @@ class InstallmentController extends Controller
           ->whereRaw("((paid_balance - paid_capital)) < ((interest_value)+$late_interest_pending)")
           ->orWhereNull('paid_balance');
       })
-			->where('status', 0)
-			->first();
+      ->where('status', 0)
+      ->first();
 
     if (!$installment) {
       $installment = $credit->installments()
@@ -134,8 +134,8 @@ class InstallmentController extends Controller
           $query
             ->whereRaw('((paid_capital) +0.1) < ((capital_value))');
         })
-				->where('status', 0)
-				->first();
+        ->where('status', 0)
+        ->first();
     }
     if (!$installment) {
       $installment = $credit->installments()
@@ -143,8 +143,8 @@ class InstallmentController extends Controller
           $query
             ->whereRaw('(paid_balance-paid_capital-interest_value)>0.1');
         })
-				->where('status', 0)
-				->first();
+        ->where('status', 0)
+        ->first();
     }
 
     $no_installment = $installment->installment_number;
@@ -156,24 +156,25 @@ class InstallmentController extends Controller
         // Primer pago
         if ($installment->capital_value >= (float)$installment->paid_capital) {
           $helpPendingCapital = $installment->capital_value - (float)$installment->paid_capital;
-          if ($balance > $helpPendingCapital) {
+          if ((int)$balance > (int) $helpPendingCapital) {
             $capital = $helpPendingCapital;
             $balance = $balance - $capital;
             $helpPendingInterest = $installment->interest_value - ($installment->paid_balance - $installment->paid_capital);
-           
+
             if ((int) $balance >= (int)  $helpPendingInterest) {
               $interest =  $helpPendingInterest;
               $balance = $balance - $interest;
               $status = 1;
-              $step=3;
+              $step = 3;
             } else {
               $interest = $balance;
               $balance = $balance - $interest;
-              $step=4;
+              $step = 4;
             }
           } else {
             $capital = $balance;
             $balance = $balance - $capital;
+            $step = 5;
           }
         }
       }
@@ -187,36 +188,37 @@ class InstallmentController extends Controller
 
         $helpPendingCapital = $installment->capital_value - (float) $installment->paid_capital;
 
-        if ($balance > $helpPendingCapital) {
+        if ((int)$balance > (int)$helpPendingCapital) {
           $capital = $helpPendingCapital < 0 ? 0 : $helpPendingCapital;
           $balance = $balance - $capital;
           $paidInterest = $installment->paid_balance - $installment->paid_capital;
           $helpPendingInterest = $paidInterest > $installment->interest_value ? 0 : $installment->interest_value - $paidInterest;
           //Hay intereses pendientes
-          if ($balance > $helpPendingInterest) {
+          if ((int)$balance > (int)$helpPendingInterest) {
             $interest =  $helpPendingInterest;
             $balance = $balance - $interest;
             $helpPaidLateInt = $paidInterest > $installment->interest_value ? $paidInterest - $installment->interest_value : 0;
             $helpPendingLateIint =  $late_interests_value - $helpPaidLateInt;
 
-            if ($balance >= $helpPendingLateIint) {
+            if ((int) $balance >= (int) $helpPendingLateIint) {
               $late_interest = $helpPendingLateIint;
               $balance = $balance - $late_interest;
               $status = 1;
-              $step=1;
+              $step = 1;
             } else {
               $late_interest = $balance;
-              $step=2;
-
+              $step = 2;
               $balance = $balance - $late_interest;
             }
           } else {
             $interest = $balance;
             $balance = $balance - $interest;
+            $step = 6;
           }
         } else {
           $capital = $balance;
           $balance = $balance - $capital;
+          $step = 7;
         }
       }
 
@@ -235,7 +237,8 @@ class InstallmentController extends Controller
         $subject = "Pago de cuota";
       }
       $credit_paid = new CreditController;
-      $credit_paid->updateValuesCredit($request,
+      $credit_paid->updateValuesCredit(
+        $request,
         $credit->id,
         $paidValue,
         $capital,
@@ -255,11 +258,11 @@ class InstallmentController extends Controller
       'late_interest' => $late_interest ??  null,
       'late_interests_value' => $late_interests_value ?? null,
       'helpPendingLateIint' => $helpPendingLateIint ?? null,
-      'helpPendingInterest'=> $helpPendingInterest ??null,
-      'helpPendingCapital'=>$helpPendingCapital??null,
+      'helpPendingInterest' => $helpPendingInterest ?? null,
+      'helpPendingCapital' => $helpPendingCapital ?? null,
       'paidInterest' => $paidInterest ??  null,
       'no_installment' => $no_installment,
-      'entry_id' => $entry_id
+      'entry_id' => $entry_id ?? 'undefined'
     ];
     // return [
     //   'balance' => $balance,
@@ -269,7 +272,7 @@ class InstallmentController extends Controller
     // ];
   }
 
- 
+
   public function payCredit(Credit $credit, Request $request)
   {
     $configurations = Company::first();

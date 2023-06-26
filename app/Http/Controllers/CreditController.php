@@ -41,7 +41,7 @@ class CreditController extends Controller
 		// $installment_controller->correctStatusInstallments();
 
 		$credits = Credit::select();
-		$headquarterId = $request->headquarter_id ?: 'all' ;
+		$headquarterId = $request->headquarter_id ?: 'all';
 		$status = $request->status != null ? $request->status : 1;
 		$status = $status == 0 ? [0, 3] : [$request->status];
 
@@ -57,8 +57,8 @@ class CreditController extends Controller
 				->select('credits.*', 'credits.id as id', 'c.name', 'c.last_name', 'c.document', 'c.type_document', 'c.phone_1', 'c.phone_2', 'c.maximum_credit_allowed')
 				->whereIn('credits.status', $status);
 		}
-		$credits = $credits->where(function ($query) use ( $headquarterId){
-			if(!is_null($headquarterId) && $headquarterId != '' && $headquarterId != 'all'){
+		$credits = $credits->where(function ($query) use ($headquarterId) {
+			if (!is_null($headquarterId) && $headquarterId != '' && $headquarterId != 'all') {
 				$query->where('credits.headquarter_id', $headquarterId);
 			}
 		});
@@ -402,7 +402,7 @@ class CreditController extends Controller
 				$entry->saveEntryInstallment($credit, $credit->initial_quota, $credit->initial_quota, 1, 0, $user_id, 'Cuota inicial');
 
 				$add_amount_box = new BoxController();
-				$request['add_amount']=$credit->initial_quota;
+				$request['add_amount'] = $credit->initial_quota;
 				$add_amount_box->addAmountBox((object)$request, $box->id, $credit->initial_quota);
 			}
 		}
@@ -429,30 +429,36 @@ class CreditController extends Controller
 				$installment->interest_value_pending = $installment->interest_value;
 
 				$days_past_due = $installment->days_past_due ? $installment->days_past_due :  $now->diffInDays($payment_date);
-				$day_value_default =($installment->interest_value * $configuration->late_interest_day);
+				$day_value_default = ($installment->interest_value * $configuration->late_interest_day);
 				$late_interest_value =  $day_value_default * $days_past_due;
 
 				$installment->days_past_due  = $days_past_due;
-				$installment->late_interests_value  =  $late_interest_value;
+				$installment->late_interests_value  = round ($late_interest_value,5);
 				$installment->late_interests_value_pending = $installment->late_interests_value;
+				$installment->step = 5;
 
 				if (($installment->paid_balance)) {
+					$installment->step = 4;
+
 					$paidInterest = $installment->paid_balance - $installment->paid_capital;
 					if ($paidInterest > ($installment->interest_value)) {
-						$installment->late_interests_value_pending =  $late_interest_value - ($paidInterest - $installment->interest_value);
+						$installment->late_interests_value_pending =  round($late_interest_value - ($paidInterest - $installment->interest_value), 5);
 						$installment->interest_value_pending = 0;
+						$installment->step = 3;
 					} else {
 						$installment->late_interests_value_pending =  $late_interest_value;
-						$installment->interest_value_pending = $installment->interest_value - $paidInterest;
+						$installment->interest_value_pending = round($installment->interest_value - $paidInterest, 2);
+						$installment->step = 2;
 					}
 				}
-				$installment->value_pending = $installment->interest_value_pending + $installment->capital_value_pending + $installment->late_interests_value_pending;
+				$installment->value_pending = round($installment->interest_value_pending + $installment->capital_value_pending + $installment->late_interests_value_pending, 5);
 			} else {
 				$installment->capital_value_pending = $installment->capital_value - $installment->paid_capital < 0 ? 0 : $installment->capital_value - $installment->paid_capital;
-				$installment->interest_value_pending = ((int)$installment->paid_balance - (int)$installment->paid_capital) >   $installment->interest_value ? 0 : $installment->interest_value - ((int)$installment->paid_balance - (int)$installment->paid_capital);
-				$installment->value_pending = $installment->interest_value_pending + $installment->capital_value_pending + $installment->late_interests_value_pending;
-				$installment->paid_capital =$installment->paid_capital+$installment->credit_deposit;
-				$installment->paid_balance =$installment->paid_balance+$installment->credit_deposit;
+				$installment->interest_value_pending = ((int)$installment->paid_balance - (int)$installment->paid_capital) >   $installment->interest_value ? 0 : round($installment->interest_value - ((int)$installment->paid_balance - (int)$installment->paid_capital), 5);
+				$installment->value_pending = round($installment->interest_value_pending + $installment->capital_value_pending + $installment->late_interests_value_pending, 5);
+				$installment->paid_capital = $installment->paid_capital + $installment->credit_deposit;
+				$installment->paid_balance = $installment->paid_balance + $installment->credit_deposit;
+				$installment->step = 1;
 			}
 		}
 

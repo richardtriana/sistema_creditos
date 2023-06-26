@@ -172,7 +172,7 @@ export default {
       infoCompany: {},
       creditStatus: {
         0: "Pendiente",
-        1: "Aprobado",
+        1: "Activos",
         2: "Rechazado",
         3: "Pendiente pago a proveedor",
         4: "Completado",
@@ -253,7 +253,7 @@ export default {
               return 'Pendiente'
             }
             if (value == 1) {
-              return 'Aprobado'
+              return 'Activo'
             }
             if (value == 2) {
               return 'Rechazado'

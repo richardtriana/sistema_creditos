@@ -25,7 +25,7 @@
 					<div class="form-group col-12 col-md-3 mr-auto">
 						<label for="search_type_entry">Tipo de entrada:</label>
 						<input type="text" id="search_type_entry" name="search_type_entry" class="form-control"
-							placeholder="Tipo de salida" v-model="search_type_entry" />
+							placeholder="Tipo de entrada" v-model="search_type_entry" />
 					</div>
 					<div class="form-group col-12 col-md-3 mr-auto">
 						<label for="headquarter_id">Sede</label>
