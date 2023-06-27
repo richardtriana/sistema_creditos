@@ -240,14 +240,14 @@ class InstallmentController extends Controller
         $subject = "Pago de cuota";
       }
       $credit_paid = new CreditController;
-      // $credit_paid->updateValuesCredit(
-      //   $request,
-      //   $credit->id,
-      //   $paidValue,
-      //   $capital,
-      //   $interest
-      // );
-      // $entry_id =  $this->saveEntryInstallment($credit, $amount, $capital + $interest + $late_interest, $no_installment, $balance, $user_id, $subject);
+      $credit_paid->updateValuesCredit(
+        $request,
+        $credit->id,
+        $paidValue,
+        $capital,
+        $interest
+      );
+      $entry_id =  $this->saveEntryInstallment($credit, $amount, $capital + $interest + $late_interest, $no_installment, $balance, $user_id, $subject);
     }
 
     return [
