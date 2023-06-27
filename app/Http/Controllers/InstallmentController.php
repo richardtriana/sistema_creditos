@@ -188,6 +188,8 @@ class InstallmentController extends Controller
 
         $helpPendingCapital = $installment->capital_value - (float) $installment->paid_capital;
 
+        if (!$late_interests_value) { $status = 1; }
+
         if ((int)$balance > (int)$helpPendingCapital) {
           $capital = $helpPendingCapital < 0 ? 0 : $helpPendingCapital;
           $balance = $balance - $capital;
@@ -213,6 +215,7 @@ class InstallmentController extends Controller
           } else {
             $interest = $balance;
             $balance = $balance - $interest;
+
             $step = 6;
           }
         } else {
@@ -237,14 +240,14 @@ class InstallmentController extends Controller
         $subject = "Pago de cuota";
       }
       $credit_paid = new CreditController;
-      $credit_paid->updateValuesCredit(
-        $request,
-        $credit->id,
-        $paidValue,
-        $capital,
-        $interest
-      );
-      $entry_id =  $this->saveEntryInstallment($credit, $amount, $capital + $interest + $late_interest, $no_installment, $balance, $user_id, $subject);
+      // $credit_paid->updateValuesCredit(
+      //   $request,
+      //   $credit->id,
+      //   $paidValue,
+      //   $capital,
+      //   $interest
+      // );
+      // $entry_id =  $this->saveEntryInstallment($credit, $amount, $capital + $interest + $late_interest, $no_installment, $balance, $user_id, $subject);
     }
 
     return [
