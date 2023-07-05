@@ -125,7 +125,7 @@ const routes = [
 					require("./components/credits/outstanding_credits/Disbursements.vue")
 						.default,
 				name: "outsanding-credits",
-			},
+			}
 		],
 	},
 	{
@@ -136,6 +136,10 @@ const routes = [
 	{
 		path: "/company",
 		component: require("./components/configurations/Company.vue").default,
+	},
+	{
+		path: "/valuation-chart",
+		component: require("./components/configurations/ValuationChart.vue").default,
 	},
 	{
 		path: "/boxes",
@@ -202,6 +206,11 @@ const routes = [
 				component: require("./components/reports/ReportCashFlow.vue").default,
 				name: "report-cash-flow",
 			},
+			{
+				path: "rating-client",
+				component: require("./components/reports/ReportRatingClient.vue").default,
+				name: "report-rating-client",
+			}
 		],
 	},
 	{

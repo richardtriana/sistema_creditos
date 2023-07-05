@@ -28,6 +28,8 @@ use App\Http\Controllers\TypeExpenseController;
 use App\Http\Controllers\MethodCreditController;
 use App\Http\Controllers\CreditProviderController;
 use App\Http\Controllers\MainBoxHistoryController;
+use App\Http\Controllers\ValuationChartController;
+use App\Models\ValuationChart;
 
 /*
 |--------------------------------------------------------------------------
@@ -108,7 +110,8 @@ Route::group(['middleware' => ['auth:api']], function () {
 
 	//Configuration
 	Route::resource('/configurations', CompanyController::class)->middleware('permission:configuration');
-	
+	Route::resource('/valuation-chart', ValuationChartController::class);
+
 	//Entries
 	Route::get('/entries/show-entry/{entry}', [EntryController::class, 'showEntry']);
 	Route::resource('/entries',  EntryController::class);
@@ -129,12 +132,12 @@ Route::group(['middleware' => ['auth:api']], function () {
 	Route::get('/main-box/current-balance', [MainBoxController::class, 'currentBalance']);
 	Route::resource('/main-box',  MainBoxController::class);
 
-	Route::get('/box-history/{box}',[ BoxHistoryController::class,'index']);
+	Route::get('/box-history/{box}', [BoxHistoryController::class, 'index']);
 	Route::resource('/box-history',  BoxHistoryController::class);
 
-	Route::get('/main-box-history/{main_box}',[ MainBoxHistoryController::class,'index']);
+	Route::get('/main-box-history/{main_box}', [MainBoxHistoryController::class, 'index']);
 	Route::resource('/main-box-history',  MainBoxHistoryController::class);
-	
+
 	// Products
 	Route::get('/products/filter-product-list',  [ProductController::class, 'filterProductList']);
 	Route::resource('/products',  ProductController::class);
@@ -154,13 +157,14 @@ Route::group(['middleware' => ['auth:api']], function () {
 	//Print tickets
 	Route::get('/print-entry/{entry}', [PrintTicketController::class, 'printEntry']);
 	Route::get('/print-expense/{expense}', [PrintTicketController::class, 'printExpense']);
-	
+
 	//Reports
 	Route::get('/reports/credits', [ReportController::class, 'ReportCredits'])->middleware('permission:report');
 	Route::get('/reports/portfolio', [ReportController::class, 'ReportPortfolio']);
 	Route::get('/reports/general-credits', [ReportController::class, 'ReportGeneralCredits']);
 	Route::get('/reports/headquarters-expenses', [ReportController::class, 'ReportHeadquartersExpenses']);
 	Route::get('/reports/headquarters-entries', [ReportController::class, 'ReportHeadquartersEntries']);
+	Route::get('/reports/rating-client', [ReportController::class, 'ReportRatingClient']);
 
 	//Roles
 	Route::get('/roles/getAllRoles', [RoleController::class, 'getAllRoles']);

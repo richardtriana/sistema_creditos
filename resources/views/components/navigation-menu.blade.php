@@ -47,6 +47,8 @@
             </router-link>
             <router-link class="dropdown-item" :to="{ name: 'report-cash-flow' }"> Reporte de flujo de caja
             </router-link>
+             <router-link class="dropdown-item" :to="{ name: 'report-rating-client' }"> Reporte calificativo de cliente
+            </router-link>
           </div>
         </li>
         <li class="nav-item dropdown" v-if="validatePermission('provider-index') || validatePermission('client-index')">
@@ -73,6 +75,8 @@
           <div class="dropdown-menu" aria-labelledby="navbarDropdownConfigurations">
             <router-link class="dropdown-item" to="/company" v-if="validatePermission('configuration')"> Empresa
             </router-link>
+            <router-link class="dropdown-item" to="/valuation-chart" v-if="validatePermission('configuration')"> Tabla de valoración clientes
+            </router-link>            
             <router-link class="dropdown-item" to="/roles" v-if="validatePermission('rol-index')"> Roles </router-link>
             <router-link class="dropdown-item" to="/users" v-if="validatePermission('user-index')"> Usuarios
             </router-link>

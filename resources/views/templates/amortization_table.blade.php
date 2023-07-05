@@ -64,6 +64,18 @@
                 <td>Sucursal</td>
                 <td>Tasa de Interés mensual: {{ $credit->interest }} %</td>
             </tr>
+            @if (count($debtors))
+                <tr>
+                    <td colspan="3" class="text-center"><b> Codeudor (es)</b></td>
+                </tr>
+                @foreach ($debtors as $debtor)
+                    <tr>
+                        <td>Codeudor: {{ $debtor->name }} {{ $debtor->last_name }}</td>
+                        <td >Nro. Documento {{ $debtor->document }}</td>
+                        <td >Teléfonos: {{ $debtor->phone_1 }}  {{ $debtor->phone_2 }}</td>
+                    </tr>
+                @endforeach
+            @endif
             <tr>
                 <td colspan="3"></td>
             </tr>

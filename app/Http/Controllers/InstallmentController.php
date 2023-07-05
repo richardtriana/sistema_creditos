@@ -441,6 +441,7 @@ class InstallmentController extends Controller
     $credit_id = $request->credit_id;
     $credit = Credit::where('id', $credit_id)->first();
     $client = $credit->client()->first();
+    $debtors = $credit->debtors()->get();
     $installments = $credit->installments()->get();
 
     $details = [
@@ -448,6 +449,7 @@ class InstallmentController extends Controller
       'credit' => $credit,
       'client' => $client,
       'installments' => $installments,
+      'debtors' => $debtors,
       'url' => URL::to('/')
     ];
 
@@ -457,6 +459,7 @@ class InstallmentController extends Controller
     $data = [
       'status' => 200,
       'pdf' => base64_encode($pdf),
+      'pd2' => $details,
       'message' => 'Tabla generada en pdf'
     ];
 

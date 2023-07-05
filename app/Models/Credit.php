@@ -92,8 +92,6 @@ class Credit extends Model
 
     public function getCreditToPayAttribute()
     {
-
-        //valor cuotas - $valor pagado
         $value = $this->installments()->where('status', 0)->sum("value");
         $paid = $this->installments()->where('status', 0)->sum("paid_balance");
         return $value - $paid;

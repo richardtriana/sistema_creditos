@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
 use App\Models\Credit;
 use App\Models\Entry;
 use App\Models\Expense;
@@ -73,20 +74,20 @@ class ReportController extends Controller
 			->leftJoin('clients', 'credits.client_id', 'clients.id')
 			->leftJoin('headquarters', 'credits.headquarter_id', 'headquarters.id');
 
-			if ($search_client) {
-				$installments = $installments->whereHas('credit.client', function ($query) use ($search_client) {
-					$query->where('name', 'LIKE', "%$search_client%")
-						->orWhere('last_name', 'LIKE', "%$search_client%")
-						->orWhere('document', 'LIKE', "%$search_client%");
-				});
-			}
+		if ($search_client) {
+			$installments = $installments->whereHas('credit.client', function ($query) use ($search_client) {
+				$query->where('name', 'LIKE', "%$search_client%")
+					->orWhere('last_name', 'LIKE', "%$search_client%")
+					->orWhere('document', 'LIKE', "%$search_client%");
+			});
+		}
 
-			$installments = $installments->with('credit')->paginate($results);
+		$installments = $installments->with('credit')->paginate($results);
 
 		$getTotalReportsController = new GetTotalReportsController;
 		$totals = $getTotalReportsController->getTotalReportPortfolio($installments);
 
-		return ['installments'=>$installments, 'totals'=> $totals];
+		return ['installments' => $installments, 'totals' => $totals];
 	}
 
 	public function ReportGeneralCredits(Request $request)
@@ -163,12 +164,12 @@ class ReportController extends Controller
 		}
 
 		$credits = $credits
-		->with('client', 'headquarter:id,headquarter')->orderBy('created_at','desc')->paginate($results);
+			->with('client', 'headquarter:id,headquarter')->orderBy('created_at', 'desc')->paginate($results);
 
 		$total_credits = new CreditController;
 		$total_credits = $total_credits->getTotalValueCredits($request);
 
-		$total_credits->total_credit_to_pay=$this->getTotalInstallmentsForGeneralCredits($request)->total_credit_to_pay;
+		$total_credits->total_credit_to_pay = $this->getTotalInstallmentsForGeneralCredits($request)->total_credit_to_pay;
 
 		return ['credits' => $credits, 'total_credits' => $total_credits];
 	}
@@ -219,10 +220,9 @@ class ReportController extends Controller
 				$query->whereDate('date', '<=', $to);
 			}
 
-			if(!is_null($headquarterId) && $headquarterId != ''){
+			if (!is_null($headquarterId) && $headquarterId != '') {
 				$query->where('headquarter_id', $headquarterId);
 			}
-
 		})->where(function ($query) use ($type_output) {
 			if ($type_output != '' && $type_output != 'undefined' && $type_output != null) {
 				$query->where('type_output', 'LIKE', "%$type_output%");
@@ -258,10 +258,9 @@ class ReportController extends Controller
 				$query->whereDate('date', '<=', $to);
 			}
 
-			if(!is_null($headquarterId) && $headquarterId != ''){
+			if (!is_null($headquarterId) && $headquarterId != '') {
 				$query->where('headquarter_id', $headquarterId);
 			}
-
 		})->where(function ($query) use ($type_entry) {
 			if ($type_entry != '' && $type_entry != 'undefined' && $type_entry != null) {
 				$query->where('type_entry', 'LIKE', "%$type_entry%");
@@ -376,7 +375,8 @@ class ReportController extends Controller
 		return $data;
 	}
 
-	public function getTotalInstallmentsForGeneralCredits(Request $request){
+	public function getTotalInstallmentsForGeneralCredits(Request $request)
+	{
 		$from = $request->from;
 		$to = $request->to;
 		$status = $request->status;
@@ -415,8 +415,8 @@ class ReportController extends Controller
 
 		$installments = $installments = $installments->whereHas('credit.client', function ($query) use ($search_client) {
 			$query->where('name', 'LIKE', "%$search_client%")
-			->orWhere('last_name', 'LIKE', "%$search_client%")
-			->orWhere('document', 'LIKE', "%$search_client%");
+				->orWhere('last_name', 'LIKE', "%$search_client%")
+				->orWhere('document', 'LIKE', "%$search_client%");
 		});
 
 		$installments = $installments = $installments->whereHas('credit', function ($query) use ($status, $from, $to, $query_date, $start_date, $end_date) {
@@ -446,8 +446,30 @@ class ReportController extends Controller
 		});
 
 		$installments = $installments->first();
-		$installments->total_credit_to_pay = $installments->value -$installments->paid_balance;
-		
+		$installments->total_credit_to_pay = $installments->value - $installments->paid_balance;
+
 		return $installments;
+	}
+
+	public function ReportRatingClient(Request $request)
+	{
+		if ($request->document == NULL)
+			return false;
+
+		$client = Client::where('clients.document',  'LIKE', "%$request->document%")
+			->orWhere('clients.name', 'LIKE', "%$request->document%")
+			->orWhere('clients.last_name', 'LIKE', "%$request->document%")
+			->first();
+
+		$credits = $client->credits()
+			->get();
+
+		foreach ($credits as $credit) {
+			$credit->days_past_due = $credit->installments()->get()->sum('days_past_due_calculated');
+		}
+
+		$total_credits = $credits->sum('days_past_due');
+
+		return ["credits" => $credits, "client"=>$client, "total_credits" => $total_credits];
 	}
 }

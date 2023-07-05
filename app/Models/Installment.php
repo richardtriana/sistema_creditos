@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -25,8 +26,24 @@ class Installment extends Model
     'capital_balance'
   ];
 
+  protected $appends = [
+    'days_past_due_calculated'
+  ];
+
   public function credit()
   {
     return $this->belongsTo(Credit::class, 'credit_id');
+  }
+
+  public function getDaysPastDueCalculatedAttribute()
+  {
+    $now = now();
+    $payment_date = Carbon::parse($this->payment_date);
+    $days_past_due = 0;
+    if (($payment_date < $now ) && $this->status != 1) {
+      $days_past_due = $this->days_past_due ? $this->days_past_due :  $now->diffInDays($payment_date);
+    }
+
+    return  $days_past_due + $this->days_past_due;
   }
 }
