@@ -28,7 +28,10 @@
       <tbody>
         <tr v-for="quote in listInstallments" :key="quote.id">
           <th>{{ quote.payment_date }}</th>
-          <td>{{ quote.installment_number }}</td>
+          <td>{{ quote.installment_number }}
+            <br>
+            <small>ID: {{ quote.id }}</small>
+          </td>
           <th class="text-right font-weight-bold">
             <span class="text-danger">{{
               quote.value_pending | currency
@@ -100,7 +103,7 @@
                 </div>
               </div>
               <template v-if="quote.add_payment">
-                  {{ quote.add_payment | currency }}
+                {{ quote.add_payment | currency }}
               </template>
             </td>
             <td v-if="$root.validatePermission('installment-reverse')">
