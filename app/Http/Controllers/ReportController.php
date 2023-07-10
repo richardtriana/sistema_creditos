@@ -466,10 +466,11 @@ class ReportController extends Controller
 
 		foreach ($credits as $credit) {
 			$credit->days_past_due = $credit->installments()->get()->sum('days_past_due_calculated');
+			$credit->days_past_due_avg = $credit->days_past_due  / $credit->number_installments;
 		}
+		$nro_credits =  $credits->count('id');
+		$total_credits = $credits->sum('days_past_due') / $nro_credits;
 
-		$total_credits = $credits->sum('days_past_due');
-
-		return ["credits" => $credits, "client"=>$client, "total_credits" => $total_credits];
+		return ["credits" => $credits, "client" => $client, "total_credits" => $total_credits];
 	}
 }

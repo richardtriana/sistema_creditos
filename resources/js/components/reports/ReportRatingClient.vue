@@ -23,7 +23,8 @@
         <div class="card w-100 text-center" v-if="ReportRatingClientList.length > 0">
             <h4 class="text-primary"> {{ client.name }} {{ client.last_name }} - {{ client.document }} </h4>
             <h6>CALIFICACIÓN GENERAL:</h6>
-            <h5 class="p-3 rounded rounded-pill" :style="{backgroundColor: getValuation(GeneralRatingClient).color}">{{ getValuation(GeneralRatingClient).valuation }}</h5>
+            <h5 class="p-3 rounded rounded-pill" :style="{ backgroundColor: reportValuationGeneral.color }">{{
+                reportValuationGeneral.valuation }}</h5>
         </div>
         <div class="page-content">
             <section class="table-responsive">
@@ -40,7 +41,7 @@
                     </thead>
                     <tbody v-if="ReportRatingClientList.length > 0">
                         <tr v-for="(report, index) in ReportRatingClientList" :key="index">
-                            <span class="hidden" v-show="false"> {{ report.valuation= getValuation(report.days_past_due)
+                            <span class="hidden" v-show="false"> {{ report.valuation= getValuation(report.days_past_due_avg)
                             }}</span>
                             <td>{{ index + 1 }}</td>
                             <td>{{ report.id }}</td>
@@ -74,7 +75,8 @@ export default {
             search_client_document: "",
             search_results: 15,
             valuationChart: [],
-            client: []
+            client: [],
+            reportValuationGeneral: []
         };
     },
     created() {
@@ -95,9 +97,12 @@ export default {
                     }
                 )
                 .then((response) => {
-                    this.ReportRatingClientList = response.data.credits;
-                    this.GeneralRatingClient = response.data.total_credits,
+                    if (response.data) {
+                        this.ReportRatingClientList = response.data.credits;
+                        this.GeneralRatingClient = response.data.total_credits,
                         this.client = response.data.client
+                        this.reportValuationGeneral = this.getValuation(response.data.total_credits)
+                    }
                 });
         },
         getValuationChart() {
@@ -115,8 +120,7 @@ export default {
                     return valuation;
                 }
             }
-            console.log(daysPastDue)
-            return "";
+            return this.valuationChart[3];
         }
     },
     mounted() {
