@@ -45,6 +45,7 @@
               <th>Sede</th>
               <th>Nro. Documento</th>
               <th>Cupo disponible</th>
+              <th>Codeudor (es)</th>
               <th>Descripción</th>
               <th>Valor crédito</th>
               <th>Valor Abonado</th>
@@ -77,6 +78,25 @@
               <td>{{ credit.headquarter.headquarter }}</td>
               <td>{{ credit.type_document }} {{ credit.document }}</td>
               <td> {{ credit.maximum_credit_allowed }}</td>
+              <td class="p-0">
+                <table v-if="credit.debtors.length" class="table table-sm">
+                  <thead>
+                    <tr>
+                      <th scope="col">Nombre</th>
+                      <th scope="col">Documento</th>
+                      <th scope="col">Celular</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="d in credit.debtors" :key="d.id">
+                      <td>{{ d.name }} {{ d.last_name }}</td>
+                      <td>{{ d.type_document }} {{ d.document }}</td>
+                      <td>{{ d.phone_1 }} {{ d.phone_2 }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <span v-else>No hay codeudores asociados</span>
+              </td>
               <td>
                 <textarea name="description" id="description" cols="10" rows="4" class="form-control-plaintext" readonly
                   v-model="credit.description"></textarea>

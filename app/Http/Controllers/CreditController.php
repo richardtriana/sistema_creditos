@@ -65,7 +65,7 @@ class CreditController extends Controller
 		$credits = $credits
 			->orderBy('id', 'desc')
 			// ->getAttributes()
-			->with('headquarter:id,headquarter', 'client:id,name,last_name', 'product:id,product', 'guarantees:id,guarantee', 'debtors:id,name,last_name')
+			->with('headquarter:id,headquarter', 'client:id,name,last_name', 'product:id,product', 'guarantees:id,guarantee', 'debtors:id,name,last_name,type_document,document,phone_1,phone_2')
 			->paginate(10);
 
 		return $credits;
