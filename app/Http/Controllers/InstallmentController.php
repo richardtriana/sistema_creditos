@@ -155,7 +155,7 @@ class InstallmentController extends Controller
       if ($payment_date >= $now) {
         // Primer pago
         if ($installment->capital_value >= (float)$installment->paid_capital) {
-          $helpPendingCapital = $installment->capital_value - (float)$installment->paid_capital;
+          $helpPendingCapital = (int)($installment->capital_value - $installment->paid_capital);
           if ((int)$balance > (int) $helpPendingCapital) {
             $capital = $helpPendingCapital;
             $balance = $balance - $capital;
@@ -268,14 +268,13 @@ class InstallmentController extends Controller
       'no_installment' => $no_installment,
       'entry_id' => $entry_id ?? 'undefined'
     ];
-    // return [
-    //   'balance' => $balance,
-    //   'no_installment' => $no_installment,
-    //   'entry_id' => $entry_id,
-    //   'installment' => $installment
-    // ];
+    return [
+      'balance' => $balance,
+      'no_installment' => $no_installment,
+      'entry_id' => $entry_id,
+      'installment' => $installment
+    ];
   }
-
 
   public function payCredit(Credit $credit, Request $request)
   {
@@ -523,5 +522,16 @@ class InstallmentController extends Controller
     } else {
       $franchiseMethod->updateInstallments($credit->id);
     }
+  }
+
+  public function changeStatusInstallment($id)
+  {
+    $cuota = Installment::find($id);
+
+    if (!$cuota) {       return response()->json(['message' => 'Cuota no encontrada'], 404);     }
+
+    $cuota->changeStatus();
+
+    return response()->json(['message' => 'Cuota marcada como pagada'], 200);
   }
 }

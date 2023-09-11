@@ -21,6 +21,7 @@
               Reversar <br />
               Pago
             </th>
+            <th>Actualizar <br> estado</th>
           </template>
 
         </tr>
@@ -109,6 +110,14 @@
             <td v-if="$root.validatePermission('installment-reverse')">
               <button class="btn btn-warning" @click="reversePayment(quote)">
                 <i class="bi bi-arrow-counterclockwise"></i>
+              </button>
+            </td>
+            <td>
+              <button v-if="quote.value_pending <= 0 && !quote.status" class="btn btn-success" @click="updateStatus(quote)">
+                <i class="bi bi-check2-square"></i>
+              </button>
+              <button v-else class="btn btn-disabled btn-secondary"  disabled>
+                <i class="bi bi-check2-square"></i>
               </button>
             </td>
           </template>
@@ -259,6 +268,34 @@ export default {
       axios
         .post(
           `api/installment/reverse-payment/${quote.id}`,
+          null,
+          this.$root.config
+        )
+        .then(function (response) {
+          // handle success
+          Swal.fire({
+            icon: "success",
+            title: ".",
+            text: "La operación se ha realizado correctamente",
+          });
+        })
+        .catch(function (error) {
+          // handle error
+          if (error) {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "No se pudo realizar esta operación",
+            });
+          }
+        })
+        .finally(this.listCreditInstallments(this.id_credit, 1));
+    },
+    
+    updateStatus(quote) {
+      axios
+        .post(
+          `api/installment/change-status/${quote.id}`,
           null,
           this.$root.config
         )
