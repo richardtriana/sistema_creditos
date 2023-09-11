@@ -46,4 +46,10 @@ class Installment extends Model
 
     return  $days_past_due + $this->days_past_due;
   }
+
+    public function changeStatus()
+    {
+        $this->status = 1;
+        $this->save();
+    }
 }

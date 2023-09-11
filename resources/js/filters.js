@@ -3,9 +3,6 @@ import moment from 'moment';
 import 'moment/locale/es'  // without this line it didn't work
 moment.locale('es')
 
-
-
-
 const defaultDollarFilter = function (value) {
 	if (!value) {
 		return '$ 0'
