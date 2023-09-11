@@ -86,23 +86,28 @@
             </router-link>
           </div>
         </li>
+				<li class="nav-item dropdown notifications">
+					<a id="navbarDropdownNotifications" href="#" class="nav-link text-white " :class="{ 'dropdown-toggle' : notifications.length != 0}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<i v-if="notifications.length == 0" class="bi bi-bell"></i>
+						<i v-else class="bi bi-bell-fill"></i>
+						Cumpleaños
+					</a>
+					<div class="dropdown-menu dropdown-menu-right px-2 birth-date" aria-labelledby="navbarDropdownNotifications">
+						<div v-for="item in notifications" :key="item.id" class="card my-1" style="width: 20rem;">
+							<div class="card-body">
+								<h6 class="card-title"><i class="bi bi-person-circle rounded me-2"></i> @{{ `${item.name} ${item.last_name}`  }}</h6>
+								<h6 class="card-subtitle mb-2 text-body-secondary"><strong>@{{ item.type_document }}: </strong>@{{ item.document }}</h6>
+								<h6 v-if="item.phone_1 !== '' && item.phone_1 != NULL" class="card-subtitle mb-2 text-body-secondary"><strong>Cel 1: </strong>@{{ item.phone_1 }}</h6>
+								<h6 v-if="item.phone_2 != '' && item.phone_2 != NULL" class="card-subtitle mb-2 text-body-secondary"><strong>Cel 2: </strong>@{{ item.phone_2 }}</h6>
+							</div>
+						</div>
+					</div>
+				</li>
       </ul>
 
       <!-- Right Side Of Navbar -->
       <ul class="navbar-nav" v-if="validateAuth">
         <!-- Authentication Links -->
-				<li class="nav-item dropdown ">
-					<a id="navbarDropdownNotifications" href="#" class="nav-link text-white dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bi bi-bell"></i></a>
-					<div class="dropdown-menu dropdown-menu-right px-2" aria-labelledby="navbarDropdownNotifications">
-						<div v-for="item in notifications" :key="item.id" class="card" style="width: 20rem;">
-							<div class="card-body">
-								<h6 class="card-title"><i class="bi bi-person-circle rounded me-2"></i> @{{ `${item.name} ${item.last_name}`  }}</h6>
-								<h6 class="card-subtitle mb-2 text-body-secondary"><strong>Fecha: </strong>@{{ item.birth_date }}</h6>
-								<h6 class="card-subtitle mb-2 text-body-secondary"><strong>@{{ item.type_document }}: </strong>@{{ item.document }}</h6>
-							</div>
-						</div>
-					</div>
-				</li>
         <li class="nav-item dropdown">
           <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             @{{ user.name }}

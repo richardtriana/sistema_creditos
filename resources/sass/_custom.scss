@@ -95,3 +95,11 @@ h3 {
 		}
 	}
 }
+
+.notifications{
+	.birth-date{
+		max-height: 50vh;
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
+}

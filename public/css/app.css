@@ -15563,6 +15563,12 @@ h3 {
   margin-left: 0.5rem;
 }
 
+.notifications .birth-date {
+  max-height: 50vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 .form-control.form-control-solid {
   background-color: #F3F6F9;
   border-color: #F3F6F9;
