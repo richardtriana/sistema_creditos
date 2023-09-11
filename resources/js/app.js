@@ -286,6 +286,7 @@ const app = new Vue({
 			},
 		}),
 		configuration: Object,
+		notifications: []
 
 	},
 	watch: {
@@ -347,6 +348,12 @@ const app = new Vue({
 				  this.configuration = response.data.company;
 				}
 			  });
+		},
+		getNotifications()
+		{
+			axios.get("api/notifications", this.config).then( response => {
+					this.notifications = response.data.data;
+			});
 		}
 	},
 	created() {
@@ -355,5 +362,6 @@ const app = new Vue({
 	},
 	mounted() {
 		this.getCurrentBalanceMainBox();
+		this.getNotifications();
 	},
 });

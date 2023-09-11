@@ -114,10 +114,9 @@ class ClientController extends Controller
 			'status' => 'success',
 			'code' =>  200,
 			'message' => 'Registro exitoso',
-			'errors' =>  $validate->errors()
 		], 200);
 	}
-	
+
 		/**
 	 * Display the specified resource.
 	 *

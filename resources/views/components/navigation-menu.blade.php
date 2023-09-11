@@ -76,7 +76,7 @@
             <router-link class="dropdown-item" to="/company" v-if="validatePermission('configuration')"> Empresa
             </router-link>
             <router-link class="dropdown-item" to="/valuation-chart" v-if="validatePermission('configuration')"> Tabla de valoración clientes
-            </router-link>            
+            </router-link>
             <router-link class="dropdown-item" to="/roles" v-if="validatePermission('rol-index')"> Roles </router-link>
             <router-link class="dropdown-item" to="/users" v-if="validatePermission('user-index')"> Usuarios
             </router-link>
@@ -91,7 +91,18 @@
       <!-- Right Side Of Navbar -->
       <ul class="navbar-nav" v-if="validateAuth">
         <!-- Authentication Links -->
-
+				<li class="nav-item dropdown ">
+					<a id="navbarDropdownNotifications" href="#" class="nav-link text-white dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bi bi-bell"></i></a>
+					<div class="dropdown-menu dropdown-menu-right px-2" aria-labelledby="navbarDropdownNotifications">
+						<div v-for="item in notifications" :key="item.id" class="card" style="width: 20rem;">
+							<div class="card-body">
+								<h6 class="card-title"><i class="bi bi-person-circle rounded me-2"></i> @{{ `${item.name} ${item.last_name}`  }}</h6>
+								<h6 class="card-subtitle mb-2 text-body-secondary"><strong>Fecha: </strong>@{{ item.birth_date }}</h6>
+								<h6 class="card-subtitle mb-2 text-body-secondary"><strong>@{{ item.type_document }}: </strong>@{{ item.document }}</h6>
+							</div>
+						</div>
+					</div>
+				</li>
         <li class="nav-item dropdown">
           <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             @{{ user.name }}

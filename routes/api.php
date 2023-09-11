@@ -29,6 +29,7 @@ use App\Http\Controllers\MethodCreditController;
 use App\Http\Controllers\CreditProviderController;
 use App\Http\Controllers\MainBoxHistoryController;
 use App\Http\Controllers\ValuationChartController;
+use \App\Http\Controllers\NotificationController;
 use App\Models\ValuationChart;
 
 /*
@@ -174,4 +175,7 @@ Route::group(['middleware' => ['auth:api']], function () {
 	//User
 	Route::post('/users/{user}/change-status',  [UserController::class, 'changeStatus']);
 	Route::resource('/users',  UserController::class);
+
+	//Notifications
+	Route::get('/notifications', [NotificationController::class, 'index']);
 });
