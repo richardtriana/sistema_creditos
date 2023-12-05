@@ -40,22 +40,22 @@
                   v-model="amount_value"
                   :min="min_amount"
                 />
-                <small id="addAmountHelpBlock" class="form-text text-muted">
+                <!-- <small id="addAmountHelpBlock" class="form-text text-muted">
                   Monto mínimo
                   {{ min_amount | currency }}
-                </small>
+                </small> -->
               </div>
               <div class="form-group col-3">
                 <button
                   class="btn btn-primary my-auto"
                   @click="payCredit()"
-                  v-if="amount_value > min_amount"
-                >
+                  >
+                  <!-- v-if="amount_value > min_amount" -->
                   Abonar <b>{{ amount_value | currency }}</b>
                 </button>
-                <button v-else class="btn btn-secondary my-auto" disabled>
+                <!-- <button v-else class="btn btn-secondary my-auto" disabled>
                   <i class="bi bi-currency-dollar"></i> Abonar a crédito
-                </button>
+                </button> -->
               </div>
               <div class="form-group col-3">
                 <h5>Saldo pendiente: <b>{{credit_to_pay | currency}}</b> </h5>
@@ -99,7 +99,7 @@ export default {
     listCreditInstallments: function (credit_id, allow_payment, credit) {
       this.id_credit = credit_id;
       this.allow_payment = allow_payment;
-      this.min_amount = credit.installment_value;
+      // this.min_amount = credit.installment_value;
       this.credit_to_pay = credit.credit_to_pay;
       this.$refs.Installment.listCreditInstallments(credit_id, allow_payment);
     },
