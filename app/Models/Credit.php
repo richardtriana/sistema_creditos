@@ -23,6 +23,7 @@ class Credit extends Model
         'debtor',
         'status',
         'start_date',
+        'old_interest',
         'interest',
         'annual_interest_percentage',
         'porcentaje_interes_mensual',

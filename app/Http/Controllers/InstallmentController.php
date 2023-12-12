@@ -366,9 +366,9 @@ class InstallmentController extends Controller
     }
 
     if ($configurations->method &&  $configurations->method == "GENERAL") {
-      $generalMethod->updateInstallmentsFromAbonoCredito($credit->id);
+      $generalMethod->updateInstallmentsFromAbonoCredito($credit->id, $request->new_interest);
     } else {
-      $franchiseMethod->updateInstallmentsFromAbonoCredito($credit->id);
+      $franchiseMethod->updateInstallmentsFromAbonoCredito($credit->id,  $request->new_interest);
     }
 
     // return [

@@ -488,6 +488,9 @@ class CreditController extends Controller
 				$credit->finish_date = date('Y-m-d');
 			}
 		}
+		$credit->old_interest = $credit->interest;
+		$credit->interest = $request->new_interest ?$request->new_interest : $credit->old_interest ;
+		
 		$credit->save();
 
 		if ($credit->status == 4) {

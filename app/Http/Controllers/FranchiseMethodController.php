@@ -146,7 +146,7 @@ class FranchiseMethodController extends InstallmentController
   }
 
   // Actualizar valor de todas las cuotas de un credito desde abono a capital del crédito
-  public function updateInstallmentsFromAbonoCredito($credit_id)
+  public function updateInstallmentsFromAbonoCredito($credit_id, $new_interest)
   {
     $credit = Credit::findOrFail($credit_id);
     $paidTotalCredit =  $credit->installments()->selectRaw("
@@ -162,7 +162,7 @@ class FranchiseMethodController extends InstallmentController
       ->where('status', 0)
       ->get();
 
-    $interest = $credit->interest;
+    $interest = $new_interest ? $new_interest : $credit->interest;
     $number_installments = count($installments);
     $start_date = date('Y-m-d');
 

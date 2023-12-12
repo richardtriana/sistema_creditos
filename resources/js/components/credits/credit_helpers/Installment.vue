@@ -206,7 +206,7 @@ export default {
       }
     },
 
-    payCredit(amount_value) {
+    payCredit(amount_value, new_interest) {
       let late_interests_value = this.listInstallments.filter((x) => x.late_interests_value_pending > 0 && x.status === 0);
       late_interests_value = late_interests_value[0]
         ? late_interests_value[0]["late_interests_value_pending"]
@@ -215,6 +215,7 @@ export default {
       var data = {
         amount: amount_value,
         late_interest_pending: late_interests_value,
+        new_interest: new_interest
       };
 
       axios

@@ -45,6 +45,9 @@
                   {{ min_amount | currency }}
                 </small>
               </div>
+              <div class="col-3 form-group">
+                <input type="number" step="any"  class="form-control" id="new_interest" v-model="new_interest" min="0">
+              </div>
               <div class="form-group col-3">
                 <button
                   class="btn btn-primary my-auto"
@@ -57,6 +60,7 @@
                   <i class="bi bi-currency-dollar"></i> Abonar a crédito
                 </button>
               </div>
+              
               <div class="form-group col-3">
                 <h5>Saldo pendiente: <b>{{credit_to_pay | currency}}</b> </h5>
               </div>
@@ -92,7 +96,8 @@ export default {
       amount_value: 0,
       allow_payment: 1,
       min_amount: 0,
-      credit_to_pay:0
+      credit_to_pay:0,
+      new_interest:0
     };
   },
   methods: {
@@ -101,12 +106,13 @@ export default {
       this.allow_payment = allow_payment;
       this.min_amount = credit.installment_value;
       this.credit_to_pay = credit.credit_to_pay;
+      this.new_interest = credit.interest;
       this.$refs.Installment.listCreditInstallments(credit_id, allow_payment);
     },
 
     payCredit() {
       if (this.amount_value > 0) {
-        this.$refs.Installment.payCredit(this.amount_value);
+        this.$refs.Installment.payCredit(this.amount_value, this.new_interest);
       } else {
         Swal.fire({
           icon: "error",
