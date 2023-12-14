@@ -23,7 +23,8 @@ class Installment extends Model
     'paid_capital',
     'payment_register',
     'status',
-    'capital_balance'
+    'capital_balance',
+    'payment_commitment'
   ];
 
   protected $appends = [

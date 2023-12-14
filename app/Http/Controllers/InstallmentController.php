@@ -534,4 +534,16 @@ class InstallmentController extends Controller
 
     return response()->json(['message' => 'Cuota marcada como pagada'], 200);
   }
+
+  public function sendPaymentCommitment(Request $request, $id)
+  {
+    $quote = Installment::find($id);
+
+    if (!$quote) {       return response()->json(['message' => 'Cuota no encontrada'], 404);     }
+
+    $quote->payment_commitment = $request->payment_commitment ;
+    $quote->save();
+
+    return response()->json(['message' => 'Cuota editada correctamente'], 200);
+  }
 }

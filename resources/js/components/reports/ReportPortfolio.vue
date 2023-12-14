@@ -84,6 +84,7 @@
               <th>Fecha de pago cuota</th>
               <th>Estado</th>
               <th>Nro. Cuota</th>
+              <th>Compromiso de pago</th>
             </tr>
           </thead>
           <tbody v-if="ReportPortfolioList.data">
@@ -133,6 +134,7 @@
               <td>
                 {{ report.installment_number }}
               </td>
+              <td>{{report.payment_commitment}}</td>
             </tr>
           </tbody>
         </table>
@@ -212,6 +214,12 @@ export default {
         },
         'Fecha de pago': {
           field: 'payment_date',
+          callback: (value) => {
+            return value;
+          }
+        },
+        'Compromiso de pago': {
+          field: 'payment_commitment',
           callback: (value) => {
             return value;
           }

@@ -155,6 +155,7 @@ Route::group(['middleware' => ['auth:api']], function () {
 	Route::post('/installment/{credit}/pay-credit', [InstallmentController::class, 'payCredit']);
 	Route::post('/installment/reverse-payment/{id}', [InstallmentController::class, 'reversePaymentInstallment'])->middleware('permission:installment.reverse');
 	Route::post('/installment/change-status/{id}', [InstallmentController::class, 'changeStatusInstallment'])->middleware('permission:installment.reverse');
+	Route::post('/installment/send-payment-commitment/{id}', [InstallmentController::class, 'sendPaymentCommitment']);
 
 	//Print tickets
 	Route::get('/print-entry/{entry}', [PrintTicketController::class, 'printEntry']);

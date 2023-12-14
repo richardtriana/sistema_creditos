@@ -21,6 +21,7 @@
               Reversar <br />
               Pago
             </th>
+            <th style="min-width: 200px;">Compromiso <br> de pago</th>
             <th>Actualizar <br> estado</th>
           </template>
 
@@ -92,12 +93,12 @@
               </button>
             </td>
             <td>
-              <div class="input-group mb-3 mw-200" v-if="quote.status == 0">
+              <div class="input-group mb-3 w-150" v-if="quote.status == 0">
                 <input type="number" :min="0" v-model="quote.add_payment" :max="quote.value" step="any"
                   class="form-control form-control-sm" placeholder="Valor" aria-label="Valor"
                   aria-describedby="pay-button" />
                 <div class="input-group-append">
-                  <button class="btn btn-outline-success btn-sm" @click="payInstallment(quote, quote.add_payment)"
+                  <button  class="btn btn-outline-success btn-sm" @click="payInstallment(quote, quote.add_payment)"
                     type="button" id="pay-button">
                     Abonar
                   </button>
@@ -111,6 +112,14 @@
               <button class="btn btn-warning" @click="reversePayment(quote)">
                 <i class="bi bi-arrow-counterclockwise"></i>
               </button>
+            </td>
+            <td>
+              <template>
+                <div>
+                  <textarea class="form-control mb-1" v-model="quote.payment_commitment" placeholder="Anotaciones de promesa de pago"></textarea> <br>
+                  <button type="button" v-if="quote.payment_commitment" class="btn btn-success" @click="sendPaymentCommitment(quote)">Enviar</button>
+                </div>
+              </template>
             </td>
             <td>
               <button v-if="quote.value_pending <= 0 && !quote.status" class="btn btn-success" @click="updateStatus(quote)">
@@ -320,6 +329,38 @@ export default {
         })
         .finally(this.listCreditInstallments(this.id_credit, 1));
     },
+
+    sendPaymentCommitment(quote) {
+      console.log(quote)
+      let data = {
+        'payment_commitment' : quote.payment_commitment
+      }
+      axios
+        .post(
+          `api/installment/send-payment-commitment/${quote.id}`,
+          data,
+          this.$root.config
+        )
+        .then(function (response) {
+          // handle success
+          Swal.fire({
+            icon: "success",
+            title: ".",
+            text: "La operación se ha realizado correctamente",
+          });
+        })
+        .catch(function (error) {
+          // handle error
+          if (error) {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "No se pudo realizar esta operación",
+            });
+          }
+        })
+        .finally(this.listCreditInstallments(this.id_credit, 1));
+    }
   },
 };
 </script>
