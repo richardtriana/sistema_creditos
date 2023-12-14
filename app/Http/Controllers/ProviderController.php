@@ -18,10 +18,10 @@ class ProviderController extends Controller
 		$this->middleware('permission:provider.delete', ['only' => ['create']]);
 		$this->middleware('permission:provider.status', ['only' => ['changeStatus']]);
 	}
-	public function index()
+	public function index(Request $request)
 	{
-		//
-		return Provider::paginate(5);
+		$results = $request->results ?? 10;
+		return Provider::paginate($results);
 	}
 
 	public function create($id)

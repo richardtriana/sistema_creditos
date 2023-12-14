@@ -24,6 +24,8 @@ class ClientController extends Controller
 	 */
 	public function index(Request $request)
 	{
+		$results = $request->results ?? 10; 
+
 		$clients = Client::select();
 		if ($request->client && ($request->client != '')) {
 			$clients  = 	$clients->where('document', 'LIKE', "%$request->client%")
@@ -31,7 +33,7 @@ class ClientController extends Controller
 				->orWhere('email', 'LIKE', "%$request->client%")
 				->orWhere('last_name', 'LIKE', "%$request->client%");
 		}
-		$clients = $clients->paginate(10);
+		$clients = $clients->with('headquarter:id,headquarter')->paginate($results);
 
 		return $clients;
 	}

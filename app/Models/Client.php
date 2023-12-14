@@ -33,4 +33,9 @@ class Client extends Model
   {
     return $this->hasMany(Credit::class);
   }
+
+  public function headquarter()
+  {
+      return $this->belongsTo(Headquarter::class, 'headquarter_id');
+  }
 }

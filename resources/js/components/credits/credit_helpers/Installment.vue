@@ -1,6 +1,6 @@
 <template>
-  <section class="table-responsive">
-    <table class="table table-sm table-bordered">
+  <section class="tablex-responsive">
+    <table class="table table-sm table-bordered table-responsive" style="overflow:visible">
       <thead>
         <tr class="text-center">
           <th>Fecha de vencimiento</th>
