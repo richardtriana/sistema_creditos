@@ -20,8 +20,19 @@ class ProviderController extends Controller
 	}
 	public function index(Request $request)
 	{
+		$results = $request->results ?? 10; 
+
 		$results = $request->results ?? 10;
-		return Provider::paginate($results);
+		$providers =  Provider::select();
+
+		if ($request->provider && ($request->provider != '')) {
+			$providers  = 	$providers->where('document', 'LIKE', "%$request->provider%")
+				->orWhere('business_name', 'LIKE', "%$request->provider%");
+		}
+
+		$providers = $providers->paginate($results);
+
+		return $providers;
 	}
 
 	public function create($id)

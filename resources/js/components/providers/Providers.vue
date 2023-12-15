@@ -13,6 +13,11 @@
 			<form>
 				<div class="form-row">
 					<div class="form-group col-md-4 col-sm-6 col-xs-6">
+						<label for="search_provider">Buscar proveedor...</label>
+						<input type="text" id="search_provider" name="search_provider" class="form-control"
+						  placeholder="Razon Social | Documento" v-model="search_provider" />
+					  </div>
+					<div class="form-group col-md-4 col-sm-6 col-xs-6">
 						<label for="">Mostrar {{ search_results }} resultados por página:</label>
 						<input type="number" id="search_results" name="search_results" class="form-control"
 							placeholder="Desde" v-model="search_results" max="1000" />
@@ -22,8 +27,8 @@
 							<i class="bi bi-search"></i> Buscar
 						</button>
 					</div>
-					<div class="form-group col-md-4 col-sm-6 col-xs-6">
-						<download-excel class="btn btn-primary w-100 mt-5" :fields="json_fields" :data="providerList.data"
+					<div class="form-group offset-md-8 col-md-4 col-sm-6 col-xs-6">
+						<download-excel class="btn btn-primary w-100" :fields="json_fields" :data="providerList.data"
 							name="list-providers.xls" type="xls">
 							<i class="bi bi-file-earmark-arrow-down-fill"></i> Descargar .xls
 						</download-excel>
@@ -94,6 +99,7 @@ export default {
 	data() {
 		return {
 			providerList: {},
+			search_provider:"",
 			search_results: 10,
 			json_fields: {
 				'ID': {
@@ -156,6 +162,7 @@ export default {
 
 			let data = {
 				page: page,
+				provider:this.search_provider,
 				results: this.search_results
 			}
 
