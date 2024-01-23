@@ -206,19 +206,25 @@ class ReportController extends Controller
 		$this_month = Carbon::now()->month;
 		$from = $request->from;
 		$to = $request->to;
+		$user_id = $request->user_id;
 		$type_output = $request->type_output;
 		$headquarterId = $request->headquarter_id;
 
 		$expenses = Expense::where(function ($query) use ($this_month, $from, $to, $headquarterId) {
 
-			$query->whereMonth('date', '<=', $this_month);
-
 			if ($from != '' && $from != 'undefined' && $from != null) {
+				$from = Carbon::parse($from)->format('Y-m-d');
 				$query->whereDate('date', '>=', $from);
 			}
+
 			if ($to != '' && $to != 'undefined' && $to != null) {
+				$to = Carbon::parse($to)->format('Y-m-d');
 				$query->whereDate('date', '<=', $to);
 			}
+
+			if (is_null($from) && is_null($to)) {
+				$query->whereMonth('date', '<=', $this_month);
+			};
 
 			if (!is_null($headquarterId) && $headquarterId != '') {
 				$query->where('headquarter_id', $headquarterId);
@@ -227,7 +233,12 @@ class ReportController extends Controller
 			if ($type_output != '' && $type_output != 'undefined' && $type_output != null) {
 				$query->where('type_output', 'LIKE', "%$type_output%");
 			}
-		})->with('headquarter');
+		})->where(function ($query) use ($user_id) {
+			if ($user_id != '' && $user_id != 'undefined' && $user_id != null) {
+				$query->where('user_id', 'LIKE', "%$user_id%");
+			}
+		})
+		->with('headquarter');
 
 
 		$getTotalReportsController = new GetTotalReportsController;
@@ -243,20 +254,26 @@ class ReportController extends Controller
 	{
 		$this_month = Carbon::now()->month;
 		$from = $request->from;
+		$user_id = $request->user_id;
 		$to = $request->to;
 		$type_entry = $request->type_entry;
 		$headquarterId = $request->headquarter_id;
 
-		$entries = Entry::where(function ($query) use ($this_month, $from, $to, $headquarterId) {
-
-			$query->whereMonth('date', '<=', $this_month);
+		$entries = Entry::where(function ($query) use ($this_month, $from, $to, $headquarterId, $user_id) {
 
 			if ($from != '' && $from != 'undefined' && $from != null) {
+				$from = Carbon::parse($from)->format('Y-m-d');
 				$query->whereDate('date', '>=', $from);
 			}
+
 			if ($to != '' && $to != 'undefined' && $to != null) {
+				$to = Carbon::parse($to)->format('Y-m-d');
 				$query->whereDate('date', '<=', $to);
 			}
+
+			if (is_null($from) && is_null($to)) {
+				$query->whereMonth('date', '<=', $this_month);
+			};
 
 			if (!is_null($headquarterId) && $headquarterId != '') {
 				$query->where('headquarter_id', $headquarterId);
@@ -265,8 +282,12 @@ class ReportController extends Controller
 			if ($type_entry != '' && $type_entry != 'undefined' && $type_entry != null) {
 				$query->where('type_entry', 'LIKE', "%$type_entry%");
 			}
-		})->with('headquarter');
-
+		})->where(function ($query) use ($user_id) {
+			if ($user_id != '' && $user_id != 'undefined' && $user_id != null) {
+				$query->where('user_id', 'LIKE', "%$user_id%");
+			}
+		})
+			->with('headquarter');
 
 		$getTotalReportsController = new GetTotalReportsController;
 		$totals = $getTotalReportsController->getTotalReportHeadquartersEntries($entries->get());

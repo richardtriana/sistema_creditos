@@ -10,7 +10,7 @@
       <h6 class="text-primary text-uppercase">Filtrar:</h6>
       <form>
         <div class="form-row">
-          <div class="form-group col-12 col-md-2 ml-auto">
+          <div class="form-group col-12 col-md-3">
             <label for="search_from">Desde:</label>
             <input
               type="date"
@@ -22,7 +22,7 @@
               :max="now"
             />
           </div>
-          <div class="form-group col-12 col-md-2 mr-auto">
+          <div class="form-group col-12 col-md-3">
             <label for="search_to">Hasta:</label>
             <input
               type="date"
@@ -34,7 +34,7 @@
               :max="now"
             />
           </div>
-          <div class="form-group col-12 col-md-3 mr-auto">
+          <div class="form-group col-12 col-md-3">
             <label for="search_type_output">Tipo de salida:</label>
             <input
               type="text"
@@ -45,7 +45,28 @@
               v-model="search_type_output"
             />
           </div>
-					<div class="form-group col-12 col-md-3 mr-auto">
+          <div class="form-group col-12 col-md-3">
+						<label for="user">Usuario
+						</label>
+						<v-select label="name" v-model="search_user_id"
+							:reduce="(option) => option.id" :filterable="false" :options="listUsers"
+							@search="onSearchUsers">
+							<template slot="no-options">
+								Escribe para iniciar la búsqueda
+							</template>
+							<template slot="option" slot-scope="option">
+								<div class="d-center">
+									{{ option.name }} {{ option.last_name }}
+								</div>
+							</template>
+							<template slot="selected-option" slot-scope="option">
+								<div class="selected d-center">
+									{{ option.name }} {{ option.last_name }}
+								</div>
+							</template>
+						</v-select>
+					</div>
+					<div class="form-group col-12 col-md-3">
 						<label for="headquarter_id">Sede</label>
 								<select class="form-control custom-selec" id="headquarter_id" v-model="search_headquarter_id">
 									<option selected value="">Todas</option>
@@ -55,7 +76,7 @@
 									</option>
 								</select>
           </div>
-					<div class="form-group col-12 col-md-2 mr-auto">
+					<div class="form-group col-12 col-md-2">
 						<label for="">Mostrar {{ search_results }} resultados:</label>
 						<input type="number" id="search_results" name="search_results" class="form-control" placeholder="Desde"
 							v-model="search_results"/>
@@ -130,10 +151,12 @@ export default {
     return {
       headquartersExpenseList: {},
       headquartersExpenseTotal: {},
+      listUsers: [],
       search_from: "",
       search_to: "",
       search_type_output: "",
 			search_headquarter_id: "",
+      search_user_id: "",
       now: moment().format('YYYY-MM-DD'),
       json_fields: {
         'Sede': {
@@ -173,6 +196,7 @@ export default {
         page: page,
         from: this.search_from,
         to: this.search_to,
+        user_id: this.search_user_id,
         type_output: this.search_type_output,
 				headquarter_id: this.search_headquarter_id,
 				results: this.search_results
@@ -199,6 +223,18 @@ export default {
           me.headquarterList = response.data;
         });
     },
+    onSearchUsers(search, loading) {
+			if (search.length) {
+				loading(true);
+				axios.get(`api/users?user=${search}&page=1`, this.$root.config)
+					.then((response) => {
+						console.log(response.data)
+						this.listUsers = (response.data.users.data);
+						loading(false)
+					})
+					.catch(e => console.log(e))
+			}
+		},
   },
 };
 </script>

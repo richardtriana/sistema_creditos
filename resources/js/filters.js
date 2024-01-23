@@ -38,7 +38,7 @@ const affectation = function (value, type) {
 			switch(type){
 				case 'expense':
 						if(data[1] !== undefined && data[3] !== undefined)
-								result = `${data[1]} - ${data[4]}`;
+								result = `${data[1]} - ${data[3]}`;
 					break;
 				case 'entry':
 					if(data[0] !== undefined)

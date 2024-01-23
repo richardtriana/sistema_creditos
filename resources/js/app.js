@@ -351,7 +351,7 @@ const app = new Vue({
 		},
 		getNotifications()
 		{
-			axios.get("api/notifications", this.config).then( response => {
+			axios.get("api/notifications", this.$root.config).then( response => {
 					this.notifications = response.data.data;
 			});
 		}

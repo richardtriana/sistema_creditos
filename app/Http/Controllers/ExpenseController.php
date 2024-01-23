@@ -32,6 +32,7 @@ class ExpenseController extends Controller
 		$from = $request->from;
 		$to = $request->to;
 		$this_month = Carbon::now()->month;
+		$user_id = $request->user_id;
 		$type_output = $request->type_output;
 		$description = $request->description;
 		$headquarter_id  = $request->headquarter_id;
@@ -39,15 +40,19 @@ class ExpenseController extends Controller
 
 		$expenses = Expense::with('user:id,name,last_name', 'headquarter:id,headquarter')
 			->where(function ($query) use ($this_month, $from, $to) {
-
-				$query->whereMonth('date', '<=', $this_month);
-
 				if ($from != '' && $from != 'undefined' && $from != null) {
+					$from = Carbon::parse($from)->format('Y-m-d');
 					$query->whereDate('date', '>=', $from);
 				}
+
 				if ($to != '' && $to != 'undefined' && $to != null) {
+					$to = Carbon::parse($to)->format('Y-m-d');
 					$query->whereDate('date', '<=', $to);
 				}
+
+				if (is_null($from) && is_null($to)) {
+					$query->whereMonth('date', '<=', $this_month);
+				};
 			});
 			
 		if ($headquarter_id && $headquarter_id != 'all') {
@@ -59,6 +64,10 @@ class ExpenseController extends Controller
 		if ($description != null) {
 			$expenses =	$expenses->where('description', 'LIKE', "%$description%");
 		}
+		if ($user_id != null) {
+			$expenses =	$expenses->where('user_id', "%$user_id%");
+		}
+		
 		$expenses =	$expenses->paginate($results);
 
 		$getTotalReportsController = new GetTotalReportsController;

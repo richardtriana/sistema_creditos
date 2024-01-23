@@ -120,7 +120,12 @@ class UserController extends Controller
         }
         $users = $users->with('headquarter')->paginate(10);
 
-        return $users;
+
+        return response()->json([
+            'status' => 'success',
+            'code' => 200,
+            'users' => $users
+        ]);
     }
 
     /**

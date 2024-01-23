@@ -9,8 +9,10 @@ use App\Models\Entry;
 use App\Models\Credit;
 use App\Models\Company;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
+
 
 class EntryController extends Controller
 {
@@ -23,6 +25,7 @@ class EntryController extends Controller
 	{
 		$id = $request->id;
 		$client = $request->client;
+		$user_id = $request->user_id;
 		$document = $request->document;
 		$from = $request->from;
 		$to = $request->to;
@@ -33,7 +36,7 @@ class EntryController extends Controller
 
 		$entries = Entry::select()
 			->orderBy('id', 'desc')
-			->with(['user:id,name,last_name','headquarter']);
+			->with(['user:id,name,last_name', 'headquarter']);
 
 		if ($client != null || $document != null) {
 			$entries = $entries->select('entries.*', 'clients.name', 'clients.last_name', 'clients.document')
@@ -52,22 +55,30 @@ class EntryController extends Controller
 		$entries = $entries
 			->where(function ($query) use ($this_month, $from, $to) {
 
-				$query->whereMonth('date', '<=', $this_month);
-
 				if ($from != '' && $from != 'undefined' && $from != null) {
+					$from = Carbon::parse($from)->format('Y-m-d');
 					$query->whereDate('date', '>=', $from);
 				}
+
 				if ($to != '' && $to != 'undefined' && $to != null) {
+					$to = Carbon::parse($to)->format('Y-m-d');
 					$query->whereDate('date', '<=', $to);
 				}
+
+				if (is_null($from) && is_null($to)) {
+					$query->whereMonth('date', '<=', $this_month);
+				};
 			});
+
 		if ($type_input != null) {
 			$entries =	$entries->where('type_entry', 'LIKE', "%$type_input%");
+		}
+		if ($user_id != null) {
+			$entries =	$entries->where('user_id', "%$user_id%");
 		}
 		if ($description != null) {
 			$entries =	$entries->where('description', 'LIKE', "%$description%");
 		}
-
 		if ($id != null) {
 			$entries =	$entries->where('id', "$id");
 		}
@@ -123,7 +134,7 @@ class EntryController extends Controller
 			$add_amount_box = new BoxController();
 			$add_amount_box->addAmountBox($request, $box->id, $request['price']);
 		}
-		
+
 		return response()->json([
 			'status' => 'success',
 			'code' =>  200,
@@ -178,8 +189,8 @@ class EntryController extends Controller
 
 		$headquarter = $entry->headquarter()->first();
 		$credit = $entry->credit()->first();
-		$client = $credit ? $credit->client()->first():NULL;
-		$product = $credit ?  $credit->product()->first():NULL;
+		$client = $credit ? $credit->client()->first() : NULL;
+		$product = $credit ?  $credit->product()->first() : NULL;
 		$user = $request->user();
 
 		$details = [

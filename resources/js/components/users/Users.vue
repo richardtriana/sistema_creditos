@@ -127,7 +127,7 @@ export default {
       axios
         .get(`api/users?page=${page}&user=${this.search_user}`, me.$root.config)
         .then(function (response) {
-          me.userList = response.data;
+          me.userList = response.data.users;
         });
     },
     showData: function (ususario) {

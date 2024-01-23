@@ -17,6 +17,10 @@ class Entry extends Model
         'type_input',
         'price',
     ];
+
+    protected $dates = [
+        'date' => 'date:Y-m-d'
+    ];
    
     public function user()
     {

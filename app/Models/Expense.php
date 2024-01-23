@@ -19,6 +19,10 @@ class Expense extends Model
         'status'
     ];
 
+    protected $dates = [
+        'date' => 'date:Y-m-d'
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
