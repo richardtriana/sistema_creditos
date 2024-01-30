@@ -30,7 +30,7 @@ class HeadquarterController extends Controller
 				->orWhere('legal_representative', 'LIKE', "%$request->headquarter%")
 				->orWhere('email', 'LIKE', "%$request->headquarter%");
 		}
-		$headquarters = $headquarters->orderBy('headquarter','asc')->paginate(5);
+		$headquarters = $headquarters->orderBy('headquarter', 'asc')->paginate(5);
 
 		return $headquarters;
 	}
@@ -185,9 +185,18 @@ class HeadquarterController extends Controller
 		$sd->save();
 	}
 
-	public function listHeadquarter()
+	public function listHeadquarter(Request $request)
 	{
-		$headquarters = Headquarter::select()->where('status', 1)->orderBy('headquarter','asc')->get();
+		$search_headquarter = $request->search_headquarter;
+
+		$headquarters = Headquarter::select()
+			->where('status', 1)
+			->where(function ($query) use ($search_headquarter) {
+				if (!is_null($search_headquarter)) {
+					$query->where('headquarter_id', 'LIKE', $search_headquarter);
+				}
+			})
+			->orderBy('headquarter', 'asc')->get();
 		return $headquarters;
 	}
 

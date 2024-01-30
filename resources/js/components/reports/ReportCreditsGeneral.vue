@@ -12,7 +12,33 @@
             <input type="text" id="search_client" name="search_client" class="form-control"
               placeholder="Nombres | Documento" v-model="search_client" />
           </div>
-          <div class="form-group col-4 ">
+          <div class="form-group col-4">
+            <label for="search_credit_id">Nro Crédito: </label>
+            <input type="number" id="search_credit_id" name="search_credit_id" class="form-control"
+              placeholder="Número de crédito" v-model="search_credit_id" />
+          </div>
+          <div class="form-group col-md-4">
+            <label for="search_headquarter_id" class=" w-100 form-label">Sede
+            </label>
+            <v-select label="headquarter" class="w-100" v-model="search_headquarter_id"
+              :reduce="(option) => option.id" :filterable="false" :options="listHeadquarters"
+              @search="onSearchHeadquarter">
+              <template slot="no-options">
+                Escribe para iniciar la búsqueda
+              </template>
+              <template slot="option" slot-scope="option">
+                <div class="d-center">
+                  {{ option.headquarter }}
+                </div>
+              </template>
+              <template slot="selected-option" slot-scope="option">
+                <div class="selected d-center">
+                  {{ option.headquarter }}
+                </div>
+              </template>
+            </v-select>
+          </div>
+          <div class="form-group col-4  offset-4">
             <label for="">Fecha de inicio:</label>
             <input type="date" id="search_start_date" name="search_start_date" class="form-control" placeholder="Desde"
               v-model="search_start_date" />
@@ -82,8 +108,8 @@
               <th>Total abonado</th>
               <th>Abono a capital</th>
               <th>Abono a intereses</th>
-							<th>Saldo capital</th>
-							<th>Saldo pendiente</th>
+              <th>Saldo capital</th>
+              <th>Saldo pendiente</th>
             </tr>
           </thead>
           <tbody v-if="ReportGeneralCreditsList.data">
@@ -111,7 +137,7 @@
               <td class="text-right">{{ report.paid_value | currency }}</td>
               <td class="text-right">{{ report.capital_value | currency }}</td>
               <td class="text-right">{{ report.interest_value | currency }}</td>
-							<td class="text-right">{{ calculateBalanceInstallment(report) | currency }}</td>
+              <td class="text-right">{{ calculateBalanceInstallment(report) | currency }}</td>
               <td class="text-right">{{ report.credit_to_pay | currency }}</td>
             </tr>
           </tbody>
@@ -141,17 +167,18 @@
             <th>Total abonado a intereses</th>
             <td>{{ ReportTotalValues.interest_value | currency }}</td>
           </tr>
-					<tr class="text-right">
+          <tr class="text-right">
             <th class="font-weight-bold">Total saldo capital</th>
             <td>{{ calculateBalanceInstallment(ReportTotalValues) | currency }}</td>
           </tr>
-           <tr class="text-right">
+          <tr class="text-right">
             <th class="font-weight-bold">Total a recaudar </th>
             <td>{{ ReportTotalValues.total_credit_to_pay | currency }}</td>
           </tr>
-         <tr class="text-right">
+          <tr class="text-right">
             <th class="font-weight-bold">Total interés a recaudar</th>
-            <td>{{ (ReportTotalValues.total_credit_to_pay -  calculateBalanceInstallment(ReportTotalValues))| currency }}</td>
+            <td>{{ (ReportTotalValues.total_credit_to_pay - calculateBalanceInstallment(ReportTotalValues)) | currency }}
+            </td>
           </tr>
           <!-- <tr class="text-right">
             <th class="font-weight-bold">Total saldo actual</th>
@@ -170,6 +197,7 @@ export default {
       ReportGeneralCreditsList: {},
       ReportTotalValues: {},
       infoCompany: {},
+      listHeadquarters: [],
       creditStatus: {
         0: "Pendiente",
         1: "Activos",
@@ -185,7 +213,9 @@ export default {
       search_start_date: '',
       search_end_date: '',
       search_client: '',
+      search_credit_id: '',
       search_results: 15,
+      search_headquarter_id: "",
 
       json_fields: {
         'Cliente': {
@@ -272,30 +302,30 @@ export default {
         'Total abonado': {
           field: 'paid_value',
           callback: (value) => {
-            return this.$options.filters.currency(value,'export');
+            return this.$options.filters.currency(value, 'export');
           }
         },
         'Abono a capital': {
           field: 'capital_value',
           callback: (value) => {
-            return this.$options.filters.currency(value,'export');
+            return this.$options.filters.currency(value, 'export');
           }
         },
         'Abono a intereses': {
           field: 'interest_value',
           callback: (value) => {
-            return this.$options.filters.currency(value,'export');
+            return this.$options.filters.currency(value, 'export');
           }
         },
         'Saldo capital': {
           callback: (value) => {
-            return this.$options.filters.currency(this.calculateBalanceInstallment(value),'export');
+            return this.$options.filters.currency(this.calculateBalanceInstallment(value), 'export');
           }
         },
         'Saldo pendiente': {
           field: 'credit_to_pay',
           callback: (value) => {
-            return this.$options.filters.currency(value,'export');
+            return this.$options.filters.currency(value, 'export');
           }
         },
       }
@@ -311,6 +341,8 @@ export default {
         start_date: this.search_start_date,
         end_date: this.search_end_date,
         search_client: this.search_client,
+        search_credit_id: this.search_credit_id,
+        search_headquarter_id: this.search_headquarter_id,
         results: this.search_results
       }
       axios
@@ -333,11 +365,21 @@ export default {
         }
       });
     },
-		calculateBalanceInstallment(data)
-		{
-			// console.log("Value saldo: ", (data.credit_value + data.interest_value) - data.paid_value);
-			return (data.credit_value + data.interest_value) - data.paid_value;
-		}
+    calculateBalanceInstallment(data) {
+      // console.log("Value saldo: ", (data.credit_value + data.interest_value) - data.paid_value);
+      return (data.credit_value + data.interest_value) - data.paid_value;
+    },
+    onSearchHeadquarter(search, loading) {
+      if (search.length) {
+        loading(true);
+        axios.get(`api/headquarters/list-headquarter?headquarter=${search}&page=1`, this.$root.config)
+          .then((response) => {
+            this.listHeadquarters = (response.data);
+            loading(false)
+          })
+          .catch(e => console.log(e))
+      }
+    },
   },
   mounted() {
     this.listReportGeneralCredits();
@@ -346,6 +388,4 @@ export default {
 };
 </script>
 
-<style>
-
-</style>
+<style></style>

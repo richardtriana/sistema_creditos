@@ -99,6 +99,8 @@ class ReportController extends Controller
 		$start_date = $request->start_date;
 		$end_date = $request->end_date;
 		$search_client = $request->search_client;
+		$search_credit_id = $request->search_credit_id;
+		$search_headquarter_id = $request->search_headquarter_id;
 		$results = $request->results ?? 15;
 
 		switch ($status) {
@@ -135,6 +137,16 @@ class ReportController extends Controller
 						$query->where('status', '<>', '-1');
 					} else {
 						$query->where('status', $status);
+					}
+				})
+				->where(function ($query) use ($search_credit_id) {
+					if (!is_null($search_credit_id)) {
+						$query->where('id', $search_credit_id);
+					}
+				})
+				->where(function ($query) use ($search_headquarter_id) {
+					if (!is_null($search_headquarter_id)) {
+						$query->where('headquarter_id', $search_headquarter_id);
 					}
 				})
 				->where(function ($query) use ($from, $to, $query_date) {
@@ -238,7 +250,7 @@ class ReportController extends Controller
 				$query->where('user_id', 'LIKE', "%$user_id%");
 			}
 		})
-		->with('headquarter');
+			->with('headquarter');
 
 
 		$getTotalReportsController = new GetTotalReportsController;
@@ -404,6 +416,8 @@ class ReportController extends Controller
 		$start_date = $request->start_date;
 		$end_date = $request->end_date;
 		$search_client = $request->search_client;
+		$search_credit_id = $request->search_credit_id;
+		$search_headquarter_id = $request->search_headquarter_id;
 
 		switch ($status) {
 			case 'all':
@@ -432,15 +446,22 @@ class ReportController extends Controller
 		$installments = Installment::select(
 			DB::raw('SUM(value) as value'),
 			DB::raw('SUM(paid_balance) as paid_balance ')
-		);
+		)
+			->where(function ($query) use ($search_credit_id) {
+				if (!is_null($search_credit_id)) {
+					$query->where('credit_id', $search_credit_id);
+				}
+			});
 
-		$installments = $installments = $installments->whereHas('credit.client', function ($query) use ($search_client) {
-			$query->where('name', 'LIKE', "%$search_client%")
-				->orWhere('last_name', 'LIKE', "%$search_client%")
-				->orWhere('document', 'LIKE', "%$search_client%");
-		});
+		$installments =  $installments
+			->whereHas('credit.client', function ($query) use ($search_client) {
+				$query->where('name', 'LIKE', "%$search_client%")
+					->orWhere('last_name', 'LIKE', "%$search_client%")
+					->orWhere('document', 'LIKE', "%$search_client%");
+			});
 
-		$installments = $installments = $installments->whereHas('credit', function ($query) use ($status, $from, $to, $query_date, $start_date, $end_date) {
+		$installments = $installments->whereHas('credit', function ($query)
+		use ($status, $from, $to, $query_date, $start_date, $end_date, $search_headquarter_id) {
 
 			if ($status == null) {
 				$query->whereMonth('created_at', Carbon::now()->month);
@@ -464,7 +485,12 @@ class ReportController extends Controller
 			if ($end_date != '' && $end_date != 'undefined' && $end_date != null) {
 				$query->whereRaw("DATE_ADD(`start_date`, INTERVAL `number_installments` MONTH) <= '$end_date'");
 			}
-		});
+		})
+			->whereHas('credit', function ($query) use ($search_headquarter_id) {
+				if (!is_null($search_headquarter_id)) {
+					$query->where('headquarter_id', $search_headquarter_id);
+				}
+			});
 
 		$installments = $installments->first();
 		$installments->total_credit_to_pay = $installments->value - $installments->paid_balance;

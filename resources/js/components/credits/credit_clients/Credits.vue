@@ -8,19 +8,24 @@
       </button>
     </div>
     <div class="page-search d-flex justify-content-between p-4 border my-2">
-      <div class="form-row col-8 m-auto">
-        <div class="col-md-4 ">
+      <div class="form-row w-100">
+        <div class="form-group col-md-4 col-lg-3 ">
           <label for="search_client">Cliente</label>
           <input type="text" id="search_client" name="search_client" class="form-control col"
             placeholder="Buscar cliente | Documento" v-model="search_client" />
         </div>
-        <div class="form-group col-md-4">
+        <div class="form-group col-md-4 col-lg-3 ">
+          <label for="search_credit_id">Nro Crédito: </label>
+          <input type="number" id="search_credit_id" name="search_credit_id" class="form-control"
+            placeholder="Número de crédito" v-model="search_credit_id" />
+        </div>
+        <div class="form-group col-md-4 col-lg-3">
           <label for="headquarter_id">Sede</label>
           <v-select :options="headquarterList" label="headquarter" aria-logname="{}"
             :reduce="(headquarter) => headquarter.id" v-model="search_headquarter_id" placeholder="Seleccionar sede">
           </v-select>
         </div>
-        <div class="col-md-4 ">
+        <div class="form-group col-md-4 col-lg-3 ">
           <label for="status">Estado</label>
           <select name="status" id="status" v-model="status" class="custom-select col">
             <option v-for="(st, index) in creditStatus" :value="index" :key="index">
@@ -28,8 +33,8 @@
             </option>
           </select>
         </div>
-        <div class="col">
-          <button class="btn btn-primary" @click="listCredits()">Buscar</button>
+        <div class="form-group col-md-4 col-lg-3 offset-md-8 offset-lg-9">
+          <button class="btn btn-primary btn-block" @click="listCredits()">Buscar</button>
         </div>
       </div>
     </div>
@@ -61,10 +66,9 @@
               <th>Paz y salvo</th>
               <th>Recoger crédito</th>
               <th>Cobro jurídico</th>
-              <th v-if="
-                $root.validatePermission('credit-update') ||
+              <th v-if="$root.validatePermission('credit-update') ||
                 $root.validatePermission('credit-status')
-              ">
+                ">
                 Opciones
               </th>
             </tr>
@@ -116,7 +120,7 @@
               <td class="text-center" v-if="$root.validatePermission('credit-index')">
                 <button class="btn btn-danger" @click="
                   printTable(credit.id, credit.name + '_' + credit.last_name)
-                ">
+                  ">
                   <i class="bi bi-file-pdf"></i>
                 </button>
               </td>
@@ -127,7 +131,7 @@
                       credit.id,
                       credit.name + '_' + credit.last_name
                     )
-                  ">
+                    ">
                     <i class="bi bi-file-earmark-pdf"></i>
                     Descargar
                   </button>
@@ -150,12 +154,12 @@
 
               </td>
 
-              <td class="text-right" v-if="
-                $root.validatePermission('credit-update') ||
+              <td class="text-right" v-if="$root.validatePermission('credit-update') ||
                 $root.validatePermission('credit-status')
-              ">
+                ">
                 <div v-if="$root.validatePermission('credit-update')" class="d-inline">
-                  <button v-if="(credit.status == 0 || credit.status == 1 || credit.status == 3) && credit.paid_value <=1" class="btn btn-primary" @click="showData(credit)">
+                  <button v-if="(credit.status == 0 || credit.status == 1 || credit.status == 3) && credit.paid_value <= 1"
+                    class="btn btn-primary" @click="showData(credit)">
                     <i class="bi bi-pen"></i>
                   </button>
                   <button v-else class="btn btn-secondary" disabled>
@@ -231,6 +235,7 @@ export default {
   data() {
     return {
       search_client: "",
+      search_credit_id: '',
       search_headquarter_id: 'all',
       status: 1,
       creditList: {},
@@ -260,8 +265,10 @@ export default {
         page: page,
         status: this.status,
         credit: this.search_client,
-        headquarter_id: this.search_headquarter_id
+        headquarter_id: this.search_headquarter_id,
+        search_credit_id: this.search_credit_id
       }
+      
       axios
         .get(
           `api/credits`,

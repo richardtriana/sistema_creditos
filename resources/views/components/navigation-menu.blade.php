@@ -86,7 +86,7 @@
             </router-link>
           </div>
         </li>
-				<li class="nav-item dropdown notifications">
+				<li class="nav-item dropdown notifications" >
 					<a id="navbarDropdownNotifications" href="#" class="nav-link text-white " :class="{ 'dropdown-toggle' : notifications.length != 0}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 						<i v-if="notifications.length == 0" class="bi bi-bell"></i>
 						<i v-else class="bi bi-bell-fill"></i>

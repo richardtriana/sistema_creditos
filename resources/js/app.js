@@ -15,7 +15,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import Swal from "sweetalert2";
 import vSelect from "vue-select";
-import { dollarFilter, affectation} from "./filters";
+import { dollarFilter, affectation } from "./filters";
 import JsonExcel from "vue-json-excel";
 
 import "vue-select/dist/vue-select.css";
@@ -269,24 +269,26 @@ router.beforeEach(async (to, from, next) => {
 const app = new Vue({
 	el: "#app",
 	router,
-	data: {
-		current_balance_main_box: 0,
-		type_documents: {
-			CC: "Cédula de ciudadania",
-			NIT: "NIT",
-			TI: "Tarjeta de identidad",
-			PP: "Pasaporte",
-			CE: "Cédula de extranjería",
-		},
-		user: Object,
-		token: "",
-		config: Object({
-			headers: {
-				Authorization: "",
+	data() {
+		return {
+			current_balance_main_box: 0,
+			type_documents: {
+				CC: "Cédula de ciudadania",
+				NIT: "NIT",
+				TI: "Tarjeta de identidad",
+				PP: "Pasaporte",
+				CE: "Cédula de extranjería",
 			},
-		}),
-		configuration: Object,
-		notifications: []
+			user: Object,
+			token: "",
+			config: Object({
+				headers: {
+					Authorization: "",
+				},
+			}),
+			configuration: Object,
+			notifications: Array
+		}
 
 	},
 	watch: {
@@ -341,17 +343,15 @@ const app = new Vue({
 				});
 			}
 		},
-		getConfiguration()
-		{
+		getConfiguration() {
 			axios.get("api/configurations", this.$root.config).then((response) => {
 				if (response.data.company) {
-				  this.configuration = response.data.company;
+					this.configuration = response.data.company;
 				}
-			  });
+			});
 		},
-		getNotifications()
-		{
-			axios.get("api/notifications", this.$root.config).then( response => {
+		getNotifications() {
+			axios.get("api/notifications", this.$root.config).then(response => {
 					this.notifications = response.data.data;
 			});
 		}
@@ -362,6 +362,6 @@ const app = new Vue({
 	},
 	mounted() {
 		this.getCurrentBalanceMainBox();
-		this.getNotifications();
+		this.getNotifications()
 	},
 });

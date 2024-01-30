@@ -44,6 +44,7 @@ class CreditController extends Controller
 		$headquarterId = $request->headquarter_id ?: 'all';
 		$status = $request->status != null ? $request->status : 1;
 		$status = $status == 0 ? [0, 3] : [$request->status];
+		$search_credit_id = $request->search_credit_id;
 
 		if ($request->credit && ($request->credit != '')) {
 			$credits  =   $credits->leftjoin('clients as c', 'c.id', 'credits.client_id')
@@ -61,7 +62,12 @@ class CreditController extends Controller
 			if (!is_null($headquarterId) && $headquarterId != '' && $headquarterId != 'all') {
 				$query->where('credits.headquarter_id', $headquarterId);
 			}
-		});
+		})
+			->where(function ($query) use ($search_credit_id) {
+				if (!is_null($search_credit_id)) {
+					$query->where('credits.id', $search_credit_id);
+				}
+			});
 		$credits = $credits
 			->orderBy('id', 'desc')
 			// ->getAttributes()
@@ -433,7 +439,7 @@ class CreditController extends Controller
 				$late_interest_value =  $day_value_default * $days_past_due;
 
 				$installment->days_past_due  = $days_past_due;
-				$installment->late_interests_value  = round ($late_interest_value,5);
+				$installment->late_interests_value  = round($late_interest_value, 5);
 				$installment->late_interests_value_pending = $installment->late_interests_value;
 				$installment->step = 5;
 
@@ -489,8 +495,8 @@ class CreditController extends Controller
 			}
 		}
 		$credit->old_interest = $credit->interest;
-		$credit->interest = $request->new_interest ?$request->new_interest : $credit->old_interest ;
-		
+		$credit->interest = $request->new_interest ? $request->new_interest : $credit->old_interest;
+
 		$credit->save();
 
 		if ($credit->status == 4) {
@@ -562,6 +568,8 @@ class CreditController extends Controller
 		$start_date = $request->start_date;
 		$end_date = $request->end_date;
 		$search_client = $request->search_client;
+		$search_credit_id = $request->search_credit_id;
+		$search_headquarter_id = $request->search_headquarter_id;
 
 		switch ($status) {
 			case 'all':
@@ -604,6 +612,11 @@ class CreditController extends Controller
 						$query->where('status', $status);
 					}
 				})
+				->where(function ($query) use ($search_credit_id) {
+					if (!is_null($search_credit_id)) {
+						$query->where('id', $search_credit_id);
+					}
+				})
 				->where(function ($query) use ($from, $to, $query_date) {
 					if ($from != '' && $from != 'undefined' && $from != null) {
 						$query->whereDate("$query_date", '>=', $from);
@@ -629,6 +642,12 @@ class CreditController extends Controller
 					->orWhere('document', 'LIKE', "%$search_client%");
 			});
 		}
+
+		$credits = $credits->where(function ($query) use ($search_headquarter_id) {
+			if (!is_null($search_headquarter_id)) {
+				$query->where('headquarter_id', $search_headquarter_id);
+			}
+		});
 		$credits = $credits->first();
 		return $credits;
 	}

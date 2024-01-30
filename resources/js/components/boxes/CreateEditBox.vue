@@ -64,7 +64,7 @@
 										add_amount > root_data.current_balance_main_box
 											? (add_amount = root_data.current_balance_main_box)
 											: (add_amount = add_amount)
-									" />
+										" />
 								<small id="addAmountHelpBlock" class="form-text text-muted">
 									Monto máximo
 									{{ root_data.current_balance_main_box | currency }}
@@ -92,6 +92,10 @@
 										@keyup="calculateBalance()" />
 								</div>
 								<div class="form-group">
+									<label for="">Diferencia Arqueo</label>
+									<input type="text" class="form-control" :class="difference < 0 ? ' text-danger' : ' text-info'" readonly :value="difference">
+								</div>
+								<div class="form-group">
 									<label for="status">Estado</label>
 									<input type="text" step="any" class="form-control" id="status"
 										aria-describedby="statuslHelp" v-model="formBox.status" readonly disabled />
@@ -105,7 +109,8 @@
 						</div>
 						<div class="modal-footer">
 							<template v-if="operationId == 1">
-								<button type="button" :disabled="add_amount<=0" class="btn btn-success" @click="updateBox()">
+								<button type="button" :disabled="add_amount <= 0" class="btn btn-success"
+									@click="updateBox()">
 									Guardar
 								</button>
 							</template>
@@ -131,6 +136,7 @@ export default {
 		return {
 			box_id: 0,
 			editar: false,
+			difference: 0,
 			formBox: {
 				cash: {
 					type: Number,
@@ -243,15 +249,15 @@ export default {
 			let total = Number(this.formBox.cash) + Number(this.formBox.consignment_to_client) + Number(this.formBox.payment_to_provider);
 
 			console.log(this.formBox.current_balance);
-			console.log((total).toFixed());
+			console.log((total));
 
-			if ((this.formBox.current_balance).toFixed() == (total)) {
+			if ((this.formBox.current_balance).toFixed() == (total.toFixed())) {
 				this.formBox.status = 'Correct'
 			} else {
 				this.formBox.status = 'Incorrect'
 			}
 
-
+			this.difference = (this.formBox.current_balance - total).toFixed(2);
 		}
 	},
 };

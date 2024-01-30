@@ -54,7 +54,7 @@ class ExpenseController extends Controller
 					$query->whereMonth('date', '<=', $this_month);
 				};
 			});
-			
+
 		if ($headquarter_id && $headquarter_id != 'all') {
 			$expenses =	$expenses->where('headquarter_id', $headquarter_id);
 		}
@@ -67,8 +67,9 @@ class ExpenseController extends Controller
 		if ($user_id != null) {
 			$expenses =	$expenses->where('user_id', "%$user_id%");
 		}
-		
-		$expenses =	$expenses->paginate($results);
+
+		$expenses =	$expenses->orderBy('id', 'desc')
+			->paginate($results);
 
 		$getTotalReportsController = new GetTotalReportsController;
 		$totals = $getTotalReportsController->getTotalReportHeadquartersExpenses($expenses);
