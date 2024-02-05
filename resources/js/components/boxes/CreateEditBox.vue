@@ -75,24 +75,24 @@
 							</div>
 							<template v-if="operationId == 2">
 								<div class="form-group">
-									<label for="cash">Efectivo</label>
+									<label for="cash">Efectivo: <b>{{ formBox.cash | currency }}</b></label>
 									<input type="number" step="any" class="form-control" id="cash"
 										aria-describedby="cashlHelp" v-model="formBox.cash" @keyup="calculateBalance()" />
 								</div>
 								<div class="form-group">
-									<label for="consignment_to_client">Consignación Cliente</label>
+									<label for="consignment_to_client">Consignación Cliente: <b>{{ formBox.consignment_to_client | currency }}</b></label>
 									<input type="number" step="any" class="form-control" id="consignment_to_client"
 										aria-describedby="consignment_to_clientlHelp"
 										v-model="formBox.consignment_to_client" @keyup="calculateBalance()" />
 								</div>
 								<div class="form-group">
-									<label for="payment_to_provider">Pago a proveedor</label>
+									<label for="payment_to_provider">Pago a proveedor: <b>{{ formBox.payment_to_provider | currency }}</b></label>
 									<input type="number" step="any" class="form-control" id="payment_to_provider"
 										aria-describedby="payment_to_providerlHelp" v-model="formBox.payment_to_provider"
 										@keyup="calculateBalance()" />
 								</div>
 								<div class="form-group">
-									<label for="">Diferencia Arqueo</label>
+									<label for="">Diferencia Arqueo: <b>{{ difference | currency }}</b></label>
 									<input type="text" class="form-control" :class="difference < 0 ? ' text-danger' : ' text-info'" readonly :value="difference">
 								</div>
 								<div class="form-group">

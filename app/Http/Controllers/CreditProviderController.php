@@ -30,11 +30,17 @@ class CreditProviderController extends Controller
 		$search_status = $request->search_status ?? -1;
 		$search_from = $request->search_from ?? NULL;
 		$search_to = $request->search_to ?? NULL;
+		$provider_id = $request->search_provider_id ?? NULL;
+		$results = $request->results ?? 10; 
 
 		$credit_providers = CreditProvider::select();
 
 		if ($search_status != '-1') {
 			$credit_providers = $credit_providers->where('status', $search_status);
+		}
+
+		if (!is_null($provider_id)) {
+			$credit_providers = $credit_providers->where('provider_id', $provider_id);
 		}
 
 		if ($search_from) {
@@ -45,7 +51,7 @@ class CreditProviderController extends Controller
 			$credit_providers = $credit_providers->where('created_at', '<=', $search_to);
 		}
 
-		$credit_providers = $credit_providers->orderBy('created_at', 'desc')->with('creditProviderPayments')->paginate(10);
+		$credit_providers = $credit_providers->orderBy('created_at', 'desc')->with('creditProviderPayments')->paginate($results);
 		return $credit_providers;
 	}
 

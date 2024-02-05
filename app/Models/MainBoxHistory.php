@@ -11,6 +11,6 @@ class MainBoxHistory extends Model
 
     public function mainBox()
 	{
-		return $this->belongsTo(Main::class, 'main_box_id');
+		return $this->belongsTo(MainBox::class, 'main_box_id');
 	}
 }

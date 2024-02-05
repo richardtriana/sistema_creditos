@@ -16,7 +16,34 @@
               <option value="1">Pagados</option>
             </select>
           </div>
-      
+
+          <div class="form-group col-md-4">
+            <label for="search_provider_id" class=" w-100 form-label">Sede
+            </label>
+            <v-select label="business_name" class="w-100" v-model="search_provider_id" :reduce="(option) => option.id"
+              :filterable="false" :options="listProviders" @search="onSearchProvider">
+              <template slot="no-options">
+                Escribe para iniciar la búsqueda
+              </template>
+              <template slot="option" slot-scope="option">
+                <div class="d-center">
+                  {{ option.business_name }}
+                </div>
+              </template>
+              <template slot="selected-option" slot-scope="option">
+                <div class="selected d-center">
+                  {{ option.business_name }}
+                </div>
+              </template>
+            </v-select>
+          </div>
+
+          <div class="form-group col-md-4 col-sm-6 col-xs-6">
+            <label for="">Mostrar {{ search_results }} resultados por página:</label>
+            <input type="number" id="search_results" name="search_results" class="form-control" placeholder="Desde"
+              v-model="search_results" max="1000" />
+          </div>
+
           <div class="form-group col-md-4 ml-auto">
             <label for="">Desde:</label>
             <input type="date" id="search_from" name="search_from" class="form-control" placeholder="Desde"
@@ -28,9 +55,15 @@
               v-model="search_to" :max="now" />
           </div>
         </div>
-        <div class="form-row text-right m-auto">
-          <div class="form-group m-md-auto col-md-4">
-            <button class="btn btn-success w-100" type="button" @click="listCreditProviders()">
+        <div class="form-row text-center m-auto">
+          <div class="form-group col-md-4 col-sm-6 col-xs-6">
+            <download-excel class="btn btn-primary w-100 mt-5" :fields="json_fields" :data="creditProvidersList.data"
+              name="credits-providers.xls" type="xls">
+              <i class="bi bi-file-earmark-arrow-down-fill"></i> Descargar .xls
+            </download-excel>
+          </div>
+          <div class="form-group col-md-4">
+            <button class="btn btn-success w-100  mt-5" type="button" @click="listCreditProviders()">
               <i class="bi bi-search"></i> Buscar
             </button>
           </div>
@@ -43,7 +76,9 @@
           <thead>
             <tr class="text-center">
               <th># Crédito</th>
+              <th>Cliente</th>
               <th>Proveedor</th>
+              <th>Fecha inicio crédito</th>
               <th>Valor crédito</th>
               <th>Saldo abonado</th>
               <th>Saldo pendiente</th>
@@ -55,8 +90,13 @@
             <tr v-for="c in creditProvidersList.data" :key="c.id">
               <td># {{ c.credit_id }}</td>
               <td>
+                {{ c.credit.client.name }} {{ c.credit.client.last_name }} <br>
+                <small><b> {{ c.credit.client.document }}</b></small>
+              </td>
+              <td>
                 {{ c.provider.business_name }}
               </td>
+              <td> {{ c.credit.start_date }}</td>
               <td class="text-right">
                 {{ c.credit_value | currency }}
               </td>
@@ -102,20 +142,85 @@ export default {
   data() {
     return {
       creditProvidersList: {},
+      listProviders: [],
       search_status: "-1",
       search_from: "",
       search_to: "",
+      search_provider_id: "",
+      search_results: 10,
       now: new Date().toISOString().slice(0, 10),
+
+      json_fields:{
+        '# Crédito': {
+          field: 'credit_id',
+          callback: (value) => {
+            return value;
+          }
+        },
+        'Cliente': {
+          callback: (value) => {
+            let name = value.credit.client.name;
+            let last_name = value.credit.client.last_name
+            return `${last_name} ${name}`;
+          }
+        },
+
+        'Identificación': {
+          callback: (value) => {
+            let type = value.credit.client.type_document;
+            let doc = value.credit.client.document
+            return `${type} ${doc}`;
+          }
+        },
+        'Proveedor': {
+          field: 'provider.business_name',
+          callback: (value) => {
+            return value;
+          }
+        },
+        'Fecha inicio crédito': {
+          field: 'credit.start_date',
+          callback: (value) => {
+            return value;
+          }
+        },
+        'Valor crédito': {
+          field: 'credit_value',
+          callback: (value) => {
+            return value;
+          }
+        },
+        'Saldo Abonado': {
+          field: 'paid_value',
+          callback: (value) => {
+            return value;
+          }
+        },
+        'Saldo pendiente': {
+          field: 'pending_value',
+          callback: (value) => {
+            return value;
+          }
+        },
+        'Historial de cambios': {
+          field: 'history',
+          callback: (value) => {
+            return value;
+          }
+        },
+      }
     };
   },
   methods: {
-    listCreditProviders(page=1) {
+    listCreditProviders(page = 1) {
 
       let data = {
         'page': page,
         'search_status': this.search_status,
         'search_from': this.search_from,
-        'search_to': this.search_to
+        'search_to': this.search_to,
+        'search_provider_id': this.search_provider_id,
+        results: this.search_results,
       }
 
       axios.get(`api/credit-providers`, {
@@ -126,12 +231,23 @@ export default {
           this.creditProvidersList = response.data;
         });
     },
-    showHistoryCredit(history,payments) {
+    showHistoryCredit(history, payments) {
       this.$refs.ShowHistoryCreditProvider.listPayments(payments);
       this.$refs.ShowHistoryCreditProvider.convertStringToJson(history);
     },
     payCreditProvider(credit_provider) {
       this.$refs.PayCreditProvider.showCreditProvider(credit_provider);
+    },
+    onSearchProvider(search, loading) {
+      if (search.length) {
+        loading(true);
+        axios.get(`api/providers?provider=${search}&page=1`, this.$root.config)
+          .then((response) => {
+            this.listProviders = (response.data.data);
+            loading(false)
+          })
+          .catch(e => console.log(e))
+      }
     },
   },
   mounted() {

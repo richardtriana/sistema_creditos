@@ -22,7 +22,8 @@ class CreditProvider extends Model
 	];
 
 	protected $with = [
-		'provider'
+		'provider',
+		'credit'
 	];
 
 
@@ -33,7 +34,7 @@ class CreditProvider extends Model
 
 	public function credit()
 	{
-		return $this->belongsTo(Credit::class, 'credit_id');
+		return $this->belongsTo(Credit::class, 'credit_id')->with('client');
 	}
 
 	public function provider()
@@ -46,10 +47,6 @@ class CreditProvider extends Model
 		return $this->belongsTo(Headquarter::class, 'headquarter_id');
 	}
 
-	public function client(){
-		// return $this->hasOneThrough()
-	}
-	
 	public function creditProviderPayments()
 	{
 		return $this->hasMany(CreditProviderPayment::class, 'credit_provider_id');
