@@ -27,10 +27,10 @@ use App\Http\Controllers\PrintTicketController;
 use App\Http\Controllers\TypeExpenseController;
 use App\Http\Controllers\MethodCreditController;
 use App\Http\Controllers\CreditProviderController;
+use App\Http\Controllers\DataFileController;
 use App\Http\Controllers\MainBoxHistoryController;
 use App\Http\Controllers\ValuationChartController;
 use \App\Http\Controllers\NotificationController;
-use App\Models\ValuationChart;
 
 /*
 |--------------------------------------------------------------------------
@@ -112,6 +112,9 @@ Route::group(['middleware' => ['auth:api']], function () {
 	//Configuration
 	Route::resource('/configurations', CompanyController::class)->middleware('permission:configuration');
 	Route::resource('/valuation-chart', ValuationChartController::class);
+
+	// Data Files
+	Route::resource('/files', DataFileController::class);
 
 	//Entries
 	Route::get('/entries/show-entry/{entry}', [EntryController::class, 'showEntry']);

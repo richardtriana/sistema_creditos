@@ -52,7 +52,7 @@
             <div class="form-group">
               <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                  <span class="input-group-text" id="inputFile">Subir evidenica</span>
+                  <span class="input-group-text" id="inputFile">Subir evidencia</span>
                 </div>
                 <div class="custom-file">
                   <input type="file" class="custom-file-input" id="evidence" name="evidence"

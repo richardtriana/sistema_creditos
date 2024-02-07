@@ -214,6 +214,10 @@ const routes = [
 		],
 	},
 	{
+		path: "/files",
+		component: require("./components/data-file/DataFiles.vue").default,
+	},
+	{
 		path: "**",
 		component: require("./components/utils/NotFound.vue").default,
 		name: "NotFound"

@@ -86,6 +86,9 @@
             </router-link>
           </div>
         </li>
+        <li class="nav-item" v-if="validatePermission('headquarter-index')">
+          <router-link class="nav-link" to="/files"><i class="bi bi-house-door"></i> Biblioteca de archivos </router-link>
+        </li>
 				<li class="nav-item dropdown notifications" >
 					<a id="navbarDropdownNotifications" href="#" class="nav-link text-white " :class="{ 'dropdown-toggle' : notifications.length != 0}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 						<i v-if="notifications.length == 0" class="bi bi-bell"></i>

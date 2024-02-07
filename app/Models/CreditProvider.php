@@ -26,6 +26,8 @@ class CreditProvider extends Model
 		'credit'
 	];
 
+	protected $appends = [
+	];
 
 	public function user()
 	{
@@ -50,5 +52,14 @@ class CreditProvider extends Model
 	public function creditProviderPayments()
 	{
 		return $this->hasMany(CreditProviderPayment::class, 'credit_provider_id');
+	}
+
+	public function setStatusAttribute($value)
+	{
+		if ($this->attributes['pending_value']) {
+			return  0;
+		} else {
+			return 1;
+		}
 	}
 }

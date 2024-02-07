@@ -36,6 +36,9 @@ class CreditProviderController extends Controller
 		$credit_providers = CreditProvider::select();
 
 		if ($search_status != '-1') {
+			if(!$search_status){
+				$credit_providers = $credit_providers->where('status', $search_status)->where('pending_value', '>',0);
+			} 
 			$credit_providers = $credit_providers->where('status', $search_status);
 		}
 
