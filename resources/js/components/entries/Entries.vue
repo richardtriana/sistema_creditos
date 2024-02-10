@@ -3,7 +3,9 @@
     <div class="page-header d-flex justify-content-between p-4 border my-2">
       <h3 class="col-4">Ingresos</h3>
       <ul class="list-group col-4">
-        <li class="list-group-item"><h5 class="text-dark font-weight-bold">Total ingresos: {{entriesTotal.price | currency}}</h5></li>
+        <li class="list-group-item">
+          <h5 class="text-dark font-weight-bold">Total ingresos: {{ entriesTotal.price | currency }}</h5>
+        </li>
       </ul>
       <button type="button" class="btn btn-primary col-4" data-toggle="modal" data-target="#entryModal"
         v-if="$root.validatePermission('entry-store')">
@@ -45,7 +47,7 @@
             <label for="">Mostrar {{ search_results }} resultados por página:</label>
             <input type="number" id="search_results" name="search_results" class="form-control" placeholder="Desde"
               v-model="search_results" max="1000" />
-          </div>         
+          </div>
         </div>
         <div class="form-row">
           <div class="form-group col-md-4 ml-auto">
@@ -80,6 +82,7 @@
               <th>Descripción</th>
               <th>Valor</th>
               <th>Ver Factura</th>
+              <th v-if="$root.validatePermission('entry-delete')">Eliminar</th>
               <th v-if="$root.validatePermission('entry-update')">
                 Opciones
               </th>
@@ -107,11 +110,24 @@
                   <i class="bi bi-receipt-cutoff"></i> Ticket
                 </button>
               </td>
+              <td class="text-right" v-if="$root.validatePermission('entry-delete')">
+                <button v-if="!e.credit_id" class="btn btn-danger" @click="deleteEntry(e.id)" data-toggle="tooltip"
+                  data-placement="top" title="No se pueden editar las entradas asociadas a créditos">
+                  <i class="bi bi-trash"></i>
+                </button>
+                <button v-if="e.credit_id" class="btn btn-disabled" data-toggle="tooltip" data-placement="top"
+                  title="No se pueden editar las entradas asociadas a créditos, los pagos a cuotas se eliminan directamente desde créditos"
+                  disabled>
+                  <i class="bi bi-trash-fill"></i>
+                </button>
+              </td>
               <td class="text-right" v-if="$root.validatePermission('entry-update')">
-                <button v-if="!e.credit_id" class="btn btn-success" @click="showData(e)">
+                <button v-if="!e.credit_id" class="btn btn-success" @click="showData(e)" data-toggle="tooltip"
+                  data-placement="top"
+                  title="No se pueden editar las entradas asociadas a créditos, los pagos a cuotas se eliminan directamente desde créditos">
                   <i class="bi bi-pen"></i>
                 </button>
-                <button v-else class="btn btn-secondary" data-toggle="tooltip" data-placement="top" 
+                <button v-else class="btn btn-secondary" data-toggle="tooltip" data-placement="top"
                   title="No se pueden editar las entradas asociadas a créditos" disabled>
                   <i class="bi bi-pen"></i>
                 </button>
@@ -195,6 +211,29 @@ export default {
     },
     printEntryTicket(id) {
       axios.get(`api/print-entry/${id}`, this.$root.config);
+    },
+
+    deleteEntry: function (id) {
+      let me = this;
+
+      Swal.fire({
+        title: "¿Quieres cambiar el estado de esta entrada?",
+        text: "Recuerda que esta operación no se puede deshacer",
+        showDenyButton: true,
+        denyButtonText: `Cancelar`,
+        confirmButtonText: `Guardar`,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          axios
+            .delete(`api/entries/${id}`, this.$root.config)
+            .then(function () {
+              me.listEntries(1);
+            });
+          Swal.fire("Cambios realizados!", "", "success");
+        } else if (result.isDenied) {
+          Swal.fire("Operación no realizada", "", "info");
+        }
+      });
     },
   },
 };

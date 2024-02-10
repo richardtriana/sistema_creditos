@@ -3,7 +3,9 @@
     <div class="page-header d-flex justify-content-between p-4 border my-2">
       <h3 class="col-4">Egresos</h3>
       <ul class="list-group col-4">
-        <li class="list-group-item"><h5 class="text-dark font-weight-bold">Total egresos: {{expensesTotal.price | currency}}</h5></li>
+        <li class="list-group-item">
+          <h5 class="text-dark font-weight-bold">Total egresos: {{ expensesTotal.price | currency }}</h5>
+        </li>
       </ul>
       <button type="button" class="btn btn-primary col-4" data-toggle="modal" data-target="#expenseModal"
         v-if="$root.validatePermission('expense-store')">
@@ -46,7 +48,7 @@
             <label for="">Mostrar {{ search_results }} resultados por página:</label>
             <input type="number" id="search_results" name="search_results" class="form-control" placeholder="Desde"
               v-model="search_results" max="1000" />
-          </div>   
+          </div>
         </div>
         <div class="form-row text-right m-auto">
           <div class="form-group m-md-auto col-md-4">
@@ -68,8 +70,8 @@
               <th>Tipo de Salida</th>
               <th>Descripción</th>
               <th>Valor</th>
-              <th v-if="$root.validatePermission('expense-status')">Estado</th>
               <th>Ver factura</th>
+              <th v-if="$root.validatePermission('expense-delete')">Eliminar</th>
               <th v-if="$root.validatePermission('expense-update')">
                 Opciones
               </th>
@@ -82,19 +84,10 @@
               <td>{{ e.date }}</td>
               <td>{{ e.type_output }}</td>
               <td class="wrap">
-                <textarea name="" class="form-control-plaintext" readonly id="" cols="7" rows="4"
-                  v-model="e.description">
+                <textarea name="" class="form-control-plaintext" readonly id="" cols="7" rows="4" v-model="e.description">
                 </textarea>
               </td>
               <td class="text-right">{{ e.price | currency }}</td>
-              <td class="text-right" v-if="$root.validatePermission('expense-status')">
-                <button v-if="e.status == 0" class="btn btn-danger" @click="changeStatus(e.id)">
-                  <i class="bi bi-x-circle"></i>
-                </button>
-                <button v-if="e.status == 1" class="btn btn-success" @click="changeStatus(e.id)">
-                  <i class="bi bi-check2-circle"></i>
-                </button>
-              </td>
               <td class="text-right">
                 <button class="btn btn-danger btn-block" type="button" @click="printExpensePdf(e.id)">
                   <i class="bi bi-file-pdf-fill"></i> PDF
@@ -104,13 +97,19 @@
                   <i class="bi bi-receipt-cutoff"></i> Ticket
                 </button>
               </td>
+              <td class="text-right" v-if="$root.validatePermission('expense-delete')">
+                <button  class="btn btn-danger" @click="deleteExpense(e.id)">
+                  <i class="bi bi-trash"></i>
+                </button>
+               
+              </td>
               <td class="text-right" v-if="$root.validatePermission('expense-update')">
-                <button v-if="e.status == 1" class="btn btn-success" @click="showData(e)">
+                <button class="btn btn-success" @click="showData(e)">
                   <i class="bi bi-pen"></i>
                 </button>
-                <button v-else class="btn btn-secondary" disabled>
+                <!-- <button class="btn btn-secondary" disabled>
                   <i class="bi bi-pen"></i>
-                </button>
+                </button> -->
               </td>
             </tr>
           </tbody>
@@ -185,18 +184,20 @@ export default {
     showData: function (expense) {
       this.$refs.ModalExpense.showEditExpense(expense);
     },
-    changeStatus: function (id) {
+
+    deleteExpense: function (id) {
       let me = this;
 
       Swal.fire({
         title: "¿Quieres cambiar el estado de este egreso?",
+        text: "Recuerda que esta operación no se puede deshacer",
         showDenyButton: true,
         denyButtonText: `Cancelar`,
         confirmButtonText: `Guardar`,
       }).then((result) => {
         if (result.isConfirmed) {
           axios
-            .post(`api/expenses/${id}/change-status`, null, me.$root.config)
+            .delete(`api/expenses/${id}`, me.$root.config)
             .then(function () {
               me.listExpenses(1);
             });

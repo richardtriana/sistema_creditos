@@ -16,6 +16,15 @@ use Illuminate\Support\Facades\Validator;
 
 class EntryController extends Controller
 {
+	
+	public function __construct()
+	{
+		$this->middleware('permission:entry.index', ['only' => ['index', 'show']]);
+		$this->middleware('permission:entry.store', ['only' => ['store']]);
+		$this->middleware('permission:entry.update', ['only' => ['update']]);
+		$this->middleware('permission:entry.delete', ['only' => ['destroy']]);
+		$this->middleware('permission:entry.status', ['only' => ['changeStatus']]);
+	}
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -220,5 +229,33 @@ class EntryController extends Controller
 
 		// return $details;
 		return response()->json($data);
+	}
+
+	public function destroy(Request $request, Entry $entry)
+	{
+		$request->add_amount = $entry->price;
+		try {
+			$box = Box::where('headquarter_id', $entry->headquarter_id)->firstOrFail();
+
+			$update_box_heaquarter = new BoxController();
+			$update_box_heaquarter->subAmountBox($request, $box->id, $entry->price);
+
+			$entry->delete();
+			
+			return response()->json([
+				'status' => 'success',
+				'code' => 200,
+				'message' => 'Entrada borrada exitosamente',
+				'entry' => $entry
+			]);
+		} catch (\Throwable $th) {
+			return response()->json([
+				'status' => 'failure',
+				'error' => $th->getMessage(),
+				'code' => 400,
+				'message' => 'Hubo un error al eliminar esta entrada',
+				'entry' => $entry
+			]);
+		}
 	}
 }

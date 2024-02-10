@@ -210,4 +210,31 @@ class ExpenseController extends Controller
 		$expense->price = $price;
 		$expense->save();
 	}
+
+	public function destroy(Request $request, Expense $expense)
+	{
+		$request->add_amount = $expense->price;
+		try {
+			$box = Box::where('headquarter_id', $expense->headquarter_id)->firstOrFail();
+
+			$update_box_heaquarter = new BoxController();
+			$update_box_heaquarter->addAmountBox($request, $box->id, $expense->price);
+
+			$expense->delete();
+			return response()->json([
+				'status' => 'success',
+				'code' => 200,
+				'message' => 'Egreso borrado exitosamente',
+				'expense' => $expense
+			]);
+		} catch (\Throwable $th) {
+			return response()->json([
+				'status' => 'failure',
+				'error' => $th->getMessage(),
+				'code' => 400,
+				'message' => 'Hubo un error al eliminar esta entrada',
+				'expense' => $expense
+			]);
+		}
+	}
 }
