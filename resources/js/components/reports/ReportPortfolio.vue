@@ -3,9 +3,15 @@
     <div class="page-header row">
       <h3 class="col-6">Reporte de cartera</h3>
       <ul class="list-group col-6">
-        <li class="list-group-item"><h5 class="text-dark font-weight-bold">Total cuotas: {{ReportPortfolioTotal.value | currency}}</h5></li>
-        <li class="list-group-item"><h5 class="text-dark font-weight-bold">Total interés: {{ReportPortfolioTotal.interest_value | currency}}</h5></li>
-        <li class="list-group-item"><h5 class="text-dark font-weight-bold">Total capital: {{ReportPortfolioTotal.capital_value | currency}}</h5></li>
+        <li class="list-group-item">
+          <h5 class="text-dark font-weight-bold">Total cuotas: {{ ReportPortfolioTotal.value | currency }}</h5>
+        </li>
+        <li class="list-group-item">
+          <h5 class="text-dark font-weight-bold">Total interés: {{ ReportPortfolioTotal.interest_value | currency }}</h5>
+        </li>
+        <li class="list-group-item">
+          <h5 class="text-dark font-weight-bold">Total capital: {{ ReportPortfolioTotal.capital_value | currency }}</h5>
+        </li>
       </ul>
     </div>
     <div class="page-search p-4 border my-2">
@@ -14,15 +20,8 @@
         <div class="form-row">
           <div class="form-group col-md-4 col-sm-6 col-xs-6">
             <label for="search_client">Buscar...</label>
-            <input
-              type="text"
-              id="search_client"
-              name="search_client"
-              class="form-control"
-              placeholder="Nombres | Documento"
-              @keypress="listReportPortfolio(1)"
-              v-model="search_client"
-            />
+            <input type="text" id="search_client" name="search_client" class="form-control"
+              placeholder="Nombres | Documento" @keypress="listReportPortfolio(1)" v-model="search_client" />
           </div>
           <div class="form-group col-md-4 col-sm-6 col-xs-6">
             <label for="headquarter_id">Sede</label>
@@ -79,7 +78,7 @@
               <th>Cliente</th>
               <th>Sede</th>
               <th>Contacto <i class="bi bi-telephone"></i></th>
-							<th>Descripción</th>
+              <th>Descripción</th>
               <th>Valor cuota</th>
               <th>Fecha de pago cuota</th>
               <th>Estado</th>
@@ -101,17 +100,17 @@
                   :href="`https://wa.me/57${report.phone_2}?text=${infoCompany.whatsapp_msg}`"><i
                     class="bi bi-whatsapp"></i> {{ report.phone_2 }}</a>
               </td>
-							<td>{{ report.credit.description }}</td>
+              <td>{{ report.credit.description }}</td>
               <td class="text-right">{{ report.value | currency }}</td>
               <td class="text-center font-weight-bold">
                 <span class="badge badge-md badge-pill badge-success" v-if="report.payment_date > now">{{
-                    report.payment_date
+                  report.payment_date
                 }}</span>
                 <span class="badge badge-md badge-pill badge-warning" v-if="report.payment_date == now">{{
-                    report.payment_date
+                  report.payment_date
                 }}</span>
                 <span class="badge badge-md badge-pill badge-danger" v-if="report.payment_date < now">{{
-                    report.payment_date
+                  report.payment_date
                 }}</span>
               </td>
               <td class="text-center">
@@ -134,7 +133,16 @@
               <td>
                 {{ report.installment_number }}
               </td>
-              <td>{{report.payment_commitment}}</td>
+              <td>
+                <template>
+                  <div>
+                    <textarea class="form-control mb-1" v-model="report.payment_commitment"
+                      placeholder="Anotaciones de promesa de pago"></textarea> <br>
+                    <button type="button" v-if="report.payment_commitment" class="btn btn-success"
+                      @click="sendPaymentCommitment(report)">Enviar</button>
+                  </div>
+                </template>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -153,7 +161,7 @@ export default {
   data() {
     return {
       ReportPortfolioList: {},
-      ReportPortfolioTotal:{},
+      ReportPortfolioTotal: {},
       headquarterList: [],
       now: moment().format('YYYY-MM-DD'),
       infoCompany: {},
@@ -162,7 +170,7 @@ export default {
       search_status: "all",
       search_headquarter_id: 'all',
       search_results: 15,
-      search_client:"",
+      search_client: "",
 
       json_fields: {
         'ID crédito': {
@@ -184,10 +192,10 @@ export default {
             return value;
           }
         },
-				'Descripción': {
-					field: 'credit.description',
-					callback: (value) => value
-				},
+        'Descripción': {
+          field: 'credit.description',
+          callback: (value) => value
+        },
         'Contacto 1': {
           field: 'phone_1',
           callback: (value) => {
@@ -283,6 +291,37 @@ export default {
         }
       });
     },
+    sendPaymentCommitment(quote) {
+      console.log(quote)
+      let data = {
+        'payment_commitment': quote.payment_commitment
+      }
+      axios
+        .post(
+          `api/installment/send-payment-commitment/${quote.id}`,
+          data,
+          this.$root.config
+        )
+        .then(function (response) {
+          // handle success
+          Swal.fire({
+            icon: "success",
+            title: ".",
+            text: "La operación se ha realizado correctamente",
+          });
+        })
+        .catch(function (error) {
+          // handle error
+          if (error) {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "No se pudo realizar esta operación",
+            });
+          }
+        })
+        .finally(this.listReportPortfolio());
+    }
   },
 
   mounted() {
