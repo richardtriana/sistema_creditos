@@ -1,8 +1,15 @@
 <template>
   <div class="page">
     <div class="page-header row">
-      <h3 class="col-6">Reporte de cartera</h3>
-      <ul class="list-group col-6">
+      <div class=" col-6 col-sm-12 col-md-6 col-lg-6">
+        <h3 class=" col-6 col-sm-12 col-md-6 col-lg-6">Reporte de cartera</h3>
+        <div class=" col-6 col-sm-12 col-md-6 col-lg-6">
+          <h1 class="h1 text-success">
+            # {{ search_results }} créditos
+          </h1>
+        </div>
+      </div>
+      <ul class="list-group  col-6 col-sm-12 col-md-6 col-lg-6">
         <li class="list-group-item">
           <h5 class="text-dark font-weight-bold">Total cuotas: {{ ReportPortfolioTotal.value | currency }}</h5>
         </li>

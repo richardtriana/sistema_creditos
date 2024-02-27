@@ -24,7 +24,8 @@ class Installment extends Model
     'payment_register',
     'status',
     'capital_balance',
-    'payment_commitment'
+    'payment_commitment',
+    'collected_by'
   ];
 
   protected $appends = [
@@ -36,21 +37,25 @@ class Installment extends Model
     return $this->belongsTo(Credit::class, 'credit_id');
   }
 
+  public function collectedBy()
+  {
+    return $this->belongsTo(User::class, 'collected_by');
+  }
+
   public function getDaysPastDueCalculatedAttribute()
   {
     $now = now();
     $payment_date = Carbon::parse($this->payment_date);
     $days_past_due = 0;
-    if (($payment_date < $now ) && $this->status != 1) {
+    if (($payment_date < $now) && $this->status != 1) {
       $days_past_due = $this->days_past_due ? $this->days_past_due :  $now->diffInDays($payment_date);
     }
-
     return  $days_past_due + $this->days_past_due;
   }
 
-    public function changeStatus()
-    {
-        $this->status = 1;
-        $this->save();
-    }
+  public function changeStatus()
+  {
+    $this->status = 1;
+    $this->save();
+  }
 }

@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Box;
 use App\Models\Company;
 use App\Models\Credit;
 use App\Models\Entry;
 use App\Models\Installment;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
@@ -231,6 +233,7 @@ class InstallmentController extends Controller
       $installment->paid_capital += $capital;
       $installment->late_interests_value += $late_interest;
       $installment->status = $status;
+      $installment->collected_by = $user_id;
       if (!$installment->save()) {
         return false;
       }
@@ -355,7 +358,7 @@ class InstallmentController extends Controller
       // $installment->status  = $status;
       $installment->credit_deposit = $balance;
       $installment->payment_register = date('Y-m-d');
-
+      $installment->collected_by = $user_id;
 
       if (!$installment->save()) {
         return false;
@@ -486,10 +489,11 @@ class InstallmentController extends Controller
     $franchiseMethod = new FranchiseMethodController();
 
     date_default_timezone_set('America/Bogota');
-    $headquarter_id = $request->user()->headquarter_id;
-    $user_id = $request->user()->id;
-
+  
     $installment = Installment::find($request->id);
+    $user_id = $installment->collected_by ? $installment->collected_by : $request->user()->id;
+    $user = User::find( $user_id)->first();
+    $headquarter_id = $user->headquarter_id;
     $paid_balance = $installment->paid_balance;
     $paid_capital =  $installment->paid_capital;
     $interest =  $installment->paid_balance - $installment->paid_capital;
@@ -516,12 +520,18 @@ class InstallmentController extends Controller
     $credit_paid = new CreditController;
     $credit_paid->updateValuesCredit($request, $credit->id, $paid_balance * -1,  $paid_capital * -1, $interest * -1, true);
 
+    $box = Box::where('headquarter_id', $headquarter_id)->firstOrFail();
+		$sub_amount_box = new BoxController();
+		$sub_amount_box->subAmountBox($request, $box->id, $request['price']);
+
     //Actualizar valores de cuotas
     if ($configurations->method &&  $configurations->method == "GENERAL") {
       $generalMethod->updateInstallments($credit->id);
     } else {
       $franchiseMethod->updateInstallments($credit->id);
     }
+
+    return $installment;
   }
 
   public function changeStatusInstallment($id)
