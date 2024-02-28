@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Validator;
 
 class EntryController extends Controller
 {
-	
+
 	public function __construct()
 	{
 		$this->middleware('permission:entry.index', ['only' => ['index', 'show']]);
@@ -109,8 +109,6 @@ class EntryController extends Controller
 	 */
 	public function store(Request $request)
 	{
-		$credit = Credit::findOrFail($request->data['credit_id']);
-
 		$validate = Validator::make($request->all(), [
 			'description' => 'required|string|max:255',
 			'date' => 'required|date',
@@ -131,7 +129,6 @@ class EntryController extends Controller
 		$entry =  new Entry();
 		$entry->headquarter_id = $request->user()->headquarter_id;
 		$entry->user_id = $request->user()->id;
-		$entry->credit_id = $credit->id ?? NULL;
 		$entry->description = $request['description'];
 		$entry->date = date('Y-m-d');
 		$entry->type_entry = $request['type_entry'];
@@ -241,7 +238,7 @@ class EntryController extends Controller
 			$update_box_heaquarter->subAmountBox($request, $box->id, $entry->price);
 
 			$entry->delete();
-			
+
 			return response()->json([
 				'status' => 'success',
 				'code' => 200,
