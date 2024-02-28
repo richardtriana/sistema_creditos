@@ -109,7 +109,7 @@ class EntryController extends Controller
 	 */
 	public function store(Request $request)
 	{
-		// $credit = Credit::findOrFail($request->data['credit_id']);
+		$credit = Credit::findOrFail($request->data['credit_id']);
 
 		$validate = Validator::make($request->all(), [
 			'description' => 'required|string|max:255',
@@ -233,7 +233,7 @@ class EntryController extends Controller
 
 	public function destroy(Request $request, Entry $entry)
 	{
-		$request->add_amount = $entry->price;
+		$request->merge(['add_amount' => $entry->price]);
 		try {
 			$box = Box::where('headquarter_id', $entry->headquarter_id)->firstOrFail();
 

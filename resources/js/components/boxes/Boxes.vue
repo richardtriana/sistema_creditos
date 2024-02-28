@@ -36,7 +36,7 @@ export default {
   components: { MainBox, Box, ShowHistoryBox, ShowHistoryMainBox },
   methods: {
     showHistoryBox(box) {
-      this.$refs.ShowHistoryBox.getHistoryBox(box.id);
+      this.$refs.ShowHistoryBox.handleIdBox(box.id);
     },
     showHistoryMainBox(box) {
       this.$refs.ShowHistoryMainBox.getHistoryMainBox(box.id);

@@ -17,10 +17,10 @@ class BoxHistoryController extends Controller
      * @param  \App\Models\Box  $box
      * @return \Illuminate\Http\Response
      */
-    public function index(Box $box)
+    public function index(Request $request, Box $box)
     {
-        $boxHistory = $box->boxHistory()->orderBy('id', 'desc')->get();
-        return $boxHistory;
+        $boxHistory = $box->boxHistory()->orderBy('id', 'desc')->paginate(10);
+        return ['boxHistory' => $boxHistory];
     }
 
     /**

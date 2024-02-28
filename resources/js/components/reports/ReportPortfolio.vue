@@ -5,7 +5,7 @@
         <h3 class=" col-6 col-sm-12 col-md-6 col-lg-6">Reporte de cartera</h3>
         <div class=" col-6 col-sm-12 col-md-6 col-lg-6">
           <h1 class="h1 text-success">
-            #  {{ ReportPortfolioTotal.nro_creditos | currency }} créditos
+            #  {{ ReportPortfolioTotal.nro_credits }} créditos
           </h1>
         </div>
       </div>

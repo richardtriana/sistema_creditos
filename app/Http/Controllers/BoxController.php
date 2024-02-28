@@ -100,7 +100,6 @@ class BoxController extends Controller
 		}
 
 		$amount =  $request->amount;
-		$request['add_amount'] = $amount;
 
 		if ($box->initial_balance == 0) {
 			$box->initial_balance =  $amount;
@@ -114,6 +113,7 @@ class BoxController extends Controller
 		$update_main_box->subAmountMainBox($request, $amount);
 
 		$boxHistory = new BoxHistoryController();
+		$request->merge(['add_amount' => $amount]);
 		$boxHistory->store($request, $box, 'Valor añadido');
 
 		return response()->json([
@@ -149,6 +149,7 @@ class BoxController extends Controller
 
 		if ($sendMainBox) {
 			$boxHistory = new BoxHistoryController();
+			$request->merge(['add_amount' => $amount]);
 			$boxHistory->store($request, $box, 'Valor añadido');
 		}
 	}
@@ -164,6 +165,7 @@ class BoxController extends Controller
 		$box->save();
 
 		$boxHistory = new BoxHistoryController();
+		$request->merge(['add_amount' => $amount]);
 		$boxHistory->store($request, $box, 'Valor retirado');
 	}
 }
