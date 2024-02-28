@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 
 class GetTotalReportsController extends Controller
 {
@@ -12,7 +14,8 @@ class GetTotalReportsController extends Controller
         $data = [
             'interest_value' => $results->sum('interest_value'),
             'value' => $results->sum('value'),
-            'capital_value' => $results->sum('capital_value')
+            'capital_value' => $results->sum('capital_value'),
+            'nro_credits' => $results->pluck('credit_id')->unique()->count()
         ];
 
         return $data;

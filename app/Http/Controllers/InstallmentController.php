@@ -341,21 +341,6 @@ class InstallmentController extends Controller
     if ($balance_credit > 0) {
       //Cuando el cliente paga a tiempo
       $step = 10;
-
-      // $helpPendingCapital = $installment->paid_capital >= $installment->capital_value ? 0 : $installment->capital_value - $installment->paid_capital;
-      // if ($balance >= $helpPendingCapital) {
-      //   $step = 1;
-      //   $capital = $balance;
-      //   $balance = $balance - $capital;
-      // } else {
-      //   $capital = $helpPendingCapital;
-      //   $balance = $balance - $capital;
-      // }
-
-      // $installment->paid_balance +=  ($capital + $interest + $late_interest);
-      // $installment->paid_capital += $capital;
-      // $installment->capital_value += $adittionalBalance;
-      // $installment->status  = $status;
       $installment->credit_deposit = $balance;
       $installment->payment_register = date('Y-m-d');
       $installment->collected_by = $user_id;
@@ -521,8 +506,9 @@ class InstallmentController extends Controller
     $credit_paid->updateValuesCredit($request, $credit->id, $paid_balance * -1,  $paid_capital * -1, $interest * -1, true);
 
     $box = Box::where('headquarter_id', $headquarter_id)->firstOrFail();
+    $request->merge(['add_amount' => $paid_balance]);
 		$sub_amount_box = new BoxController();
-		$sub_amount_box->subAmountBox($request, $box->id, $request['price']);
+		$sub_amount_box->subAmountBox($request, $box->id, $paid_balance);
 
     //Actualizar valores de cuotas
     if ($configurations->method &&  $configurations->method == "GENERAL") {

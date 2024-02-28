@@ -481,6 +481,7 @@ class CreditController extends Controller
 
 		$add_amount_box = new BoxController();
 		if (!$is_reverse) {
+			$request->merge(['add_amount' => $total_amount]);
 			$add_amount_box->addAmountBox($request, $box->id, $total_amount);
 		}
 
