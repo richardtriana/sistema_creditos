@@ -128,6 +128,9 @@
           <button type="button" class="btn btn-danger" @click="changeStatus(CreditInformation.id, 2)">
             Rechazar
           </button>
+          <button type="button" class="btn btn-danger" @click="changeStatus(CreditInformation.id, 6)">
+            Eliminar
+          </button>
         </div>
       </div>
     </div>
@@ -185,14 +188,14 @@ export default {
             this.sendData(id, data);
             Swal.fire("Cambios realizados!", "", "success");
           } else {
-            this.msgRejectd(id);
+            this.msgRejectd(id, status);
           }
         } else {
           Swal.fire("Operación no realizada", "", "info");
         }
       });
     },
-    msgRejectd: async function (id) {
+    msgRejectd: async function (id,status) {
       const swalWithBootstrapButtons = Swal.mixin({
         customClass: {
           title: "text-primary",
@@ -222,7 +225,7 @@ export default {
           console.log(response.isConfirmed);
           if (response.isConfirmed) {
             var data = {
-              status: 2,
+              status: status,
               description: response.value,
             };
             this.sendData(id, data);

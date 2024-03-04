@@ -20,6 +20,16 @@ use function PHPUnit\Framework\isEmpty;
 
 class CreditController extends Controller
 {
+	private  $creditStatus = [
+		0 => "Pendiente",
+		1 => "Activo",
+		2 => "Rechazado",
+		3 => "Pendiente pago a proveedor",
+		4 => "Completado",
+		5 => "Cobro jurídico",
+		6 => "Eliminado",
+		7 => 'Pérdida'
+	];
 
 	public function __construct()
 	{
@@ -413,8 +423,9 @@ class CreditController extends Controller
 			}
 		}
 
-		if ($request->status == 2 && $request->description != null) {
-			$credit->description  = "$credit->description \n Rechazado por: $request->description";
+		if ($request->description != null) {
+			$valueStatus =  $this->creditStatus[$request->status];
+			$credit->description  = "$credit->description \n$valueStatus por: $request->description";
 		}
 
 		$credit->save();
@@ -430,7 +441,8 @@ class CreditController extends Controller
 			$now = now();
 			$payment_date = Carbon::createFromFormat('Y-m-d', $installment->payment_date);
 
-			if (($payment_date < $now) &&  $installment->status != '1') {
+			// if (($payment_date < $now) &&  $installment->status != '1') {
+			if ($installment->status != '1') {
 				$installment->capital_value_pending = $installment->capital_value - $installment->paid_capital < 0 ? 0 : $installment->capital_value - $installment->paid_capital;
 				$installment->interest_value_pending = $installment->interest_value;
 

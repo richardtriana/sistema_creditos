@@ -65,7 +65,7 @@
               </th>
               <th>Paz y salvo</th>
               <th>Recoger crédito</th>
-              <th>Cobro jurídico</th>
+              <!-- <th>Cobro jurídico</th> -->
               <th v-if="$root.validatePermission('credit-update') ||
                 $root.validatePermission('credit-status')
                 ">
@@ -109,7 +109,10 @@
               <td class="text-right">{{ credit.paid_value | currency }}</td>
               <td>{{ credit.number_installments }}</td>
               <td>
-                {{ creditStatus[credit.status] }}
+              <b class="text-uppercase">  {{ creditStatus[credit.status] }}</b> <br>               
+                <button @click="openModalChangeStatus(credit)" style="font-size:10px" data-toggle="modal" data-target="#modalChangeStatus" class="btn btn-info">
+                  <i class="bi bi-arrow-repeat"></i>  Cambiar estado
+                </button>
               </td>
               <td class="text-center" v-if="$root.validatePermission('credit-index')">
                 <button data-toggle="modal" data-target="#cuotasModal" class="btn btn-info"
@@ -144,15 +147,14 @@
                   Recoger
                 </button>
               </td>
-              <td>
+              <!-- <td>
                 <button v-if="credit.status == 1" class="btn btn-danger" @click="changeStatus(credit.id, 5)">
                   <i class="bi bi-x-circle"></i> Pasar a cobro jurídico
                 </button>
                 <button v-if="credit.status == 5" class="btn btn-success" @click="changeStatus(credit.id, 1)">
                   <i class="bi bi-check"></i> Deshacer cobro jurídico
                 </button>
-
-              </td>
+              </td> -->
 
               <td class="text-right" v-if="$root.validatePermission('credit-update') ||
                 $root.validatePermission('credit-status')
@@ -175,11 +177,10 @@
                     @click="changeStatus(credit.id, 1)">
                     <i class="bi bi-check2-circle"></i>
                   </button> -->
-
+                
                   <button v-if="credit.status == 0 || credit.status == 3" type="button" class="btn btn-success"
                     data-toggle="modal" data-target="#creditInformationModal" @click="showInformation(credit)">
                     <i class="bi bi-check2-circle"></i>
-
                     Aprobación de crédito
                   </button>
                 </div>
@@ -210,10 +211,12 @@
       </section>
     </div>
 
+    
     <modal-create-edit-client ref="ModalCreateEditClient" @list-clients="listCredits(1)" />
     <create-edit-credit ref="CreateEditCredit" @list-credits="listCredits(1)" />
     <modal-installment ref="ModalInstallment" />
     <credit-information ref="CreditInformation" @list-credits="listCredits(1)" />
+    <modal-change-status ref="ModalChangeStatus" @list-credits="listCredits(1)"></modal-change-status>
 
   </div>
 </template>
@@ -223,13 +226,15 @@ import CreateEditCredit from "./CreateEditCredit.vue";
 import ModalCreateEditClient from "../../clients/ModalCreateEditClient.vue";
 import ModalInstallment from "../credit_helpers/ModalInstallment.vue";
 import CreditInformation from "../outstanding_credits/CreditInformation.vue";
+import ModalChangeStatus from "../credit_helpers/ModalChangeStatus.vue";
 
 export default {
   components: {
     CreateEditCredit,
     ModalCreateEditClient,
     ModalInstallment,
-    CreditInformation
+    CreditInformation,
+    ModalChangeStatus
   },
 
   data() {
@@ -248,6 +253,8 @@ export default {
         3: "Pendiente pago a proveedor",
         4: "Completado",
         5: "Cobro jurídico",
+        6: "Eliminado",
+        7: 'Pérdida'
       },
       msg_rejected: "",
     };
@@ -330,18 +337,18 @@ export default {
         confirmButtonText: `Aceptar`,
       }).then((result) => {
         if (result.isConfirmed) {
-          if (status != 2) {
+          if (status != 2 && status != 7) {
             this.sendData(id, data);
             Swal.fire("Cambios realizados!", "", "success");
           } else {
-            this.msgRejectd(id);
+            this.msgRejectd(id,status);
           }
         } else {
           Swal.fire("Operación no realizada", "", "info");
         }
       });
     },
-    msgRejectd: async function (id) {
+    msgRejectd: async function (id,status) {
       const swalWithBootstrapButtons = Swal.mixin({
         customClass: {
           title: "text-primary",
@@ -353,14 +360,14 @@ export default {
 
       await swalWithBootstrapButtons
         .fire({
-          title: "Motivo de rechazo",
+          title: "Motivo de cambio de estado a ${status}",
           reverseButtons: true,
           input: "text",
           inputLabel: "Realice una descripción del motivo",
           inputPlaceholder: "",
           showCancelButton: true,
           cancelButtonText: "Cancelar",
-          confirmButtonText: "Rechazar",
+          confirmButtonText: "Aceptar",
           inputValidator: (value) => {
             if (!value) {
               return "Debes completar este campo!";
@@ -371,7 +378,7 @@ export default {
           console.log(response.isConfirmed);
           if (response.isConfirmed) {
             var data = {
-              status: 2,
+              status: status,
               description: response.value,
             };
             this.sendData(id, data);
@@ -441,6 +448,10 @@ export default {
     },
     showInformation(credit) {
       this.$refs.CreditInformation.showInformation(credit, 0);
+    },
+
+    openModalChangeStatus (credit) {
+      this.$refs.ModalChangeStatus.openModal(credit)
     }
   },
 };

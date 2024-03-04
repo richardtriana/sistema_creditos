@@ -91,6 +91,12 @@
                   >
                     <i class="bi bi-x-circle"></i> Rechazar
                   </button>
+                  <button
+                  class="btn btn-danger"
+                  @click="changeStatus(credit.id, 6)"
+                >
+                  <i class="bi bi-x-circle"></i> Elimninar
+                </button>
                 </div>
               </td>
               <td>
@@ -167,6 +173,7 @@ export default {
         3: "Pendiente pago a proveedor",
         4: "Completado",
         5: "Cobro jurídico",
+        6: 'Eliminado'
       },
     };
   },
