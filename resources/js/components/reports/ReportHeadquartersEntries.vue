@@ -31,17 +31,18 @@
 					<div class="form-group col-12 col-md-3">
 						<label for="user">Usuario
 						</label>
-						<v-select label="name" v-model="search_user_id"
-							:reduce="(option) => option.id" :filterable="false" :options="listUsers"
-							@search="onSearchUsers">
+						<v-select label="name" v-model="search_user_id" :reduce="(option) => option.id"
+							:filterable="false" :options="listUsers" @search="onSearchUsers">
 							<template slot="no-options">
 								Escribe para iniciar la búsqueda
 							</template>
+
 							<template slot="option" slot-scope="option">
 								<div class="d-center">
 									{{ option.name }} {{ option.last_name }}
 								</div>
 							</template>
+
 							<template slot="selected-option" slot-scope="option">
 								<div class="selected d-center">
 									{{ option.name }} {{ option.last_name }}
@@ -53,7 +54,8 @@
 						<label for="headquarter_id">Sede</label>
 						<select class="form-control custom-selec" id="headquarter_id" v-model="search_headquarter_id">
 							<option selected value="">Todas</option>
-							<option v-for="headquarter in headquarterList" :key="headquarter.id" :value="headquarter.id">
+							<option v-for="headquarter in headquarterList" :key="headquarter.id"
+								:value="headquarter.id">
 								{{ headquarter.headquarter }}
 							</option>
 						</select>
@@ -86,6 +88,7 @@
 						<tr class="text-center">
 							<th>ID</th>
 							<th>Sede</th>
+							<th>Fecha</th>
 							<th>Tipo</th>
 							<th>Afectación</th>
 							<th>Valor</th>
@@ -97,6 +100,7 @@
 						<tr v-for="r in headquartersEntryList.data" :key="r.id">
 							<td>{{ r.id }}</td>
 							<td>{{ r.headquarter.headquarter }}</td>
+							<td> {{ r.date }} </td>
 							<td>{{ r.type_entry }}</td>
 							<td>{{ r.description | affectation('entry') }}</td>
 							<td class="text-right">{{ r.price | currency }}</td>
@@ -132,6 +136,10 @@ export default {
 			json_fields: {
 				'Sede': {
 					field: 'headquarter.headquarter',
+					callback: (value) => value
+				},
+				'Fecha': {
+					field: "date",
 					callback: (value) => value
 				},
 				'Tipo': {

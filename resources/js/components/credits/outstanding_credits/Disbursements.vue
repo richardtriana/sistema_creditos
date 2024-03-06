@@ -95,7 +95,7 @@
                   class="btn btn-danger"
                   @click="changeStatus(credit.id, 6)"
                 >
-                  <i class="bi bi-x-circle"></i> Elimninar
+                  <i class="bi bi-x-circle"></i> Eliminar
                 </button>
                 </div>
               </td>

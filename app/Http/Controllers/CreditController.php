@@ -8,6 +8,7 @@ use App\Models\Credit;
 use App\Models\CreditProvider;
 use App\Models\Entry;
 use App\Models\Installment;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -415,7 +416,10 @@ class CreditController extends Controller
 
 			if ($credit->initial_quota) {
 				$entry = new InstallmentController;
-				$entry->saveEntryInstallment($credit, $credit->initial_quota, $credit->initial_quota, 1, 0, $user_id, 'Cuota inicial');
+				$entry->saveEntryInstallment($credit, $credit->initial_quota, $credit->initial_quota, 1, 0, $credit->user_id, 'Cuota inicial');
+				
+				$user = User::findOrFail($credit->user_id)->first();
+				$box = Box::where('headquarter_id', $user->headquarter_id)->firstOrFail();
 
 				$add_amount_box = new BoxController();
 				$request['add_amount'] = $credit->initial_quota;
@@ -441,7 +445,6 @@ class CreditController extends Controller
 			$now = now();
 			$payment_date = Carbon::createFromFormat('Y-m-d', $installment->payment_date);
 
-			// if (($payment_date < $now) &&  $installment->status != '1') {
 				if (($payment_date < $now) &&  $installment->status != '1') {
 				$installment->capital_value_pending = $installment->capital_value - $installment->paid_capital < 0 ? 0 : $installment->capital_value - $installment->paid_capital;
 				$installment->interest_value_pending = $installment->interest_value;
@@ -688,13 +691,14 @@ class CreditController extends Controller
 				]
 			);
 
-			$box = Box::where('headquarter_id', $credit->headquarter_id)->firstOrFail();
+
+			$box = Box::where('headquarter_id',  $request->user()->headquarter_id)->firstOrFail();
 
 			$update_box = new BoxController();
 			$update_box->addAmountBox($request, $box->id, $pending_value, false);
 
 			$entry =  new Entry();
-			$entry->headquarter_id = $credit->headquarter_id;
+			$entry->headquarter_id =  $request->user()->headquarter_id;
 			$entry->user_id = $request->user()->id;
 			$entry->credit_id = $credit->id;
 			$entry->description = "

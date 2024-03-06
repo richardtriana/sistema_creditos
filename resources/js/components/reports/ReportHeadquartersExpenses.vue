@@ -108,6 +108,7 @@
             <tr class="text-center">
               <th>ID</th>
               <th>Sede</th>
+              <th>Fecha</th>
 							<th>Tipo</th>
 							<th>Afectación</th>
               <th>Valor</th>
@@ -122,6 +123,7 @@
             <tr v-for="r in headquartersExpenseList.data" :key="r.id">
 							<td>{{ r.id }}</td>
               <td>{{ r.headquarter.headquarter }}</td>
+              <td> {{ r.date }} </td>
 							<td>{{ r.type_output }}</td>
 							<td>{{ r.description | affectation('expense') }}</td>
               <td class="text-right">{{ r.price | currency }}</td>
@@ -163,6 +165,10 @@ export default {
           field: 'headquarter.headquarter',
           callback: (value) => value
         },
+        'Fecha': {
+					field: "date",
+					callback: (value) => value
+				},
 				'Tipo': {
           field: 'type_output',
           callback: (value) => value
