@@ -442,7 +442,7 @@ class CreditController extends Controller
 			$payment_date = Carbon::createFromFormat('Y-m-d', $installment->payment_date);
 
 			// if (($payment_date < $now) &&  $installment->status != '1') {
-			if ($installment->status != '1') {
+				if (($payment_date < $now) &&  $installment->status != '1') {
 				$installment->capital_value_pending = $installment->capital_value - $installment->paid_capital < 0 ? 0 : $installment->capital_value - $installment->paid_capital;
 				$installment->interest_value_pending = $installment->interest_value;
 
