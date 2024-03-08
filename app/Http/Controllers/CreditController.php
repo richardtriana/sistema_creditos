@@ -418,7 +418,7 @@ class CreditController extends Controller
 				$entry = new InstallmentController;
 				$entry->saveEntryInstallment($credit, $credit->initial_quota, $credit->initial_quota, 1, 0, $credit->user_id, 'Cuota inicial');
 				
-				$user = User::findOrFail($credit->user_id)->first();
+				$user = User::find($credit->user_id);
 				$box = Box::where('headquarter_id', $user->headquarter_id)->firstOrFail();
 
 				$add_amount_box = new BoxController();
@@ -690,7 +690,6 @@ class CreditController extends Controller
 					'paid_capital' => DB::raw('capital_value')
 				]
 			);
-
 
 			$box = Box::where('headquarter_id',  $request->user()->headquarter_id)->firstOrFail();
 
