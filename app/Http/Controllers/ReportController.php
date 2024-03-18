@@ -68,7 +68,11 @@ class ReportController extends Controller
 					}
 				}
 			})
-			->whereNull('payment_register')
+			->where(function ($query) {
+				$query
+					->whereNull('payment_register')
+					->orWhere('installments.status', 0);
+			})
 			->where('credits.status', 1)
 			->leftJoin('credits', 'installments.credit_id', 'credits.id')
 			->leftJoin('clients', 'credits.client_id', 'clients.id')

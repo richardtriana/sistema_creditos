@@ -139,3 +139,8 @@ export default {
     }
 }
 </script>
+<style>
+    .list-group-item {
+        cursor:pointer
+    }
+</style>
