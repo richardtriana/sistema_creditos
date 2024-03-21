@@ -524,4 +524,51 @@ class ReportController extends Controller
 
 		return ["credits" => $credits, "client" => $client, "total_credits" => $total_credits];
 	}
+
+
+	/* @Route api/reports/installments */
+	public function ReportInstallments(Request $request)
+	{
+		$results = $request->results ?? 15;
+		$search_client = $request->search_client;
+		$from = $request->from;
+		$to = $request->to;
+
+		$installments = Installment::select(
+			'installments.*',
+			'credits.client_id',
+			'clients.name',
+			'clients.last_name',
+			'clients.type_document',
+			'clients.document',
+			'headquarters.headquarter as headquarter'
+		)
+			->where(function ($query) use ($from, $to) {
+				if ($from != '' && $from != 'undefined' && $from != null) {
+					$query->whereDate('payment_register', '>=', $from);
+				}
+				if ($to != '' && $to != 'undefined' && $to != null) {
+					$query->whereDate('payment_register', '<=', $to);
+				}
+			})
+			->where('paid_balance', '<>', 0)
+			->leftJoin('credits', 'installments.credit_id', 'credits.id')
+			->leftJoin('clients', 'credits.client_id', 'clients.id')
+			->leftJoin('headquarters', 'credits.headquarter_id', 'headquarters.id');
+
+		if ($search_client) {
+			$installments = $installments->whereHas('credit.client', function ($query) use ($search_client) {
+				$query->where('name', 'LIKE', "%$search_client%")
+					->orWhere('last_name', 'LIKE', "%$search_client%")
+					->orWhere('document', 'LIKE', "%$search_client%");
+			});
+		}
+
+		$installments = $installments->with('credit')->orderBy('payment_register','desc')->paginate($results);
+
+		$getTotalReportsController = new GetTotalReportsController;
+		$totals = $getTotalReportsController->getTotalReportInstallments($installments);
+
+		return ['installments' => $installments, 'totals' => $totals];
+	}
 }

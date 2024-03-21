@@ -167,6 +167,11 @@ const routes = [
 				name: "report-portfolio",
 			},
 			{
+				path: "installments",
+				component: require("./components/reports/ReportInstallments.vue").default,
+				name: "report-installments",
+			},
+			{
 				path: "general-credits",
 				component: require("./components/reports/ReportCreditsGeneral.vue")
 					.default,
@@ -291,7 +296,7 @@ const app = new Vue({
 				},
 			}),
 			configuration: Object,
-			notifications: Array
+			notifications: []
 		}
 
 	},

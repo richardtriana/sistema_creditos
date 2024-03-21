@@ -167,6 +167,7 @@ Route::group(['middleware' => ['auth:api']], function () {
 	//Reports
 	Route::get('/reports/credits', [ReportController::class, 'ReportCredits'])->middleware('permission:report');
 	Route::get('/reports/portfolio', [ReportController::class, 'ReportPortfolio']);
+	Route::get('/reports/installments', [ReportController::class, 'ReportInstallments']);
 	Route::get('/reports/general-credits', [ReportController::class, 'ReportGeneralCredits']);
 	Route::get('/reports/headquarters-expenses', [ReportController::class, 'ReportHeadquartersExpenses']);
 	Route::get('/reports/headquarters-entries', [ReportController::class, 'ReportHeadquartersEntries']);

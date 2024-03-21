@@ -21,6 +21,16 @@ class GetTotalReportsController extends Controller
         return $data;
     }
 
+    public function getTotalReportInstallments($results)
+    {
+        $data = [
+            'paid_capital' => $results->sum('paid_capital'),
+            'paid_balance' => $results->sum('paid_balance')
+        ];
+
+        return $data;
+    }
+
     public function getTotalReportHeadquartersExpenses($results){
         $data = [
             'price' => $results->sum('price')

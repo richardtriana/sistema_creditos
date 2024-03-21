@@ -33,6 +33,7 @@
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdownConfigurations">
             <router-link class="dropdown-item" :to="{ name: 'report-portfolio' }"> Cartera </router-link>
+            <router-link class="dropdown-item" :to="{ name: 'report-installments' }"> Reporte de cuotas </router-link>
             <router-link class="dropdown-item" :to="{ name: 'report-general-credits' }"> Reporte general de créditos
             </router-link>
             <router-link class="dropdown-item" :to="{ name: 'report-headquarters' }"> Reporte general de Sedes
@@ -100,8 +101,8 @@
 							<div class="card-body">
 								<h6 class="card-title"><i class="bi bi-person-circle rounded me-2"></i> @{{ `${item.name} ${item.last_name}`  }}</h6>
 								<h6 class="card-subtitle mb-2 text-body-secondary"><strong>@{{ item.type_document }}: </strong>@{{ item.document }}</h6>
-								<h6 v-if="item.phone_1 !== '' && item.phone_1 != NULL" class="card-subtitle mb-2 text-body-secondary"><strong>Cel 1: </strong>@{{ item.phone_1 }}</h6>
-								<h6 v-if="item.phone_2 != '' && item.phone_2 != NULL" class="card-subtitle mb-2 text-body-secondary"><strong>Cel 2: </strong>@{{ item.phone_2 }}</h6>
+								<h6 v-if="item.phone_1 !== '' && item.phone_1 != null" class="card-subtitle mb-2 text-body-secondary"><strong>Cel 1: </strong>@{{ item.phone_1 }}</h6>
+								<h6 v-if="item.phone_2 != '' && item.phone_2 != null" class="card-subtitle mb-2 text-body-secondary"><strong>Cel 2: </strong>@{{ item.phone_2 }}</h6>
 							</div>
 						</div>
 					</div>
