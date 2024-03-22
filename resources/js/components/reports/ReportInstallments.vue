@@ -7,10 +7,10 @@
       </div>
       <ul class="list-group  col-6 col-sm-12 col-md-6 col-lg-6">
         <li class="list-group-item">
-          <h5 class="text-dark font-weight-bold">Valor total: {{ ReportPortfolioTotal.paid_capital | currency }}</h5>
+          <h5 class="text-dark font-weight-bold">Valor total: {{ ReportPortfolioTotal.paid_balance | currency }}</h5>
         </li>
         <li class="list-group-item">
-          <h5 class="text-dark font-weight-bold">Capital: {{ ReportPortfolioTotal.paid_balance | currency }}</h5>
+          <h5 class="text-dark font-weight-bold">Capital:{{ ReportPortfolioTotal.paid_capital | currency }} </h5>
         </li>
         <li class="list-group-item">
           <h5 class="text-dark font-weight-bold">Intereses: {{ (ReportPortfolioTotal.paid_balance -
@@ -92,7 +92,7 @@
               <td class="text-right">{{ report.paid_balance | currency }}</td>
             </tr>
             <tr>
-              <th colspan="6"></th>
+              <th colspan="5"></th>
               <th> {{ ReportPortfolioTotal.paid_capital | currency }}</th>
               <th> {{ (ReportPortfolioTotal.paid_balance - ReportPortfolioTotal.paid_capital) | currency }}</th>
               <th> {{ ReportPortfolioTotal.paid_balance | currency }}</th>
@@ -167,7 +167,8 @@ export default {
           callback: (value) => {
             let c = value.paid_capital;
             let b = value.paid_balance;
-            return b - c;
+            let i = b-c;
+            return Number(i).toFixed(2);
           }
         },
         'Valor': {
