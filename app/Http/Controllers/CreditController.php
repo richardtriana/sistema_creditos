@@ -417,7 +417,7 @@ class CreditController extends Controller
 			if ($credit->initial_quota) {
 				$entry = new InstallmentController;
 				$entry->saveEntryInstallment($credit, $credit->initial_quota, $credit->initial_quota, 1, 0, $credit->user_id, 'Cuota inicial');
-				
+
 				$user = User::find($credit->user_id);
 				$box = Box::where('headquarter_id', $user->headquarter_id)->firstOrFail();
 
@@ -445,7 +445,7 @@ class CreditController extends Controller
 			$now = now();
 			$payment_date = Carbon::createFromFormat('Y-m-d', $installment->payment_date);
 
-				if (($payment_date < $now) &&  $installment->status != '1') {
+			if (($payment_date < $now) &&  $installment->status != '1') {
 				$installment->capital_value_pending = $installment->capital_value - $installment->paid_capital < 0 ? 0 : $installment->capital_value - $installment->paid_capital;
 				$installment->interest_value_pending = $installment->interest_value;
 
@@ -490,7 +490,9 @@ class CreditController extends Controller
 	{
 		$credit_id = $id;
 		$credit = Credit::findOrFail($credit_id);
-		$headquarter_id = $request->user()->headquarter_id;
+		$user_id = $request->user_id ? $request->user_id : $request->user()->id;
+		$user = User::find($user_id);
+		$headquarter_id = $user->headquarter_id;
 
 		$box = Box::where('headquarter_id', $headquarter_id)->firstOrFail();
 
@@ -521,7 +523,8 @@ class CreditController extends Controller
 					'status' => 1,
 					'payment_register' => date('Y-m-d'),
 					'paid_balance' => 0,
-					'paid_capital' => 0
+					'paid_capital' => 0,
+					'collected_by' => $request->user()->id
 				]
 			);
 		}

@@ -75,6 +75,7 @@ Route::resource('/credit-guarantee', CreditGuaranteeController::class);
 
 Route::get('/expenses/show-expense/{expense}', [ExpenseController::class, 'showExpense']);
 Route::get('/installments/calculate-installments', [MethodCreditController::class, 'calculateInstallments']);
+Route::post('/installments/payment-date', [MethodCreditController::class, 'updatePaymentDate']);
 
 Route::get('/reports/headquarters', [ReportController::class, 'ReportHeadquarters']);
 Route::get('/reports/general-client', [ReportController::class, 'ReportGeneralClient']);

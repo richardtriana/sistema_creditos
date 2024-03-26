@@ -40,8 +40,8 @@
     </div>
 
     <div class="page-content mt-4" style="width: 100%">
-      <section class="table-responsive">
-        <table class="table table-sm table-bordered">
+      <section class="table-responsivee ">
+        <table class="table table-sm table-bordered bg-light">
           <thead>
             <tr class="text-center">
               <th>ID</th>
@@ -67,8 +67,8 @@
               <th>Recoger crédito</th>
               <!-- <th>Cobro jurídico</th> -->
               <th v-if="$root.validatePermission('credit-update') ||
-                $root.validatePermission('credit-status')
-                ">
+          $root.validatePermission('credit-status')
+          ">
                 Opciones
               </th>
             </tr>
@@ -109,9 +109,10 @@
               <td class="text-right">{{ credit.paid_value | currency }}</td>
               <td>{{ credit.number_installments }}</td>
               <td>
-              <b class="text-uppercase">  {{ creditStatus[credit.status] }}</b> <br>               
-                <button @click="openModalChangeStatus(credit)" style="font-size:10px" data-toggle="modal" data-target="#modalChangeStatus" class="btn btn-info">
-                  <i class="bi bi-arrow-repeat"></i>  Cambiar estado
+                <b class="text-uppercase"> {{ creditStatus[credit.status] }}</b> <br>
+                <button @click="openModalChangeStatus(credit)" data-toggle="modal" data-target="#modalChangeStatus"
+                  class="btn btn-info btn-sm">
+                  <i class="bi bi-arrow-repeat"></i> Cambiar estado
                 </button>
               </td>
               <td class="text-center" v-if="$root.validatePermission('credit-index')">
@@ -122,19 +123,19 @@
               </td>
               <td class="text-center" v-if="$root.validatePermission('credit-index')">
                 <button class="btn btn-danger" @click="
-                  printTable(credit.id, credit.name + '_' + credit.last_name)
-                  ">
+          printTable(credit.id, credit.name + '_' + credit.last_name)
+          ">
                   <i class="bi bi-file-pdf"></i>
                 </button>
               </td>
               <td>
                 <div v-if="credit.status == 4">
                   <button type="button" class="btn btn-danger" @click="
-                    downloadReceiptPDF(
-                      credit.id,
-                      credit.name + '_' + credit.last_name
-                    )
-                    ">
+          downloadReceiptPDF(
+            credit.id,
+            credit.name + '_' + credit.last_name
+          )
+          ">
                     <i class="bi bi-file-earmark-pdf"></i>
                     Descargar
                   </button>
@@ -157,15 +158,20 @@
               </td> -->
 
               <td class="text-right" v-if="$root.validatePermission('credit-update') ||
-                $root.validatePermission('credit-status')
-                ">
+          $root.validatePermission('credit-status')
+          ">
                 <div v-if="$root.validatePermission('credit-update')" class="d-inline">
-                  <button v-if="(credit.status == 0 || credit.status == 1 || credit.status == 3) && credit.paid_value <= 1"
-                    class="btn btn-primary" @click="showData(credit)">
+                  <button
+                    v-if="(credit.status == 0 || credit.status == 1 || credit.status == 3) && credit.paid_value <= 1"
+                    class="btn btn-sm btn-primary" @click="showData(credit)">
+                    <i class="bi bi-pen"></i> Crédito
+                  </button>
+                  <button v-else class="btn btn-sm btn-secondary" disabled>
                     <i class="bi bi-pen"></i>
                   </button>
-                  <button v-else class="btn btn-secondary" disabled>
-                    <i class="bi bi-pen"></i>
+
+                  <button class="btn btn-sm btn-success" @click="updateDate(credit.id)">
+                    <i class="bi bi-pen"></i> Fecha
                   </button>
                 </div>
                 <div v-if="$root.validatePermission('credit-status')" class="d-inline">
@@ -177,7 +183,7 @@
                     @click="changeStatus(credit.id, 1)">
                     <i class="bi bi-check2-circle"></i>
                   </button> -->
-                
+
                   <button v-if="credit.status == 0 || credit.status == 3" type="button" class="btn btn-success"
                     data-toggle="modal" data-target="#creditInformationModal" @click="showInformation(credit)">
                     <i class="bi bi-check2-circle"></i>
@@ -211,7 +217,7 @@
       </section>
     </div>
 
-    
+
     <modal-create-edit-client ref="ModalCreateEditClient" @list-clients="listCredits(1)" />
     <create-edit-credit ref="CreateEditCredit" @list-credits="listCredits(1)" />
     <modal-installment ref="ModalInstallment" />
@@ -275,7 +281,7 @@ export default {
         headquarter_id: this.search_headquarter_id,
         search_credit_id: this.search_credit_id
       }
-      
+
       axios
         .get(
           `api/credits`,
@@ -341,14 +347,14 @@ export default {
             this.sendData(id, data);
             Swal.fire("Cambios realizados!", "", "success");
           } else {
-            this.msgRejectd(id,status);
+            this.msgRejectd(id, status);
           }
         } else {
           Swal.fire("Operación no realizada", "", "info");
         }
       });
     },
-    msgRejectd: async function (id,status) {
+    updateDate: async function (id, status) {
       const swalWithBootstrapButtons = Swal.mixin({
         customClass: {
           title: "text-primary",
@@ -360,14 +366,14 @@ export default {
 
       await swalWithBootstrapButtons
         .fire({
-          title: "Motivo de cambio de estado a ${status}",
+          title: "Motivo de rechazo",
           reverseButtons: true,
           input: "text",
           inputLabel: "Realice una descripción del motivo",
           inputPlaceholder: "",
           showCancelButton: true,
           cancelButtonText: "Cancelar",
-          confirmButtonText: "Aceptar",
+          confirmButtonText: "Rechazar",
           inputValidator: (value) => {
             if (!value) {
               return "Debes completar este campo!";
@@ -383,6 +389,51 @@ export default {
             };
             this.sendData(id, data);
             Swal.fire("Cambios realizados!", "", "success");
+          } else {
+            Swal.fire("Operación no realizada", "", "info");
+          }
+        });
+    },
+    updateDate: function (id) {
+      let me = this;
+      const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+          title: "text-primary",
+          cancelButton: "btn btn-secondary",
+          confirmButton: "btn btn-danger",
+        },
+        buttonsStyling: false,
+      });
+
+      swalWithBootstrapButtons
+        .fire({
+          title: "Cambio de fecha de crédito",
+          reverseButtons: true,
+          input: "date",
+          inputLabel: "Esta operación afectara a todas las cuotas relacionadas",
+          showCancelButton: true,
+          cancelButtonText: "Cancelar",
+          confirmButtonText: "Aceptar",
+          inputValidator: (value) => {
+            if (!value) {
+              return "Debes completar este campo!";
+            }
+          },
+        })
+        .then((response) => {
+          console.log(response.isConfirmed);
+          if (response.isConfirmed) {
+            var data = {
+              credit_id: id,
+              start_date: response.value,
+            };
+            axios
+              .post(`api/installments/payment-date`, data, this.$root.config)
+              .then(function () {
+               
+                me.listCredits(1);
+                Swal.fire("Cambios realizados!", "", "success");
+              });
           } else {
             Swal.fire("Operación no realizada", "", "info");
           }
@@ -450,7 +501,7 @@ export default {
       this.$refs.CreditInformation.showInformation(credit, 0);
     },
 
-    openModalChangeStatus (credit) {
+    openModalChangeStatus(credit) {
       this.$refs.ModalChangeStatus.openModal(credit)
     }
   },

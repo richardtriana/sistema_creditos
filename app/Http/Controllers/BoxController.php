@@ -154,11 +154,9 @@ class BoxController extends Controller
 		}
 	}
 
-	public function subAmountBox(Request $request, $id, $amount)
+	public function subAmountBox(Request $request, $box_id, $amount)
 	{
-		$user =  $request->user();
 
-		$box_id = $id;
 		$box = Box::findOrFail($box_id);
 		$box->current_balance = $box->current_balance - $amount;
 		$box->output = $box->output + $amount;

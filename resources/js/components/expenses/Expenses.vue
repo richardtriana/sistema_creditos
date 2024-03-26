@@ -16,6 +16,11 @@
       <h6 class="text-primary text-uppercase">Filtrar:</h6>
       <form>
         <div class="form-row">
+          <div class="form-group col-md-4">
+            <label for="search_id">Nro. de egreso:</label>
+            <input type="text" id="search_id" name="search_id" class="form-control" placeholder="Nro de egreso"
+              v-model="search_id" />
+          </div>
           <div class="form-group col-md-4 ml-md-auto">
             <label for="headquarter_id">Sede</label>
             <v-select :options="headquarterList" label="headquarter" aria-logname="{}"
@@ -135,6 +140,7 @@ export default {
       headquarterList: [],
       search_from: "",
       search_to: "",
+      search_id: "",
       search_description: "",
       search_type_output: "",
       search_headquarter_id: 'all',
@@ -152,6 +158,7 @@ export default {
 
       let data = {
         page: page,
+        id: this.search_id,
         from: this.search_from,
         to: this.search_to,
         type_output: this.search_type_output,

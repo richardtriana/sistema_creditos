@@ -119,7 +119,7 @@
 
           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
             <a class="dropdown-item" href="javascript:void(0)" @click="logout">
-              {{ __('Logout') }}
+              {{ __('Salir') }}
             </a>
           </div>
         </li>

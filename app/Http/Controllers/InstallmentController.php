@@ -244,6 +244,7 @@ class InstallmentController extends Controller
         $subject = "Pago de cuota";
       }
       $credit_paid = new CreditController;
+      $request->merge(['user_id' => $user_id]);
       $credit_paid->updateValuesCredit(
         $request,
         $credit->id,
@@ -271,12 +272,12 @@ class InstallmentController extends Controller
       'no_installment' => $no_installment,
       'entry_id' => $entry_id ?? 'undefined'
     ];
-    return [
-      'balance' => $balance,
-      'no_installment' => $no_installment,
-      'entry_id' => $entry_id,
-      'installment' => $installment
-    ];
+    // return [
+    //   'balance' => $balance,
+    //   'no_installment' => $no_installment,
+    //   'entry_id' => $entry_id,
+    //   'installment' => $installment
+    // ];
   }
 
   public function payCredit(Credit $credit, Request $request)
@@ -349,6 +350,7 @@ class InstallmentController extends Controller
         return false;
       }
       $credit_paid = new CreditController;
+      $request->merge(['user_id' => $user_id]);
       $credit_paid->updateValuesCredit($request, $credit->id, $amount, $balance, $interest);
       $entry_id =  $this->saveEntryInstallment($credit, $amount, $balance, $no_installment, $balance, $user_id, 'Abono a crédito');
     }
@@ -474,11 +476,13 @@ class InstallmentController extends Controller
     $franchiseMethod = new FranchiseMethodController();
 
     date_default_timezone_set('America/Bogota');
-  
+
     $installment = Installment::find($request->id);
+    // Datos de usuario
     $user_id = $installment->collected_by ? $installment->collected_by : $request->user()->id;
-    $user = User::find( $user_id)->first();
+    $user = User::find($user_id);
     $headquarter_id = $user->headquarter_id;
+    //Datos para calculr valores
     $paid_balance = $installment->paid_balance;
     $paid_capital =  $installment->paid_capital;
     $interest =  $installment->paid_balance - $installment->paid_capital;
@@ -502,13 +506,15 @@ class InstallmentController extends Controller
     $installment->save();
 
     //Restar valores en el crédito
+    $request->merge(['user_id' => $user_id]);
     $credit_paid = new CreditController;
     $credit_paid->updateValuesCredit($request, $credit->id, $paid_balance * -1,  $paid_capital * -1, $interest * -1, true);
 
+      //Restar valores en caja
     $box = Box::where('headquarter_id', $headquarter_id)->firstOrFail();
     $request->merge(['add_amount' => $paid_balance]);
-		$sub_amount_box = new BoxController();
-		$sub_amount_box->subAmountBox($request, $box->id, $paid_balance);
+    $sub_amount_box = new BoxController();
+    $sub_amount_box->subAmountBox($request, $box->id, $paid_balance);
 
     //Actualizar valores de cuotas
     if ($configurations->method &&  $configurations->method == "GENERAL") {
@@ -524,7 +530,9 @@ class InstallmentController extends Controller
   {
     $cuota = Installment::find($id);
 
-    if (!$cuota) {       return response()->json(['message' => 'Cuota no encontrada'], 404);     }
+    if (!$cuota) {
+      return response()->json(['message' => 'Cuota no encontrada'], 404);
+    }
 
     $cuota->changeStatus();
 
@@ -535,9 +543,11 @@ class InstallmentController extends Controller
   {
     $quote = Installment::find($id);
 
-    if (!$quote) {       return response()->json(['message' => 'Cuota no encontrada'], 404);     }
+    if (!$quote) {
+      return response()->json(['message' => 'Cuota no encontrada'], 404);
+    }
 
-    $quote->payment_commitment = $request->payment_commitment ;
+    $quote->payment_commitment = $request->payment_commitment;
     $quote->save();
 
     return response()->json(['message' => 'Cuota editada correctamente'], 200);

@@ -32,6 +32,11 @@ h3 {
 
 .btn {
 	border-radius: 2rem;
+    margin-block-end: 5px;
+}
+
+.btn-sm {
+	min-width: 80px;
 }
 
 .page {

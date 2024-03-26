@@ -29,6 +29,7 @@ class ExpenseController extends Controller
 
 	public function index(Request $request)
 	{
+		$id = $request->id;
 		$from = $request->from;
 		$to = $request->to;
 		$this_month = Carbon::now()->month;
@@ -66,6 +67,9 @@ class ExpenseController extends Controller
 		}
 		if ($user_id != null) {
 			$expenses =	$expenses->where('user_id', "%$user_id%");
+		}
+		if ($id != null) {
+			$expenses =	$expenses->where('id', "$id");
 		}
 
 		$expenses =	$expenses->orderBy('id', 'desc')
