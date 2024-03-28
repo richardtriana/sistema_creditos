@@ -1,74 +1,45 @@
 <template>
-  <div
-    class="modal fade"
-    id="cuotasModal"
-    tabindex="-1"
-    role="dialog"
-    aria-labelledby="cuotasModalLabel"
-    aria-hidden="true"
-  >
+  <div class="modal fade" id="cuotasModal" tabindex="-1" role="dialog" aria-labelledby="cuotasModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="cuotasModalLabel">Listado de Cuotas</h5>
-          <button
-            type="button"
-            class="close"
-            data-dismiss="modal"
-            aria-label="Close"
-          >
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          <div
-            class="page-header d-flex justify-content-between p-4 border my-2"
-          >
+          <div class="page-header d-flex justify-content-between p-4 border my-2">
             <div class="form-row w-100">
               <div class="form-group col-2">
-                <label for="amount"
-                  >Monto a pagar: <b>{{ amount_value | currency }}</b></label
-                >
+                <label for="amount">Monto a pagar: <b>{{ amount_value | currency }}</b></label>
               </div>
               <div class="form-group col-4">
-                <input
-                  type="number"
-                  step="any"
-                  class="form-control"
-                  id="amount"
-                  placeholder="$"
-                  v-model="amount_value"
-                  :min="min_amount"
-                />
+                <input type="number" step="any" class="form-control" id="amount" placeholder="$" v-model="amount_value"
+                  :min="min_amount" />
                 <small id="addAmountHelpBlock" class="form-text text-muted">
                   Monto mínimo
                   {{ min_amount | currency }}
                 </small>
               </div>
               <div class="col-3 form-group">
-                <input type="number" step="any"  class="form-control" id="new_interest" v-model="new_interest" min="0">
+                <input type="number" step="any" class="form-control" id="new_interest" v-model="new_interest" min="0">
               </div>
               <div class="form-group col-3">
-                <button
-                  class="btn btn-primary my-auto"
-                  @click="payCredit()"
-                  v-if="amount_value > min_amount"
-                >
+                <button class="btn btn-primary my-auto" @click="payCredit()" v-if="amount_value > min_amount">
                   Abonar <b>{{ amount_value | currency }}</b>
                 </button>
                 <button v-else class="btn btn-secondary my-auto" disabled>
                   <i class="bi bi-currency-dollar"></i> Abonar a crédito
                 </button>
               </div>
-              
+
               <div class="form-group col-3">
-                <h5>Saldo pendiente: <b>{{credit_to_pay | currency}}</b> </h5>
+                <h5>Saldo pendiente: <b>{{ credit_to_pay | currency }}</b> </h5>
               </div>
               <div class="form-group col-12 text-center">
-                <button
-                  class="btn btn-danger w-50 font-weight-bold"
-                  @click="printTable()"
-                >
+                <button class="btn btn-danger w-50 font-weight-bold" @click="printTable()">
                   <i class="bi bi-file-pdf"></i> Tabla de amortización
                 </button>
               </div>
@@ -96,8 +67,8 @@ export default {
       amount_value: 0,
       allow_payment: 1,
       min_amount: 0,
-      credit_to_pay:0,
-      new_interest:0
+      credit_to_pay: 0,
+      new_interest: 0
     };
   },
   methods: {
@@ -111,6 +82,16 @@ export default {
     },
 
     payCredit() {
+      let pending_installment = this.$refs.Installment.listInstallments.filter((x) => x.paid_capital > 0 && x.status === 0);
+
+      if (pending_installment.length) {
+        return  Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: `No se puede abonar a capital hasta que la cuota este paga completamente`,
+        });
+      }
+
       if (this.amount_value > 0) {
         this.$refs.Installment.payCredit(this.amount_value, this.new_interest);
       } else {
