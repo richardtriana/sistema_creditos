@@ -127,6 +127,14 @@
           ">
                   <i class="bi bi-file-pdf"></i>
                 </button>
+                <br>
+                <a role="button" class="btn btn-primary" v-if="credit.phone_1 != null" target="_blank"
+                  :href="`https://wa.me/57${credit.phone_1}?text=Hola!`"><i
+                    class="bi bi-whatsapp  "></i> {{ credit.phone_1 }}</a>
+                <br />
+                <a role="button" class="btn btn-primary" v-if="credit.phone_2 != null" target="_blank"
+                  :href="`https://wa.me/57${credit.phone_2}?text=Hola!`"><i
+                    class="bi bi-whatsapp "></i> {{ credit.phone_2 }}</a>
               </td>
               <td>
                 <div v-if="credit.status == 4">

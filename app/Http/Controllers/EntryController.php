@@ -45,7 +45,7 @@ class EntryController extends Controller
 
 		$entries = Entry::select()
 			->orderBy('id', 'desc')
-			->with(['user:id,name,last_name', 'headquarter']);
+			->with(['user:id,name,last_name', 'headquarter', 'credit.client']);
 
 		if ($client != null || $document != null) {
 			$entries = $entries->select('entries.*', 'clients.name', 'clients.last_name', 'clients.document')

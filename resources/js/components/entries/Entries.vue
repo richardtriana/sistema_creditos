@@ -109,6 +109,16 @@
                 <button class="btn btn-success btn-block" type="button" @click="printEntryTicket(e.id)">
                   <i class="bi bi-receipt-cutoff"></i> Ticket
                 </button>
+                <br>
+                <template v-if="e.credit && e.credit.client">
+                  <a role="button" class="btn btn-primary" v-if="e.credit.client.phone_1 != null" target="_blank"
+                  :href="`https://wa.me/57${e.credit.client.phone_1}?text=Hola!`"><i
+                    class="bi bi-whatsapp  "></i> {{ e.credit.client.phone_1 }}</a>
+                <br />
+                <a role="button" class="btn btn-primary" v-if="e.credit.client.phone_2 != null" target="_blank"
+                  :href="`https://wa.me/57${e.credit.client.phone_2}?text=Hola!`"><i
+                    class="bi bi-whatsapp "></i> {{ e.credit.client.phone_2 }}</a>
+                </template>
               </td>
               <td class="text-right" v-if="$root.validatePermission('entry-delete')">
                 <button v-if="!e.credit_id" class="btn btn-danger" @click="deleteEntry(e.id)" data-toggle="tooltip"
