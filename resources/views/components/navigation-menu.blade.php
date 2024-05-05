@@ -42,13 +42,15 @@
             </router-link>
             <router-link class="dropdown-item" :to="{ name: 'report-headquarters-expenses' }"> Reporte egresos sedes
             </router-link>
-              <router-link class="dropdown-item" :to="{ name: 'report-headquarters-entries' }"> Reporte ingresos sedes
+            <router-link class="dropdown-item" :to="{ name: 'report-headquarters-entries' }"> Reporte ingresos sedes
             </router-link>
             <router-link class="dropdown-item" :to="{ name: 'report-profitability' }"> Reporte de Rentabilidad
             </router-link>
             <router-link class="dropdown-item" :to="{ name: 'report-cash-flow' }"> Reporte de flujo de caja
             </router-link>
-             <router-link class="dropdown-item" :to="{ name: 'report-rating-client' }"> Reporte calificativo de cliente
+            <router-link class="dropdown-item" :to="{ name: 'report-rating-client' }"> Reporte calificativo de cliente
+            </router-link>
+            <router-link class="dropdown-item" :to="{ name: 'report-box-flow' }"> Reporte Arqueo
             </router-link>
           </div>
         </li>
@@ -90,23 +92,23 @@
         <li class="nav-item" v-if="validatePermission('headquarter-index')">
           <router-link class="nav-link" to="/files"><i class="bi bi-house-door"></i> Registro de archivos </router-link>
         </li>
-				<li class="nav-item dropdown notifications" >
-					<a id="navbarDropdownNotifications" href="#" class="nav-link text-white " :class="{ 'dropdown-toggle' : notifications.length != 0}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						<i v-if="notifications.length == 0" class="bi bi-bell"></i>
-						<i v-else class="bi bi-bell-fill"></i>
-						Cumpleaños
-					</a>
-					<div class="dropdown-menu dropdown-menu-right px-2 birth-date" aria-labelledby="navbarDropdownNotifications">
-						<div v-for="item in notifications" :key="item.id" class="card my-1" style="width: 20rem;">
-							<div class="card-body">
-								<h6 class="card-title"><i class="bi bi-person-circle rounded me-2"></i> @{{ `${item.name} ${item.last_name}`  }}</h6>
-								<h6 class="card-subtitle mb-2 text-body-secondary"><strong>@{{ item.type_document }}: </strong>@{{ item.document }}</h6>
-								<h6 v-if="item.phone_1 !== '' && item.phone_1 != null" class="card-subtitle mb-2 text-body-secondary"><strong>Cel 1: </strong>@{{ item.phone_1 }}</h6>
-								<h6 v-if="item.phone_2 != '' && item.phone_2 != null" class="card-subtitle mb-2 text-body-secondary"><strong>Cel 2: </strong>@{{ item.phone_2 }}</h6>
-							</div>
-						</div>
-					</div>
-				</li>
+        <li class="nav-item dropdown notifications">
+          <a id="navbarDropdownNotifications" href="#" class="nav-link text-white " :class="{ 'dropdown-toggle' : notifications.length != 0}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i v-if="notifications.length == 0" class="bi bi-bell"></i>
+            <i v-else class="bi bi-bell-fill"></i>
+            Cumpleaños
+          </a>
+          <div class="dropdown-menu dropdown-menu-right px-2 birth-date" aria-labelledby="navbarDropdownNotifications">
+            <div v-for="item in notifications" :key="item.id" class="card my-1" style="width: 20rem;">
+              <div class="card-body">
+                <h6 class="card-title"><i class="bi bi-person-circle rounded me-2"></i> @{{ `${item.name} ${item.last_name}`  }}</h6>
+                <h6 class="card-subtitle mb-2 text-body-secondary"><strong>@{{ item.type_document }}: </strong>@{{ item.document }}</h6>
+                <h6 v-if="item.phone_1 !== '' && item.phone_1 != null" class="card-subtitle mb-2 text-body-secondary"><strong>Cel 1: </strong>@{{ item.phone_1 }}</h6>
+                <h6 v-if="item.phone_2 != '' && item.phone_2 != null" class="card-subtitle mb-2 text-body-secondary"><strong>Cel 2: </strong>@{{ item.phone_2 }}</h6>
+              </div>
+            </div>
+          </div>
+        </li>
       </ul>
 
       <!-- Right Side Of Navbar -->

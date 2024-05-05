@@ -215,6 +215,11 @@ const routes = [
 				path: "rating-client",
 				component: require("./components/reports/ReportRatingClient.vue").default,
 				name: "report-rating-client",
+			},
+			{
+				path: "box-flow",
+				component: require("./components/reports/ReportBoxFlow.vue").default,
+				name: "report-box-flow",
 			}
 		],
 	},

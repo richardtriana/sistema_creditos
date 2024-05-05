@@ -81,6 +81,7 @@ Route::get('/reports/headquarters', [ReportController::class, 'ReportHeadquarter
 Route::get('/reports/general-client', [ReportController::class, 'ReportGeneralClient']);
 Route::get('/reports/profitability', [ReportController::class, 'ReportProfitability']);
 Route::get('/reports/cash-flow', [ReportController::class, 'ReportCashFlow']);
+Route::get('/reports/box-flow', [ReportController::class, 'ReportBoxFlow']);
 
 Route::group(['middleware' => ['auth:api']], function () {
 

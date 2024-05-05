@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BoxHistory;
 use App\Models\Client;
 use App\Models\Credit;
 use App\Models\Entry;
@@ -564,11 +565,60 @@ class ReportController extends Controller
 			});
 		}
 
-		$installments = $installments->with('credit')->orderBy('payment_register','desc')->paginate($results);
+		$installments = $installments->with('credit')->orderBy('payment_register', 'desc')->paginate($results);
 
 		$getTotalReportsController = new GetTotalReportsController;
 		$totals = $getTotalReportsController->getTotalReportInstallments($installments);
 
 		return ['installments' => $installments, 'totals' => $totals];
+	}
+
+	/* @Route api/reports/box-flow */
+	public function ReportBoxFlow(Request $request)
+	{
+		$from = $request->from ?? '';
+		$to = $request->to ?? '';
+		$headquarter_id = $request->headquarter_id ?? '';
+		$status = $request->status ?? '';
+		$results = $request->results ?? '15';
+		$description = $request->description ?? '';
+
+		$boxes = BoxHistory::select(
+			'box_histories.*',
+			'headquarters.headquarter'
+
+		)
+			->where(function ($query) use ($from, $to) {
+
+				if ($from != '' && $from != 'undefined' && $from != null) {
+					$query->whereDate('date', '>=', $from);
+				}
+				if ($to != '' && $to != 'undefined' && $to != null) {
+					$query->whereDate('date', '<=', $to);
+				}
+			})
+			->where(function ($query) use ($status) {
+
+				if ($status != '' && $status != 'undefined' && $status != null) {
+					$query->where('box_histories.status', 'LIKE', "$status%");
+				}
+			})
+			->where(function ($query) use ($description) {
+
+				if ($description != '' && $description != 'undefined' && $description != null) {
+					$query->where('box_histories.description', 'LIKE', "%$description%");
+				}
+			})
+			->leftJoin('boxes', 'box_histories.box_id', 'boxes.id')
+			->leftJoin('headquarters', 'boxes.headquarter_id', 'headquarters.id');
+
+		if ($headquarter_id != '' && $headquarter_id != 'undefined' && $headquarter_id != null) {
+			$boxes = $boxes->whereHas('box', function ($query) use ($headquarter_id) {
+				$query->where('headquarter_id', "$headquarter_id");
+			});
+		}
+
+		$boxes = $boxes->orderBy('date', 'desc')->paginate($results);
+		return ['boxes' => $boxes];
 	}
 }

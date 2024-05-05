@@ -187,13 +187,19 @@ class HeadquarterController extends Controller
 
 	public function listHeadquarter(Request $request)
 	{
-		$search_headquarter = $request->search_headquarter;
+		$headquarter_id = $request->search_headquarter;
+		$headquarter = $request->headquarter;
 
 		$headquarters = Headquarter::select()
 			->where('status', 1)
-			->where(function ($query) use ($search_headquarter) {
-				if (!is_null($search_headquarter)) {
-					$query->where('headquarter_id', 'LIKE', $search_headquarter);
+			->where(function ($query) use ($headquarter_id) {
+				if (!is_null($headquarter_id)) {
+					$query->where('id',  $headquarter_id);
+				}
+			})
+			->where(function ($query) use ($headquarter) {
+				if (!is_null($headquarter)) {
+					$query->where('headquarter', 'LIKE', "%$headquarter%");
 				}
 			})
 			->orderBy('headquarter', 'asc')->get();
