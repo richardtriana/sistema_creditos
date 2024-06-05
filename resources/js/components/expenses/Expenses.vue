@@ -69,6 +69,7 @@
         <table class="table table-bordered table-sm">
           <thead>
             <tr class="text-center">
+              <th>N° recibo</th>
               <th>Sede</th>
               <th>Responsable</th>
               <th>Fecha</th>
@@ -84,6 +85,7 @@
           </thead>
           <tbody v-if="expenseList.data && expenseList.data.length > 0">
             <tr v-for="e in expenseList.data" :key="e.id">
+              <td>{{ e.id }}</td>
               <td>{{ e.headquarter.headquarter }}</td>
               <td>{{ e.user.name }} {{ e.user.last_name }}</td>
               <td>{{ e.date }}</td>
@@ -103,18 +105,14 @@
                 </button>
               </td>
               <td class="text-right" v-if="$root.validatePermission('expense-delete')">
-                <button  class="btn btn-danger" @click="deleteExpense(e.id)">
+                <button class="btn btn-danger" @click="deleteExpense(e.id)">
                   <i class="bi bi-trash"></i>
                 </button>
-               
               </td>
               <td class="text-right" v-if="$root.validatePermission('expense-update')">
                 <button class="btn btn-success" @click="showData(e)">
                   <i class="bi bi-pen"></i>
                 </button>
-                <!-- <button class="btn btn-secondary" disabled>
-                  <i class="bi bi-pen"></i>
-                </button> -->
               </td>
             </tr>
           </tbody>
@@ -155,7 +153,6 @@ export default {
 
   methods: {
     listExpenses(page = 1) {
-
       let data = {
         page: page,
         id: this.search_id,

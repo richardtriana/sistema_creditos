@@ -106,7 +106,7 @@
         <table class="table table-bordered table-sm">
           <thead>
             <tr class="text-center">
-              <th>ID</th>
+              <th>Recibo</th>
               <th>Sede</th>
               <th>Fecha</th>
 							<th>Tipo</th>

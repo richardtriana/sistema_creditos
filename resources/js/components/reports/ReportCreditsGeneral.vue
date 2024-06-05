@@ -1,7 +1,14 @@
 <template>
   <div class="page">
     <div class="page-header">
-      <h3>Reporte general de créditos</h3>
+      <h3>
+        Reporte general de créditos
+      </h3>
+      <h3>
+        <span v-if="ReportGeneralCreditsList && ReportGeneralCreditsList.data">
+          Creditos filtrados: {{ ReportGeneralCreditsList.data.length }}
+        </span>
+      </h3>
     </div>
     <div class="page-search border my-2">
       <h6 class="text-primary text-uppercase">Filtrar:</h6>
@@ -95,7 +102,7 @@
         <table class="table table-sm table-bordered">
           <thead>
             <tr class="text-center">
-              <th>#</th>
+              <th>Cred.</th>
               <th>Cliente</th>
               <th>Identificación</th>
               <th>Contacto <i class="bi bi-telephone"></i></th>

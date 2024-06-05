@@ -10,10 +10,8 @@
     "
   >
     <div class="login-aside d-none d-md-flex flex-column flex-row-auto justify-content-center position-relative">
-      <div
-        class="aside-img  d-md-flex flex-column flex-row-auto justify-content-center p-3"
-        style="background-image: url('https://picsum.photos/600')"
-      >
+      <div>
+       <CENTer> <img class="img-fluid" src="saludo.gif" alt="./saludo.gif"  srcset="" width="400"/></CENTer>
         <img class="img-fluid" src="logo.jpeg" alt="./logo.jpeg" />
       </div>
     </div>
@@ -32,7 +30,8 @@
     >
       <div class="login-form login-signin">
         <div class="pb-5">
-          <h2 class="py-2 font-weight-bold">Bienvenido a Tecnoplus</h2>
+        <center> <img class="img-fluid" src="main.png" alt="./main.png"  srcset="" width="400"/></center>
+          <h2 class="py-2 font-weight-bold">Bienvenido a Crediplus Vers. 3.1 </h2>
           <span class="text-muted">Ingresa tus datos de usuario</span>
         </div>
         <form id="form_login" autocomplete="off" @submit.prevent="login">
@@ -76,6 +75,12 @@
               Acceder
             </button>
           </div>
+          <br>
+         
+          <h2 class="py-2 font-weight-bold">___________________________________________</h2>
+          <small> SOFTWARE PARA CONTROL DE CREDITOS - "CREDIPLUS" </small><br>
+          <small> Des. Ing Richard peña triana --- Todos Derechos reservados </small><br>
+          <small> Inf Cel 3125334687 - email richardpen90@gmail.com </small><br>
         </form>
       </div>
     </div>

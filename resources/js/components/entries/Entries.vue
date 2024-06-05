@@ -33,17 +33,17 @@
           </div>
         </div>
         <div class="form-row">
-          <div class="form-group col-md-4 col-sm-6 col-xs-6  ml-md-auto">
+          <div class="form-group col-md-4 col-sm-6 col-xs-6 ml-md-auto">
             <label for="search_type_input">Tipo de ingreso:</label>
             <input type="text" id="search_type_input" name="search_type_input" class="form-control"
               placeholder="Escribir el tipo de ingreso" v-model="search_type_input" />
           </div>
-          <div class="form-group col-md-4 col-sm-6 col-xs-6 ">
+          <div class="form-group col-md-4 col-sm-6 col-xs-6">
             <label for="search_description">Descripción:</label>
             <input type="text" id="search_description" name="search_description" class="form-control"
               placeholder="Escribir el motivo o descripción" v-model="search_description" />
           </div>
-          <div class="form-group col-md-4 col-sm-6 col-xs-6  mr-md-auto">
+          <div class="form-group col-md-4 col-sm-6 col-xs-6 mr-md-auto">
             <label for="">Mostrar {{ search_results }} resultados por página:</label>
             <input type="number" id="search_results" name="search_results" class="form-control" placeholder="Desde"
               v-model="search_results" max="1000" />
@@ -75,6 +75,7 @@
         <table class="table table-bordered table-sm">
           <thead>
             <tr class="text-center">
+              <th>N° recibo</th>
               <th>Sede</th>
               <th>Responsable</th>
               <th>Fecha</th>
@@ -83,22 +84,20 @@
               <th>Valor</th>
               <th>Ver Factura</th>
               <th v-if="$root.validatePermission('entry-delete')">Eliminar</th>
-              <th v-if="$root.validatePermission('entry-update')">
-                Opciones
-              </th>
+              <th v-if="$root.validatePermission('entry-update')">Opciones</th>
             </tr>
           </thead>
           <tbody v-if="entryList.data && entryList.data.length > 0">
             <tr v-for="e in entryList.data" :key="e.id">
+              <td>{{ e.id }}</td>
               <td>{{ e.headquarter.headquarter }}</td>
               <td class="wrap">{{ e.user.name }} {{ e.user.last_name }}</td>
               <td>{{ e.date }}</td>
-
               <td>{{ e.type_entry }}</td>
               <td class="h6 font-weight-normal">
                 <textarea name="" class="form-control-plaintext" readonly id="" cols="10" rows="8"
                   v-model="e.description">
-                  </textarea>
+                </textarea>
               </td>
               <td class="text-right">{{ e.price | currency }}</td>
               <td class="text-right">
@@ -111,13 +110,15 @@
                 </button>
                 <br>
                 <template v-if="e.credit && e.credit.client">
-                  <a role="button" class="btn btn-primary" v-if="e.credit.client.phone_1 != null" target="_blank"
-                  :href="`https://wa.me/57${e.credit.client.phone_1}?text=Hola!`"><i
-                    class="bi bi-whatsapp  "></i> {{ e.credit.client.phone_1 }}</a>
-                <br />
-                <a role="button" class="btn btn-primary" v-if="e.credit.client.phone_2 != null" target="_blank"
-                  :href="`https://wa.me/57${e.credit.client.phone_2}?text=Hola!`"><i
-                    class="bi bi-whatsapp "></i> {{ e.credit.client.phone_2 }}</a>
+                  <a role="button" class="btn btn-primary" v-if="e.credit.client.phone_1" target="_blank"
+                    :href="generateWhatsAppLink(e.credit.client.phone_1, e.id)">
+                    <i class="bi bi-whatsapp"></i> {{ e.credit.client.phone_1 }}
+                  </a>
+                  <br />
+                  <a role="button" class="btn btn-primary" v-if="e.credit.client.phone_2" target="_blank"
+                    :href="generateWhatsAppLink(e.credit.client.phone_2, e.id)">
+                    <i class="bi bi-whatsapp"></i> {{ e.credit.client.phone_2 }}
+                  </a>
                 </template>
               </td>
               <td class="text-right" v-if="$root.validatePermission('entry-delete')">
@@ -152,12 +153,12 @@
       </section>
     </div>
     <modal-entry ref="ModalEntry" @list-entries="listEntries(1)" />
-
   </div>
 </template>
 
 <script>
 import ModalEntry from './ModalEntry.vue';
+
 export default {
   components: { ModalEntry },
   data() {
@@ -180,7 +181,6 @@ export default {
   },
   methods: {
     listEntries(page = 1) {
-
       let data = {
         page: page,
         client: this.search_client,
@@ -191,7 +191,7 @@ export default {
         description: this.search_description,
         results: this.search_results,
         id: this.search_id,
-      }
+      };
 
       let me = this;
       axios
@@ -222,7 +222,6 @@ export default {
     printEntryTicket(id) {
       axios.get(`api/print-entry/${id}`, this.$root.config);
     },
-
     deleteEntry: function (id) {
       let me = this;
 
@@ -245,6 +244,14 @@ export default {
         }
       });
     },
+    generateWhatsAppLink(phone, entryId) {
+      const message = encodeURIComponent(`Hola, Me permito adjuntar Recibo de pago!!`);
+      return `https://wa.me/57${phone}?text=${message}`;
+    },
   },
 };
 </script>
+
+<style scoped>
+/* Aquí puedes incluir tus estilos CSS específicos para este componente */
+</style>

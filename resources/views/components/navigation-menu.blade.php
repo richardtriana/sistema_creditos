@@ -129,7 +129,7 @@
 
       <ul class="navbar-nav justify-content-end ml-auto" v-else>
         <li class="nav-item">
-          <router-link class="nav-link" to="/login">{{ __('Login') }}</router-link>
+          <h5><router-link class="nav-link" to="/login">{{ __('Ingresar') }}</router-link></h5>
         </li>
       </ul>
     </div>
