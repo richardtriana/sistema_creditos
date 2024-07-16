@@ -517,11 +517,11 @@ class InstallmentController extends Controller
     $sub_amount_box->subAmountBox($request, $box->id, $paid_balance);
 
     //Actualizar valores de cuotas
-    if ($configurations->method &&  $configurations->method == "GENERAL") {
-      $generalMethod->updateInstallments($credit->id);
-    } else {
-      $franchiseMethod->updateInstallments($credit->id);
-    }
+    //if ($configurations->method &&  $configurations->method == "GENERAL") {
+      //$generalMethod->updateInstallments($credit->id);
+    //} else {
+      //$franchiseMethod->updateInstallments($credit->id);
+    //}
 
     return $installment;
   }

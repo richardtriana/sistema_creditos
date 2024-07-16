@@ -20,15 +20,15 @@
                   :min="min_amount" />
                 <small id="addAmountHelpBlock" class="form-text text-muted">
                   Monto mínimo
-                  {{ min_amount | currency }}
+                  {{ 0 | currency }}
                 </small>
               </div>
               <div class="col-3 form-group">
                 <input type="number" step="any" class="form-control" id="new_interest" v-model="new_interest" min="0">
               </div>
               <div class="form-group col-3">
-                <button class="btn btn-primary my-auto" @click="payCredit()" v-if="amount_value > min_amount">
-                  Abonar <b>{{ amount_value | currency }}</b>
+                <button class="btn btn-primary my-auto" @click="payCredit()" v-if="amount_value > 0 ">
+                  Abonar <b>{{ 0 | currency }}</b>
                 </button>
                 <button v-else class="btn btn-secondary my-auto" disabled>
                   <i class="bi bi-currency-dollar"></i> Abonar a crédito
